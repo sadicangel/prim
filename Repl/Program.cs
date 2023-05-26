@@ -30,7 +30,7 @@ while (true)
     var binder = new Binder();
     var boundExpression = binder.BindExpression(syntaxTree.Root);
 
-    var diagnosists = syntaxTree.Diagnostics.Concat(binder.Diagnostics);
+    var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics);
 
     if (showTree)
     {
@@ -40,13 +40,30 @@ while (true)
 
     Console.ResetColor();
 
-    if (diagnosists.Any())
+    if (diagnostics.Any())
     {
-        foreach (var diagnostic in diagnosists)
+        foreach (var diagnostic in diagnostics)
         {
+            Console.WriteLine();
             Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
-            Console.WriteLine(diagnostic.Message);
+            Console.WriteLine(diagnostic);
+            Console.ResetColor();
+
+            var prefix = line[..diagnostic.Span.Start];
+            var error = line[diagnostic.Span.Range];
+            var suffix = line[diagnostic.Span.End..];
+
+            Console.Write("    ");
+            Console.Write(prefix);
+
+            Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
+            Console.Write(error);
+            Console.ResetColor();
+
+            Console.Write(suffix);
+            Console.WriteLine();
         }
+        Console.WriteLine();
 
         Console.ResetColor();
     }

@@ -3,12 +3,11 @@
 public sealed class Parser
 {
     private readonly List<Token> _tokens;
-    private readonly List<Diagnostic> _diagnostics;
+    private readonly DiagnosticBag _diagnostics = new();
 
     public Parser(string text)
     {
         _tokens = new List<Token>();
-        _diagnostics = new List<Diagnostic>();
 
         var lexer = new Lexer(text);
         Token token;
@@ -46,7 +45,7 @@ public sealed class Parser
         if (Current.Kind == tokenKind)
             return NextToken();
 
-        _diagnostics.Add(Diagnostic.UnexpectedToken(Current.Kind, tokenKind));
+        _diagnostics.ReportUnexpectedToken(tokenKind, Current);
         return new Token(tokenKind, Current.Position, "", null);
     }
 

@@ -2,6 +2,8 @@
 
 public sealed record class Token(TokenKind Kind, int Position, string Text, object? Value = null) : IPrintableNode
 {
+    public TextSpan Span { get => new TextSpan(Position, Text.Length); }
+
     public void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true)
     {
         var marker = isLast ? "└──" : "├──";

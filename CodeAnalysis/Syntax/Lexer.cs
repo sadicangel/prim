@@ -3,12 +3,11 @@
 public sealed class Lexer
 {
     private readonly string _text;
-    private readonly List<Diagnostic> _diagnostics;
+    private readonly DiagnosticBag _diagnostics = new();
 
     public Lexer(string text)
     {
         _text = text;
-        _diagnostics = new List<Diagnostic>();
     }
 
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
@@ -29,8 +28,9 @@ public sealed class Lexer
 
     private int Next(int stride = 1)
     {
+        var position = Position;
         Position += stride;
-        return Position;
+        return position;
     }
 
     public Token NextToken()
@@ -40,10 +40,10 @@ public sealed class Lexer
             return new Token(TokenKind.EOF, Position, "\0");
         }
 
+        var start = Position;
+
         if (char.IsDigit(Current))
         {
-            var start = Position;
-
             do
             {
                 Next();
@@ -53,14 +53,12 @@ public sealed class Lexer
             var length = Position - start;
             var text = _text.Substring(start, length);
             if (!long.TryParse(text, out var value))
-                _diagnostics.Add(Diagnostic.InvalidNumber(text));
+                _diagnostics.ReportInvalidNumber(new TextSpan(start, length), text, typeof(long));
             return new Token(TokenKind.Int64, Position, text, value);
         }
 
         if (char.IsWhiteSpace(Current))
         {
-            var start = Position;
-
             do
             {
                 Next();
@@ -75,8 +73,6 @@ public sealed class Lexer
 
         if (char.IsLetter(Current))
         {
-            var start = Position;
-
             do
             {
                 Next();
@@ -116,7 +112,7 @@ public sealed class Lexer
                 return new Token(TokenKind.PipePipe, Next(2), "||");
         }
 
-        _diagnostics.Add(Diagnostic.InvalidCharacter(Current));
+        _diagnostics.ReportInvalidCharacter(Position, Current);
         return new Token(TokenKind.Invalid, Next(), _text.Substring(Position - 1, 1));
     }
 }

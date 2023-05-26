@@ -4,7 +4,7 @@ namespace CodeAnalysis.Binding;
 
 public sealed class Binder : IExpressionVisitor<BoundExpression>
 {
-    private readonly List<Diagnostic> _diagnostics = new();
+    private readonly DiagnosticBag _diagnostics = new();
 
     public BoundExpression BindExpression(Expression expression)
     {
@@ -24,7 +24,7 @@ public sealed class Binder : IExpressionVisitor<BoundExpression>
         var boundOperator = BoundUnaryOperator.Bind(expression.OperatorToken.Kind, boundOperand.Type);
         if (boundOperator is null)
         {
-            _diagnostics.Add(Diagnostic.InvalidUnaryOperator(expression.OperatorToken.Text, boundOperand.Type));
+            _diagnostics.ReportUndefinedUnaryOperator(expression.OperatorToken, boundOperand.Type);
             return boundOperand;
         }
         return new BoundUnaryExpression(boundOperator, boundOperand);
@@ -37,7 +37,7 @@ public sealed class Binder : IExpressionVisitor<BoundExpression>
         var boundOperator = BoundBinaryOperator.Bind(expression.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
         if (boundOperator is null)
         {
-            _diagnostics.Add(Diagnostic.InvalidBinaryOperator(expression.OperatorToken.Text, boundLeft.Type, boundRight.Type));
+            _diagnostics.ReportUndefinedBinaryOperator(expression.OperatorToken, boundLeft.Type, boundRight.Type);
             return boundLeft;
         }
         return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
