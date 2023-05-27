@@ -14,9 +14,9 @@ public sealed class Compilation
 
     public SyntaxTree SyntaxTree { get; }
 
-    public EvaluationResult Evaluate()
+    public EvaluationResult Evaluate(Dictionary<Variable, object> variables)
     {
-        var binder = new Binder();
+        var binder = new Binder(variables);
         var boundExpression = binder.BindExpression(SyntaxTree.Root);
 
         var diagnostics = SyntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
@@ -24,7 +24,7 @@ public sealed class Compilation
         {
             return new EvaluationResult(null, diagnostics);
         }
-        var evaluator = new Evaluator(boundExpression);
+        var evaluator = new Evaluator(boundExpression, variables);
         var value = evaluator.Evaluate();
 
         return new EvaluationResult(value, Enumerable.Empty<Diagnostic>());

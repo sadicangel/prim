@@ -106,6 +106,8 @@ public sealed class Lexer
                 return new Token(TokenKind.Bang, Next(), "!");
             case '=' when Lookahead is '=':
                 return new Token(TokenKind.EqualsEquals, Next(2), "==");
+            case '=':
+                return new Token(TokenKind.Equals, Next(), "=");
             case '&' when Lookahead is '&':
                 return new Token(TokenKind.AmpersandAmpersand, Next(2), "&&");
             case '|' when Lookahead is '|':

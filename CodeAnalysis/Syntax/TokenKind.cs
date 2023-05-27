@@ -16,6 +16,7 @@ public enum TokenKind
     False,
     Identifier,
     Bang,
+    Equals,
     AmpersandAmpersand,
     PipePipe,
     EqualsEquals,

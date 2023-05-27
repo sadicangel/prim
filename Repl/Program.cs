@@ -1,6 +1,7 @@
 ﻿using CodeAnalysis;
-using CodeAnalysis.Binding;
 using CodeAnalysis.Syntax;
+
+var variables = new Dictionary<Variable, object>();
 
 var showTree = false;
 
@@ -27,10 +28,10 @@ while (true)
     }
 
     var syntaxTree = SyntaxTree.Parse(line);
-    var binder = new Binder();
-    var boundExpression = binder.BindExpression(syntaxTree.Root);
+    var compilation = new Compilation(syntaxTree);
+    var result = compilation.Evaluate(variables);
 
-    var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics);
+    var diagnostics = result.Diagnostics;
 
     if (showTree)
     {
@@ -40,7 +41,11 @@ while (true)
 
     Console.ResetColor();
 
-    if (diagnostics.Any())
+    if (!diagnostics.Any())
+    {
+        Console.WriteLine(result.Value);
+    }
+    else
     {
         foreach (var diagnostic in diagnostics)
         {
@@ -66,10 +71,5 @@ while (true)
         Console.WriteLine();
 
         Console.ResetColor();
-    }
-    else
-    {
-        var evaluator = new Evaluator(boundExpression);
-        Console.WriteLine(evaluator.Evaluate());
     }
 }

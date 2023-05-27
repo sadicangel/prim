@@ -56,14 +56,32 @@ public sealed class Parser
         return new SyntaxTree(_diagnostics, expression, eofToken);
     }
 
-    private Expression ParseExpression(int parentPrecedence = 0)
+    private Expression ParseExpression()
+    {
+        return ParseAssignmentExpression();
+    }
+
+    private Expression ParseAssignmentExpression()
+    {
+        if (Peek(0).Kind == TokenKind.Identifier && Peek(1).Kind == TokenKind.Equals)
+        {
+            var identifierToken = NextToken();
+            var operatorToken = NextToken();
+            var right = ParseAssignmentExpression();
+            return new AssignmentExpression(identifierToken, operatorToken, right);
+        }
+
+        return ParseBinaryExpression();
+    }
+
+    private Expression ParseBinaryExpression(int parentPrecedence = 0)
     {
         Expression left;
         var unaryPrecendence = Current.Kind.GetUnaryOperatorPrecendence();
         if (unaryPrecendence != 0 && unaryPrecendence >= parentPrecedence)
         {
             var operationToken = NextToken();
-            var operand = ParseExpression(unaryPrecendence);
+            var operand = ParseBinaryExpression(unaryPrecendence);
             left = new UnaryExpression(operationToken, operand);
         }
         else
@@ -78,7 +96,7 @@ public sealed class Parser
                 break;
 
             var operatorToken = NextToken();
-            var right = ParseExpression(precendence);
+            var right = ParseBinaryExpression(precendence);
             left = new BinaryExpression(left, operatorToken, right);
         }
         return left;
@@ -89,16 +107,14 @@ public sealed class Parser
         switch (Current.Kind)
         {
             case TokenKind.OpenParenthesis:
-                var left = NextToken();
-                var expression = ParseExpression();
-                var right = MatchToken(TokenKind.CloseParenthesis);
-
-                return new GroupExpression(left, expression, right);
+                return new GroupExpression(NextToken(), ParseExpression(), MatchToken(TokenKind.CloseParenthesis));
 
             case TokenKind.False or TokenKind.True:
-                var token = NextToken();
-                var value = token.Kind == TokenKind.True;
-                return new LiteralExpression(token, value);
+                var booleanToken = NextToken();
+                return new LiteralExpression(booleanToken, booleanToken.Kind == TokenKind.True);
+
+            case TokenKind.Identifier:
+                return new NameExpression(NextToken());
 
             default:
                 var literal = MatchToken(TokenKind.Int64);

@@ -23,4 +23,5 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
 
     public void ReportUndefinedUnaryOperator(Token @operator, Type operandType) => ReportError(@operator.Span, $"Unary operator '{@operator.Text}' is not defined for type {operandType.Name}");
     public void ReportUndefinedBinaryOperator(Token @operator, Type leftType, Type rightType) => ReportError(@operator.Span, $"Binary operator '{@operator.Text}' is not defined for types {leftType.Name} and {rightType.Name}");
+    public void ReportUndefinedName(Token identifer) => ReportError(identifer.Span, $"Variable '{identifer.Text}' does not exist");
 }

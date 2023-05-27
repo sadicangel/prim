@@ -5,16 +5,24 @@ namespace CodeAnalysis;
 public sealed class Evaluator : IBoundExpressionVisitor<object>
 {
     private readonly BoundExpression _boundExpression;
+    private readonly Dictionary<Variable, object> _variables;
 
-    public Evaluator(BoundExpression boundExpression)
+    public Evaluator(BoundExpression boundExpression, Dictionary<Variable, object> variables)
     {
         _boundExpression = boundExpression;
+        _variables = variables;
     }
 
     public object Evaluate() => _boundExpression.Accept(this);
 
 
     object IBoundExpressionVisitor<object>.Visit(BoundExpression expression) => expression.Accept(this);
+
+    object IBoundExpressionVisitor<object>.Visit(BoundLiteralExpression expression) => expression.Value!;
+
+    object IBoundExpressionVisitor<object>.Visit(BoundVariableExpression expression) => _variables[expression.Variable];
+
+    object IBoundExpressionVisitor<object>.Visit(BoundAssignmentExpression expression) => _variables[expression.Variable] = expression.Expression.Accept(this);
 
     object IBoundExpressionVisitor<object>.Visit(BoundUnaryExpression expression)
     {
@@ -53,6 +61,4 @@ public sealed class Evaluator : IBoundExpressionVisitor<object>
             _ => throw new InvalidOperationException($"Unexpected binary operator {kind}"),
         };
     }
-
-    object IBoundExpressionVisitor<object>.Visit(BoundLiteralExpression expression) => expression.Value!;
 }

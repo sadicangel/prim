@@ -13,4 +13,8 @@ public interface IExpressionVisitor<out TResult>
     TResult Visit(BinaryExpression expression);
 
     TResult Visit(LiteralExpression expression);
+
+    TResult Visit(AssignmentExpression expression);
+
+    TResult Visit(NameExpression expression);
 }
