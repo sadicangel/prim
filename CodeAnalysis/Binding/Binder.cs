@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Syntax;
+using System.Runtime.Serialization;
 
 namespace CodeAnalysis.Binding;
 
@@ -78,7 +79,7 @@ public sealed class Binder : IExpressionVisitor<BoundExpression>
 
         var variable = new Variable(name, boundExpression.Type);
         _variables[variable] = boundExpression.Type.IsValueType
-            ? Activator.CreateInstance(boundExpression.Type)!
+            ? FormatterServices.GetUninitializedObject(boundExpression.Type)
             : throw new InvalidOperationException($"Unsupported variable type {boundExpression.Type.Name}");
 
         return new BoundAssignmentExpression(variable, boundExpression);
