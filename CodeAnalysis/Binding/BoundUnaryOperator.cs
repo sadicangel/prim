@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-public sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, Type OperandType, Type ResultType)
+internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, Type OperandType, Type ResultType)
 {
     private static readonly BoundUnaryOperator[] Operators =
     {

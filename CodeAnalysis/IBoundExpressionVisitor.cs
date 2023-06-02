@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis;
 
-public interface IBoundExpressionVisitor<out TResult>
+internal interface IBoundExpressionVisitor<out TResult>
 {
     TResult Visit(BoundExpression expression);
 

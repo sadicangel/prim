@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Binding;
 
-public sealed record class BoundUnaryExpression(BoundUnaryOperator Operator, BoundExpression Operand) : BoundExpression(BoundNodeKind.UnaryExpression, Operator.ResultType)
+internal sealed record class BoundUnaryExpression(BoundUnaryOperator Operator, BoundExpression Operand) : BoundExpression(BoundNodeKind.UnaryExpression, Operator.ResultType)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
 }

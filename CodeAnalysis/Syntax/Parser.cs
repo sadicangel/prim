@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed class Parser
+internal sealed class Parser
 {
     private readonly List<Token> _tokens;
     private readonly DiagnosticBag _diagnostics = new();

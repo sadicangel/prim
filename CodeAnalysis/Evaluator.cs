@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis;
 
-public sealed class Evaluator : IBoundExpressionVisitor<object>
+internal sealed class Evaluator : IBoundExpressionVisitor<object>
 {
     private readonly BoundExpression _boundExpression;
     private readonly Dictionary<Variable, object> _variables;

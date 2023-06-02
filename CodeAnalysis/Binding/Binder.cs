@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace CodeAnalysis.Binding;
 
-public sealed class Binder : IExpressionVisitor<BoundExpression>
+internal sealed class Binder : IExpressionVisitor<BoundExpression>
 {
     private readonly DiagnosticBag _diagnostics = new();
     private readonly Dictionary<Variable, object> _variables;

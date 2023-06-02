@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-public sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinaryOperatorKind Kind, Type LeftType, Type RightType, Type ResultType)
+internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinaryOperatorKind Kind, Type LeftType, Type RightType, Type ResultType)
 {
     private static readonly BoundBinaryOperator[] Operators =
     {

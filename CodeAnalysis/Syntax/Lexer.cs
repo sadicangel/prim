@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed class Lexer
+internal sealed class Lexer
 {
     private readonly string _text;
     private readonly DiagnosticBag _diagnostics = new();
