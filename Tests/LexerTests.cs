@@ -6,6 +6,23 @@ public sealed class LexerTests
 {
     public readonly record struct TokenInfo(TokenKind Kind, string Text);
 
+    [Fact]
+    public void Lexer_Tests_AllTokens()
+    {
+        var tokenKinds = Enum.GetValues<TokenKind>().ToList();
+
+        var testedTokenKinds = GetTokens().Concat(GetSeparatorTokens()).Select(t => t.Kind);
+
+        var untestedTokenKinds = new SortedSet<TokenKind>(tokenKinds);
+
+        untestedTokenKinds.Remove(TokenKind.Invalid);
+        untestedTokenKinds.Remove(TokenKind.EOF);
+
+        untestedTokenKinds.ExceptWith(testedTokenKinds);
+
+        Assert.Empty(untestedTokenKinds);
+    }
+
     public static IEnumerable<object[]> GetTokensData() => GetTokens().Concat(GetSeparatorTokens()).Select(t => new object[] { t.Kind, t.Text });
 
     [Theory]
