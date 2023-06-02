@@ -53,27 +53,14 @@ public sealed class LexerTests
 
     private static IEnumerable<TokenInfo> GetTokens()
     {
-        return new[]
+        return GetFixedTokens().Concat(GetDynamicTokens());
+
+        static IEnumerable<TokenInfo> GetFixedTokens() => Enum.GetValues<TokenKind>()
+            .Select(k => new TokenInfo(k, SyntaxFacts.GetText(k)!))
+            .Where(t => t.Text is not null);
+
+        static IEnumerable<TokenInfo> GetDynamicTokens() => new[]
         {
-            new TokenInfo(TokenKind.Plus, "+"),
-            new TokenInfo(TokenKind.Minus, "-"),
-            new TokenInfo(TokenKind.Star, "*"),
-            new TokenInfo(TokenKind.Slash, "/"),
-            new TokenInfo(TokenKind.Bang, "!"),
-            new TokenInfo(TokenKind.Equals, "="),
-
-            new TokenInfo(TokenKind.AmpersandAmpersand, "&&"),
-            new TokenInfo(TokenKind.PipePipe, "||"),
-
-            new TokenInfo(TokenKind.EqualsEquals, "=="),
-            new TokenInfo(TokenKind.BangEquals, "!="),
-
-            new TokenInfo(TokenKind.OpenParenthesis, "("),
-            new TokenInfo(TokenKind.CloseParenthesis, ")"),
-
-            new TokenInfo(TokenKind.False, "false"),
-            new TokenInfo(TokenKind.True, "true"),
-
             new TokenInfo(TokenKind.Int64, "1"),
             new TokenInfo(TokenKind.Int64, "123"),
 
