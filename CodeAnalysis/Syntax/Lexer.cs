@@ -12,109 +12,162 @@ internal sealed class Lexer
 
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
 
-    public int Position { get; private set; }
+    private int _position;
+    private int _start;
+    private TokenKind _kind;
+    private object? _value;
 
     private char Current { get => Peek(0); }
 
     private char Lookahead { get => Peek(1); }
 
-    public bool IsEOF { get => Position >= _text.Length; }
+    public bool IsEOF { get => _position >= _text.Length; }
 
     private char Peek(int offset)
     {
-        var index = Position + offset;
+        var index = _position + offset;
         return index < _text.Length ? _text[index] : '\0';
-    }
-
-    private int Next(int stride = 1)
-    {
-        var position = Position;
-        Position += stride;
-        return position;
     }
 
     public Token NextToken()
     {
-        if (IsEOF)
-        {
-            return new Token(TokenKind.EOF, Position, "\0");
-        }
-
-        var start = Position;
-
-        if (char.IsDigit(Current))
-        {
-            do
-            {
-                Next();
-            }
-            while (char.IsDigit(Current));
-
-            var length = Position - start;
-            var text = _text.Substring(start, length);
-            if (!long.TryParse(text, out var value))
-                _diagnostics.ReportInvalidNumber(new TextSpan(start, length), text, typeof(long));
-            return new Token(TokenKind.Int64, Position, text, value);
-        }
-
-        if (char.IsWhiteSpace(Current))
-        {
-            do
-            {
-                Next();
-            }
-            while (char.IsWhiteSpace(Current));
-
-            var length = Position - start;
-            var text = _text.Substring(start, length);
-
-            return new Token(TokenKind.WhiteSpace, Position, text);
-        }
-
-        if (char.IsLetter(Current))
-        {
-            do
-            {
-                Next();
-            }
-            while (char.IsLetter(Current));
-
-            var length = Position - start;
-            var text = _text.Substring(start, length);
-            var kind = text.GetKeywordKind();
-
-            return new Token(kind, Position, text);
-        }
+        _start = _position;
+        _kind = TokenKind.Invalid;
+        _value = null;
 
         switch (Current)
         {
-            case '+':
-                return new Token(TokenKind.Plus, Next(), "+");
-            case '-':
-                return new Token(TokenKind.Minus, Next(), "-");
-            case '*':
-                return new Token(TokenKind.Star, Next(), "*");
-            case '/':
-                return new Token(TokenKind.Slash, Next(), "/");
-            case '(':
-                return new Token(TokenKind.OpenParenthesis, Next(), "(");
-            case ')':
-                return new Token(TokenKind.CloseParenthesis, Next(), ")");
-            case '!' when Lookahead is '=':
-                return new Token(TokenKind.BangEquals, Next(2), "!=");
-            case '!':
-                return new Token(TokenKind.Bang, Next(), "!");
-            case '=' when Lookahead is '=':
-                return new Token(TokenKind.EqualsEquals, Next(2), "==");
-            case '=':
-                return new Token(TokenKind.Equals, Next(), "=");
-            case '&' when Lookahead is '&':
-                return new Token(TokenKind.AmpersandAmpersand, Next(2), "&&");
-            case '|' when Lookahead is '|':
-                return new Token(TokenKind.PipePipe, Next(2), "||");
-        }
+            case '\0':
+                _kind = TokenKind.EOF;
+                break;
 
-        _diagnostics.ReportInvalidCharacter(Position, Current);
-        return new Token(TokenKind.Invalid, Next(), _text.Substring(Position - 1, 1));
+            case '+':
+                _kind = TokenKind.Plus;
+                _position++;
+                break;
+
+            case '-':
+                _kind = TokenKind.Minus;
+                _position++;
+                break;
+
+            case '*':
+                _kind = TokenKind.Star;
+                _position++;
+                break;
+
+            case '/':
+                _kind = TokenKind.Slash;
+                _position++;
+                break;
+
+            case '(':
+                _kind = TokenKind.OpenParenthesis;
+                _position++;
+                break;
+
+            case ')':
+                _kind = TokenKind.CloseParenthesis;
+                _position++;
+                break;
+
+            case '!' when Lookahead is '=':
+                _kind = TokenKind.BangEquals;
+                _position += 2;
+                break;
+
+            case '!':
+                _kind = TokenKind.Bang;
+                _position++;
+                break;
+
+            case '=' when Lookahead is '=':
+                _kind = TokenKind.EqualsEquals;
+                _position += 2;
+                break;
+
+            case '=':
+                _kind = TokenKind.Equals;
+                _position++;
+                break;
+
+            case '&' when Lookahead is '&':
+                _kind = TokenKind.AmpersandAmpersand;
+                _position += 2;
+                break;
+
+            case '|' when Lookahead is '|':
+                _kind = TokenKind.PipePipe;
+                _position += 2;
+                break;
+
+            case '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9':
+                ReadNumberToken();
+                break;
+
+            case 'A' or 'B' or 'C' or 'D' or 'E' or 'F' or 'G' or 'H' or 'I' or 'J' or 'K' or 'L' or 'M' or 'N' or 'O' or 'P' or 'Q' or 'R' or 'S' or 'T' or 'U' or 'V' or 'W' or 'X' or 'Y' or 'Z' or
+                 'a' or 'b' or 'c' or 'd' or 'e' or 'f' or 'g' or 'h' or 'i' or 'j' or 'k' or 'l' or 'm' or 'n' or 'o' or 'p' or 'q' or 'r' or 's' or 't' or 'u' or 'v' or 'w' or 'x' or 'y' or 'z':
+                ReadIdentifier();
+                break;
+
+            case ' ' or '\t' or '\n' or '\r':
+                ReadWhiteSpace();
+                break;
+
+            case char when Char.IsWhiteSpace(Current):
+                ReadWhiteSpace();
+                break;
+
+            default:
+                _diagnostics.ReportInvalidCharacter(_position, Current);
+                _kind = TokenKind.Invalid;
+                _position++;
+                break;
+        }
+        var text = SyntaxFacts.GetText(_kind) ?? _text[_start.._position];
+
+        return new Token(_kind, _start, text, _value);
+    }
+
+    private void ReadIdentifier()
+    {
+        do
+        {
+            _position++;
+        }
+        while (Char.IsLetter(Current));
+
+        var length = _position - _start;
+        var text = _text.Substring(_start, length);
+        _kind = text.GetKeywordKind();
+    }
+
+    private void ReadWhiteSpace()
+    {
+        do
+        {
+            _position++;
+        }
+        while (Char.IsWhiteSpace(Current));
+
+        _kind = TokenKind.WhiteSpace;
+    }
+
+    private string ReadNumberToken()
+    {
+        do
+        {
+            _position++;
+        }
+        while (Char.IsDigit(Current));
+
+        var length = _position - _start;
+        var text = _text.Substring(_start, length);
+        if (!long.TryParse(text, out var value))
+            _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, typeof(long));
+
+        _kind = TokenKind.Int64;
+        _value = value;
+        return text;
     }
 }
