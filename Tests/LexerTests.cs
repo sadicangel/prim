@@ -2,7 +2,7 @@ using CodeAnalysis.Syntax;
 
 namespace Tests;
 
-public class LexerTests
+public sealed class LexerTests
 {
     public readonly record struct TokenInfo(TokenKind Kind, string Text);
 

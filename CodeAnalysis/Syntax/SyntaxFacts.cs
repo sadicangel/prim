@@ -24,4 +24,23 @@ internal static class SyntaxFacts
         "true" => TokenKind.True,
         _ => TokenKind.Identifier,
     };
+
+    public static string? GetText(this TokenKind kind) => kind switch
+    {
+        TokenKind.Plus => "+",
+        TokenKind.Minus => "-",
+        TokenKind.Star => "*",
+        TokenKind.Slash => "/",
+        TokenKind.Bang => "!",
+        TokenKind.Equals => "=",
+        TokenKind.AmpersandAmpersand => "&&",
+        TokenKind.PipePipe => "||",
+        TokenKind.EqualsEquals => "==",
+        TokenKind.BangEquals => "!=",
+        TokenKind.OpenParenthesis => "(",
+        TokenKind.CloseParenthesis => ")",
+        TokenKind.False => "false",
+        TokenKind.True => "true",
+        _ => null
+    };
 }
