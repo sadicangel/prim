@@ -1,8 +1,8 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public interface IPrintableNode
+public interface INode
 {
     void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true);
 
-    IEnumerable<IPrintableNode> GetChildren();
+    IEnumerable<INode> GetChildren();
 }

@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class Token(TokenKind Kind, int Position, string Text, object? Value = null) : IPrintableNode
+public sealed record class Token(TokenKind Kind, int Position, string Text, object? Value = null) : INode
 {
     public TextSpan Span { get => new TextSpan(Position, Text.Length); }
 
@@ -26,6 +26,6 @@ public sealed record class Token(TokenKind Kind, int Position, string Text, obje
             child.PrettyPrint(writer, indent, child == lastChild);
     }
 
-    public IEnumerable<IPrintableNode> GetChildren() => Enumerable.Empty<IPrintableNode>();
+    public IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();
 
 }

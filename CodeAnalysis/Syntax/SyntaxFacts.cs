@@ -25,6 +25,10 @@ internal static class SyntaxFacts
         _ => TokenKind.Identifier,
     };
 
+    public static IEnumerable<TokenKind> GetUnaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecendence(k) > 0);
+
+    public static IEnumerable<TokenKind> GetBinaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecendence(k) > 0);
+
     public static string? GetText(this TokenKind kind) => kind switch
     {
         TokenKind.Plus => "+",

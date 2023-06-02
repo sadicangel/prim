@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public abstract record class Node(NodeKind Kind) : IPrintableNode
+public abstract record class Node(NodeKind Kind) : INode
 {
     public void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true)
     {
@@ -19,5 +19,5 @@ public abstract record class Node(NodeKind Kind) : IPrintableNode
             child.PrettyPrint(writer, indent, child == lastChild);
     }
 
-    public abstract IEnumerable<IPrintableNode> GetChildren();
+    public abstract IEnumerable<INode> GetChildren();
 }

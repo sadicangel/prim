@@ -6,5 +6,5 @@ public sealed record class LiteralExpression(Token LiteralToken, object? Value) 
 
     public override T Accept<T>(IExpressionVisitor<T> visitor) => visitor.Visit(this);
 
-    public override IEnumerable<IPrintableNode> GetChildren() { yield return LiteralToken; }
+    public override IEnumerable<INode> GetChildren() { yield return LiteralToken; }
 }
