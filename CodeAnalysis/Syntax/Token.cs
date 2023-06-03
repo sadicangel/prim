@@ -28,4 +28,10 @@ public sealed record class Token(TokenKind Kind, int Position, string Text, obje
 
     public IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();
 
+    public override string ToString()
+    {
+        using var writer = new StringWriter();
+        WriteTo(writer);
+        return writer.ToString();
+    }
 }

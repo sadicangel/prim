@@ -22,4 +22,11 @@ public abstract record class Node(NodeKind Kind) : INode
     }
 
     public abstract IEnumerable<INode> GetChildren();
+
+    public override string ToString()
+    {
+        using var writer = new StringWriter();
+        WriteTo(writer);
+        return writer.ToString();
+    }
 }

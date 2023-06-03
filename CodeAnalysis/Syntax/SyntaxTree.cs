@@ -20,4 +20,11 @@ public sealed record class SyntaxTree(IEnumerable<Diagnostic> Diagnostics, Expre
             yield return token;
         }
     }
+
+    public override string ToString()
+    {
+        using var writer = new StringWriter();
+        WriteTo(writer);
+        return writer.ToString();
+    }
 }
