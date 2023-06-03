@@ -1,13 +1,11 @@
-﻿using CodeAnalysis.Syntax;
-
-namespace Tests;
+﻿namespace CodeAnalysis.Syntax;
 public sealed class SyntaxFactsTests
 {
     [Theory]
     [MemberData(nameof(GetTokenKindData))]
     public void SyntaxFacts_GetText_Roundtrips(TokenKind kind)
     {
-        var text = SyntaxFacts.GetText(kind);
+        var text = kind.GetText();
         if (text is null)
             return;
 

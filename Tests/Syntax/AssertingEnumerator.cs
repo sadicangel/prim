@@ -1,6 +1,4 @@
-﻿using CodeAnalysis.Syntax;
-
-namespace Tests;
+﻿namespace CodeAnalysis.Syntax;
 
 internal sealed class AssertingEnumerator : IDisposable
 {

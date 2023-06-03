@@ -1,7 +1,4 @@
-﻿using CodeAnalysis;
-using CodeAnalysis.Syntax;
-
-namespace Tests;
+﻿namespace CodeAnalysis.Syntax;
 public sealed class EvaluatorTests
 {
     [Theory]

@@ -1,6 +1,4 @@
-using CodeAnalysis.Syntax;
-
-namespace Tests;
+namespace CodeAnalysis.Syntax;
 
 public sealed class LexerTests
 {
@@ -73,7 +71,7 @@ public sealed class LexerTests
         return GetFixedTokens().Concat(GetDynamicTokens());
 
         static IEnumerable<TokenInfo> GetFixedTokens() => Enum.GetValues<TokenKind>()
-            .Select(k => new TokenInfo(k, SyntaxFacts.GetText(k)!))
+            .Select(k => new TokenInfo(k, k.GetText()!))
             .Where(t => t.Text is not null);
 
         static IEnumerable<TokenInfo> GetDynamicTokens() => new[]
