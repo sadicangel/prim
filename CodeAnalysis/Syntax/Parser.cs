@@ -104,21 +104,39 @@ internal sealed class Parser
 
     private Expression ParsePrimaryExpression()
     {
-        switch (Current.Kind)
+        return Current.Kind switch
         {
-            case TokenKind.OpenParenthesis:
-                return new GroupExpression(NextToken(), ParseExpression(), MatchToken(TokenKind.CloseParenthesis));
+            TokenKind.OpenParenthesis => ParseGroupExpression(),
+            TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(),
+            TokenKind.Int64 => ParseNumberLiteralExpression(),
+            _ => ParseNameExpression(),
+        };
+    }
 
-            case TokenKind.False or TokenKind.True:
-                var booleanToken = NextToken();
-                return new LiteralExpression(booleanToken, booleanToken.Kind == TokenKind.True);
+    private Expression ParseGroupExpression()
+    {
+        var left = MatchToken(TokenKind.OpenParenthesis);
+        var expression = ParseExpression();
+        var right = MatchToken(TokenKind.CloseParenthesis);
+        return new GroupExpression(left, expression, right);
+    }
 
-            case TokenKind.Identifier:
-                return new NameExpression(NextToken());
+    private Expression ParseBooleanLiteralExpression()
+    {
+        var isTrue = Current.Kind == TokenKind.True;
+        var booleanToken = MatchToken(isTrue ? TokenKind.True : TokenKind.False);
+        return new LiteralExpression(booleanToken, isTrue);
+    }
 
-            default:
-                var literal = MatchToken(TokenKind.Int64);
-                return new LiteralExpression(literal);
-        }
+    private Expression ParseNumberLiteralExpression()
+    {
+        var literal = MatchToken(TokenKind.Int64);
+        return new LiteralExpression(literal);
+    }
+
+    private Expression ParseNameExpression()
+    {
+        var identifierToken = MatchToken(TokenKind.Identifier);
+        return new NameExpression(identifierToken);
     }
 }
