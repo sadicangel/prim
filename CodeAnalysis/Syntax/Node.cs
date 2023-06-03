@@ -4,7 +4,7 @@ public abstract record class Node(NodeKind Kind) : INode
 {
     public TextSpan Span { get => GetChildren().Last().Span - GetChildren().First().Span; }
 
-    public void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true)
+    public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
         var marker = isLast ? "└──" : "├──";
 
@@ -18,7 +18,7 @@ public abstract record class Node(NodeKind Kind) : INode
         var lastChild = GetChildren().LastOrDefault();
 
         foreach (var child in GetChildren())
-            child.PrettyPrint(writer, indent, child == lastChild);
+            child.WriteTo(writer, indent, child == lastChild);
     }
 
     public abstract IEnumerable<INode> GetChildren();

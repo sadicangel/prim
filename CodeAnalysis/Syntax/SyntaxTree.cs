@@ -4,7 +4,7 @@ public sealed record class SyntaxTree(IEnumerable<Diagnostic> Diagnostics, Expre
 {
     TextSpan INode.Span { get => Root.Span; }
 
-    public void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true) => Root.PrettyPrint(writer, indent, isLast);
+    public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Root.WriteTo(writer, indent, isLast);
     IEnumerable<INode> INode.GetChildren() => Root.GetChildren();
 
     public static SyntaxTree Parse(string text) => new Parser(text).Parse();

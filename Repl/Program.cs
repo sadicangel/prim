@@ -36,7 +36,7 @@ while (true)
     if (showTree)
     {
         Console.ForegroundColor = ConsoleColor.DarkGray;
-        syntaxTree.PrettyPrint(Console.Out);
+        syntaxTree.WriteTo(Console.Out);
     }
 
     Console.ResetColor();

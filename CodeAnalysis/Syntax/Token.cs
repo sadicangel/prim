@@ -4,7 +4,7 @@ public sealed record class Token(TokenKind Kind, int Position, string Text, obje
 {
     public TextSpan Span { get => new(Position, Text.Length); }
 
-    public void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true)
+    public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
         var marker = isLast ? "└──" : "├──";
 
@@ -23,7 +23,7 @@ public sealed record class Token(TokenKind Kind, int Position, string Text, obje
         var lastChild = GetChildren().LastOrDefault();
 
         foreach (var child in GetChildren())
-            child.PrettyPrint(writer, indent, child == lastChild);
+            child.WriteTo(writer, indent, child == lastChild);
     }
 
     public IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();
