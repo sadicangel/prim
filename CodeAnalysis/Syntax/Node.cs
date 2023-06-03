@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Text;
+
+namespace CodeAnalysis.Syntax;
 
 public abstract record class Node(NodeKind Kind) : INode
 {

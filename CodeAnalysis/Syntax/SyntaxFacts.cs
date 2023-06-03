@@ -18,7 +18,9 @@ internal static class SyntaxFacts
         _ => 0,
     };
 
-    public static TokenKind GetKeywordKind(this string text) => text switch
+    public static TokenKind GetKeywordKind(this string text) => GetKeywordKind(text.AsSpan());
+
+    public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
         "false" => TokenKind.False,
         "true" => TokenKind.True,

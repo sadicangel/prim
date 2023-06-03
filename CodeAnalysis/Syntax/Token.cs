@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Text;
+
+namespace CodeAnalysis.Syntax;
 
 public sealed record class Token(TokenKind Kind, int Position, string Text, object? Value = null) : INode
 {

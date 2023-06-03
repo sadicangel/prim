@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis;
+﻿namespace CodeAnalysis.Text;
 
 public readonly record struct TextSpan(int Start, int Length)
 {

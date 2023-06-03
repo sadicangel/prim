@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Text;
+
+namespace CodeAnalysis.Syntax;
 
 public interface INode
 {

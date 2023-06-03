@@ -1,20 +1,23 @@
 ﻿using CodeAnalysis;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
+using System.Text;
 
 var variables = new Dictionary<Variable, object>();
 
 var showTree = false;
 
+var builder = new StringBuilder();
+
 while (true)
 {
-    Console.Write("> ");
-    var line = Console.ReadLine();
-    if (String.IsNullOrWhiteSpace(line))
-        return;
+    Console.Write(builder.Length == 0 ? "> " : "| ");
 
-    if (line.StartsWith('\\'))
+    var input = Console.ReadLine();
+
+    if (builder.Length == 0)
     {
-        switch (line)
+        switch (input)
         {
             case "\\showtree":
                 showTree = true;
@@ -27,7 +30,12 @@ while (true)
         }
     }
 
-    var syntaxTree = SyntaxTree.Parse(line);
+    builder.AppendLine(input);
+    var syntaxTree = SyntaxTree.Parse(builder.ToString());
+
+    if (!String.IsNullOrWhiteSpace(input) && syntaxTree.Diagnostics.Any())
+        continue;
+
     var compilation = new Compilation(syntaxTree);
     var result = compilation.Evaluate(variables);
 
@@ -49,27 +57,38 @@ while (true)
     {
         foreach (var diagnostic in diagnostics)
         {
+            var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
+            var lineNumber = lineIndex + 1;
+            var line = syntaxTree.Text.Lines[lineIndex];
+            var character = diagnostic.Span.Start - line.Start + 1;
+
             Console.WriteLine();
             Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
+            Console.Write($"({lineNumber}, {character}): ");
             Console.WriteLine(diagnostic);
             Console.ResetColor();
 
-            var prefix = line[..diagnostic.Span.Start];
-            var error = line[diagnostic.Span.Range];
-            var suffix = line[diagnostic.Span.End..];
+            var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
+            var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+
+            var prefix = syntaxTree.Text[prefixSpan];
+            var error = syntaxTree.Text[diagnostic.Span];
+            var suffix = syntaxTree.Text[suffixSpan];
 
             Console.Write("    ");
-            Console.Write(prefix);
+            Console.Write(prefix.ToString());
 
             Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
-            Console.Write(error);
+            Console.Write(error.ToString());
             Console.ResetColor();
 
-            Console.Write(suffix);
+            Console.Write(suffix.ToString());
             Console.WriteLine();
         }
         Console.WriteLine();
 
         Console.ResetColor();
     }
+
+    builder.Clear();
 }

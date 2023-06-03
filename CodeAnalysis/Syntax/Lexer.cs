@@ -1,11 +1,13 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Text;
+
+namespace CodeAnalysis.Syntax;
 
 internal sealed class Lexer
 {
-    private readonly string _text;
+    private readonly SourceText _text;
     private readonly DiagnosticBag _diagnostics = new();
 
-    public Lexer(string text)
+    public Lexer(SourceText text)
     {
         _text = text;
     }
@@ -126,7 +128,7 @@ internal sealed class Lexer
         }
         var text = SyntaxFacts.GetText(_kind) ?? _text[_start.._position];
 
-        return new Token(_kind, _start, text, _value);
+        return new Token(_kind, _start, text.ToString(), _value);
     }
 
     private void ReadIdentifier()
@@ -137,8 +139,7 @@ internal sealed class Lexer
         }
         while (Char.IsLetter(Current));
 
-        var length = _position - _start;
-        var text = _text.Substring(_start, length);
+        var text = _text[_start.._position];
         _kind = text.GetKeywordKind();
     }
 
@@ -153,7 +154,7 @@ internal sealed class Lexer
         _kind = TokenKind.WhiteSpace;
     }
 
-    private string ReadNumberToken()
+    private void ReadNumberToken()
     {
         do
         {
@@ -161,13 +162,11 @@ internal sealed class Lexer
         }
         while (Char.IsDigit(Current));
 
-        var length = _position - _start;
-        var text = _text.Substring(_start, length);
+        var text = _text[_start.._position];
         if (!long.TryParse(text, out var value))
-            _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, typeof(long));
+            _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), typeof(long));
 
         _kind = TokenKind.Int64;
         _value = value;
-        return text;
     }
 }

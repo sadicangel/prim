@@ -13,11 +13,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>
         _variables = variables;
     }
 
-    public BoundExpression BindExpression(Expression expression)
-    {
-        IExpressionVisitor<BoundExpression> visitor = this;
-        return visitor.Visit(expression);
-    }
+    public BoundExpression BindExpression(Expression expression) => expression.Accept(this);
 
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
 
@@ -62,7 +58,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>
         if (variable is null)
         {
             _diagnostics.ReportUndefinedName(expression.IdentifierToken);
-            return new BoundLiteralExpression(0);
+            return new BoundLiteralExpression(0L);
         }
 
         return new BoundVariableExpression(variable);
