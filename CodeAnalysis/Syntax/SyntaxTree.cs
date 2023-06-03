@@ -2,6 +2,8 @@
 
 public sealed record class SyntaxTree(IEnumerable<Diagnostic> Diagnostics, Expression Root, Token Eof) : INode
 {
+    TextSpan INode.Span { get => Root.Span; }
+
     public void PrettyPrint(TextWriter writer, string indent = "", bool isLast = true) => Root.PrettyPrint(writer, indent, isLast);
     IEnumerable<INode> INode.GetChildren() => Root.GetChildren();
 
