@@ -77,7 +77,7 @@ public sealed record class SourceText : IReadOnlyList<char>
             }
         }
 
-        if (position > lineStart)
+        if (position >= lineStart)
             lines.Add(CreateLine(sourceText, position, lineStart, 0));
 
         return lines;
