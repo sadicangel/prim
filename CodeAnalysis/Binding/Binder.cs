@@ -1,21 +1,55 @@
 ﻿using CodeAnalysis.Syntax;
-using System.Runtime.Serialization;
 
 namespace CodeAnalysis.Binding;
 
 internal sealed class Binder : IExpressionVisitor<BoundExpression>
 {
     private readonly DiagnosticBag _diagnostics = new();
-    private readonly Dictionary<Variable, object> _variables;
+    private readonly BoundScope _scope;
 
-    public Binder(Dictionary<Variable, object> variables)
+    private Binder(BoundScope? parentScope = null)
     {
-        _variables = variables;
+        _scope = new BoundScope(parentScope);
+    }
+    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
+
+    internal static BoundGlobalScope BindGlobalScope(CompilationUnit compilationUnit, BoundGlobalScope? previousScope = null)
+    {
+        var parentScope = CreateParentScopes(previousScope);
+        var binder = new Binder(parentScope);
+        var expression = binder.BindExpression(compilationUnit.Expression);
+        var variables = binder._scope.DeclaredVariables;
+        var diagnostics = binder.Diagnostics;
+
+        return new BoundGlobalScope(diagnostics, variables, expression, previousScope);
     }
 
-    public BoundExpression BindExpression(Expression expression) => expression.Accept(this);
+    private static BoundScope? CreateParentScopes(BoundGlobalScope? previous)
+    {
+        var stack = new Stack<BoundGlobalScope>();
 
-    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
+        while (previous is not null)
+        {
+            stack.Push(previous);
+            previous = previous.Previous;
+        }
+
+        var parent = default(BoundScope);
+
+        while (stack.Count > 0)
+        {
+            previous = stack.Pop();
+            var scope = new BoundScope(parent);
+            foreach (var v in previous.Variables)
+                scope.TryDeclare(v);
+            parent = scope;
+        }
+
+        return parent;
+    }
+
+    private BoundExpression BindExpression(Expression expression) => expression.Accept(this);
+
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(Expression expression) => expression.Accept(this);
 
@@ -54,8 +88,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(NameExpression expression)
     {
-        var variable = _variables.Keys.FirstOrDefault(v => v.Name == expression.IdentifierToken.Text);
-        if (variable is null)
+        if (!_scope.TryLookup(expression.IdentifierToken.Text, out var variable))
         {
             _diagnostics.ReportUndefinedName(expression.IdentifierToken);
             return new BoundLiteralExpression(0L);
@@ -69,14 +102,17 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>
         var name = expression.IdentifierToken.Text;
         var boundExpression = BindExpression(expression.Expression);
 
-        var existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
-        if (existingVariable is not null)
-            _variables.Remove(existingVariable);
+        if (!_scope.TryLookup(name, out var variable))
+        {
+            variable = new Variable(name, boundExpression.Type);
+            _scope.TryDeclare(variable);
+        }
 
-        var variable = new Variable(name, boundExpression.Type);
-        _variables[variable] = boundExpression.Type.IsValueType
-            ? FormatterServices.GetUninitializedObject(boundExpression.Type)
-            : throw new InvalidOperationException($"Unsupported variable type {boundExpression.Type.Name}");
+        if (boundExpression.Type != variable.Type)
+        {
+            _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, variable.Type);
+            return boundExpression;
+        }
 
         return new BoundAssignmentExpression(variable, boundExpression);
     }

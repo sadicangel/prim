@@ -6,6 +6,7 @@ using System.Text;
 var variables = new Dictionary<Variable, object>();
 var showTree = false;
 var builder = new StringBuilder();
+var previousCompilation = default(Compilation);
 
 while (true)
 {
@@ -26,6 +27,10 @@ while (true)
                 Console.Clear();
                 continue;
 
+            case "\\reset":
+                previousCompilation = null;
+                continue;
+
             case "\\exit":
                 return;
         }
@@ -37,7 +42,7 @@ while (true)
     if (!String.IsNullOrWhiteSpace(input) && syntaxTree.Diagnostics.Any())
         continue;
 
-    var compilation = new Compilation(syntaxTree);
+    var compilation = new Compilation(syntaxTree, previousCompilation);
     var result = compilation.Evaluate(variables);
 
     var diagnostics = result.Diagnostics;
@@ -52,6 +57,7 @@ while (true)
     if (!diagnostics.Any())
     {
         Console.Out.WriteLineColored(result.Value, ConsoleColor.Magenta);
+        previousCompilation = compilation;
     }
     else
     {
@@ -60,13 +66,13 @@ while (true)
             var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
             var lineNumber = lineIndex + 1;
             var line = syntaxTree.Text.Lines[lineIndex];
-            var character = diagnostic.Span.Start - line.Start + 1;
+            var columnIndex = diagnostic.Span.Start - line.Start;
+            var columnNumber = columnIndex + 1;
             var diagnosticColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
 
             Console.WriteLine();
 
-            Console.Out.WriteColored($"({lineNumber}, {character}): ", diagnosticColor);
-            Console.Out.WriteColored(diagnostic, diagnosticColor);
+            Console.Out.WriteLineColored($"({lineNumber}, {columnNumber}): {diagnostic}", diagnosticColor);
 
             var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
             var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
@@ -77,9 +83,12 @@ while (true)
 
             Console.Write("    ");
             Console.Write(prefix.ToString());
-            Console.Out.Write(error.ToString(), diagnosticColor);
+            Console.Out.WriteColored(error.ToString(), diagnosticColor);
             Console.Write(suffix.ToString());
+            Console.WriteLine();
 
+            Console.Write(new string(' ', 4 + columnIndex));
+            Console.Write("˄");
             Console.WriteLine();
         }
         Console.WriteLine();

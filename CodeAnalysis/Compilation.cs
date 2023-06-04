@@ -7,19 +7,32 @@ public sealed record class EvaluationResult(object? Value, IEnumerable<Diagnosti
 
 public sealed class Compilation
 {
-    public Compilation(SyntaxTree syntaxTree)
+    private BoundGlobalScope? _globalScope;
+
+    public Compilation(SyntaxTree syntaxTree, Compilation? previous = null)
     {
         SyntaxTree = syntaxTree;
+        Previous = previous;
     }
 
     public SyntaxTree SyntaxTree { get; }
+    public Compilation? Previous { get; }
+
+    internal BoundGlobalScope GlobalScope
+    {
+        get
+        {
+            if (_globalScope is null)
+                Interlocked.CompareExchange(ref _globalScope, Binder.BindGlobalScope(SyntaxTree.Root, Previous?.GlobalScope), null);
+            return _globalScope;
+        }
+    }
 
     public EvaluationResult Evaluate(Dictionary<Variable, object> variables)
     {
-        var binder = new Binder(variables);
-        var boundExpression = binder.BindExpression(SyntaxTree.Root.Expression);
+        var boundExpression = GlobalScope.Expression;
 
-        var diagnostics = SyntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+        var diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToArray();
         if (diagnostics.Any())
         {
             return new EvaluationResult(null, diagnostics);

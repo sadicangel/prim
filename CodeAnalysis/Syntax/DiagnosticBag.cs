@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using CodeAnalysis.Text;
+﻿using CodeAnalysis.Text;
+using System.Collections;
 
 namespace CodeAnalysis.Syntax;
 
@@ -24,5 +24,6 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
 
     public void ReportUndefinedUnaryOperator(Token @operator, Type operandType) => ReportError(@operator.Span, $"Unary operator '{@operator.Text}' is not defined for type {operandType.Name}");
     public void ReportUndefinedBinaryOperator(Token @operator, Type leftType, Type rightType) => ReportError(@operator.Span, $"Binary operator '{@operator.Text}' is not defined for types {leftType.Name} and {rightType.Name}");
-    public void ReportUndefinedName(Token identifer) => ReportError(identifer.Span, $"Variable '{identifer.Text}' does not exist");
+    public void ReportUndefinedName(Token identifier) => ReportError(identifier.Span, $"Variable '{identifier.Text}' does not exist");
+    public void ReportInvalidConversion(TextSpan span, Type sourceType, Type destinationType) => ReportError(span, $"Cannot convert from type {sourceType} to {destinationType}");
 }
