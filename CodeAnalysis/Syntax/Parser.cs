@@ -4,7 +4,6 @@ namespace CodeAnalysis.Syntax;
 
 internal sealed class Parser
 {
-    private readonly SourceText _text;
     private readonly List<Token> _tokens;
     private readonly DiagnosticBag _diagnostics = new();
 
@@ -22,8 +21,9 @@ internal sealed class Parser
         }
         while (token.Kind != TokenKind.EOF);
         _diagnostics.AddRange(lexer.Diagnostics);
-        _text = text;
     }
+
+    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
 
     private Token Current => Peek(0);
 
@@ -53,11 +53,11 @@ internal sealed class Parser
         return new Token(tokenKind, Current.Position, "", null);
     }
 
-    public SyntaxTree Parse()
+    public CompilationUnit ParseCompilationUnit()
     {
         var expression = ParseExpression();
         var eofToken = MatchToken(TokenKind.EOF);
-        return new SyntaxTree(_text, _diagnostics, expression, eofToken);
+        return new CompilationUnit(expression, eofToken);
     }
 
     private Expression ParseExpression()
