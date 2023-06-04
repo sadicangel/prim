@@ -22,7 +22,7 @@ public sealed class EvaluatorTests
     [InlineData("false", false)]
     [InlineData("!true", false)]
     [InlineData("!false", true)]
-    [InlineData("(a = 10) * a", 100L)]
+    [InlineData("{ var a = 10 (a = 10) * a }", 100L)]
     public void SyntaxFacts_GetText_Roundtrips(string text, object expectedValue)
     {
         var syntaxTree = SyntaxTree.Parse(text);

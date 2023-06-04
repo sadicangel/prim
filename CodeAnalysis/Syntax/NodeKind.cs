@@ -10,4 +10,5 @@ public enum NodeKind
     AssignmentExpression,
     BlockStatement,
     ExpressionStatement,
+    DeclarationStatement,
 }

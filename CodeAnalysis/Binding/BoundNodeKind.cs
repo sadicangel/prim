@@ -8,5 +8,6 @@ internal enum BoundNodeKind
     VariableExpression,
     AssignmentExpression,
     BlockStatement,
-    ExpressionStatement
+    BoundDeclarationStatement,
+    ExpressionStatement,
 }

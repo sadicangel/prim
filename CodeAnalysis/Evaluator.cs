@@ -28,11 +28,9 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
         foreach (var s in statement.Statements)
             EvaluateStatement(s);
     }
+    void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _variables[statement.Variable] = EvaluateExpression(statement.Expression);
 
-    void IBoundStatementVisitor.Accept(BoundExpressionStatement statement)
-    {
-        _lastValue = EvaluateExpression(statement.Expression);
-    }
+    void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
 
     private object EvaluateExpression(BoundExpression expression) => expression.Accept(this);
 

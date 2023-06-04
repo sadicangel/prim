@@ -2,17 +2,12 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed class BoundScope
+internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<Variable>? Variables = null)
 {
-    private readonly BoundScope? _parent;
-    private readonly Dictionary<string, Variable> _variables = new();
+    private readonly Dictionary<string, Variable> _variables = Variables?.ToDictionary(v => v.Name) ?? new();
 
-    public BoundScope(BoundScope? parent)
-    {
-        _parent = parent;
-    }
 
-    public IEnumerable<Variable> DeclaredVariables { get => _variables.Values; }
+    public IReadOnlyCollection<Variable> Variables { get => _variables.Values; }
 
     public bool TryDeclare(Variable variable) => _variables.TryAdd(variable.Name, variable);
 
@@ -30,6 +25,6 @@ internal sealed class BoundScope
         if (_variables.TryGetValue(name, out variable))
             return true;
 
-        return _parent is not null && _parent.TryLookup(name, out variable);
+        return Parent is not null && Parent.TryLookup(name, out variable);
     }
 }

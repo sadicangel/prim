@@ -5,7 +5,7 @@ namespace CodeAnalysis.Binding;
 internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVisitor<BoundStatement>
 {
     private readonly DiagnosticBag _diagnostics = new();
-    private readonly BoundScope _scope;
+    private BoundScope _scope;
 
     private Binder(BoundScope? parentScope = null)
     {
@@ -18,7 +18,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var parentScope = CreateParentScopes(previousScope);
         var binder = new Binder(parentScope);
         var expression = binder.BindStatement(compilationUnit.Statement);
-        var variables = binder._scope.DeclaredVariables;
+        var variables = binder._scope.Variables;
         var diagnostics = binder.Diagnostics;
 
         return new BoundGlobalScope(diagnostics, variables, expression, previousScope);
@@ -53,9 +53,25 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     BoundStatement IStatementVisitor<BoundStatement>.Accept(BlockStatement statement)
     {
         var boundStatements = new List<BoundStatement>();
+        _scope = new BoundScope(_scope);
         foreach (var s in statement.Statements)
             boundStatements.Add(BindStatement(s));
+        _scope = _scope.Parent ?? throw new InvalidOperationException("Scope cannot be null");
         return new BoundBlockStatement(boundStatements);
+    }
+    BoundStatement IStatementVisitor<BoundStatement>.Accept(DeclarationStatement statement)
+    {
+        var name = statement.IdentifierToken.Text;
+        var isReadOnly = statement.KeywordToken.Kind == TokenKind.Let;
+        var expression = BindExpression(statement.Expression);
+        var variable = new Variable(name, isReadOnly, expression.Type);
+
+        if (!_scope.TryDeclare(variable))
+        {
+            _diagnostics.ReportVariableRedeclaration(statement.IdentifierToken);
+        }
+
+        return new BoundDeclarationStatement(variable, expression);
     }
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
@@ -118,8 +134,13 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
         if (!_scope.TryLookup(name, out var variable))
         {
-            variable = new Variable(name, boundExpression.Type);
-            _scope.TryDeclare(variable);
+            _diagnostics.ReportUndefinedName(expression.IdentifierToken);
+            return boundExpression;
+        }
+
+        if (variable.IsReadOnly)
+        {
+            _diagnostics.ReportAssignmentToReadOnlyVariable(expression.EqualsToken.Span, name);
         }
 
         if (boundExpression.Type != variable.Type)
