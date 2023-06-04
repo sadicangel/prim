@@ -1,6 +1,8 @@
 ﻿namespace CodeAnalysis.Syntax;
 public sealed class ParserTests
 {
+    private static Expression ParseExpression(string text) => SyntaxTree.Parse(text).Root.Expression;
+
     [Theory]
     [MemberData(nameof(GetBinaryOperatorsPairsData))]
     public void Parser_BinaryExpression_HonorsPrecedence(TokenKind op1, TokenKind op2)
@@ -12,7 +14,7 @@ public sealed class ParserTests
         var op2Text = op2.GetText();
 
         var text = $"a {op1Text} b {op2Text} c";
-        var expr = SyntaxTree.Parse(text).Root;
+        var expr = ParseExpression(text);
 
         if (op1Precedence >= op2Precedence)
         {
@@ -63,7 +65,7 @@ public sealed class ParserTests
         var binaryText = binaryKind.GetText();
 
         var text = $"{unaryText} a {binaryText} b";
-        var expr = SyntaxTree.Parse(text).Root;
+        var expr = ParseExpression(text);
 
         if (unaryPrecedence >= binaryPrecedence)
         {
