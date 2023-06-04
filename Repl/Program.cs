@@ -4,14 +4,12 @@ using CodeAnalysis.Text;
 using System.Text;
 
 var variables = new Dictionary<Variable, object>();
-
 var showTree = false;
-
 var builder = new StringBuilder();
 
 while (true)
 {
-    Console.Write(builder.Length == 0 ? "> " : "| ");
+    Console.Out.WriteColored(builder.Length == 0 ? "» " : "· ", ConsoleColor.Green);
 
     var input = Console.ReadLine();
 
@@ -27,6 +25,9 @@ while (true)
             case "\\cls":
                 Console.Clear();
                 continue;
+
+            case "\\exit":
+                return;
         }
     }
 
@@ -43,7 +44,6 @@ while (true)
 
     if (showTree)
     {
-        Console.ForegroundColor = ConsoleColor.DarkGray;
         syntaxTree.WriteTo(Console.Out);
     }
 
@@ -51,7 +51,7 @@ while (true)
 
     if (!diagnostics.Any())
     {
-        Console.WriteLine(result.Value);
+        Console.Out.WriteLineColored(result.Value, ConsoleColor.Magenta);
     }
     else
     {
@@ -61,12 +61,12 @@ while (true)
             var lineNumber = lineIndex + 1;
             var line = syntaxTree.Text.Lines[lineIndex];
             var character = diagnostic.Span.Start - line.Start + 1;
+            var diagnosticColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
 
             Console.WriteLine();
-            Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
-            Console.Write($"({lineNumber}, {character}): ");
-            Console.WriteLine(diagnostic);
-            Console.ResetColor();
+
+            Console.Out.WriteColored($"({lineNumber}, {character}): ", diagnosticColor);
+            Console.Out.WriteColored(diagnostic, diagnosticColor);
 
             var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
             var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
@@ -77,17 +77,12 @@ while (true)
 
             Console.Write("    ");
             Console.Write(prefix.ToString());
-
-            Console.ForegroundColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
-            Console.Write(error.ToString());
-            Console.ResetColor();
-
+            Console.Out.Write(error.ToString(), diagnosticColor);
             Console.Write(suffix.ToString());
+
             Console.WriteLine();
         }
         Console.WriteLine();
-
-        Console.ResetColor();
     }
 
     builder.Clear();

@@ -10,13 +10,13 @@ public sealed record class Token(TokenKind Kind, int Position, string Text, obje
     {
         var marker = isLast ? "└──" : "├──";
 
-        writer.Write(indent);
-        writer.Write(marker);
-        writer.Write(Kind);
+        writer.WriteColored(indent, ConsoleColor.DarkGray);
+        writer.WriteColored(marker, ConsoleColor.DarkGray);
+        writer.WriteColored(Kind, ConsoleColor.Blue);
         if (Value is not null)
         {
             writer.Write(' ');
-            writer.Write(Value);
+            writer.WriteColored(Value, ConsoleColor.DarkGreen);
         }
         writer.WriteLine();
 

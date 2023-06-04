@@ -10,9 +10,9 @@ public abstract record class Node(NodeKind Kind) : INode
     {
         var marker = isLast ? "└──" : "├──";
 
-        writer.Write(indent);
-        writer.Write(marker);
-        writer.Write(Kind);
+        writer.WriteColored(indent, ConsoleColor.DarkGray);
+        writer.WriteColored(marker, ConsoleColor.DarkGray);
+        writer.WriteColored(Kind, ConsoleColor.Cyan);
         writer.WriteLine();
 
         indent += isLast ? "   " : "│  ";
