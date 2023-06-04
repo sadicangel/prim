@@ -11,6 +11,8 @@ public enum TokenKind
     Slash,
     OpenParenthesis,
     CloseParenthesis,
+    OpenBrace,
+    CloseBrace,
     EOF,
     True,
     False,

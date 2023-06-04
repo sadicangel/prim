@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed class Binder : IExpressionVisitor<BoundExpression>
+internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVisitor<BoundStatement>
 {
     private readonly DiagnosticBag _diagnostics = new();
     private readonly BoundScope _scope;
@@ -17,7 +17,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>
     {
         var parentScope = CreateParentScopes(previousScope);
         var binder = new Binder(parentScope);
-        var expression = binder.BindExpression(compilationUnit.Expression);
+        var expression = binder.BindStatement(compilationUnit.Statement);
         var variables = binder._scope.DeclaredVariables;
         var diagnostics = binder.Diagnostics;
 
@@ -48,10 +48,24 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>
         return parent;
     }
 
+    private BoundStatement BindStatement(Statement statement) => statement.Accept(this);
+
+    BoundStatement IStatementVisitor<BoundStatement>.Accept(BlockStatement statement)
+    {
+        var boundStatements = new List<BoundStatement>();
+        foreach (var s in statement.Statements)
+            boundStatements.Add(BindStatement(s));
+        return new BoundBlockStatement(boundStatements);
+    }
+
+    BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
+    {
+        var expression = BindExpression(statement.Expression);
+        return new BoundExpressionStatement(expression);
+    }
+
     private BoundExpression BindExpression(Expression expression) => expression.Accept(this);
 
-
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(Expression expression) => expression.Accept(this);
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(GroupExpression expression) => expression.Expression.Accept(this);
 

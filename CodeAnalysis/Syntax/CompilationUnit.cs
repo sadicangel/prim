@@ -2,10 +2,10 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class CompilationUnit(Expression Expression, Token Eof) : INode
+public sealed record class CompilationUnit(Statement Statement, Token Eof) : INode
 {
-    TextSpan INode.Span { get => Expression.Span; }
+    TextSpan INode.Span { get => Statement.Span; }
 
-    public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Expression.WriteTo(writer, indent, isLast);
-    IEnumerable<INode> INode.GetChildren() => Expression.GetChildren();
+    public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Statement.WriteTo(writer, indent, isLast);
+    IEnumerable<INode> INode.GetChildren() => Statement.GetChildren();
 }

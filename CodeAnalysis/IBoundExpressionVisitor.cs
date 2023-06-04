@@ -4,8 +4,6 @@ namespace CodeAnalysis;
 
 internal interface IBoundExpressionVisitor<out TResult>
 {
-    TResult Visit(BoundExpression expression);
-
     TResult Visit(BoundUnaryExpression expression);
 
     TResult Visit(BoundBinaryExpression expression);

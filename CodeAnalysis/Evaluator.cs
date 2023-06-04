@@ -2,21 +2,39 @@
 
 namespace CodeAnalysis;
 
-internal sealed class Evaluator : IBoundExpressionVisitor<object>
+internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStatementVisitor
 {
-    private readonly BoundExpression _boundExpression;
+    private readonly BoundStatement _boundStatement;
     private readonly Dictionary<Variable, object> _variables;
 
-    public Evaluator(BoundExpression boundExpression, Dictionary<Variable, object> variables)
+    private object? _lastValue;
+
+    public Evaluator(BoundStatement boundStatement, Dictionary<Variable, object> variables)
     {
-        _boundExpression = boundExpression;
+        _boundStatement = boundStatement;
         _variables = variables;
     }
 
-    public object Evaluate() => _boundExpression.Accept(this);
+    public object? Evaluate()
+    {
+        EvaluateStatement(_boundStatement);
+        return _lastValue;
+    }
 
+    private void EvaluateStatement(BoundStatement statement) => statement.Accept(this);
 
-    object IBoundExpressionVisitor<object>.Visit(BoundExpression expression) => expression.Accept(this);
+    void IBoundStatementVisitor.Accept(BoundBlockStatement statement)
+    {
+        foreach (var s in statement.Statements)
+            EvaluateStatement(s);
+    }
+
+    void IBoundStatementVisitor.Accept(BoundExpressionStatement statement)
+    {
+        _lastValue = EvaluateExpression(statement.Expression);
+    }
+
+    private object EvaluateExpression(BoundExpression expression) => expression.Accept(this);
 
     object IBoundExpressionVisitor<object>.Visit(BoundLiteralExpression expression) => expression.Value!;
 

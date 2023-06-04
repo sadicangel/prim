@@ -30,14 +30,14 @@ public sealed class Compilation
 
     public EvaluationResult Evaluate(Dictionary<Variable, object> variables)
     {
-        var boundExpression = GlobalScope.Expression;
+        var boundStatement = GlobalScope.Statement;
 
         var diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToArray();
         if (diagnostics.Any())
         {
             return new EvaluationResult(null, diagnostics);
         }
-        var evaluator = new Evaluator(boundExpression, variables);
+        var evaluator = new Evaluator(boundStatement, variables);
         var value = evaluator.Evaluate();
 
         return new EvaluationResult(value, Enumerable.Empty<Diagnostic>());

@@ -8,4 +8,6 @@ public enum NodeKind
     GroupExpression,
     NameExpression,
     AssignmentExpression,
+    BlockStatement,
+    ExpressionStatement,
 }

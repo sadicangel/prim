@@ -45,6 +45,8 @@ internal static class SyntaxFacts
         TokenKind.BangEquals => "!=",
         TokenKind.OpenParenthesis => "(",
         TokenKind.CloseParenthesis => ")",
+        TokenKind.OpenBrace => "{",
+        TokenKind.CloseBrace => "}",
         TokenKind.False => "false",
         TokenKind.True => "true",
         _ => null

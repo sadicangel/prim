@@ -55,9 +55,36 @@ internal sealed class Parser
 
     public CompilationUnit ParseCompilationUnit()
     {
-        var expression = ParseExpression();
+        var statement = ParseStatement();
         var eofToken = MatchToken(TokenKind.EOF);
-        return new CompilationUnit(expression, eofToken);
+        return new CompilationUnit(statement, eofToken);
+    }
+
+    private Statement ParseStatement()
+    {
+        if (Current.Kind is TokenKind.OpenBrace)
+            return ParseBlockStatement();
+
+        return ParseExpressionStatement();
+    }
+
+    private Statement ParseBlockStatement()
+    {
+        var statements = new List<Statement>();
+        var openBraceToken = MatchToken(TokenKind.OpenBrace);
+        while (Current.Kind is not TokenKind.EOF and not TokenKind.CloseBrace)
+        {
+            var statement = ParseStatement();
+            statements.Add(statement);
+        }
+        var closeBraceToken = MatchToken(TokenKind.CloseBrace);
+        return new BlockStatement(openBraceToken, statements, closeBraceToken);
+    }
+
+    private Statement ParseExpressionStatement()
+    {
+        var expression = ParseExpression();
+        return new ExpressionStatement(expression);
     }
 
     private Expression ParseExpression()

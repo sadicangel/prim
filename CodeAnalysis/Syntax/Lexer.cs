@@ -73,6 +73,16 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case '{':
+                _kind = TokenKind.OpenBrace;
+                _position++;
+                break;
+
+            case '}':
+                _kind = TokenKind.CloseBrace;
+                _position++;
+                break;
+
             case '!' when Lookahead is '=':
                 _kind = TokenKind.BangEquals;
                 _position += 2;
