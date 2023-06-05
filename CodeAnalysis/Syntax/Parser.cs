@@ -78,7 +78,9 @@ internal sealed class Parser
         return Current.Kind switch
         {
             TokenKind.OpenBrace => ParseBlockStatement(),
-            TokenKind.Const or TokenKind.Var => ParseDeclaration(),
+            TokenKind.Const or
+            TokenKind.Var => ParseDeclarationStatement(),
+            TokenKind.If => ParseIfStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -96,7 +98,7 @@ internal sealed class Parser
         return new BlockStatement(openBraceToken, statements, closeBraceToken);
     }
 
-    private Statement ParseDeclaration()
+    private Statement ParseDeclarationStatement()
     {
         var keyword = MatchToken(Current.Kind is TokenKind.Const ? TokenKind.Const : TokenKind.Var);
         var identifier = MatchToken(TokenKind.Identifier);
@@ -104,6 +106,17 @@ internal sealed class Parser
         var expression = ParseExpression();
         var semicolon = MatchToken(TokenKind.Semicolon);
         return new DeclarationStatement(keyword, identifier, equals, expression, semicolon);
+    }
+
+    private Statement ParseIfStatement()
+    {
+        var ifToken = MatchToken(TokenKind.If);
+        var condition = ParseAssignmentExpression();
+        var then = ParseStatement();
+        if (!TryMatchToken(TokenKind.Else, out var elseToken))
+            return new IfStatement(ifToken, condition, then);
+        var @else = ParseStatement();
+        return new IfStatement(ifToken, condition, then, elseToken, @else);
     }
 
     private Statement ParseExpressionStatement()
@@ -122,10 +135,20 @@ internal sealed class Parser
     {
         if (Peek(0).Kind == TokenKind.Identifier && Peek(1).Kind == TokenKind.Equals)
         {
-            var identifierToken = NextToken();
-            var operatorToken = NextToken();
+            var identifierToken = MatchToken(TokenKind.Identifier);
+            var operatorToken = MatchToken(TokenKind.Equals);
             var right = ParseAssignmentExpression();
             return new AssignmentExpression(identifierToken, operatorToken, right);
+        }
+
+        if (Peek(0).Kind == TokenKind.If)
+        {
+            var ifToken = MatchToken(TokenKind.If);
+            var condition = ParseAssignmentExpression();
+            var then = ParseAssignmentExpression();
+            var elseToken = MatchToken(TokenKind.Else);
+            var @else = ParseAssignmentExpression();
+            return new IfExpression(ifToken, condition, then, elseToken, @else);
         }
 
         return ParseBinaryExpression();

@@ -7,7 +7,9 @@ internal enum BoundNodeKind
     BinaryExpression,
     VariableExpression,
     AssignmentExpression,
+    IfExpression,
     BlockStatement,
     BoundDeclarationStatement,
     ExpressionStatement,
+    IfStatement,
 }

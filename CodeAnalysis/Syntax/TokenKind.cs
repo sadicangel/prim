@@ -29,5 +29,7 @@ public enum TokenKind
     False,
     Const,
     Var,
+    If,
+    Else,
     Identifier,
 }

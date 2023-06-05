@@ -128,7 +128,13 @@ public sealed class LexerTests
         if (k1 is TokenKind.Greater && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
             return true;
 
-        static bool IsKeyworkd(TokenKind kind) => kind is TokenKind.True or TokenKind.False or TokenKind.Const or TokenKind.Var;
+        static bool IsKeyworkd(TokenKind kind) => kind
+            is TokenKind.True
+            or TokenKind.False
+            or TokenKind.If
+            or TokenKind.Else
+            or TokenKind.Const
+            or TokenKind.Var;
 
         return false;
     }

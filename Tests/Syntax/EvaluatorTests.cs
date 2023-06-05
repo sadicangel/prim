@@ -48,6 +48,10 @@ public sealed class EvaluatorTests
             new object[] { "!true", false },
             new object[] { "!false", true },
             new object[] { "{ var a = 10; (a = 10) * a }", 100L },
+            new object[] { "{ var a = 0; if a == 0 a = 10 a }", 10L },
+            new object[] { "{ var a = 0; if a == 4 a = 10 a }", 0L },
+            new object[] { "{ var a = 0; if a == 0 a = 10 else a = 5 a }", 10L },
+            new object[] { "{ var a = 0; if a == 4 a = 10 else a = 5 a }", 5L },
         };
     }
 

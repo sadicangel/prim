@@ -38,7 +38,9 @@ internal static class SyntaxFacts
     public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
         "const" => TokenKind.Const,
+        "else" => TokenKind.Else,
         "false" => TokenKind.False,
+        "if" => TokenKind.If,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
         _ => TokenKind.Identifier,
@@ -73,6 +75,8 @@ internal static class SyntaxFacts
         TokenKind.True => "true",
         TokenKind.Const => "const",
         TokenKind.Var => "var",
+        TokenKind.If => "if",
+        TokenKind.Else => "else",
         _ => null
     };
 

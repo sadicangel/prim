@@ -28,11 +28,27 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
         foreach (var s in statement.Statements)
             EvaluateStatement(s);
     }
+    void IBoundStatementVisitor.Accept(BoundIfStatement statement)
+    {
+        var condition = (bool)EvaluateExpression(statement.Condition);
+        if (condition)
+            EvaluateStatement(statement.Then);
+        else if (statement.HasElseClause)
+            EvaluateStatement(statement.Else);
+    }
+
     void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _variables[statement.Variable] = EvaluateExpression(statement.Expression);
 
     void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
 
     private object EvaluateExpression(BoundExpression expression) => expression.Accept(this);
+
+    object IBoundExpressionVisitor<object>.Visit(BoundIfExpression expression)
+    {
+        var isTrue = (bool)EvaluateExpression(expression.Condition);
+
+        return isTrue ? EvaluateExpression(expression.Then) : EvaluateExpression(expression.Else);
+    }
 
     object IBoundExpressionVisitor<object>.Visit(BoundLiteralExpression expression) => expression.Value!;
 

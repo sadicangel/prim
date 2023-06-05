@@ -15,4 +15,5 @@ public interface IExpressionVisitor<out TResult>
     TResult Visit(AssignmentExpression expression);
 
     TResult Visit(NameExpression expression);
+    TResult Visit(IfExpression expression);
 }

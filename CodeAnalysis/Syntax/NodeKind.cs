@@ -8,7 +8,9 @@ public enum NodeKind
     GroupExpression,
     NameExpression,
     AssignmentExpression,
+    IfExpression,
     BlockStatement,
     ExpressionStatement,
     DeclarationStatement,
+    IfStatement,
 }

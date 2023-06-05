@@ -74,14 +74,44 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundDeclarationStatement(variable, expression);
     }
 
+    BoundStatement IStatementVisitor<BoundStatement>.Accept(IfStatement statement)
+    {
+        var condition = BindExpression(statement.Condition, typeof(bool));
+        var then = BindStatement(statement.Then);
+        var @else = statement.HasElseClause ? BindStatement(statement.Else) : null;
+        return new BoundIfStatement(condition, then, @else);
+    }
+
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
     {
         var expression = BindExpression(statement.Expression);
         return new BoundExpressionStatement(expression);
     }
 
+    private BoundExpression BindExpression(Expression expression, Type targetType)
+    {
+        var boundExpression = BindExpression(expression);
+        if (boundExpression.Type != targetType)
+            _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
+        return boundExpression;
+    }
+
     private BoundExpression BindExpression(Expression expression) => expression.Accept(this);
 
+
+    BoundExpression IExpressionVisitor<BoundExpression>.Visit(IfExpression expression)
+    {
+        var condition = BindExpression(expression.Condition, typeof(bool));
+        var then = BindExpression(expression.Then);
+        var @else = BindExpression(expression.Else);
+
+        if (then.Type != @else.Type)
+        {
+
+        }
+
+        return new BoundIfExpression(condition, then, @else, then.Type);
+    }
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(GroupExpression expression) => expression.Expression.Accept(this);
 
