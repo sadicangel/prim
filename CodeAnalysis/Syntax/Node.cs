@@ -4,7 +4,7 @@ namespace CodeAnalysis.Syntax;
 
 public abstract record class Node(NodeKind Kind) : INode
 {
-    public TextSpan Span { get => GetChildren().Last().Span - GetChildren().First().Span; }
+    public TextSpan Span { get => TextSpan.FromBounds(GetChildren().First().Span.Start, GetChildren().Last().Span.End); }
 
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
