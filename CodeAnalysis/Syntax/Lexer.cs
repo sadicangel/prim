@@ -201,10 +201,10 @@ internal sealed class Lexer
         while (Char.IsDigit(Current));
 
         var text = _text[_start.._position];
-        if (!long.TryParse(text, out var value))
-            _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), typeof(long));
+        if (!Int32.TryParse(text, out var value))
+            _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), typeof(int));
 
-        _kind = TokenKind.Int64;
+        _kind = TokenKind.I32;
         _value = value;
     }
 }

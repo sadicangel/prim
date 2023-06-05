@@ -76,8 +76,8 @@ public sealed class LexerTests
 
         static IEnumerable<TokenInfo> GetDynamicTokens() => new[]
         {
-            new TokenInfo(TokenKind.Int64, "1"),
-            new TokenInfo(TokenKind.Int64, "123"),
+            new TokenInfo(TokenKind.I32, "1"),
+            new TokenInfo(TokenKind.I32, "123"),
 
             new TokenInfo(TokenKind.Identifier, "a"),
             new TokenInfo(TokenKind.Identifier, "abc"),
@@ -113,7 +113,7 @@ public sealed class LexerTests
         if (k1IsKeyword && k2 is TokenKind.Identifier)
             return true;
 
-        if (k1 is TokenKind.Int64 && k2 is TokenKind.Int64)
+        if (k1 is TokenKind.I32 && k2 is TokenKind.I32)
             return true;
 
         if (k1 is TokenKind.Bang && k2 is TokenKind.Equals or TokenKind.EqualsEquals)

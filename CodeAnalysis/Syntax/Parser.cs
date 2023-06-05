@@ -197,7 +197,7 @@ internal sealed class Parser
         {
             TokenKind.OpenParenthesis => ParseGroupExpression(),
             TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(),
-            TokenKind.Int64 => ParseNumberLiteralExpression(),
+            TokenKind.I32 => ParseNumberLiteralExpression(),
             _ => ParseNameExpression(),
         };
     }
@@ -219,7 +219,7 @@ internal sealed class Parser
 
     private Expression ParseNumberLiteralExpression()
     {
-        var literal = MatchToken(TokenKind.Int64);
+        var literal = MatchToken(TokenKind.I32);
         return new LiteralExpression(literal);
     }
 

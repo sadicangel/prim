@@ -40,6 +40,7 @@ internal static class SyntaxFacts
         "const" => TokenKind.Const,
         "else" => TokenKind.Else,
         "false" => TokenKind.False,
+        "for" => TokenKind.For,
         "if" => TokenKind.If,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
@@ -51,6 +52,7 @@ internal static class SyntaxFacts
         is TokenKind.Const
         or TokenKind.Else
         or TokenKind.False
+        or TokenKind.For
         or TokenKind.If
         or TokenKind.True
         or TokenKind.Var
@@ -62,31 +64,32 @@ internal static class SyntaxFacts
 
     public static string? GetText(this TokenKind kind) => kind switch
     {
-        TokenKind.Semicolon => ";",
-        TokenKind.Plus => "+",
-        TokenKind.Minus => "-",
-        TokenKind.Star => "*",
-        TokenKind.Slash => "/",
+        TokenKind.AmpersandAmpersand => "&&",
         TokenKind.Bang => "!",
+        TokenKind.BangEquals => "!=",
+        TokenKind.CloseBrace => "}",
+        TokenKind.CloseParenthesis => ")",
+        TokenKind.Const => "const",
+        TokenKind.Else => "else",
         TokenKind.Equals => "=",
         TokenKind.EqualsEquals => "==",
-        TokenKind.BangEquals => "!=",
-        TokenKind.Less => "<",
-        TokenKind.LessEquals => "<=",
+        TokenKind.False => "false",
+        TokenKind.For => "for",
         TokenKind.Greater => ">",
         TokenKind.GreaterEquals => ">=",
-        TokenKind.AmpersandAmpersand => "&&",
-        TokenKind.PipePipe => "||",
-        TokenKind.OpenParenthesis => "(",
-        TokenKind.CloseParenthesis => ")",
-        TokenKind.OpenBrace => "{",
-        TokenKind.CloseBrace => "}",
-        TokenKind.False => "false",
-        TokenKind.True => "true",
-        TokenKind.Const => "const",
-        TokenKind.Var => "var",
         TokenKind.If => "if",
-        TokenKind.Else => "else",
+        TokenKind.Less => "<",
+        TokenKind.LessEquals => "<=",
+        TokenKind.Minus => "-",
+        TokenKind.OpenBrace => "{",
+        TokenKind.OpenParenthesis => "(",
+        TokenKind.PipePipe => "||",
+        TokenKind.Plus => "+",
+        TokenKind.Semicolon => ";",
+        TokenKind.Slash => "/",
+        TokenKind.Star => "*",
+        TokenKind.True => "true",
+        TokenKind.Var => "var",
         TokenKind.While => "while",
         _ => null
     };

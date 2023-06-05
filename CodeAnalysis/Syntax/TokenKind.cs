@@ -10,7 +10,7 @@ public enum TokenKind
     OpenBrace,
     CloseBrace,
     EOF,
-    Int64,
+    I32,
     Plus,
     Minus,
     Star,
@@ -33,4 +33,5 @@ public enum TokenKind
     Else,
     While,
     Identifier,
+    For,
 }

@@ -6,20 +6,20 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 {
     private static readonly BoundBinaryOperator[] Operators =
     {
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Addition, typeof(long)),
-        new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtraction, typeof(long)),
-        new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiplication, typeof(long)),
-        new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Division, typeof(long)),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Addition, typeof(int)),
+        new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtraction, typeof(int)),
+        new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiplication, typeof(int)),
+        new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Division, typeof(int)),
 
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equals, typeof(long), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equals, typeof(int), typeof(bool)),
         new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equals, typeof(bool)),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(long), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(int), typeof(bool)),
         new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool)),
 
-        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, typeof(long), typeof(bool)),
-        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqualTo, typeof(long), typeof(bool)),
-        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, typeof(long), typeof(bool)),
-        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqualTo, typeof(long), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, typeof(int), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqualTo, typeof(int), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, typeof(int), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqualTo, typeof(int), typeof(bool)),
 
         new BoundBinaryOperator(TokenKind.AmpersandAmpersand, BoundBinaryOperatorKind.AndAlso, typeof(bool)),
         new BoundBinaryOperator(TokenKind.PipePipe, BoundBinaryOperatorKind.OrElse, typeof(bool)),

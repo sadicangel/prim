@@ -148,7 +148,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(LiteralExpression expression)
     {
-        var value = expression.Value ?? 0L;
+        var value = expression.Value ?? 0;
         return new BoundLiteralExpression(value);
     }
 
@@ -157,7 +157,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         if (!_scope.TryLookup(expression.IdentifierToken.Text, out var variable))
         {
             _diagnostics.ReportUndefinedName(expression.IdentifierToken);
-            return new BoundLiteralExpression(0L);
+            return new BoundLiteralExpression(0);
         }
 
         return new BoundVariableExpression(variable);

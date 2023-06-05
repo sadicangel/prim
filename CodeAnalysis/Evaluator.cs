@@ -72,7 +72,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
         static Func<object, object> GetOperation(BoundUnaryOperatorKind kind) => kind switch
         {
             BoundUnaryOperatorKind.Identity => value => value,
-            BoundUnaryOperatorKind.Negation => value => -(long)value,
+            BoundUnaryOperatorKind.Negation => value => -(int)value,
             BoundUnaryOperatorKind.LogicalNegation => value => !(bool)value,
             _ => throw new InvalidOperationException($"Unexpected unary operator {kind}"),
         };
@@ -88,16 +88,16 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
         static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind) => kind switch
         {
-            BoundBinaryOperatorKind.Addition => static (l, r) => (long)l + (long)r,
-            BoundBinaryOperatorKind.Subtraction => static (l, r) => (long)l - (long)r,
-            BoundBinaryOperatorKind.Multiplication => static (l, r) => (long)l * (long)r,
-            BoundBinaryOperatorKind.Division => static (l, r) => (long)l / (long)r,
+            BoundBinaryOperatorKind.Addition => static (l, r) => (int)l + (int)r,
+            BoundBinaryOperatorKind.Subtraction => static (l, r) => (int)l - (int)r,
+            BoundBinaryOperatorKind.Multiplication => static (l, r) => (int)l * (int)r,
+            BoundBinaryOperatorKind.Division => static (l, r) => (int)l / (int)r,
             BoundBinaryOperatorKind.Equals => static (l, r) => Equals(l, r),
             BoundBinaryOperatorKind.NotEquals => static (l, r) => !Equals(l, r),
-            BoundBinaryOperatorKind.LessThan => static (l, r) => (long)l < (long)r,
-            BoundBinaryOperatorKind.LessThanOrEqualTo => static (l, r) => (long)l <= (long)r,
-            BoundBinaryOperatorKind.GreaterThan => static (l, r) => (long)l > (long)r,
-            BoundBinaryOperatorKind.GreaterThanOrEqualTo => static (l, r) => (long)l >= (long)r,
+            BoundBinaryOperatorKind.LessThan => static (l, r) => (int)l < (int)r,
+            BoundBinaryOperatorKind.LessThanOrEqualTo => static (l, r) => (int)l <= (int)r,
+            BoundBinaryOperatorKind.GreaterThan => static (l, r) => (int)l > (int)r,
+            BoundBinaryOperatorKind.GreaterThanOrEqualTo => static (l, r) => (int)l >= (int)r,
             BoundBinaryOperatorKind.AndAlso => static (l, r) => (bool)l && (bool)r,
             BoundBinaryOperatorKind.OrElse => static (l, r) => (bool)l || (bool)r,
             _ => throw new InvalidOperationException($"Unexpected binary operator {kind}"),

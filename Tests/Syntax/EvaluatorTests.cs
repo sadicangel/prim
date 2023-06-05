@@ -19,14 +19,14 @@ public sealed class EvaluatorTests
     {
         return new object[][]
         {
-            new object[] { "1", 1L },
-            new object[] { "+1", 1L },
-            new object[] { "-1", -1L },
-            new object[] { "10 + 19", 29L },
-            new object[] { "12 - 3", 9L },
-            new object[] { "2 * 3", 6L },
-            new object[] { "9 / 3", 3L },
-            new object[] { "(10)", 10L },
+            new object[] { "1", 1 },
+            new object[] { "+1", 1 },
+            new object[] { "-1", -1 },
+            new object[] { "10 + 19", 29 },
+            new object[] { "12 - 3", 9 },
+            new object[] { "2 * 3", 6 },
+            new object[] { "9 / 3", 3 },
+            new object[] { "(10)", 10 },
             new object[] { "12 == 3", false },
             new object[] { "3 == 3", true },
             new object[] { "12 != 3", true },
@@ -47,12 +47,12 @@ public sealed class EvaluatorTests
             new object[] { "false", false },
             new object[] { "!true", false },
             new object[] { "!false", true },
-            new object[] { "{ var a = 10; (a = 10) * a }", 100L },
-            new object[] { "{ var a = 0; if a == 0 a = 10 a }", 10L },
-            new object[] { "{ var a = 0; if a == 4 a = 10 a }", 0L },
-            new object[] { "{ var a = 0; if a == 0 a = 10 else a = 5 a }", 10L },
-            new object[] { "{ var a = 0; if a == 4 a = 10 else a = 5 a }", 5L },
-            new object[] { "{ var i = 10; var result = 0; while i > 0 { result = result + i; i = i - 1; } result }", 55L },
+            new object[] { "{ var a = 10; (a = 10) * a }", 100 },
+            new object[] { "{ var a = 0; if a == 0 a = 10 a }", 10 },
+            new object[] { "{ var a = 0; if a == 4 a = 10 a }", 0 },
+            new object[] { "{ var a = 0; if a == 0 a = 10 else a = 5 a }", 10 },
+            new object[] { "{ var a = 0; if a == 4 a = 10 else a = 5 a }", 5 },
+            new object[] { "{ var i = 10; var result = 0; while i > 0 { result = result + i; i = i - 1; } result }", 55 },
         };
     }
 
@@ -133,7 +133,7 @@ public sealed class EvaluatorTests
                     ⟨x = false⟩;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(typeof(long), typeof(bool))}"
+                $"{DiagnosticMessage.InvalidConversion(typeof(int), typeof(bool))}"
             },
             new object[]
             {
@@ -145,7 +145,7 @@ public sealed class EvaluatorTests
             {
                 $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
                 "10 ⟨+⟩ true",
-                $"{DiagnosticMessage.UndefinedBinaryOperator("+", typeof(long), typeof(bool))}"
+                $"{DiagnosticMessage.UndefinedBinaryOperator("+", typeof(int), typeof(bool))}"
             },
         };
     }
