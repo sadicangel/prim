@@ -16,8 +16,13 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(long), typeof(bool)),
         new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEquals, typeof(bool)),
 
-        new BoundBinaryOperator(TokenKind.AmpersandAmpersand, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
-        new BoundBinaryOperator(TokenKind.PipePipe, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),
+        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, typeof(long), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqualTo, typeof(long), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, typeof(long), typeof(bool)),
+        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqualTo, typeof(long), typeof(bool)),
+
+        new BoundBinaryOperator(TokenKind.AmpersandAmpersand, BoundBinaryOperatorKind.AndAlso, typeof(bool)),
+        new BoundBinaryOperator(TokenKind.PipePipe, BoundBinaryOperatorKind.OrElse, typeof(bool)),
     };
 
     public BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, Type operandType)

@@ -70,10 +70,14 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
             BoundBinaryOperatorKind.Subtraction => static (l, r) => (long)l - (long)r,
             BoundBinaryOperatorKind.Multiplication => static (l, r) => (long)l * (long)r,
             BoundBinaryOperatorKind.Division => static (l, r) => (long)l / (long)r,
-            BoundBinaryOperatorKind.LogicalAnd => static (l, r) => (bool)l && (bool)r,
-            BoundBinaryOperatorKind.LogicalOr => static (l, r) => (bool)l || (bool)r,
             BoundBinaryOperatorKind.Equals => static (l, r) => Equals(l, r),
             BoundBinaryOperatorKind.NotEquals => static (l, r) => !Equals(l, r),
+            BoundBinaryOperatorKind.LessThan => static (l, r) => (long)l < (long)r,
+            BoundBinaryOperatorKind.LessThanOrEqualTo => static (l, r) => (long)l <= (long)r,
+            BoundBinaryOperatorKind.GreaterThan => static (l, r) => (long)l > (long)r,
+            BoundBinaryOperatorKind.GreaterThanOrEqualTo => static (l, r) => (long)l >= (long)r,
+            BoundBinaryOperatorKind.AndAlso => static (l, r) => (bool)l && (bool)r,
+            BoundBinaryOperatorKind.OrElse => static (l, r) => (bool)l || (bool)r,
             _ => throw new InvalidOperationException($"Unexpected binary operator {kind}"),
         };
     }

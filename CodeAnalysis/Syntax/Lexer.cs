@@ -37,101 +37,123 @@ internal sealed class Lexer
         _kind = TokenKind.Invalid;
         _value = null;
 
-        switch (Current)
+        ReadOnlySpan<char> span = _text[_start..];
+
+        switch (span)
         {
-            case '\0':
+            case "":
                 _kind = TokenKind.EOF;
                 break;
 
-            case ';':
+            case [';', ..]:
                 _kind = TokenKind.Semicolon;
                 _position++;
                 break;
 
-            case '+':
+            case ['+', ..]:
                 _kind = TokenKind.Plus;
                 _position++;
                 break;
 
-            case '-':
+            case ['-', ..]:
                 _kind = TokenKind.Minus;
                 _position++;
                 break;
 
-            case '*':
+            case ['*', ..]:
                 _kind = TokenKind.Star;
                 _position++;
                 break;
 
-            case '/':
+            case ['/', ..]:
                 _kind = TokenKind.Slash;
                 _position++;
                 break;
 
-            case '(':
+            case ['(', ..]:
                 _kind = TokenKind.OpenParenthesis;
                 _position++;
                 break;
 
-            case ')':
+            case [')', ..]:
                 _kind = TokenKind.CloseParenthesis;
                 _position++;
                 break;
 
-            case '{':
+            case ['{', ..]:
                 _kind = TokenKind.OpenBrace;
                 _position++;
                 break;
 
-            case '}':
+            case ['}', ..]:
                 _kind = TokenKind.CloseBrace;
                 _position++;
                 break;
 
-            case '!' when Lookahead is '=':
+            case ['!', '=', ..]:
                 _kind = TokenKind.BangEquals;
                 _position += 2;
                 break;
 
-            case '!':
+            case ['!', ..]:
                 _kind = TokenKind.Bang;
                 _position++;
                 break;
 
-            case '=' when Lookahead is '=':
+            case ['=', '=', ..]:
                 _kind = TokenKind.EqualsEquals;
                 _position += 2;
                 break;
 
-            case '=':
+            case ['=', ..]:
                 _kind = TokenKind.Equals;
                 _position++;
                 break;
 
-            case '&' when Lookahead is '&':
+            case ['<', '=', ..]:
+                _kind = TokenKind.LessEquals;
+                _position += 2;
+                break;
+
+            case ['<', ..]:
+                _kind = TokenKind.Less;
+                _position++;
+                break;
+
+            case ['>', '=', ..]:
+                _kind = TokenKind.GreaterEquals;
+                _position += 2;
+                break;
+
+            case ['>', ..]:
+                _kind = TokenKind.Greater;
+                _position++;
+                break;
+
+            case ['&', '&', ..]:
                 _kind = TokenKind.AmpersandAmpersand;
                 _position += 2;
                 break;
 
-            case '|' when Lookahead is '|':
+            case ['|', '|', ..]:
                 _kind = TokenKind.PipePipe;
                 _position += 2;
                 break;
 
-            case '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9':
+            case ['0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
                 ReadNumberToken();
                 break;
 
-            case 'A' or 'B' or 'C' or 'D' or 'E' or 'F' or 'G' or 'H' or 'I' or 'J' or 'K' or 'L' or 'M' or 'N' or 'O' or 'P' or 'Q' or 'R' or 'S' or 'T' or 'U' or 'V' or 'W' or 'X' or 'Y' or 'Z' or
-                 'a' or 'b' or 'c' or 'd' or 'e' or 'f' or 'g' or 'h' or 'i' or 'j' or 'k' or 'l' or 'm' or 'n' or 'o' or 'p' or 'q' or 'r' or 's' or 't' or 'u' or 'v' or 'w' or 'x' or 'y' or 'z':
+            case ['A' or 'B' or 'C' or 'D' or 'E' or 'F' or 'G' or 'H' or 'I' or 'J' or 'K' or 'L' or 'M' or 'N' or 'O' or 'P' or 'Q' or 'R' or 'S' or 'T' or 'U' or 'V' or 'W' or 'X' or 'Y' or 'Z' or
+                 'a' or 'b' or 'c' or 'd' or 'e' or 'f' or 'g' or 'h' or 'i' or 'j' or 'k' or 'l' or 'm' or 'n' or 'o' or 'p' or 'q' or 'r' or 's' or 't' or 'u' or 'v' or 'w' or 'x' or 'y' or 'z', ..]:
                 ReadIdentifier();
                 break;
 
-            case ' ' or '\t' or '\n' or '\r':
+            case [' ' or '\t' or '\n' or '\r', ..]:
                 ReadWhiteSpace();
                 break;
 
-            case char when Char.IsWhiteSpace(Current):
+            case [var whitespace, ..] when Char.IsWhiteSpace(whitespace):
                 ReadWhiteSpace();
                 break;
 
@@ -141,7 +163,8 @@ internal sealed class Lexer
                 _position++;
                 break;
         }
-        var text = SyntaxFacts.GetText(_kind) ?? _text[_start.._position];
+
+        var text = SyntaxFacts.GetText(_kind) ?? span[..(_position - _start)];
 
         return new Token(_kind, _start, text.ToString(), _value);
     }
