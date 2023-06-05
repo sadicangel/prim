@@ -81,6 +81,12 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var @else = statement.HasElseClause ? BindStatement(statement.Else) : null;
         return new BoundIfStatement(condition, then, @else);
     }
+    BoundStatement IStatementVisitor<BoundStatement>.Accept(WhileStatement statement)
+    {
+        var condition = BindExpression(statement.Condition, typeof(bool));
+        var body = BindStatement(statement.Body);
+        return new BoundWhileStatement(condition, body);
+    }
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
     {

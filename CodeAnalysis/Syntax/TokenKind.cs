@@ -31,5 +31,6 @@ public enum TokenKind
     Var,
     If,
     Else,
+    While,
     Identifier,
 }

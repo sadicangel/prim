@@ -43,8 +43,18 @@ internal static class SyntaxFacts
         "if" => TokenKind.If,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
+        "while" => TokenKind.While,
         _ => TokenKind.Identifier,
     };
+
+    public static bool IsKeyword(this TokenKind kind) => kind
+        is TokenKind.Const
+        or TokenKind.Else
+        or TokenKind.False
+        or TokenKind.If
+        or TokenKind.True
+        or TokenKind.Var
+        or TokenKind.While;
 
     public static IEnumerable<TokenKind> GetUnaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecendence(k) > 0);
 
@@ -77,6 +87,7 @@ internal static class SyntaxFacts
         TokenKind.Var => "var",
         TokenKind.If => "if",
         TokenKind.Else => "else",
+        TokenKind.While => "while",
         _ => null
     };
 

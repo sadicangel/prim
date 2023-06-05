@@ -12,4 +12,5 @@ internal enum BoundNodeKind
     BoundDeclarationStatement,
     ExpressionStatement,
     IfStatement,
+    WhileStatement,
 }

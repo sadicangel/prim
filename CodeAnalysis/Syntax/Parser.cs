@@ -81,6 +81,7 @@ internal sealed class Parser
             TokenKind.Const or
             TokenKind.Var => ParseDeclarationStatement(),
             TokenKind.If => ParseIfStatement(),
+            TokenKind.While => ParseWhileStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -111,12 +112,20 @@ internal sealed class Parser
     private Statement ParseIfStatement()
     {
         var ifToken = MatchToken(TokenKind.If);
-        var condition = ParseAssignmentExpression();
+        var condition = ParseExpression();
         var then = ParseStatement();
         if (!TryMatchToken(TokenKind.Else, out var elseToken))
             return new IfStatement(ifToken, condition, then);
         var @else = ParseStatement();
         return new IfStatement(ifToken, condition, then, elseToken, @else);
+    }
+
+    private Statement ParseWhileStatement()
+    {
+        var whileToken = MatchToken(TokenKind.While);
+        var condition = ParseAssignmentExpression();
+        var body = ParseStatement();
+        return new WhileStatement(whileToken, condition, body);
     }
 
     private Statement ParseExpressionStatement()

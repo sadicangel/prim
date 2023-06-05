@@ -37,6 +37,12 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
             EvaluateStatement(statement.Else);
     }
 
+    void IBoundStatementVisitor.Accept(BoundWhileStatement statement)
+    {
+        while ((bool)EvaluateExpression(statement.Condition))
+            EvaluateStatement(statement.Body);
+    }
+
     void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _variables[statement.Variable] = EvaluateExpression(statement.Expression);
 
     void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);

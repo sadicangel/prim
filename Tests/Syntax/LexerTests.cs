@@ -98,8 +98,8 @@ public sealed class LexerTests
 
     private static bool RequireSeparator(TokenKind k1, TokenKind k2)
     {
-        var k1IsKeyword = IsKeyworkd(k1);
-        var k2IsKeyword = IsKeyworkd(k2);
+        var k1IsKeyword = k1.IsKeyword();
+        var k2IsKeyword = k2.IsKeyword();
 
         if (k1 is TokenKind.Identifier && k2 is TokenKind.Identifier)
             return true;
@@ -127,14 +127,6 @@ public sealed class LexerTests
 
         if (k1 is TokenKind.Greater && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
             return true;
-
-        static bool IsKeyworkd(TokenKind kind) => kind
-            is TokenKind.True
-            or TokenKind.False
-            or TokenKind.If
-            or TokenKind.Else
-            or TokenKind.Const
-            or TokenKind.Var;
 
         return false;
     }

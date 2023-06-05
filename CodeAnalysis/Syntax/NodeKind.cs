@@ -13,4 +13,5 @@ public enum NodeKind
     ExpressionStatement,
     DeclarationStatement,
     IfStatement,
+    WhileStatement,
 }
