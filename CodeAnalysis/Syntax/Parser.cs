@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Syntax;
 
@@ -44,13 +45,25 @@ internal sealed class Parser
         return current;
     }
 
-    private Token MatchToken(TokenKind tokenKind)
+    private Token MatchToken(TokenKind kind)
     {
-        if (Current.Kind == tokenKind)
-            return NextToken();
+        if (!TryMatchToken(kind, out var token))
+        {
+            _diagnostics.ReportUnexpectedToken(kind, Current);
+            token = new Token(kind, Current.Position, "", null);
+        }
+        return token;
+    }
 
-        _diagnostics.ReportUnexpectedToken(tokenKind, Current);
-        return new Token(tokenKind, Current.Position, "", null);
+    private bool TryMatchToken(TokenKind kind, [MaybeNullWhen(false)] out Token token)
+    {
+        if (Current.Kind == kind)
+        {
+            token = NextToken();
+            return true;
+        }
+        token = null;
+        return false;
     }
 
     public CompilationUnit ParseCompilationUnit()
@@ -65,7 +78,7 @@ internal sealed class Parser
         return Current.Kind switch
         {
             TokenKind.OpenBrace => ParseBlockStatement(),
-            TokenKind.Let or TokenKind.Var => ParseDeclaration(),
+            TokenKind.Const or TokenKind.Var => ParseDeclaration(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -85,17 +98,19 @@ internal sealed class Parser
 
     private Statement ParseDeclaration()
     {
-        var keyword = MatchToken(Current.Kind is TokenKind.Let ? TokenKind.Let : TokenKind.Var);
+        var keyword = MatchToken(Current.Kind is TokenKind.Const ? TokenKind.Const : TokenKind.Var);
         var identifier = MatchToken(TokenKind.Identifier);
         var equals = MatchToken(TokenKind.Equals);
         var expression = ParseExpression();
-        return new DeclarationStatement(keyword, identifier, equals, expression);
+        var semicolon = MatchToken(TokenKind.Semicolon);
+        return new DeclarationStatement(keyword, identifier, equals, expression, semicolon);
     }
 
     private Statement ParseExpressionStatement()
     {
         var expression = ParseExpression();
-        return new ExpressionStatement(expression);
+        TryMatchToken(TokenKind.Semicolon, out var semicolonToken);
+        return new ExpressionStatement(expression, semicolonToken);
     }
 
     private Expression ParseExpression()

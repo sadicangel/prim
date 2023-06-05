@@ -88,7 +88,7 @@ while (true)
             Console.WriteLine();
 
             Console.Write(new string(' ', 4 + columnIndex));
-            Console.Write("˄");
+            Console.Write(new string('˄', error.Length));
             Console.WriteLine();
         }
         Console.WriteLine();

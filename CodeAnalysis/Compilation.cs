@@ -3,7 +3,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis;
 
-public sealed record class EvaluationResult(object? Value, IEnumerable<Diagnostic> Diagnostics);
+public sealed record class EvaluationResult(object? Value, IReadOnlyList<Diagnostic> Diagnostics);
 
 public sealed class Compilation
 {
@@ -40,6 +40,6 @@ public sealed class Compilation
         var evaluator = new Evaluator(boundStatement, variables);
         var value = evaluator.Evaluate();
 
-        return new EvaluationResult(value, Enumerable.Empty<Diagnostic>());
+        return new EvaluationResult(value, Array.Empty<Diagnostic>());
     }
 }

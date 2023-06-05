@@ -15,13 +15,13 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportError(TextSpan span, string message) => _diagnostics.Add(new Diagnostic(IsError: true, span, message));
     public void ReportWarning(TextSpan span, string message) => _diagnostics.Add(new Diagnostic(IsError: false, span, message));
 
-    public void ReportInvalidNumber(TextSpan span, string text, Type type) => ReportError(span, $"The value {text} is not a valid {type.Name}");
-    public void ReportInvalidCharacter(int position, char character) => ReportError(new TextSpan(position, 1), $"Invalid character input: {character}");
-    public void ReportUnexpectedToken(TokenKind expected, Token actual) => ReportError(actual.Span, $"Unexpected token <{actual.Kind}>. Expected <{expected}>");
-    public void ReportUndefinedUnaryOperator(Token @operator, Type operandType) => ReportError(@operator.Span, $"Unary operator '{@operator.Text}' is not defined for type {operandType.Name}");
-    public void ReportUndefinedBinaryOperator(Token @operator, Type leftType, Type rightType) => ReportError(@operator.Span, $"Binary operator '{@operator.Text}' is not defined for types {leftType.Name} and {rightType.Name}");
-    public void ReportUndefinedName(Token identifier) => ReportError(identifier.Span, $"Variable '{identifier.Text}' does not exist");
-    public void ReportInvalidConversion(TextSpan span, Type sourceType, Type destinationType) => ReportError(span, $"Cannot convert from type {sourceType} to {destinationType}");
-    public void ReportVariableRedeclaration(Token identifier) => ReportError(identifier.Span, $"Variable '{identifier.Text}' already declared");
-    public void ReportAssignmentToReadOnlyVariable(TextSpan span, string name) => ReportError(span, $"Invalid assignment to read-only variable '{name}'");
+    public void ReportInvalidNumber(TextSpan span, string text, Type type) => ReportError(span, DiagnosticMessage.InvalidNumber(text, type));
+    public void ReportInvalidCharacter(int position, char character) => ReportError(new TextSpan(position, 1), DiagnosticMessage.InvalidCharacter(character));
+    public void ReportUnexpectedToken(TokenKind expected, Token actual) => ReportError(actual.Span, DiagnosticMessage.UnexpectedToken(expected, actual.Kind));
+    public void ReportUndefinedUnaryOperator(Token @operator, Type operandType) => ReportError(@operator.Span, DiagnosticMessage.UndefinedUnaryOperator(@operator.Text, operandType));
+    public void ReportUndefinedBinaryOperator(Token @operator, Type leftType, Type rightType) => ReportError(@operator.Span, DiagnosticMessage.UndefinedBinaryOperator(@operator.Text, leftType, rightType));
+    public void ReportUndefinedName(Token identifier) => ReportError(identifier.Span, DiagnosticMessage.UndefinedName(identifier.Text));
+    public void ReportInvalidConversion(TextSpan span, Type sourceType, Type destinationType) => ReportError(span, DiagnosticMessage.InvalidConversion(sourceType, destinationType));
+    public void ReportRedeclaration(Token identifier) => ReportError(identifier.Span, DiagnosticMessage.Redeclaration(identifier.Text));
+    public void ReportReadOnlyAssignment(TextSpan span, string name) => ReportError(span, DiagnosticMessage.ReadOnlyAssignment(name));
 }

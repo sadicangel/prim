@@ -4,6 +4,7 @@ public enum TokenKind
 {
     Invalid,
     WhiteSpace,
+    Semicolon,
     OpenParenthesis,
     CloseParenthesis,
     OpenBrace,
@@ -22,7 +23,7 @@ public enum TokenKind
     BangEquals,
     True,
     False,
-    Let,
+    Const,
     Var,
     Identifier,
 }

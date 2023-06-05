@@ -2,28 +2,8 @@
 public sealed class EvaluatorTests
 {
     [Theory]
-    [InlineData("1", 1L)]
-    [InlineData("+1", 1L)]
-    [InlineData("-1", -1L)]
-    [InlineData("10 + 19", 29L)]
-    [InlineData("12 - 3", 9L)]
-    [InlineData("2 * 3", 6L)]
-    [InlineData("9 / 3", 3L)]
-    [InlineData("(10)", 10L)]
-    [InlineData("12 == 3", false)]
-    [InlineData("3 == 3", true)]
-    [InlineData("12 != 3", true)]
-    [InlineData("3 != 3", false)]
-    [InlineData("false == false", true)]
-    [InlineData("true == false", false)]
-    [InlineData("false != false", false)]
-    [InlineData("true != false", true)]
-    [InlineData("true", true)]
-    [InlineData("false", false)]
-    [InlineData("!true", false)]
-    [InlineData("!false", true)]
-    [InlineData("{ var a = 10 (a = 10) * a }", 100L)]
-    public void SyntaxFacts_GetText_Roundtrips(string text, object expectedValue)
+    [MemberData(nameof(GetEvalueResultsData))]
+    public void Evaluator_Evaluates_CorrectValues(string text, object expectedValue)
     {
         var syntaxTree = SyntaxTree.Parse(text);
         var compilation = new Compilation(syntaxTree);
@@ -35,5 +15,125 @@ public sealed class EvaluatorTests
         Assert.Equal(expectedValue, result.Value);
     }
 
-    public static IEnumerable<object[]> GetTokenKindData() => Enum.GetValues<TokenKind>().Select(e => new object[] { e });
+    public static IEnumerable<object[]> GetEvalueResultsData()
+    {
+        return new object[][]
+        {
+            new object[] { "1", 1L },
+            new object[] { "+1", 1L },
+            new object[] { "-1", -1L },
+            new object[] { "10 + 19", 29L },
+            new object[] { "12 - 3", 9L },
+            new object[] { "2 * 3", 6L },
+            new object[] { "9 / 3", 3L },
+            new object[] { "(10)", 10L },
+            new object[] { "12 == 3", false },
+            new object[] { "3 == 3", true },
+            new object[] { "12 != 3", true },
+            new object[] { "3 != 3", false },
+            new object[] { "false == false", true },
+            new object[] { "true == false", false },
+            new object[] { "false != false", false },
+            new object[] { "true != false", true },
+            new object[] { "true", true },
+            new object[] { "false", false },
+            new object[] { "!true", false },
+            new object[] { "!false", true },
+            new object[] { "{ var a = 10; (a = 10) * a }", 100L },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(GetDiagnosticsData))]
+    public void Evaluator_Emits_CorrectDiagnostics(string diagnosticCase, string annotatedText, string expectedDiagnosticText)
+    {
+        Assert.NotNull(diagnosticCase);
+
+        var annotated = AnnotatedText.Parse(annotatedText);
+        var syntaxTree = SyntaxTree.Parse(annotated.Text);
+        var compilation = new Compilation(syntaxTree);
+        var result = compilation.Evaluate(new Dictionary<Variable, object>());
+
+        var expectedDiagnostics = expectedDiagnosticText.Split(Environment.NewLine);
+
+        if (annotated.Spans.Count != expectedDiagnostics.Length)
+            throw new InvalidOperationException("Invalid test: Number of marked spans does not match expected diagnostics");
+
+        Assert.Equal(expectedDiagnostics.Length, result.Diagnostics.Count);
+
+        for (var i = 0; i < expectedDiagnostics.Length; ++i)
+        {
+            var expectedMessage = expectedDiagnostics[i];
+            var actualMessage = result.Diagnostics[i].Message;
+
+            Assert.Equal(expectedMessage, actualMessage);
+
+            var expectedSpan = annotated.Spans[i];
+            var actualSpan = result.Diagnostics[i].Span;
+
+            Assert.Equal(expectedSpan, actualSpan);
+        }
+    }
+
+    public static IEnumerable<object[]> GetDiagnosticsData()
+    {
+        return new object[][]
+        {
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.Redeclaration)}",
+                """
+                {
+                    var x = 10;
+                    var y = 100;
+                    {
+                        var x = 10;
+                    }
+                    var ⟨x⟩ = 5;
+                }
+                """,
+                $"{DiagnosticMessage.Redeclaration("x")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)}",
+                "⟨x⟩ * 10",
+                $"{DiagnosticMessage.UndefinedName("x")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.ReadOnlyAssignment)}",
+                """
+                {
+                    const x = 10;
+                    x ⟨=⟩ 5;
+                }
+                """,
+                $"{DiagnosticMessage.ReadOnlyAssignment("x")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidConversion)}",
+                """
+                {
+                    var x = 10;
+                    ⟨x = false⟩;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidConversion(typeof(long), typeof(bool))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedUnaryOperator)}",
+                "⟨+⟩true",
+                $"{DiagnosticMessage.UndefinedUnaryOperator("+", typeof(bool))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
+                "10 ⟨+⟩ true",
+                $"{DiagnosticMessage.UndefinedBinaryOperator("+", typeof(long), typeof(bool))}"
+            },
+        };
+    }
 }

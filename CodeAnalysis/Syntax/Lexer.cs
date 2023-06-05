@@ -43,6 +43,11 @@ internal sealed class Lexer
                 _kind = TokenKind.EOF;
                 break;
 
+            case ';':
+                _kind = TokenKind.Semicolon;
+                _position++;
+                break;
+
             case '+':
                 _kind = TokenKind.Plus;
                 _position++;

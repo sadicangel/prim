@@ -22,8 +22,8 @@ internal static class SyntaxFacts
 
     public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
+        "const" => TokenKind.Const,
         "false" => TokenKind.False,
-        "let" => TokenKind.Let,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
         _ => TokenKind.Identifier,
@@ -35,6 +35,7 @@ internal static class SyntaxFacts
 
     public static string? GetText(this TokenKind kind) => kind switch
     {
+        TokenKind.Semicolon => ";",
         TokenKind.Plus => "+",
         TokenKind.Minus => "-",
         TokenKind.Star => "*",
@@ -51,8 +52,10 @@ internal static class SyntaxFacts
         TokenKind.CloseBrace => "}",
         TokenKind.False => "false",
         TokenKind.True => "true",
-        TokenKind.Let => "let",
+        TokenKind.Const => "const",
         TokenKind.Var => "var",
         _ => null
     };
+
+    public static string GetDiagnosticDisplay(this TokenKind kind) => kind.GetText() ?? $"<{kind}>";
 }

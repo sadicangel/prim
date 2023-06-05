@@ -62,13 +62,13 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     BoundStatement IStatementVisitor<BoundStatement>.Accept(DeclarationStatement statement)
     {
         var name = statement.IdentifierToken.Text;
-        var isReadOnly = statement.KeywordToken.Kind == TokenKind.Let;
+        var isReadOnly = statement.KeywordToken.Kind == TokenKind.Const;
         var expression = BindExpression(statement.Expression);
         var variable = new Variable(name, isReadOnly, expression.Type);
 
         if (!_scope.TryDeclare(variable))
         {
-            _diagnostics.ReportVariableRedeclaration(statement.IdentifierToken);
+            _diagnostics.ReportRedeclaration(statement.IdentifierToken);
         }
 
         return new BoundDeclarationStatement(variable, expression);
@@ -140,12 +140,12 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
         if (variable.IsReadOnly)
         {
-            _diagnostics.ReportAssignmentToReadOnlyVariable(expression.EqualsToken.Span, name);
+            _diagnostics.ReportReadOnlyAssignment(expression.EqualsToken.Span, name);
         }
 
         if (boundExpression.Type != variable.Type)
         {
-            _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, variable.Type);
+            _diagnostics.ReportInvalidConversion(expression.Span, variable.Type, boundExpression.Type);
             return boundExpression;
         }
 
