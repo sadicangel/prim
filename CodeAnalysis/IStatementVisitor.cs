@@ -8,4 +8,5 @@ public interface IStatementVisitor<out TResult>
     TResult Accept(ExpressionStatement statement);
     TResult Accept(IfStatement statement);
     TResult Accept(WhileStatement statement);
+    TResult Accept(ForStatement statement);
 }

@@ -34,4 +34,6 @@ public enum TokenKind
     While,
     Identifier,
     For,
+    Range,
+    In,
 }

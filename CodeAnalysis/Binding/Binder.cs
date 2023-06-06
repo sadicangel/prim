@@ -81,11 +81,47 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var @else = statement.HasElseClause ? BindStatement(statement.Else) : null;
         return new BoundIfStatement(condition, then, @else);
     }
+
     BoundStatement IStatementVisitor<BoundStatement>.Accept(WhileStatement statement)
     {
         var condition = BindExpression(statement.Condition, typeof(bool));
         var body = BindStatement(statement.Body);
         return new BoundWhileStatement(condition, body);
+    }
+
+    BoundStatement IStatementVisitor<BoundStatement>.Accept(ForStatement statement)
+    {
+        var lowerBound = BindExpression(statement.LowerBound, typeof(int));
+        var upperBound = BindExpression(statement.UpperBound, typeof(int));
+
+        _scope = new BoundScope(_scope);
+
+        Variable variable;
+        if (statement.DeclaresVariable)
+        {
+            variable = new Variable(statement.IdentifierToken.Text, IsReadOnly: true, typeof(int));
+            // Check outter scope for name.
+            if (_scope.Parent!.TryLookup(variable.Name, out _) || !_scope.TryDeclare(variable))
+                _diagnostics.ReportRedeclaration(statement.IdentifierToken);
+        }
+        else
+        {
+            if (!_scope.TryLookup(statement.IdentifierToken.Text, out variable!))
+            {
+                variable = new Variable(statement.IdentifierToken.Text, IsReadOnly: true, typeof(int));
+                _diagnostics.ReportUndefinedName(statement.IdentifierToken);
+            }
+            else if (variable.IsReadOnly)
+            {
+                _diagnostics.ReportReadOnlyAssignment(statement.IdentifierToken.Span, statement.IdentifierToken.Text);
+            }
+        }
+
+        var body = BindStatement(statement.Body);
+
+        _scope = _scope.Parent!;
+
+        return new BoundForStatement(variable, lowerBound, upperBound, body);
     }
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
@@ -154,7 +190,15 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(NameExpression expression)
     {
-        if (!_scope.TryLookup(expression.IdentifierToken.Text, out var variable))
+        var name = expression.IdentifierToken.Text;
+
+        if (String.IsNullOrEmpty(name))
+        {
+            // We already reported this as an error.
+            return new BoundLiteralExpression(0);
+        }
+
+        if (!_scope.TryLookup(name, out var variable))
         {
             _diagnostics.ReportUndefinedName(expression.IdentifierToken);
             return new BoundLiteralExpression(0);

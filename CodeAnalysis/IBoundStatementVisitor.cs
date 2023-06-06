@@ -9,4 +9,5 @@ internal interface IBoundStatementVisitor
     void Accept(BoundExpressionStatement statement);
     void Accept(BoundIfStatement statement);
     void Accept(BoundWhileStatement statement);
+    void Accept(BoundForStatement statement);
 }

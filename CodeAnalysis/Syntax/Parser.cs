@@ -82,6 +82,7 @@ internal sealed class Parser
             TokenKind.Var => ParseDeclarationStatement(),
             TokenKind.If => ParseIfStatement(),
             TokenKind.While => ParseWhileStatement(),
+            TokenKind.For => ParseForStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -92,8 +93,15 @@ internal sealed class Parser
         var openBraceToken = MatchToken(TokenKind.OpenBrace);
         while (Current.Kind is not TokenKind.EOF and not TokenKind.CloseBrace)
         {
+            var startToken = Current;
+
             var statement = ParseStatement();
             statements.Add(statement);
+
+            // No tokens consumed. Skip the current token to avoid infinite loop.
+            // No need to report any extra error as parse methods already failed.
+            if (Current == startToken)
+                NextToken();
         }
         var closeBraceToken = MatchToken(TokenKind.CloseBrace);
         return new BlockStatement(openBraceToken, statements, closeBraceToken);
@@ -126,6 +134,19 @@ internal sealed class Parser
         var condition = ParseAssignmentExpression();
         var body = ParseStatement();
         return new WhileStatement(whileToken, condition, body);
+    }
+
+    private Statement ParseForStatement()
+    {
+        var forToken = MatchToken(TokenKind.For);
+        TryMatchToken(TokenKind.Var, out var varToken);
+        var identifier = MatchToken(TokenKind.Identifier);
+        var equals = MatchToken(TokenKind.In);
+        var lowerBound = ParseExpression();
+        var rangeToken = MatchToken(TokenKind.Range);
+        var upperBound = ParseExpression();
+        var body = ParseStatement();
+        return new ForStatement(forToken, varToken, identifier, equals, lowerBound, rangeToken, upperBound, body);
     }
 
     private Statement ParseExpressionStatement()

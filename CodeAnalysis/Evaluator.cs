@@ -43,6 +43,18 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
             EvaluateStatement(statement.Body);
     }
 
+    void IBoundStatementVisitor.Accept(BoundForStatement statement)
+    {
+        var lowerBound = (int)EvaluateExpression(statement.LowerBound);
+        var upperBound = (int)EvaluateExpression(statement.UpperBound);
+
+        for (var i = lowerBound; i <= upperBound; ++i)
+        {
+            _variables[statement.Variable] = i;
+            EvaluateStatement(statement.Body);
+        }
+    }
+
     void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _variables[statement.Variable] = EvaluateExpression(statement.Expression);
 
     void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);

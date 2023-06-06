@@ -42,6 +42,7 @@ internal static class SyntaxFacts
         "false" => TokenKind.False,
         "for" => TokenKind.For,
         "if" => TokenKind.If,
+        "in" => TokenKind.In,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
         "while" => TokenKind.While,
@@ -54,6 +55,7 @@ internal static class SyntaxFacts
         or TokenKind.False
         or TokenKind.For
         or TokenKind.If
+        or TokenKind.In
         or TokenKind.True
         or TokenKind.Var
         or TokenKind.While;
@@ -78,6 +80,7 @@ internal static class SyntaxFacts
         TokenKind.Greater => ">",
         TokenKind.GreaterEquals => ">=",
         TokenKind.If => "if",
+        TokenKind.In => "in",
         TokenKind.Less => "<",
         TokenKind.LessEquals => "<=",
         TokenKind.Minus => "-",
@@ -88,6 +91,7 @@ internal static class SyntaxFacts
         TokenKind.Semicolon => ";",
         TokenKind.Slash => "/",
         TokenKind.Star => "*",
+        TokenKind.Range => "..",
         TokenKind.True => "true",
         TokenKind.Var => "var",
         TokenKind.While => "while",

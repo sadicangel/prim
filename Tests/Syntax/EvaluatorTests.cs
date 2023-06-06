@@ -41,18 +41,24 @@ public sealed class EvaluatorTests
             new object[] { "3 >= 4", false },
             new object[] { "false == false", true },
             new object[] { "true == false", false },
+            new object[] { "true && true", true },
+            new object[] { "false || false", false },
             new object[] { "false != false", false },
             new object[] { "true != false", true },
             new object[] { "true", true },
             new object[] { "false", false },
             new object[] { "!true", false },
             new object[] { "!false", true },
+            new object[] { "var a = 10;", 10 },
+            new object[] { "const a = 10;", 10 },
             new object[] { "{ var a = 10; (a = 10) * a }", 100 },
+            new object[] { "{ var a = 10; (a * a) }", 100 },
             new object[] { "{ var a = 0; if a == 0 a = 10 a }", 10 },
             new object[] { "{ var a = 0; if a == 4 a = 10 a }", 0 },
             new object[] { "{ var a = 0; if a == 0 a = 10 else a = 5 a }", 10 },
             new object[] { "{ var a = 0; if a == 4 a = 10 else a = 5 a }", 5 },
             new object[] { "{ var i = 10; var result = 0; while i > 0 { result = result + i; i = i - 1; } result }", 55 },
+            new object[] { "{ var result = 0; for var i in 1..10 { result = result + i; } result}", 55 },
         };
     }
 
@@ -146,6 +152,113 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
                 "10 ⟨+⟩ true",
                 $"{DiagnosticMessage.UndefinedBinaryOperator("+", typeof(int), typeof(bool))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} in inserted token",
+                "⟨⟩",
+                $"{DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.EOF)}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} in block statement",
+                """
+                {
+                    ⟨)⟩⟨⟩
+                """,
+                $"""
+                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.CloseParenthesis)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.CloseBrace, TokenKind.EOF)}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidConversion)} in if statement condition",
+                """
+                {
+                    var x = 10;
+                    if ⟨10⟩
+                        x = 10;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidConversion(typeof(int), typeof(bool))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidConversion)} in while statement condition",
+                """
+                {
+                    var x = 10;
+                    while ⟨10⟩
+                        x = 10;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidConversion(typeof(int), typeof(bool))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidConversion)} in for statement lower bound",
+                """
+                {
+                    var result = 0;
+                    for var i in ⟨false⟩..10
+                        result = result + i;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidConversion(typeof(bool), typeof(int))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidConversion)} in for statement upper bound",
+                """
+                {
+                    var result = 0;
+                    for var i in 1..⟨false⟩
+                        result = result + i;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidConversion(typeof(bool), typeof(int))}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)} in for statement variable",
+                """
+                {
+                    var result = 0;
+                    for ⟨i⟩ in 1..10
+                        result = result + ⟨i⟩;
+                }
+                """,
+                $"""
+                {DiagnosticMessage.UndefinedName("i")}
+                {DiagnosticMessage.UndefinedName("i")}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.Redeclaration)} in for statement variable",
+                """
+                {
+                    var result = 0;
+                    var i = 0;
+                    for var ⟨i⟩ in 1..10
+                        result = result + i;
+                }
+                """,
+                $"{DiagnosticMessage.Redeclaration("i")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.ReadOnlyAssignment)} in for statement variable",
+                """
+                {
+                    var result = 0;
+                    const i = 0;
+                    for ⟨i⟩ in 1..10
+                        result = result + i;
+                }
+                """,
+                $"{DiagnosticMessage.ReadOnlyAssignment("i")}"
             },
         };
     }

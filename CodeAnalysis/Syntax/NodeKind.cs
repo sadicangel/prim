@@ -14,4 +14,5 @@ public enum NodeKind
     DeclarationStatement,
     IfStatement,
     WhileStatement,
+    ForStatement,
 }

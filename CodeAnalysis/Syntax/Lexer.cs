@@ -41,7 +41,7 @@ internal sealed class Lexer
 
         switch (span)
         {
-            case "":
+            case []:
                 _kind = TokenKind.EOF;
                 break;
 
@@ -137,6 +137,11 @@ internal sealed class Lexer
 
             case ['|', '|', ..]:
                 _kind = TokenKind.PipePipe;
+                _position += 2;
+                break;
+
+            case ['.', '.', ..]:
+                _kind = TokenKind.Range;
                 _position += 2;
                 break;
 
