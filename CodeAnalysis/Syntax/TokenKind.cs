@@ -2,29 +2,40 @@
 
 public enum TokenKind
 {
+    // Control
     Invalid,
-    WhiteSpace,
-    Semicolon,
-    OpenParenthesis,
-    CloseParenthesis,
-    OpenBrace,
-    CloseBrace,
     EOF,
-    I32,
-    Plus,
-    Minus,
-    Star,
-    Slash,
+
+    // Punctuation
+    OpenBrace,
+    OpenParenthesis,
+    CloseBrace,
+    CloseParenthesis,
+    Semicolon,
+
+    // Operatos
+    Ampersand,
+    AmpersandAmpersand,
     Bang,
+    BangEquals,
     Equals,
     EqualsEquals,
-    BangEquals,
-    Less,
-    LessEquals,
     Greater,
     GreaterEquals,
-    AmpersandAmpersand,
+    Hat,
+    Less,
+    LessEquals,
+    Minus,
+    Percent,
+    Pipe,
     PipePipe,
+    Plus,
+    Range,
+    Slash,
+    Star,
+    Tilde,
+
+    // Keywords
     True,
     False,
     Const,
@@ -32,8 +43,11 @@ public enum TokenKind
     If,
     Else,
     While,
-    Identifier,
     For,
-    Range,
     In,
+
+    // Variable
+    WhiteSpace,
+    I32,
+    Identifier,
 }

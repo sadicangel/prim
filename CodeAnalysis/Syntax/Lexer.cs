@@ -21,8 +21,6 @@ internal sealed class Lexer
 
     private char Current { get => Peek(0); }
 
-    private char Lookahead { get => Peek(1); }
-
     public bool IsEOF { get => _position >= _text.Length; }
 
     private char Peek(int offset)
@@ -41,32 +39,9 @@ internal sealed class Lexer
 
         switch (span)
         {
-            case []:
-                _kind = TokenKind.EOF;
-                break;
-
-            case [';', ..]:
-                _kind = TokenKind.Semicolon;
-                _position++;
-                break;
-
-            case ['+', ..]:
-                _kind = TokenKind.Plus;
-                _position++;
-                break;
-
-            case ['-', ..]:
-                _kind = TokenKind.Minus;
-                _position++;
-                break;
-
-            case ['*', ..]:
-                _kind = TokenKind.Star;
-                _position++;
-                break;
-
-            case ['/', ..]:
-                _kind = TokenKind.Slash;
+            // Punctuation
+            case ['{', ..]:
+                _kind = TokenKind.OpenBrace;
                 _position++;
                 break;
 
@@ -75,18 +50,29 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case ['}', ..]:
+                _kind = TokenKind.CloseBrace;
+                _position++;
+                break;
+
             case [')', ..]:
                 _kind = TokenKind.CloseParenthesis;
                 _position++;
                 break;
 
-            case ['{', ..]:
-                _kind = TokenKind.OpenBrace;
+            case [';', ..]:
+                _kind = TokenKind.Semicolon;
                 _position++;
                 break;
 
-            case ['}', ..]:
-                _kind = TokenKind.CloseBrace;
+            // Operators
+            case ['&', '&', ..]:
+                _kind = TokenKind.AmpersandAmpersand;
+                _position += 2;
+                break;
+
+            case ['&', ..]:
+                _kind = TokenKind.Ampersand;
                 _position++;
                 break;
 
@@ -110,16 +96,6 @@ internal sealed class Lexer
                 _position++;
                 break;
 
-            case ['<', '=', ..]:
-                _kind = TokenKind.LessEquals;
-                _position += 2;
-                break;
-
-            case ['<', ..]:
-                _kind = TokenKind.Less;
-                _position++;
-                break;
-
             case ['>', '=', ..]:
                 _kind = TokenKind.GreaterEquals;
                 _position += 2;
@@ -130,9 +106,29 @@ internal sealed class Lexer
                 _position++;
                 break;
 
-            case ['&', '&', ..]:
-                _kind = TokenKind.AmpersandAmpersand;
+            case ['^', ..]:
+                _kind = TokenKind.Hat;
+                _position++;
+                break;
+
+            case ['<', '=', ..]:
+                _kind = TokenKind.LessEquals;
                 _position += 2;
+                break;
+
+            case ['<', ..]:
+                _kind = TokenKind.Less;
+                _position++;
+                break;
+
+            case ['-', ..]:
+                _kind = TokenKind.Minus;
+                _position++;
+                break;
+
+            case ['%', ..]:
+                _kind = TokenKind.Percent;
+                _position++;
                 break;
 
             case ['|', '|', ..]:
@@ -140,9 +136,34 @@ internal sealed class Lexer
                 _position += 2;
                 break;
 
+            case ['|', ..]:
+                _kind = TokenKind.Pipe;
+                _position++;
+                break;
+
+            case ['+', ..]:
+                _kind = TokenKind.Plus;
+                _position++;
+                break;
+
             case ['.', '.', ..]:
                 _kind = TokenKind.Range;
                 _position += 2;
+                break;
+
+            case ['/', ..]:
+                _kind = TokenKind.Slash;
+                _position++;
+                break;
+
+            case ['*', ..]:
+                _kind = TokenKind.Star;
+                _position++;
+                break;
+
+            case ['~', ..]:
+                _kind = TokenKind.Tilde;
+                _position++;
                 break;
 
             case ['0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
@@ -160,6 +181,11 @@ internal sealed class Lexer
 
             case [var whitespace, ..] when Char.IsWhiteSpace(whitespace):
                 ReadWhiteSpace();
+                break;
+
+            // Control
+            case []:
+                _kind = TokenKind.EOF;
                 break;
 
             default:

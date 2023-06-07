@@ -4,15 +4,17 @@ internal static class SyntaxFacts
 {
     public static int GetUnaryOperatorPrecendence(this TokenKind type) => type switch
     {
-        TokenKind.Plus or
+        TokenKind.Bang or
         TokenKind.Minus or
-        TokenKind.Bang => 6,
+        TokenKind.Plus or
+        TokenKind.Tilde => 6,
 
         _ => 0,
     };
 
     public static int GetBinaryOperatorPrecendence(this TokenKind type) => type switch
     {
+        TokenKind.Percent or
         TokenKind.Star or
         TokenKind.Slash => 5,
 
@@ -26,9 +28,12 @@ internal static class SyntaxFacts
         TokenKind.Greater or
         TokenKind.GreaterEquals => 3,
 
+        TokenKind.Ampersand or
         TokenKind.AmpersandAmpersand => 2,
 
-        TokenKind.PipePipe => 1,
+        TokenKind.Pipe or
+        TokenKind.PipePipe or
+        TokenKind.Hat => 1,
 
         _ => 0,
     };
@@ -60,12 +65,38 @@ internal static class SyntaxFacts
         or TokenKind.Var
         or TokenKind.While;
 
+    public static bool IsOperator(this TokenKind kind) => kind.IsUnaryOperator() || kind.IsBinaryOperator();
+
+    public static bool IsUnaryOperator(this TokenKind kind) => kind
+        is TokenKind.Bang
+        or TokenKind.Minus
+        or TokenKind.Plus
+        or TokenKind.Tilde;
+
+    public static bool IsBinaryOperator(this TokenKind kind) => kind
+        is TokenKind.Ampersand
+        or TokenKind.AmpersandAmpersand
+        or TokenKind.BangEquals
+        or TokenKind.EqualsEquals
+        or TokenKind.Greater
+        or TokenKind.GreaterEquals
+        or TokenKind.Less
+        or TokenKind.LessEquals
+        or TokenKind.Minus
+        or TokenKind.Percent
+        or TokenKind.Pipe
+        or TokenKind.PipePipe
+        or TokenKind.Plus
+        or TokenKind.Slash
+        or TokenKind.Star;
+
     public static IEnumerable<TokenKind> GetUnaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecendence(k) > 0);
 
     public static IEnumerable<TokenKind> GetBinaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecendence(k) > 0);
 
     public static string? GetText(this TokenKind kind) => kind switch
     {
+        TokenKind.Ampersand => "&",
         TokenKind.AmpersandAmpersand => "&&",
         TokenKind.Bang => "!",
         TokenKind.BangEquals => "!=",
@@ -79,6 +110,7 @@ internal static class SyntaxFacts
         TokenKind.For => "for",
         TokenKind.Greater => ">",
         TokenKind.GreaterEquals => ">=",
+        TokenKind.Hat => "^",
         TokenKind.If => "if",
         TokenKind.In => "in",
         TokenKind.Less => "<",
@@ -86,12 +118,15 @@ internal static class SyntaxFacts
         TokenKind.Minus => "-",
         TokenKind.OpenBrace => "{",
         TokenKind.OpenParenthesis => "(",
+        TokenKind.Percent => "%",
+        TokenKind.Pipe => "|",
         TokenKind.PipePipe => "||",
         TokenKind.Plus => "+",
         TokenKind.Semicolon => ";",
         TokenKind.Slash => "/",
         TokenKind.Star => "*",
         TokenKind.Range => "..",
+        TokenKind.Tilde => "~",
         TokenKind.True => "true",
         TokenKind.Var => "var",
         TokenKind.While => "while",

@@ -14,4 +14,9 @@ internal enum BoundBinaryOperatorKind
     GreaterThanOrEqualTo,
     AndAlso,
     OrElse,
+    And,
+    Else,
+    Or,
+    ExclusiveOr,
+    Modulo,
 }

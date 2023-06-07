@@ -10,6 +10,11 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtraction, typeof(int)),
         new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiplication, typeof(int)),
         new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Division, typeof(int)),
+        new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulo, typeof(int)),
+
+        new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, typeof(int)),
+        new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, typeof(int)),
+        new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, typeof(int)),
 
         new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equals, typeof(int), typeof(bool)),
         new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equals, typeof(bool)),
@@ -23,12 +28,15 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 
         new BoundBinaryOperator(TokenKind.AmpersandAmpersand, BoundBinaryOperatorKind.AndAlso, typeof(bool)),
         new BoundBinaryOperator(TokenKind.PipePipe, BoundBinaryOperatorKind.OrElse, typeof(bool)),
+
+        new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, typeof(bool)),
+        new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, typeof(bool)),
+        new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, typeof(bool)),
     };
 
     public BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, Type operandType)
         : this(tokenKind, kind, operandType, operandType, operandType)
     {
-
     }
 
     public BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, Type operandType, Type resultType)

@@ -128,6 +128,12 @@ public sealed class LexerTests
         if (k1 is TokenKind.Greater && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
             return true;
 
+        if (k1 is TokenKind.Ampersand && k2 is TokenKind.Ampersand or TokenKind.AmpersandAmpersand)
+            return true;
+
+        if (k1 is TokenKind.Pipe && k2 is TokenKind.Pipe or TokenKind.PipePipe)
+            return true;
+
         return false;
     }
 

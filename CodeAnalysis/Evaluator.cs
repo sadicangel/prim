@@ -86,32 +86,40 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
             BoundUnaryOperatorKind.Identity => value => value,
             BoundUnaryOperatorKind.Negation => value => -(int)value,
             BoundUnaryOperatorKind.LogicalNegation => value => !(bool)value,
+            BoundUnaryOperatorKind.OnesComplement => value => ~(int)value,
             _ => throw new InvalidOperationException($"Unexpected unary operator {kind}"),
         };
     }
 
     object IBoundExpressionVisitor<object>.Visit(BoundBinaryExpression expression)
     {
-        var operation = GetOperation(expression.Operator.Kind);
+        var operation = GetOperation(expression.Operator.Kind, expression.Left.Type, expression.Right.Type);
         var left = expression.Left.Accept(this);
         var right = expression.Right.Accept(this);
 
         return operation.Invoke(left, right);
 
-        static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind) => kind switch
+        static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind, Type leftType, Type rightType) => kind switch
         {
             BoundBinaryOperatorKind.Addition => static (l, r) => (int)l + (int)r,
-            BoundBinaryOperatorKind.Subtraction => static (l, r) => (int)l - (int)r,
-            BoundBinaryOperatorKind.Multiplication => static (l, r) => (int)l * (int)r,
+            BoundBinaryOperatorKind.And when leftType == typeof(bool) => static (l, r) => (bool)l & (bool)r,
+            BoundBinaryOperatorKind.And when leftType == typeof(int) => static (l, r) => (int)l & (int)r,
+            BoundBinaryOperatorKind.AndAlso => static (l, r) => (bool)l && (bool)r,
             BoundBinaryOperatorKind.Division => static (l, r) => (int)l / (int)r,
             BoundBinaryOperatorKind.Equals => static (l, r) => Equals(l, r),
-            BoundBinaryOperatorKind.NotEquals => static (l, r) => !Equals(l, r),
-            BoundBinaryOperatorKind.LessThan => static (l, r) => (int)l < (int)r,
-            BoundBinaryOperatorKind.LessThanOrEqualTo => static (l, r) => (int)l <= (int)r,
+            BoundBinaryOperatorKind.ExclusiveOr when leftType == typeof(bool) => static (l, r) => (bool)l ^ (bool)r,
+            BoundBinaryOperatorKind.ExclusiveOr when leftType == typeof(int) => static (l, r) => (int)l ^ (int)r,
             BoundBinaryOperatorKind.GreaterThan => static (l, r) => (int)l > (int)r,
             BoundBinaryOperatorKind.GreaterThanOrEqualTo => static (l, r) => (int)l >= (int)r,
-            BoundBinaryOperatorKind.AndAlso => static (l, r) => (bool)l && (bool)r,
+            BoundBinaryOperatorKind.LessThan => static (l, r) => (int)l < (int)r,
+            BoundBinaryOperatorKind.LessThanOrEqualTo => static (l, r) => (int)l <= (int)r,
+            BoundBinaryOperatorKind.Modulo => static (l, r) => (int)l % (int)r,
+            BoundBinaryOperatorKind.Multiplication => static (l, r) => (int)l * (int)r,
+            BoundBinaryOperatorKind.NotEquals => static (l, r) => !Equals(l, r),
+            BoundBinaryOperatorKind.Or when leftType == typeof(bool) => static (l, r) => (bool)l | (bool)r,
+            BoundBinaryOperatorKind.Or when leftType == typeof(int) => static (l, r) => (int)l | (int)r,
             BoundBinaryOperatorKind.OrElse => static (l, r) => (bool)l || (bool)r,
+            BoundBinaryOperatorKind.Subtraction => static (l, r) => (int)l - (int)r,
             _ => throw new InvalidOperationException($"Unexpected binary operator {kind}"),
         };
     }
