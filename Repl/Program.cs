@@ -5,6 +5,7 @@ using System.Text;
 
 var variables = new Dictionary<Variable, object>();
 var showTree = false;
+var showProgram = false;
 var builder = new StringBuilder();
 var previousCompilation = default(Compilation);
 
@@ -18,9 +19,14 @@ while (true)
     {
         switch (input)
         {
-            case "\\showtree":
+            case "\\tree":
                 showTree = true;
-                Console.WriteLine($"<{(showTree ? "showing" : "hiding")} parse trees>");
+                Console.Out.WriteLineColored($"[{(showTree ? "showing" : "hiding")} parse trees]", ConsoleColor.DarkGray);
+                continue;
+
+            case "\\program":
+                showProgram = true;
+                Console.Out.WriteLineColored($"[{(showProgram ? "showing" : "hiding")} bound tree]", ConsoleColor.DarkGray);
                 continue;
 
             case "\\cls":
@@ -50,6 +56,11 @@ while (true)
     if (showTree)
     {
         syntaxTree.WriteTo(Console.Out);
+    }
+
+    if (showProgram)
+    {
+        compilation.WriteTo(Console.Out);
     }
 
     Console.ResetColor();

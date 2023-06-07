@@ -42,4 +42,6 @@ public sealed class Compilation
 
         return new EvaluationResult(value, Array.Empty<Diagnostic>());
     }
+
+    public void WriteTo(TextWriter writer) => GlobalScope.Statement.WriteTo(writer);
 }

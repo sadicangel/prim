@@ -6,7 +6,6 @@ internal sealed record class BoundBinaryExpression(BoundExpression Left, BoundBi
     public override IEnumerable<INode> GetChildren()
     {
         yield return Left;
-        yield return Operator;
         yield return Right;
     }
 }

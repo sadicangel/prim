@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinaryOperatorKind Kind, Type LeftType, Type RightType, Type ResultType) : BoundOperator
+internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinaryOperatorKind Kind, Type LeftType, Type RightType, Type ResultType)
 {
     private static readonly BoundBinaryOperator[] Operators =
     {
@@ -55,6 +55,4 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 
         return null;
     }
-
-    protected override string GetDisplayString() => $"{ResultType} operator{TokenKind.GetText()}({LeftType}, {RightType})";
 }

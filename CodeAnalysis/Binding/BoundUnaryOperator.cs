@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, Type OperandType, Type ResultType) : BoundOperator
+internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, Type OperandType, Type ResultType)
 {
     private static readonly BoundUnaryOperator[] Operators =
     {
@@ -28,6 +28,4 @@ internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryO
 
         return null;
     }
-
-    protected override string GetDisplayString() => $"{ResultType} operator{TokenKind.GetText()}({OperandType})";
 }
