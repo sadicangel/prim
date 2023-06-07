@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Text;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis;
 
 public sealed record class Diagnostic(bool IsError, TextSpan Span, string Message)
 {

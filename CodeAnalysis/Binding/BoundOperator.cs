@@ -3,9 +3,13 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Binding;
 
-internal abstract record class BoundNode(BoundNodeKind Kind) : INode
+internal abstract record class BoundOperator : INode
 {
-    public TextSpan Span { get => throw new NotSupportedException(); }
+    TextSpan INode.Span { get; }
+
+    public IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();
+
+    protected abstract string GetDisplayString();
 
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
@@ -13,18 +17,9 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
 
         writer.WriteColored(indent, ConsoleColor.DarkGray);
         writer.WriteColored(marker, ConsoleColor.DarkGray);
-        writer.WriteColored(Kind, ConsoleColor.Cyan);
+        writer.WriteColored(GetDisplayString(), ConsoleColor.Cyan);
         writer.WriteLine();
-
-        indent += isLast ? "   " : "│  ";
-
-        var lastChild = GetChildren().LastOrDefault();
-
-        foreach (var child in GetChildren())
-            child.WriteTo(writer, indent, child == lastChild);
     }
-
-    public abstract IEnumerable<INode> GetChildren();
 
     public override string ToString()
     {

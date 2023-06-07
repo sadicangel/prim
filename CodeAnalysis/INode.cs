@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Text;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis;
 
 public interface INode
 {

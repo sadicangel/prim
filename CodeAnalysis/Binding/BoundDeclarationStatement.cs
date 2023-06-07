@@ -3,4 +3,9 @@
 internal sealed record class BoundDeclarationStatement(Variable Variable, BoundExpression Expression) : BoundStatement(BoundNodeKind.BoundDeclarationStatement)
 {
     public override void Accept(IBoundStatementVisitor visitor) => visitor.Accept(this);
+    public override IEnumerable<INode> GetChildren()
+    {
+        yield return Variable;
+        yield return Expression;
+    }
 }

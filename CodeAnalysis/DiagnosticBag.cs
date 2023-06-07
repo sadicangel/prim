@@ -1,7 +1,8 @@
-﻿using CodeAnalysis.Text;
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
 using System.Collections;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis;
 
 public sealed class DiagnosticBag : IEnumerable<Diagnostic>
 {

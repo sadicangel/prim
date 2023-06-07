@@ -10,4 +10,11 @@ internal sealed record class BoundIfStatement(BoundExpression Condition, BoundSt
     public bool HasElseClause { get => Else is not null; }
 
     public override void Accept(IBoundStatementVisitor visitor) => visitor.Accept(this);
+    public override IEnumerable<INode> GetChildren()
+    {
+        yield return Condition;
+        yield return Then;
+        if (Else is not null)
+            yield return Else;
+    }
 }
