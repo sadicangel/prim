@@ -20,13 +20,17 @@ while (true)
         switch (input)
         {
             case "\\tree":
-                showTree = true;
-                Console.Out.WriteLineColored($"[{(showTree ? "showing" : "hiding")} parse trees]", ConsoleColor.DarkGray);
+                showTree = !showTree;
+                Console.Out.WriteColored("[show parse tree: ", ConsoleColor.DarkGray);
+                Console.Out.WriteColored((showTree ? "on" : "off"), showTree ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
+                Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
                 continue;
 
             case "\\program":
-                showProgram = true;
-                Console.Out.WriteLineColored($"[{(showProgram ? "showing" : "hiding")} bound tree]", ConsoleColor.DarkGray);
+                showProgram = !showProgram;
+                Console.Out.WriteColored("[show bound tree: ", ConsoleColor.DarkGray);
+                Console.Out.WriteColored((showProgram ? "on" : "off"), showProgram ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
+                Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
                 continue;
 
             case "\\cls":

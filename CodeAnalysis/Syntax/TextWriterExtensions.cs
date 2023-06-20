@@ -15,6 +15,7 @@ public static class TextWriterExtensions
         writer.Write(value);
         Console.ResetColor();
     }
+
     public static void WriteLineColored(this TextWriter writer, string? text, ConsoleColor color)
     {
         Console.ForegroundColor = color;

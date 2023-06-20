@@ -29,10 +29,10 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
 
         static (string Text, ConsoleColor Color) GetTextAndColor(INode node) => node switch
         {
-            BoundBinaryExpression e => ($"{e.Operator.Kind}Expression", ConsoleColor.Blue),
-            BoundUnaryExpression e => ($"{e.Operator.Kind}Expression", ConsoleColor.Blue),
-            BoundExpression e => (e.Kind.ToString(), ConsoleColor.Blue),
-            BoundStatement s => (s.Kind.ToString(), ConsoleColor.Cyan),
+            BoundBinaryExpression e => ($"{e.Operator.Kind}Expression ", ConsoleColor.Blue),
+            BoundUnaryExpression e => ($"{e.Operator.Kind}Expression ", ConsoleColor.Blue),
+            BoundExpression e => ($"{e.Kind} ", ConsoleColor.Blue),
+            BoundStatement s => ($"{s.Kind} ", ConsoleColor.Cyan),
             _ => throw new InvalidOperationException($"Invalid node type '{node?.GetType()}' in bound tree")
         };
 
@@ -46,9 +46,9 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
                 else
                     writer.WriteColored(", ", ConsoleColor.DarkGray);
 
-                writer.WriteColored(property.Name, ConsoleColor.DarkYellow);
+                writer.WriteColored(property.Name, ConsoleColor.Yellow);
                 writer.WriteColored(" = ", ConsoleColor.DarkGray);
-                writer.WriteColored(property.Value, ConsoleColor.Yellow);
+                writer.WriteColored(property.Value, ConsoleColor.DarkYellow);
             }
         };
     }
@@ -75,9 +75,9 @@ file static class NodePropertyCache
         if (!Cache.TryGetValue(type, out var properties))
         {
             var list = new List<NodeProperty>();
-            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Reverse())
             {
-                if (property.Name is nameof(BoundNode.Kind) or nameof(BoundNode.Span))
+                if (property.Name is nameof(BoundNode.Kind) or nameof(BoundNode.Span) or nameof(BoundBinaryExpression.Operator))
                     continue;
 
                 if (typeof(BoundNode).IsAssignableFrom(property.PropertyType) || typeof(IEnumerable<BoundNode>).IsAssignableFrom(property.PropertyType))
