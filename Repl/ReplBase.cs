@@ -229,6 +229,9 @@ internal abstract class ReplBase
 
     private void UpdateDocumentFromHistory(ObservableCollection<string> document, InputView view)
     {
+        if (_history.Count == 0)
+            return;
+
         document.Clear();
 
         var historyItem = _history[_historyIndex];
@@ -245,11 +248,20 @@ internal abstract class ReplBase
         var line = document[lineIndex];
         var start = view.CurrentCharacter;
         if (start >= line.Length)
-            return;
+        {
+            if (view.CurrentLineIndex == document.Count - 1)
+                return;
 
-        var before = line[..start];
-        var after = line[(start + 1)..];
-        document[lineIndex] = before + after;
+            var nextLine = document[view.CurrentLineIndex + 1];
+            document[view.CurrentLineIndex] += nextLine;
+            document.RemoveAt(view.CurrentLineIndex + 1);
+        }
+        else
+        {
+            var before = line[..start];
+            var after = line[(start + 1)..];
+            document[lineIndex] = before + after;
+        }
     }
 
     private void HandleBackspace(ObservableCollection<string> document, InputView view)

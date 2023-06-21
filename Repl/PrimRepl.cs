@@ -24,7 +24,9 @@ internal sealed class PrimRepl : ReplBase
         {
             var color = ConsoleColor.DarkGray;
             if (token.Kind.IsLiteral())
-                color = ConsoleColor.White;
+                color = ConsoleColor.Cyan;
+            else if (token.Kind == TokenKind.Identifier)
+                color = ConsoleColor.DarkYellow;
             else if (token.Kind.IsKeyword())
                 color = ConsoleColor.Blue;
 
@@ -39,7 +41,8 @@ internal sealed class PrimRepl : ReplBase
 
         var syntaxTree = SyntaxTree.Parse(text);
 
-        if (syntaxTree.Diagnostics.Any())
+        INode node = syntaxTree.Root.Statement;
+        if (node.GetLastToken().IsMissing)
             return false;
 
         return true;
