@@ -187,11 +187,11 @@ internal sealed class Parser
     private Expression ParseBinaryExpression(int parentPrecedence = 0)
     {
         Expression left;
-        var unaryPrecendence = Current.Kind.GetUnaryOperatorPrecedence();
-        if (unaryPrecendence != 0 && unaryPrecendence >= parentPrecedence)
+        var unaryPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
+        if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
         {
             var operationToken = NextToken();
-            var operand = ParseBinaryExpression(unaryPrecendence);
+            var operand = ParseBinaryExpression(unaryPrecedence);
             left = new UnaryExpression(operationToken, operand);
         }
         else
@@ -201,12 +201,12 @@ internal sealed class Parser
 
         while (true)
         {
-            var precendence = Current.Kind.GetBinaryOperatorPrecedence();
-            if (precendence == 0 || precendence <= parentPrecedence)
+            var precedence = Current.Kind.GetBinaryOperatorPrecedence();
+            if (precedence == 0 || precedence <= parentPrecedence)
                 break;
 
             var operatorToken = NextToken();
-            var right = ParseBinaryExpression(precendence);
+            var right = ParseBinaryExpression(precedence);
             left = new BinaryExpression(left, operatorToken, right);
         }
         return left;
@@ -219,6 +219,7 @@ internal sealed class Parser
             TokenKind.OpenParenthesis => ParseGroupExpression(),
             TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(),
             TokenKind.I32 => ParseNumberLiteralExpression(),
+            TokenKind.String => ParseStringLiteralExpression(),
             _ => ParseNameExpression(),
         };
     }
@@ -241,6 +242,12 @@ internal sealed class Parser
     private Expression ParseNumberLiteralExpression()
     {
         var literal = MatchToken(TokenKind.I32);
+        return new LiteralExpression(literal);
+    }
+
+    private Expression ParseStringLiteralExpression()
+    {
+        var literal = MatchToken(TokenKind.String);
         return new LiteralExpression(literal);
     }
 

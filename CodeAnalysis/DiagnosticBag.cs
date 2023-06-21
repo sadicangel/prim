@@ -25,4 +25,5 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportInvalidConversion(TextSpan span, Type sourceType, Type destinationType) => ReportError(span, DiagnosticMessage.InvalidConversion(sourceType, destinationType));
     public void ReportRedeclaration(Token identifier) => ReportError(identifier.Span, DiagnosticMessage.Redeclaration(identifier.Text));
     public void ReportReadOnlyAssignment(TextSpan span, string name) => ReportError(span, DiagnosticMessage.ReadOnlyAssignment(name));
+    internal void ReportUnterminatedString(TextSpan span) => ReportError(span, DiagnosticMessage.UnterminatedString());
 }

@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Text;
+using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
@@ -166,6 +167,10 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case ['"', ..]:
+                ReadStringToken();
+                break;
+
             case ['0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
                 ReadNumberToken();
                 break;
@@ -237,5 +242,42 @@ internal sealed class Lexer
 
         _kind = TokenKind.I32;
         _value = value;
+    }
+
+    private void ReadStringToken()
+    {
+        var builder = new StringBuilder();
+        var done = false;
+        _position++;
+        while (!done)
+        {
+            var span = _text[_position..];
+            switch (span)
+            {
+                case ['\0', ..]:
+                case ['\r', ..]:
+                case ['\n', ..]:
+                case []:
+                    _diagnostics.ReportUnterminatedString(new TextSpan(_start, 1));
+                    done = true;
+                    break;
+                case ['\\', '"', ..]:
+                    _position++;
+                    builder.Append(Current);
+                    _position++;
+                    break;
+                case ['"', ..]:
+                    _position++;
+                    done = true;
+                    break;
+                default:
+                    builder.Append(Current);
+                    _position++;
+                    break;
+            }
+        }
+
+        _kind = TokenKind.String;
+        _value = builder.ToString();
     }
 }

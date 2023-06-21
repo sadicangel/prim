@@ -19,4 +19,5 @@ public static class DiagnosticMessage
     public static string Redeclaration(string identifier) => $"Redeclaration of '{identifier}'";
 
     public static string ReadOnlyAssignment(string identifier) => $"Invalid assignment to read-only '{identifier}'";
+    public static string UnterminatedString() => "Unterminated string literal.";
 }

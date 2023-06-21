@@ -269,6 +269,14 @@ public sealed class EvaluatorTests
                 """,
                 $"{DiagnosticMessage.ReadOnlyAssignment("i")}"
             },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnterminatedString)}",
+                """
+                ⟨"⟩text
+                """,
+                $"{DiagnosticMessage.UnterminatedString()}"
+            },
         };
     }
 }

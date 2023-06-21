@@ -81,6 +81,13 @@ public sealed class LexerTests
 
             new TokenInfo(TokenKind.Identifier, "a"),
             new TokenInfo(TokenKind.Identifier, "abc"),
+
+            new TokenInfo(TokenKind.String, """
+                                            "test"
+                                            """),
+            new TokenInfo(TokenKind.String, """
+                                            "te\"st"
+                                            """),
         };
     }
 
@@ -114,6 +121,9 @@ public sealed class LexerTests
             return true;
 
         if (k1 is TokenKind.I32 && k2 is TokenKind.I32)
+            return true;
+
+        if (k1 is TokenKind.String && k2 is TokenKind.String)
             return true;
 
         if (k1 is TokenKind.Bang && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
