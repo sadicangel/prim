@@ -4,9 +4,9 @@ namespace CodeAnalysis.Text;
 
 public sealed record class SourceText : IReadOnlyList<char>
 {
-    private readonly string _text;
+    private readonly ReadOnlyMemory<char> _text;
 
-    public SourceText(string text)
+    public SourceText(ReadOnlyMemory<char> text)
     {
         _text = text;
         Lines = ParseLines(this, text);
@@ -17,13 +17,13 @@ public sealed record class SourceText : IReadOnlyList<char>
     public int Length { get => _text.Length; }
     int IReadOnlyCollection<char>.Count { get => _text.Length; }
 
-    public char this[int index] { get => _text[index]; }
+    public char this[int index] { get => _text.Span[index]; }
 
-    public ReadOnlySpan<char> this[TextSpan span] { get => _text.AsSpan()[(Range)span]; }
+    public ReadOnlySpan<char> this[TextSpan span] { get => _text.Span[(Range)span]; }
 
-    public ReadOnlySpan<char> this[Range range] { get => _text.AsSpan()[range]; }
+    public ReadOnlySpan<char> this[Range range] { get => _text.Span[range]; }
 
-    public ReadOnlySpan<char> Slice(int start, int length) => _text.AsSpan(start, length);
+    public ReadOnlySpan<char> Slice(int start, int length) => _text.Span.Slice(start, length);
 
     public int GetLineIndex(int position)
     {
@@ -51,12 +51,17 @@ public sealed record class SourceText : IReadOnlyList<char>
         return lower - 1;
     }
 
-    public override string ToString() => _text;
+    public override string ToString() => _text.ToString();
 
-    public IEnumerator<char> GetEnumerator() => _text.GetEnumerator();
+    public IEnumerator<char> GetEnumerator()
+    {
+        for (int i = 0; i < _text.Length; ++i)
+            yield return _text.Span[i];
+
+    }
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private static IReadOnlyList<TextLine> ParseLines(SourceText sourceText, string text)
+    private static IReadOnlyList<TextLine> ParseLines(SourceText sourceText, ReadOnlyMemory<char> text)
     {
         var lines = new List<TextLine>();
 
@@ -64,7 +69,7 @@ public sealed record class SourceText : IReadOnlyList<char>
         var lineStart = 0;
         while (position < text.Length)
         {
-            var lineBreakWidth = GetLineBreakWidth(text, position);
+            var lineBreakWidth = GetLineBreakWidth(text.Span, position);
             if (lineBreakWidth == 0)
             {
                 position++;

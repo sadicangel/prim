@@ -1,19 +1,19 @@
 ﻿namespace CodeAnalysis.Syntax;
 public sealed class ParserTests
 {
-    private static Expression ParseExpression(string text) => Assert.IsType<ExpressionStatement>(SyntaxTree.Parse(text).Root.Statement).Expression;
+    private static Expression ParseExpression(ReadOnlyMemory<char> text) => Assert.IsType<ExpressionStatement>(SyntaxTree.Parse(text).Root.Statement).Expression;
 
     [Theory]
     [MemberData(nameof(GetBinaryOperatorsPairsData))]
     public void Parser_BinaryExpression_HonorsPrecedence(TokenKind op1, TokenKind op2)
     {
-        var op1Precedence = op1.GetBinaryOperatorPrecendence();
-        var op2Precedence = op2.GetBinaryOperatorPrecendence();
+        var op1Precedence = op1.GetBinaryOperatorPrecedence();
+        var op2Precedence = op2.GetBinaryOperatorPrecedence();
 
         var op1Text = op1.GetText();
         var op2Text = op2.GetText();
 
-        var text = $"a {op1Text} b {op2Text} c";
+        var text = $"a {op1Text} b {op2Text} c".AsMemory();
         var expr = ParseExpression(text);
 
         if (op1Precedence >= op2Precedence)
@@ -58,13 +58,13 @@ public sealed class ParserTests
     [MemberData(nameof(GetUnaryOperatorsPairsData))]
     public void Parser_UnaryExpression_HonorsPrecedence(TokenKind unaryKind, TokenKind binaryKind)
     {
-        var unaryPrecedence = unaryKind.GetUnaryOperatorPrecendence();
-        var binaryPrecedence = binaryKind.GetBinaryOperatorPrecendence();
+        var unaryPrecedence = unaryKind.GetUnaryOperatorPrecedence();
+        var binaryPrecedence = binaryKind.GetBinaryOperatorPrecedence();
 
         var unaryText = unaryKind.GetText();
         var binaryText = binaryKind.GetText();
 
-        var text = $"{unaryText} a {binaryText} b";
+        var text = $"{unaryText} a {binaryText} b".AsMemory();
         var expr = ParseExpression(text);
 
         if (unaryPrecedence >= binaryPrecedence)

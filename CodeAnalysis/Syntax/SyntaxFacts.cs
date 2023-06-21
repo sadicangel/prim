@@ -1,8 +1,8 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-internal static class SyntaxFacts
+public static class SyntaxFacts
 {
-    public static int GetUnaryOperatorPrecendence(this TokenKind type) => type switch
+    public static int GetUnaryOperatorPrecedence(this TokenKind type) => type switch
     {
         TokenKind.Bang or
         TokenKind.Minus or
@@ -12,7 +12,7 @@ internal static class SyntaxFacts
         _ => 0,
     };
 
-    public static int GetBinaryOperatorPrecendence(this TokenKind type) => type switch
+    public static int GetBinaryOperatorPrecedence(this TokenKind type) => type switch
     {
         TokenKind.Percent or
         TokenKind.Star or
@@ -54,6 +54,10 @@ internal static class SyntaxFacts
         _ => TokenKind.Identifier,
     };
 
+    public static bool IsNumber(this TokenKind kind) => kind is TokenKind.I32;
+    public static bool IsBoolean(this TokenKind kind) => kind is TokenKind.True or TokenKind.False;
+    public static bool IsLiteral(this TokenKind kind) => kind.IsNumber() || kind.IsBoolean();
+
     public static bool IsKeyword(this TokenKind kind) => kind
         is TokenKind.Const
         or TokenKind.Else
@@ -90,9 +94,9 @@ internal static class SyntaxFacts
         or TokenKind.Slash
         or TokenKind.Star;
 
-    public static IEnumerable<TokenKind> GetUnaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecendence(k) > 0);
+    public static IEnumerable<TokenKind> GetUnaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecedence(k) > 0);
 
-    public static IEnumerable<TokenKind> GetBinaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecendence(k) > 0);
+    public static IEnumerable<TokenKind> GetBinaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecedence(k) > 0);
 
     public static string? GetText(this TokenKind kind) => kind switch
     {

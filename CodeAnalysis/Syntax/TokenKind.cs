@@ -13,7 +13,7 @@ public enum TokenKind
     CloseParenthesis,
     Semicolon,
 
-    // Operatos
+    // Operators
     Ampersand,
     AmpersandAmpersand,
     Bang,

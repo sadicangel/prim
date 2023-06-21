@@ -2,10 +2,10 @@
 public sealed class EvaluatorTests
 {
     [Theory]
-    [MemberData(nameof(GetEvalueResultsData))]
+    [MemberData(nameof(GetEvaluateResultsData))]
     public void Evaluator_Evaluates_CorrectValues(string text, object expectedValue)
     {
-        var syntaxTree = SyntaxTree.Parse(text);
+        var syntaxTree = SyntaxTree.Parse(text.AsMemory());
         var compilation = new Compilation(syntaxTree);
         var variables = new Dictionary<Variable, object>();
         var result = compilation.Evaluate(variables);
@@ -15,7 +15,7 @@ public sealed class EvaluatorTests
         Assert.Equal(expectedValue, result.Value);
     }
 
-    public static IEnumerable<object[]> GetEvalueResultsData()
+    public static IEnumerable<object[]> GetEvaluateResultsData()
     {
         return new object[][]
         {
