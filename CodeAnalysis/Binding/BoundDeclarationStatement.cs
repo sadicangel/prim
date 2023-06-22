@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundDeclarationStatement(VariableSymbol Variable, BoundExpression Expression) : BoundStatement(BoundNodeKind.BoundDeclarationStatement)
+internal sealed record class BoundDeclarationStatement(VariableSymbol Variable, BoundExpression Expression) : BoundStatement(BoundNodeKind.DeclarationStatement)
 {
     public override void Accept(IBoundStatementVisitor visitor) => visitor.Accept(this);
     public override IEnumerable<INode> GetChildren()

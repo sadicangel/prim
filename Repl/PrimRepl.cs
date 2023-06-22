@@ -106,7 +106,8 @@ internal sealed class PrimRepl : ReplBase
 
         if (!diagnostics.Any())
         {
-            Console.Out.WriteLineColored(result.Value, ConsoleColor.White);
+            if (result.Value is not null)
+                Console.Out.WriteLineColored(result.Value, ConsoleColor.White);
             _previousCompilation = compilation;
         }
         else

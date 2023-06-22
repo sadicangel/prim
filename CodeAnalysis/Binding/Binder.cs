@@ -127,7 +127,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
     {
-        var expression = BindExpression(statement.Expression);
+        var expression = BindExpression(statement.Expression, allowVoid: true);
         return new BoundExpressionStatement(expression);
     }
 
@@ -140,7 +140,18 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return boundExpression;
     }
 
-    private BoundExpression BindExpression(Expression expression) => expression.Accept(this);
+    private BoundExpression BindExpression(Expression expression) => BindExpression(expression, allowVoid: false);
+
+    private BoundExpression BindExpression(Expression expression, bool allowVoid)
+    {
+        var result = expression.Accept(this);
+        if (!allowVoid && result.Type == TypeSymbol.Void)
+        {
+            _diagnostics.ReportInvalidExpressionType(expression.Span, result.Type);
+            return new BoundNeverExpression();
+        }
+        return result;
+    }
 
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(IfExpression expression)
@@ -214,6 +225,36 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         }
 
         return new BoundVariableExpression(variable);
+    }
+    BoundExpression IExpressionVisitor<BoundExpression>.Visit(CallExpression expression)
+    {
+        var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
+
+        if (!BuiltinFunctions.TryLookup(expression.Identifier.Text, out var function))
+        {
+            _diagnostics.ReportUndefinedName(expression.Identifier);
+            return new BoundNeverExpression();
+        }
+
+        if (boundArguments.Length != function.Parameters.Length)
+        {
+            _diagnostics.ReportInvalidArgumentCount(expression.Span, function.Name, function.Parameters.Length, boundArguments.Length);
+            return new BoundNeverExpression();
+        }
+
+        for (int i = 0; i < boundArguments.Length; ++i)
+        {
+            var argument = boundArguments[i];
+            var parameter = function.Parameters[i];
+
+            if (!argument.Type.IsAssignableTo(parameter.Type))
+            {
+                _diagnostics.ReportInvalidArgumentType(expression.Arguments[i].Span, parameter.Name, parameter.Type, argument.Type);
+                return new BoundNeverExpression();
+            }
+        }
+
+        return new BoundCallExpression(function, boundArguments);
     }
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(AssignmentExpression expression)

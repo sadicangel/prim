@@ -6,14 +6,14 @@ using System.Reflection;
 
 namespace CodeAnalysis;
 
-internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStatementVisitor
+internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatementVisitor
 {
     private readonly BoundStatement _boundStatement;
-    private readonly Dictionary<VariableSymbol, object> _variables;
+    private readonly Dictionary<VariableSymbol, object?> _variables;
 
     private object? _lastValue;
 
-    public Evaluator(BoundStatement boundStatement, Dictionary<VariableSymbol, object> variables)
+    public Evaluator(BoundStatement boundStatement, Dictionary<VariableSymbol, object?> variables)
     {
         _boundStatement = boundStatement;
         _variables = variables;
@@ -34,7 +34,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
     }
     void IBoundStatementVisitor.Accept(BoundIfStatement statement)
     {
-        var condition = (bool)EvaluateExpression(statement.Condition);
+        var condition = (bool)EvaluateExpression(statement.Condition)!;
         if (condition)
             EvaluateStatement(statement.Then);
         else if (statement.HasElseClause)
@@ -43,14 +43,14 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
     void IBoundStatementVisitor.Accept(BoundWhileStatement statement)
     {
-        while ((bool)EvaluateExpression(statement.Condition))
+        while ((bool)EvaluateExpression(statement.Condition)!)
             EvaluateStatement(statement.Body);
     }
 
     void IBoundStatementVisitor.Accept(BoundForStatement statement)
     {
-        var lowerBound = (int)EvaluateExpression(statement.LowerBound);
-        var upperBound = (int)EvaluateExpression(statement.UpperBound);
+        var lowerBound = (int)EvaluateExpression(statement.LowerBound)!;
+        var upperBound = (int)EvaluateExpression(statement.UpperBound)!;
 
         for (var i = lowerBound; i <= upperBound; ++i)
         {
@@ -63,24 +63,38 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
     void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
 
-    private object EvaluateExpression(BoundExpression expression) => expression.Accept(this);
+    private object? EvaluateExpression(BoundExpression expression) => expression.Accept(this);
 
-    object IBoundExpressionVisitor<object>.Visit(BoundNeverExpression expression) => _lastValue!;
+    object? IBoundExpressionVisitor<object?>.Visit(BoundNeverExpression expression) => _lastValue;
 
-    object IBoundExpressionVisitor<object>.Visit(BoundIfExpression expression)
+    object? IBoundExpressionVisitor<object?>.Visit(BoundIfExpression expression)
     {
-        var isTrue = (bool)EvaluateExpression(expression.Condition);
+        var isTrue = (bool)EvaluateExpression(expression.Condition)!;
 
         return isTrue ? EvaluateExpression(expression.Then) : EvaluateExpression(expression.Else);
     }
 
-    object IBoundExpressionVisitor<object>.Visit(BoundLiteralExpression expression) => expression.Value!;
+    object? IBoundExpressionVisitor<object?>.Visit(BoundLiteralExpression expression) => expression.Value!;
 
-    object IBoundExpressionVisitor<object>.Visit(BoundVariableExpression expression) => _variables[expression.Variable];
+    object? IBoundExpressionVisitor<object?>.Visit(BoundVariableExpression expression) => _variables[expression.Variable];
 
-    object IBoundExpressionVisitor<object>.Visit(BoundAssignmentExpression expression) => _variables[expression.Variable] = expression.Expression.Accept(this);
+    object? IBoundExpressionVisitor<object?>.Visit(BoundCallExpression expression)
+    {
+        switch (expression.Function.Name)
+        {
+            case string name when name == BuiltinFunctions.Input.Name:
+                return Console.ReadLine();
+            case string name when name == BuiltinFunctions.Print.Name:
+                Console.WriteLine(EvaluateExpression(expression.Arguments[0]));
+                return null;
+            default:
+                throw new InvalidOperationException($"Undefined function {expression.Function.Name}");
+        }
+    }
 
-    object IBoundExpressionVisitor<object>.Visit(BoundUnaryExpression expression)
+    object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _variables[expression.Variable] = expression.Expression.Accept(this);
+
+    object? IBoundExpressionVisitor<object?>.Visit(BoundUnaryExpression expression)
     {
         var operation = expression.GetOperation();
         var value = expression.Operand.Accept(this);
@@ -88,7 +102,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
         return operation.Invoke(value);
     }
 
-    object IBoundExpressionVisitor<object>.Visit(BoundBinaryExpression expression)
+    object? IBoundExpressionVisitor<object?>.Visit(BoundBinaryExpression expression)
     {
         var operation = expression.GetOperation();
         var left = expression.Left.Accept(this);
@@ -101,11 +115,11 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 file static class BoundExpressionExtensions
 {
     private readonly record struct UnaryExpressionCacheKey(BoundUnaryOperatorKind Kind, TypeSymbol OperandType);
-    private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, ConcurrentDictionary<UnaryExpressionCacheKey, Func<object, object>>> UnaryExpressionCache = new();
+    private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, ConcurrentDictionary<UnaryExpressionCacheKey, Func<object?, object?>>> UnaryExpressionCache = new();
     private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, Func<Expression, UnaryExpression>> UnaryOperatorCache = new();
 
     private readonly record struct BinaryExpressionCacheKey(BoundBinaryOperatorKind Kind, TypeSymbol LeftType, TypeSymbol RightType);
-    private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, ConcurrentDictionary<BinaryExpressionCacheKey, Func<object, object, object>>> BinaryExpressionCache = new();
+    private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, ConcurrentDictionary<BinaryExpressionCacheKey, Func<object?, object?, object?>>> BinaryExpressionCache = new();
     private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, Func<Expression, Expression, BinaryExpression>> BinaryOperatorCache = new();
 
     public static Func<Expression, UnaryExpression> GetExpressionFactory(this BoundUnaryOperatorKind kind)
@@ -148,13 +162,13 @@ file static class BoundExpressionExtensions
         });
     }
 
-    public static Func<object, object> GetOperation(this BoundUnaryExpression expression)
+    public static Func<object?, object?> GetOperation(this BoundUnaryExpression expression)
     {
-        var cacheNode = UnaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<UnaryExpressionCacheKey, Func<object, object>>());
+        var cacheNode = UnaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<UnaryExpressionCacheKey, Func<object?, object?>>());
 
         return cacheNode.GetOrAdd(new UnaryExpressionCacheKey(expression.Operator.Kind, expression.Operand.Type), CreateOperation);
 
-        static Func<object, object> CreateOperation(UnaryExpressionCacheKey key)
+        static Func<object?, object?> CreateOperation(UnaryExpressionCacheKey key)
         {
             var (kind, operandType) = key;
             var operandClrType = operandType.GetClrType();
@@ -162,24 +176,24 @@ file static class BoundExpressionExtensions
             var operand = Expression.Parameter(typeof(object), "operand");
             var expr = kind.GetExpressionFactory();
             var body = Expression.Convert(expr.Invoke(Expression.Convert(operand, operandClrType)), typeof(object));
-            var expression = Expression.Lambda<Func<object, object>>(body, operand);
+            var expression = Expression.Lambda<Func<object?, object?>>(body, operand);
 
             return expression.Compile();
         }
     }
 
-    public static Func<object, object, object> GetOperation(this BoundBinaryExpression expression)
+    public static Func<object?, object?, object?> GetOperation(this BoundBinaryExpression expression)
     {
-        var cacheNode = BinaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<BinaryExpressionCacheKey, Func<object, object, object>>());
+        var cacheNode = BinaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<BinaryExpressionCacheKey, Func<object?, object?, object?>>());
 
         return cacheNode.GetOrAdd(new BinaryExpressionCacheKey(expression.Operator.Kind, expression.Left.Type, expression.Right.Type), CreateOperation);
 
-        static Func<object, object, object> CreateOperation(BinaryExpressionCacheKey key)
+        static Func<object?, object?, object?> CreateOperation(BinaryExpressionCacheKey key)
         {
             var (kind, leftType, rightType) = key;
             var leftClrType = leftType.GetClrType();
             var rightClrType = rightType.GetClrType();
-            Expression<Func<object, object, object>> expression;
+            Expression<Func<object?, object?, object?>> expression;
             if (kind == BoundBinaryOperatorKind.Add && (leftClrType == typeof(string) || rightClrType == typeof(string)))
             {
                 var left = Expression.Parameter(typeof(object), "left");
@@ -190,7 +204,7 @@ file static class BoundExpressionExtensions
                     throw new InvalidOperationException($"Could not find {nameof(String.Concat)} method");
 
                 var body = Expression.Convert(Expression.Call(instance: null, method, left, right), typeof(object));
-                expression = Expression.Lambda<Func<object, object, object>>(body, left, right);
+                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
             }
             else
             {
@@ -198,7 +212,7 @@ file static class BoundExpressionExtensions
                 var right = Expression.Parameter(typeof(object), "right");
                 var expr = kind.GetExpressionFactory();
                 var body = Expression.Convert(expr.Invoke(Expression.Convert(left, leftClrType), Expression.Convert(right, rightClrType)), typeof(object));
-                expression = Expression.Lambda<Func<object, object, object>>(body, left, right);
+                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
             }
             return expression.Compile();
         }

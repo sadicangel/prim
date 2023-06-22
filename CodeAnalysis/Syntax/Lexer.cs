@@ -67,6 +67,11 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case [',', ..]:
+                _kind = TokenKind.Comma;
+                _position++;
+                break;
+
             // Operators
             case ['&', '&', ..]:
                 _kind = TokenKind.AmpersandAmpersand;

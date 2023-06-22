@@ -12,6 +12,7 @@ public enum TokenKind
     CloseBrace,
     CloseParenthesis,
     Semicolon,
+    Comma,
 
     // Operators
     Ampersand,

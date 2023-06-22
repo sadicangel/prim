@@ -11,4 +11,5 @@ internal interface IBoundExpressionVisitor<out TResult>
     TResult Visit(BoundVariableExpression expression);
     TResult Visit(BoundAssignmentExpression expression);
     TResult Visit(BoundIfExpression expression);
+    TResult Visit(BoundCallExpression expression);
 }

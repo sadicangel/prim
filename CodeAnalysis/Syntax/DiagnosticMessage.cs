@@ -21,5 +21,8 @@ public static class DiagnosticMessage
     public static string Redeclaration(string identifier) => $"Redeclaration of '{identifier}'";
 
     public static string ReadOnlyAssignment(string identifier) => $"Invalid assignment to read-only '{identifier}'";
-    public static string UnterminatedString() => "Unterminated string literal.";
+    public static string UnterminatedString() => "Unterminated string literal";
+    public static string InvalidArgumentCount(string functionName, int expectedCount, int actualCount) => $"Function '{functionName}' expected {expectedCount} arguments. Got {actualCount}";
+    public static string InvalidArgumentType(string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => $"Parameter '{parameterName}' cannot be converted from type '{actualType}' to '{expectedType}'";
+    internal static string InvalidExpressionType(TypeSymbol type) => $"Invalid expression of type '{type}'";
 }

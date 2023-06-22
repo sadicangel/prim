@@ -220,7 +220,7 @@ internal sealed class Parser
             TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(Current.Kind),
             TokenKind.I32 or TokenKind.F32 => ParseNumberLiteralExpression(Current.Kind),
             TokenKind.String => ParseStringLiteralExpression(),
-            _ => ParseNameExpression(),
+            _ => ParseNameOrCallExpression(),
         };
     }
 
@@ -252,6 +252,42 @@ internal sealed class Parser
     {
         var literal = MatchToken(TokenKind.String);
         return new LiteralExpression(literal);
+    }
+
+    private Expression ParseNameOrCallExpression()
+    {
+        if (Current.Kind is TokenKind.Identifier && Peek(1).Kind is TokenKind.OpenParenthesis)
+            return ParseCallExpression();
+        else
+            return ParseNameExpression();
+    }
+
+    private Expression ParseCallExpression()
+    {
+        var identifierToken = MatchToken(TokenKind.Identifier);
+        var openParenthesisToken = MatchToken(TokenKind.OpenParenthesis);
+        var arguments = ParseArguments();
+        var closeParenthesisToken = MatchToken(TokenKind.CloseParenthesis);
+        return new CallExpression(identifierToken, openParenthesisToken, arguments, closeParenthesisToken);
+
+        SeparatedNodeList<Expression> ParseArguments()
+        {
+            var nodes = new List<INode>();
+
+            while (Current.Kind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
+            {
+                var expression = ParseExpression();
+                nodes.Add(expression);
+
+                if (Current.Kind is not TokenKind.CloseParenthesis)
+                {
+                    var commaToken = MatchToken(TokenKind.Comma);
+                    nodes.Add(commaToken);
+                }
+            }
+
+            return new SeparatedNodeList<Expression>(nodes.ToArray());
+        }
     }
 
     private Expression ParseNameExpression()

@@ -29,7 +29,7 @@ public sealed class Compilation
         }
     }
 
-    public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
+    public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)
     {
         var boundStatement = GlobalScope.Statement;
 

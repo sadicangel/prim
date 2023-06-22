@@ -27,4 +27,7 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportRedeclaration(Token identifier) => ReportError(identifier.Span, DiagnosticMessage.Redeclaration(identifier.Text));
     public void ReportReadOnlyAssignment(TextSpan span, string name) => ReportError(span, DiagnosticMessage.ReadOnlyAssignment(name));
     internal void ReportUnterminatedString(TextSpan span) => ReportError(span, DiagnosticMessage.UnterminatedString());
+    internal void ReportInvalidArgumentCount(TextSpan span, string functionName, int expectedCount, int actualCount) => ReportError(span, DiagnosticMessage.InvalidArgumentCount(functionName, expectedCount, actualCount));
+    internal void ReportInvalidArgumentType(TextSpan span, string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidArgumentType(parameterName, expectedType, actualType));
+    internal void ReportInvalidExpressionType(TextSpan span, TypeSymbol type) => ReportError(span, DiagnosticMessage.InvalidExpressionType(type));
 }

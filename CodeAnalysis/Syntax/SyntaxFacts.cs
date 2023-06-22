@@ -109,6 +109,7 @@ public static class SyntaxFacts
         TokenKind.BangEquals => "!=",
         TokenKind.CloseBrace => "}",
         TokenKind.CloseParenthesis => ")",
+        TokenKind.Comma => ",",
         TokenKind.Const => "const",
         TokenKind.Else => "else",
         TokenKind.Equals => "=",
