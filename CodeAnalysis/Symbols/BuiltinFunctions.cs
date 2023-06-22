@@ -8,6 +8,7 @@ internal static class BuiltinFunctions
 {
     public static readonly FunctionSymbol Print = new("print", TypeSymbol.Void, new ParameterSymbol("value", TypeSymbol.Any));
     public static readonly FunctionSymbol Input = new("input", TypeSymbol.String, Array.Empty<ParameterSymbol>());
+    public static readonly FunctionSymbol Random = new("random", TypeSymbol.I32, new ParameterSymbol("max", TypeSymbol.I32));
 
     private static readonly Lazy<ConcurrentDictionary<string, FunctionSymbol>> FunctionMap = new(() => new ConcurrentDictionary<string, FunctionSymbol>(typeof(BuiltinFunctions)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
