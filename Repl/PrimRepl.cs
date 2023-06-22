@@ -23,13 +23,14 @@ internal sealed class PrimRepl : ReplBase
         var tokens = SyntaxTree.ParseTokens(line.AsMemory());
         foreach (var token in tokens)
         {
-            var color = ConsoleColor.DarkGray;
-            if (token.Kind.IsLiteral())
-                color = ConsoleColor.Cyan;
-            else if (token.Kind == TokenKind.Identifier)
-                color = ConsoleColor.DarkYellow;
-            else if (token.Kind.IsKeyword())
-                color = ConsoleColor.Blue;
+            var color = token.Kind switch
+            {
+                TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
+                TokenKind.String => ConsoleColor.Magenta,
+                TokenKind.Identifier => ConsoleColor.DarkYellow,
+                TokenKind k when k.IsKeyword() => ConsoleColor.Blue,
+                _ => ConsoleColor.DarkGray,
+            };
 
             Console.Out.WriteColored(token.Text, color);
         }
@@ -105,7 +106,7 @@ internal sealed class PrimRepl : ReplBase
 
         if (!diagnostics.Any())
         {
-            Console.Out.WriteLineColored(result.Value, ConsoleColor.Magenta);
+            Console.Out.WriteLineColored(result.Value, ConsoleColor.White);
             _previousCompilation = compilation;
         }
         else
