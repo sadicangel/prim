@@ -16,7 +16,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     internal static BoundGlobalScope BindGlobalScope(CompilationUnit compilationUnit, BoundGlobalScope? previousScope = null)
     {
-        var parentScope = CreateParentScopes(previousScope);
+        var parentScope = CreateParentScope(previousScope);
         var binder = new Binder(parentScope);
         var expression = binder.BindStatement(compilationUnit.Statement);
         var variables = binder._scope.Variables;
@@ -25,7 +25,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundGlobalScope(diagnostics, variables, expression, previousScope);
     }
 
-    private static BoundScope? CreateParentScopes(BoundGlobalScope? previous)
+    private static BoundScope? CreateParentScope(BoundGlobalScope? previous)
     {
         var stack = new Stack<BoundGlobalScope>();
 
@@ -35,7 +35,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
             previous = previous.Previous;
         }
 
-        var parent = default(BoundScope);
+        var parent = CreateRootScope();
 
         while (stack.Count > 0)
         {
@@ -47,6 +47,15 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         }
 
         return parent;
+    }
+
+    private static BoundScope CreateRootScope()
+    {
+        var root = new BoundScope(null);
+        foreach (var function in BuiltinFunctions.All)
+            if (!root.TryDeclare(function))
+                throw new InvalidOperationException($"Could not declare builtin function {function.Name}");
+        return root;
     }
 
     private BoundStatement BindStatement(Statement statement) => statement.Accept(this);
@@ -102,7 +111,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         {
             variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, TypeSymbol.I32);
             // Check outer scope for name.
-            if (_scope.Parent!.TryLookup(variable.Name, out _) || !_scope.TryDeclare(variable))
+            if (_scope.Parent!.TryLookup(variable.Name, out VariableSymbol? _) || !_scope.TryDeclare(variable))
                 _diagnostics.ReportRedeclaration(statement.IdentifierToken);
         }
         else
@@ -218,7 +227,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
             return new BoundNeverExpression();
         }
 
-        if (!_scope.TryLookup(name, out var variable))
+        if (!_scope.TryLookup(name, out VariableSymbol? variable))
         {
             _diagnostics.ReportUndefinedName(expression.IdentifierToken);
             return new BoundNeverExpression();
@@ -230,7 +239,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     {
         var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
 
-        if (!BuiltinFunctions.TryLookup(expression.Identifier.Text, out var function))
+        if (!_scope.TryLookup(expression.Identifier.Text, out FunctionSymbol? function))
         {
             _diagnostics.ReportUndefinedName(expression.Identifier);
             return new BoundNeverExpression();
@@ -265,7 +274,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         if (boundExpression.Type == TypeSymbol.Never)
             return new BoundNeverExpression();
 
-        if (!_scope.TryLookup(name, out var variable))
+        if (!_scope.TryLookup(name, out VariableSymbol? variable))
         {
             _diagnostics.ReportUndefinedName(expression.IdentifierToken);
             return boundExpression;
