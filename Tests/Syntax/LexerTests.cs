@@ -79,6 +79,9 @@ public sealed class LexerTests
             new TokenInfo(TokenKind.I32, "1"),
             new TokenInfo(TokenKind.I32, "123"),
 
+            new TokenInfo(TokenKind.F32, ".1"),
+            new TokenInfo(TokenKind.F32, "1.23"),
+
             new TokenInfo(TokenKind.Identifier, "a"),
             new TokenInfo(TokenKind.Identifier, "abc"),
 
@@ -120,7 +123,7 @@ public sealed class LexerTests
         if (k1IsKeyword && k2 is TokenKind.Identifier)
             return true;
 
-        if (k1 is TokenKind.I32 && k2 is TokenKind.I32)
+        if (k1.IsNumber() && k2.IsNumber())
             return true;
 
         if (k1 is TokenKind.String && k2 is TokenKind.String)

@@ -282,6 +282,12 @@ public sealed class EvaluatorTests
                 """,
                 $"{DiagnosticMessage.UnterminatedString()}"
             },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidNumber)} for multiple '.' in a number",
+                "⟨1.1.1⟩",
+                $"{DiagnosticMessage.InvalidNumber("1.1.1", TypeSymbol.F32)}"
+            },
         };
     }
 }

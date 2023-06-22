@@ -232,33 +232,45 @@ internal sealed class Lexer
 
     private void ReadNumberToken()
     {
+        var isInteger = Current != '.';
         do
         {
             _position++;
         }
-        while (Char.IsDigit(Current) || Current == '.');
+        while (Char.IsDigit(Current));
+
+        // Scan the decimal part of a floating point?
+        if (isInteger && _text[_position..] is ['.', '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..])
+        {
+            isInteger = false;
+            // We stop when there is not dot after a number. This way we grab all dots in a number (which we report as incorrect).
+            while (true)
+            {
+                do
+                {
+                    _position++;
+                }
+                while (Char.IsDigit(Current));
+
+                // Keep consuming if the next input is a single '.'.
+                if (_text[_position..] is not ['.', not '.', ..])
+                    break;
+            }
+        }
+
+
 
         var text = _text[_start.._position];
-        (_kind, _value) = Count(text, '.') switch
-        {
-            0 => (TokenKind.I32, EnsureCorrectType<int>(text, TypeSymbol.I32)),
-            _ => (TokenKind.F32, EnsureCorrectType<float>(text, TypeSymbol.F32)),
-        };
+
+        (_kind, _value) = isInteger
+            ? (TokenKind.I32, EnsureCorrectType<int>(text, TypeSymbol.I32))
+            : (TokenKind.F32, EnsureCorrectType<float>(text, TypeSymbol.F32));
 
         object EnsureCorrectType<T>(ReadOnlySpan<char> text, TypeSymbol type) where T : unmanaged, ISpanParsable<T>
         {
             if (!T.TryParse(text, provider: null, out T value))
                 _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), type);
             return value;
-        }
-
-        static int Count(ReadOnlySpan<char> text, char c)
-        {
-            var count = 0;
-            for (var i = 0; i < text.Length; ++i)
-                if (text[i] == c)
-                    count++;
-            return count;
         }
     }
 
