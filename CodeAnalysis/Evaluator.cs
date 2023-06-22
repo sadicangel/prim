@@ -104,6 +104,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
         static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind, TypeSymbol leftType, TypeSymbol rightType) => kind switch
         {
+            BoundBinaryOperatorKind.Addition when leftType == TypeSymbol.String => static (l, r) => (string)l + (string)r,
             BoundBinaryOperatorKind.Addition => static (l, r) => (int)l + (int)r,
             BoundBinaryOperatorKind.And when leftType == TypeSymbol.Bool => static (l, r) => (bool)l & (bool)r,
             BoundBinaryOperatorKind.And when leftType == TypeSymbol.I32 => static (l, r) => (int)l & (int)r,

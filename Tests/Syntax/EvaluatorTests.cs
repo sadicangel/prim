@@ -70,6 +70,9 @@ public sealed class EvaluatorTests
             new object[] { "{ var a = 0; if a == 4 a = 10 else a = 5 a }", 5 },
             new object[] { "{ var i = 10; var result = 0; while i > 0 { result = result + i; i = i - 1; } result }", 55 },
             new object[] { "{ var result = 0; for var i in 1..10 { result = result + i; } result}", 55 },
+            new object[] { """
+                "Hello" + " " + "World!"
+                """, "Hello World!" },
         };
     }
 

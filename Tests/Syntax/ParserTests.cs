@@ -5,7 +5,7 @@ public sealed class ParserTests
 
     [Theory]
     [MemberData(nameof(GetBinaryOperatorsPairsData))]
-    public void Parser_BinaryExpression_HonorsPrecedence(TokenKind op1, TokenKind op2)
+    public void Parser_BinaryExpression_HonoursPrecedence(TokenKind op1, TokenKind op2)
     {
         var op1Precedence = op1.GetBinaryOperatorPrecedence();
         var op2Precedence = op2.GetBinaryOperatorPrecedence();
@@ -56,7 +56,7 @@ public sealed class ParserTests
 
     [Theory]
     [MemberData(nameof(GetUnaryOperatorsPairsData))]
-    public void Parser_UnaryExpression_HonorsPrecedence(TokenKind unaryKind, TokenKind binaryKind)
+    public void Parser_UnaryExpression_HonoursPrecedence(TokenKind unaryKind, TokenKind binaryKind)
     {
         var unaryPrecedence = unaryKind.GetUnaryOperatorPrecedence();
         var binaryPrecedence = binaryKind.GetBinaryOperatorPrecedence();

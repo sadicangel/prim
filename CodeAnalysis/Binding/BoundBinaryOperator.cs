@@ -33,6 +33,8 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, TypeSymbol.Bool),
         new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, TypeSymbol.Bool),
         new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, TypeSymbol.Bool),
+
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Addition, TypeSymbol.String),
     };
 
     public BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, TypeSymbol operandType)

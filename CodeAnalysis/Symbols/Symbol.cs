@@ -12,8 +12,8 @@ public abstract record class Symbol(string Name, SymbolKind Kind) : INode
     {
         var marker = isLast ? "└──" : "├──";
 
-        writer.WriteColored(indent, ConsoleColor.DarkGray);
-        writer.WriteColored(marker, ConsoleColor.DarkGray);
+        writer.WriteColored((object)indent, ConsoleColor.DarkGray);
+        writer.WriteColored((object)marker, ConsoleColor.DarkGray);
         writer.WriteColored(Kind, ConsoleColor.Cyan);
         writer.WriteLine();
     }
