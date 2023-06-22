@@ -52,7 +52,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
         var lowerBound = (int)EvaluateExpression(statement.LowerBound)!;
         var upperBound = (int)EvaluateExpression(statement.UpperBound)!;
 
-        for (var i = lowerBound; i <= upperBound; ++i)
+        for (var i = lowerBound; i < upperBound; ++i)
         {
             _variables[statement.Variable] = i;
             EvaluateStatement(statement.Body);
@@ -82,17 +82,28 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
     {
         switch (expression.Function.Name)
         {
-            case string name when name == BuiltinFunctions.Input.Name:
+            case string name when name == BuiltinFunctions.ReadLine.Name:
                 return Console.ReadLine();
-            case string name when name == BuiltinFunctions.Print.Name:
+
+            case string name when name == BuiltinFunctions.WriteLine.Name:
                 Console.WriteLine(EvaluateExpression(expression.Arguments[0]));
                 return null;
+
+            case string name when name == BuiltinFunctions.ToStr.Name:
+                return EvaluateExpression(expression.Arguments[0])?.ToString();
+
+            case string name when name == BuiltinFunctions.IsSame.Name:
+                return ReferenceEquals(EvaluateExpression(expression.Arguments[0]), EvaluateExpression(expression.Arguments[1]));
+
             case string name when name == BuiltinFunctions.Random.Name:
                 return Random.Shared.Next((int)EvaluateExpression(expression.Arguments[0])!);
+
             default:
                 throw new InvalidOperationException($"Undefined function {expression.Function.Name}");
         }
     }
+
+    object? IBoundExpressionVisitor<object?>.Visit(BoundConvertExpression expression) => expression.Type.Convert(EvaluateExpression(expression.Expression));
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _variables[expression.Variable] = expression.Expression.Accept(this);
 

@@ -16,4 +16,5 @@ public enum NodeKind
     WhileStatement,
     ForStatement,
     CallExpression,
+    ConvertExpression,
 }

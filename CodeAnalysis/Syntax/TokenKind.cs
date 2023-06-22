@@ -11,12 +11,14 @@ public enum TokenKind
     OpenParenthesis,
     CloseBrace,
     CloseParenthesis,
+    Colon,
     Semicolon,
     Comma,
 
     // Operators
     Ampersand,
     AmpersandAmpersand,
+    As,
     Bang,
     BangEquals,
     Equals,

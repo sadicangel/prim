@@ -6,8 +6,10 @@ namespace CodeAnalysis.Symbols;
 
 internal static class BuiltinFunctions
 {
-    public static readonly FunctionSymbol Print = new("print", TypeSymbol.Void, new ParameterSymbol("value", TypeSymbol.Any));
-    public static readonly FunctionSymbol Input = new("input", TypeSymbol.String, Array.Empty<ParameterSymbol>());
+    public static readonly FunctionSymbol WriteLine = new("writeLine", TypeSymbol.Void, new ParameterSymbol("value", TypeSymbol.Any));
+    public static readonly FunctionSymbol ReadLine = new("readLine", TypeSymbol.String, Array.Empty<ParameterSymbol>());
+    public static readonly FunctionSymbol ToStr = new("toStr", TypeSymbol.String, new ParameterSymbol("value", TypeSymbol.Any));
+    public static readonly FunctionSymbol IsSame = new("isSame", TypeSymbol.Bool, new ParameterSymbol("left", TypeSymbol.Any), new ParameterSymbol("right", TypeSymbol.Any));
     public static readonly FunctionSymbol Random = new("random", TypeSymbol.I32, new ParameterSymbol("max", TypeSymbol.I32));
 
     private static readonly Lazy<ConcurrentDictionary<string, FunctionSymbol>> FunctionMap = new(() => new ConcurrentDictionary<string, FunctionSymbol>(typeof(BuiltinFunctions)

@@ -24,6 +24,7 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportUndefinedBinaryOperator(Token @operator, TypeSymbol leftType, TypeSymbol rightType) => ReportError(@operator.Span, DiagnosticMessage.UndefinedBinaryOperator(@operator.Text, leftType, rightType));
     public void ReportUndefinedName(Token identifier) => ReportError(identifier.Span, DiagnosticMessage.UndefinedName(identifier.Text));
     public void ReportInvalidConversion(TextSpan span, TypeSymbol sourceType, TypeSymbol destinationType) => ReportError(span, DiagnosticMessage.InvalidConversion(sourceType, destinationType));
+    public void ReportInvalidImplicitConversion(TextSpan span, TypeSymbol sourceType, TypeSymbol destinationType) => ReportError(span, DiagnosticMessage.InvalidImplicitConversion(sourceType, destinationType));
     public void ReportRedeclaration(Token identifier) => ReportError(identifier.Span, DiagnosticMessage.Redeclaration(identifier.Text));
     public void ReportReadOnlyAssignment(TextSpan span, string name) => ReportError(span, DiagnosticMessage.ReadOnlyAssignment(name));
     internal void ReportUnterminatedString(TextSpan span) => ReportError(span, DiagnosticMessage.UnterminatedString());

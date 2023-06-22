@@ -16,13 +16,19 @@ public static class DiagnosticMessage
 
     public static string UndefinedName(string identifier) => $"'{identifier}' is undefined";
 
-    public static string InvalidConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Cannot convert from type '{sourceType}' to '{destinationType}'";
+    public static string InvalidConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Invalid conversion from type '{sourceType}' to '{destinationType}'";
+
+    public static string InvalidImplicitConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
 
     public static string Redeclaration(string identifier) => $"Redeclaration of '{identifier}'";
 
     public static string ReadOnlyAssignment(string identifier) => $"Invalid assignment to read-only '{identifier}'";
+
     public static string UnterminatedString() => "Unterminated string literal";
+
     public static string InvalidArgumentCount(string functionName, int expectedCount, int actualCount) => $"Function '{functionName}' expected {expectedCount} arguments. Got {actualCount}";
+
     public static string InvalidArgumentType(string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => $"Parameter '{parameterName}' cannot be converted from type '{actualType}' to '{expectedType}'";
-    internal static string InvalidExpressionType(TypeSymbol type) => $"Invalid expression of type '{type}'";
+
+    public static string InvalidExpressionType(TypeSymbol type) => $"Invalid expression of type '{type}'";
 }

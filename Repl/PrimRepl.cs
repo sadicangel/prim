@@ -6,16 +6,18 @@ using CodeAnalysis.Text;
 namespace Repl;
 internal sealed class PrimRepl : ReplBase
 {
-    private readonly Dictionary<VariableSymbol, object> _variables;
+    private readonly Dictionary<VariableSymbol, object?> _variables;
     private bool _showTree;
     private bool _showProgram;
+    private bool _showResultType = true;
     private Compilation? _previousCompilation;
 
     public PrimRepl()
     {
-        _variables = new Dictionary<VariableSymbol, object>();
+        _variables = new Dictionary<VariableSymbol, object?>();
         _showTree = false;
         _showProgram = false;
+        Console.ForegroundColor = ConsoleColor.White;
     }
 
     protected override void RenderLine(string line)
@@ -54,6 +56,10 @@ internal sealed class PrimRepl : ReplBase
     {
         switch (input[1..])
         {
+            case "help":
+                Console.Out.WriteColored("[show help]", ConsoleColor.DarkGray);
+                return true;
+
             case "tree":
                 _showTree = !_showTree;
                 Console.Out.WriteColored("[show parse tree: ", ConsoleColor.DarkGray);
@@ -65,6 +71,13 @@ internal sealed class PrimRepl : ReplBase
                 _showProgram = !_showProgram;
                 Console.Out.WriteColored("[show bound tree: ", ConsoleColor.DarkGray);
                 Console.Out.WriteColored((_showProgram ? "on" : "off"), _showProgram ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
+                Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
+                return true;
+
+            case "type":
+                _showResultType = !_showResultType;
+                Console.Out.WriteColored("[show result type: ", ConsoleColor.DarkGray);
+                Console.Out.WriteColored((_showResultType ? "on" : "off"), _showResultType ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
                 Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
                 return true;
 
@@ -107,7 +120,12 @@ internal sealed class PrimRepl : ReplBase
         if (!diagnostics.Any())
         {
             if (result.Value is not null)
-                Console.Out.WriteLineColored(result.Value, ConsoleColor.White);
+            {
+                Console.Out.WriteColored(result.Value, ConsoleColor.White);
+                if (_showResultType)
+                    Console.Out.WriteColored($" ({TypeSymbol.TypeOf(result.Value)})", ConsoleColor.DarkGray);
+                Console.WriteLine();
+            }
             _previousCompilation = compilation;
         }
         else

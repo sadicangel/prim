@@ -2,12 +2,13 @@
 using CodeAnalysis.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
+using LinqExpr = System.Linq.Expressions.Expression;
 
 namespace CodeAnalysis.Binding;
 
 internal abstract record class BoundNode(BoundNodeKind Kind) : INode
 {
-    public TextSpan Span { get => throw new NotSupportedException(); }
+    TextSpan INode.Span { get; }
 
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
@@ -48,7 +49,7 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
 
                 writer.WriteColored(property.Name, ConsoleColor.Yellow);
                 writer.WriteColored(" = ", ConsoleColor.DarkGray);
-                writer.WriteColored(property.Value, ConsoleColor.DarkYellow);
+                writer.WriteColored(property.GetValue(node), ConsoleColor.DarkYellow);
             }
         };
     }
@@ -63,7 +64,7 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
     }
 }
 
-file readonly record struct NodeProperty(string Name, object Value);
+file readonly record struct NodeProperty(string Name, Func<INode, object> GetValue);
 
 file static class NodePropertyCache
 {
@@ -77,15 +78,19 @@ file static class NodePropertyCache
             var list = new List<NodeProperty>();
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Reverse())
             {
-                if (property.Name is nameof(BoundNode.Kind) or nameof(BoundNode.Span) or nameof(BoundBinaryExpression.Operator))
+                if (property.Name is nameof(INode.Span) or nameof(BoundNode.Kind) or nameof(BoundBinaryExpression.Operator))
                     continue;
 
                 if (typeof(BoundNode).IsAssignableFrom(property.PropertyType) || typeof(IEnumerable<BoundNode>).IsAssignableFrom(property.PropertyType))
                     continue;
 
+                var param = LinqExpr.Parameter(typeof(INode), "node");
+                var body = LinqExpr.Convert(LinqExpr.Property(LinqExpr.Convert(param, type), property), typeof(object));
+                var func = LinqExpr.Lambda<Func<INode, object>>(body, param).Compile();
+
                 var value = property.GetValue(node);
                 if (value is not null)
-                    list.Add(new NodeProperty(property.Name, value));
+                    list.Add(new NodeProperty(property.Name, func));
             }
             Cache[type] = properties = list;
         }

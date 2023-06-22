@@ -9,7 +9,7 @@ public sealed class EvaluatorTests
     {
         var syntaxTree = SyntaxTree.Parse(text.AsMemory());
         var compilation = new Compilation(syntaxTree);
-        var variables = new Dictionary<VariableSymbol, object>();
+        var variables = new Dictionary<VariableSymbol, object?>();
         var result = compilation.Evaluate(variables);
 
         Assert.Empty(result.Diagnostics);
@@ -69,10 +69,13 @@ public sealed class EvaluatorTests
             new object[] { "{ var a = 0; if a == 0 a = 10 else a = 5 a }", 10 },
             new object[] { "{ var a = 0; if a == 4 a = 10 else a = 5 a }", 5 },
             new object[] { "{ var i = 10; var result = 0; while i > 0 { result = result + i; i = i - 1; } result }", 55 },
-            new object[] { "{ var result = 0; for var i in 1..10 { result = result + i; } result}", 55 },
+            new object[] { "{ var result = 0; for var i in 1..10 { result = result + i; } result}", 45 },
             new object[] { """
                 "Hello" + " " + "World!"
                 """, "Hello World!" },
+            new object[] { "const f = 10 as f32;", 10f },
+            new object[] { "const f = 10.0 as i32;", 10 },
+            new object[] { "const f = 11.4 as i32;", 11 }
         };
     }
 
@@ -85,7 +88,7 @@ public sealed class EvaluatorTests
         var annotated = AnnotatedText.Parse(annotatedText);
         var syntaxTree = SyntaxTree.Parse(annotated.Text);
         var compilation = new Compilation(syntaxTree);
-        var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
+        var result = compilation.Evaluate(new Dictionary<VariableSymbol, object?>());
 
         var expectedDiagnostics = expectedDiagnosticText.Split(Environment.NewLine);
 

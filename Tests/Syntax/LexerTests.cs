@@ -114,6 +114,9 @@ public sealed class LexerTests
         if (k1 is TokenKind.Identifier && k2 is TokenKind.Identifier)
             return true;
 
+        if (k1 is TokenKind.As || k2 is TokenKind.As)
+            return true;
+
         if (k1IsKeyword && k2IsKeyword)
             return true;
 
@@ -121,6 +124,12 @@ public sealed class LexerTests
             return true;
 
         if (k1IsKeyword && k2 is TokenKind.Identifier)
+            return true;
+
+        if (k1 is TokenKind.Identifier && k2.IsNumber())
+            return true;
+
+        if (k1.IsKeyword() && k2.IsNumber())
             return true;
 
         if (k1.IsNumber() && k2.IsNumber())

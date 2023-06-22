@@ -1,7 +1,16 @@
-﻿namespace CodeAnalysis.Symbols;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
+
+namespace CodeAnalysis.Symbols;
 
 public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Type)
 {
+    private static readonly Lazy<ConcurrentDictionary<string, TypeSymbol>> TypeMap = new(() => new ConcurrentDictionary<string, TypeSymbol>(typeof(TypeSymbol)
+        .GetFields(BindingFlags.Public | BindingFlags.Static)
+        .Where(f => f.FieldType == typeof(TypeSymbol))
+        .Select(f => (TypeSymbol)f.GetValue(null)!)
+        .ToDictionary(f => f.Name)));
+
     public static readonly TypeSymbol Never = new("never");
 
     public static readonly TypeSymbol Any = new("any");
@@ -23,7 +32,9 @@ public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Typ
     public static readonly TypeSymbol F32 = new("f32");
     public static readonly TypeSymbol F64 = new("f64");
 
-    public static readonly TypeSymbol String = new("string");
+    public static readonly TypeSymbol String = new("str");
+
+    public static TypeSymbol? GetTypeSymbol(string name) => TypeMap.Value.GetValueOrDefault(name);
 
     public bool Equals(TypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
@@ -52,7 +63,30 @@ public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Typ
             "u64" => typeof(ulong),
             "f32" => typeof(float),
             "f64" => typeof(double),
-            "string" => typeof(string),
+            "str" => typeof(string),
+            _ => throw new NotImplementedException(Name)
+        };
+    }
+
+    internal object? Convert(object? value)
+    {
+        return Name switch
+        {
+            "never" => null,
+            "any" => value,
+            "void" => null,
+            "bool" => System.Convert.ToBoolean(value),
+            "i8" => System.Convert.ToSByte(value),
+            "i16" => System.Convert.ToInt16(value),
+            "i32" => System.Convert.ToInt32(value),
+            "i64" => System.Convert.ToInt64(value),
+            "u8" => System.Convert.ToByte(value),
+            "u16" => System.Convert.ToUInt16(value),
+            "u32" => System.Convert.ToUInt32(value),
+            "u64" => System.Convert.ToUInt64(value),
+            "f32" => System.Convert.ToSingle(value),
+            "f64" => System.Convert.ToDouble(value),
+            "str" => System.Convert.ToString(value),
             _ => throw new NotImplementedException(Name)
         };
     }

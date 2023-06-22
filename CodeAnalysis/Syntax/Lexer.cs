@@ -62,6 +62,11 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case [':', ..]:
+                _kind = TokenKind.Colon;
+                _position++;
+                break;
+
             case [';', ..]:
                 _kind = TokenKind.Semicolon;
                 _position++;
@@ -218,7 +223,7 @@ internal sealed class Lexer
         {
             _position++;
         }
-        while (Char.IsLetter(Current));
+        while (Char.IsLetterOrDigit(Current));
 
         var text = _text[_start.._position];
         _kind = text.GetKeywordKind();

@@ -72,8 +72,24 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     BoundStatement IStatementVisitor<BoundStatement>.Accept(DeclarationStatement statement)
     {
         var name = statement.IdentifierToken.Text;
-        var isReadOnly = statement.KeywordToken.Kind == TokenKind.Const;
-        var expression = BindExpression(statement.Expression);
+        var isReadOnly = statement.StorageToken.Kind == TokenKind.Const;
+        BoundExpression expression;
+        if (statement.HasTypeDeclaration)
+        {
+            if (TypeSymbol.GetTypeSymbol(statement.TypeToken.Text) is TypeSymbol type)
+            {
+                expression = BindExpression(statement.Expression, type);
+            }
+            else
+            {
+                _diagnostics.ReportUndefinedName(statement.TypeToken);
+                expression = new BoundNeverExpression();
+            }
+        }
+        else
+        {
+            expression = BindExpression(statement.Expression);
+        }
         var variable = new VariableSymbol(name, isReadOnly, expression.Type);
 
         if (!_scope.TryDeclare(variable))
@@ -144,8 +160,23 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     {
         var boundExpression = BindExpression(expression);
 
-        if (boundExpression.Type != TypeSymbol.Never && targetType != TypeSymbol.Never && boundExpression.Type != targetType)
+        var conversion = Conversion.Classify(boundExpression.Type, targetType);
+
+        if (conversion.Exists)
+        {
+            if (!conversion.IsIdentity)
+            {
+                if (conversion.IsImplicit)
+                    boundExpression = new BoundConvertExpression(boundExpression, targetType);
+                else
+                    _diagnostics.ReportInvalidImplicitConversion(expression.Span, boundExpression.Type, targetType);
+            }
+        }
+        else
+        {
             _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
+        }
+
         return boundExpression;
     }
 
@@ -292,5 +323,22 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         }
 
         return new BoundAssignmentExpression(variable, boundExpression);
+    }
+
+    BoundExpression IExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
+    {
+        var boundExpression = BindExpression(expression.Expression);
+        if (TypeSymbol.GetTypeSymbol(expression.TypeToken.Text) is not TypeSymbol type)
+        {
+            _diagnostics.ReportUndefinedName(expression.TypeToken);
+            return new BoundNeverExpression();
+        }
+        var conversion = Conversion.Classify(boundExpression.Type, type);
+        if (!conversion.Exists)
+        {
+            _diagnostics.ReportInvalidConversion(expression.AsToken.Span, boundExpression.Type, type);
+            return new BoundNeverExpression();
+        }
+        return new BoundConvertExpression(boundExpression, type);
     }
 }

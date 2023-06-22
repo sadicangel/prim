@@ -42,6 +42,7 @@ public static class SyntaxFacts
 
     public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
+        "as" => TokenKind.As,
         "const" => TokenKind.Const,
         "else" => TokenKind.Else,
         "false" => TokenKind.False,
@@ -62,7 +63,8 @@ public static class SyntaxFacts
     public static bool IsLiteral(this TokenKind kind) => kind.IsNumber() || kind.IsBoolean();
 
     public static bool IsKeyword(this TokenKind kind) => kind
-        is TokenKind.Const
+        is TokenKind.As
+        or TokenKind.Const
         or TokenKind.Else
         or TokenKind.False
         or TokenKind.For
@@ -105,10 +107,12 @@ public static class SyntaxFacts
     {
         TokenKind.Ampersand => "&",
         TokenKind.AmpersandAmpersand => "&&",
+        TokenKind.As => "as",
         TokenKind.Bang => "!",
         TokenKind.BangEquals => "!=",
         TokenKind.CloseBrace => "}",
         TokenKind.CloseParenthesis => ")",
+        TokenKind.Colon => ":",
         TokenKind.Comma => ",",
         TokenKind.Const => "const",
         TokenKind.Else => "else",

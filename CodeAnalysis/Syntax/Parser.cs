@@ -111,10 +111,13 @@ internal sealed class Parser
     {
         var keyword = MatchToken(Current.Kind is TokenKind.Const ? TokenKind.Const : TokenKind.Var);
         var identifier = MatchToken(TokenKind.Identifier);
+        var typeToken = default(Token);
+        if (TryMatchToken(TokenKind.Colon, out var colonToken))
+            typeToken = MatchToken(TokenKind.Identifier);
         var equals = MatchToken(TokenKind.Equals);
         var expression = ParseExpression();
         var semicolon = MatchToken(TokenKind.Semicolon);
-        return new DeclarationStatement(keyword, identifier, equals, expression, semicolon);
+        return new DeclarationStatement(keyword, identifier, colonToken, typeToken, equals, expression, semicolon);
     }
 
     private Statement ParseIfStatement()
@@ -169,6 +172,14 @@ internal sealed class Parser
             var operatorToken = MatchToken(TokenKind.Equals);
             var right = ParseAssignmentExpression();
             return new AssignmentExpression(identifierToken, operatorToken, right);
+        }
+
+        if (Peek(1).Kind == TokenKind.As)
+        {
+            var expression = ParseBinaryExpression();
+            var asToken = MatchToken(TokenKind.As);
+            var typeIdentifierToken = MatchToken(TokenKind.Identifier);
+            return new ConvertExpression(expression, asToken, typeIdentifierToken);
         }
 
         if (Peek(0).Kind == TokenKind.If)
