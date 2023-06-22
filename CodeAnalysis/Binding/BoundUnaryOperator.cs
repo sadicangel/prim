@@ -7,9 +7,9 @@ internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryO
 {
     private static readonly BoundUnaryOperator[] Operators =
     {
-        new BoundUnaryOperator(TokenKind.Bang, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
-        new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negation, TypeSymbol.I32),
-        new BoundUnaryOperator(TokenKind.Plus, BoundUnaryOperatorKind.Identity, TypeSymbol.I32),
+        new BoundUnaryOperator(TokenKind.Bang, BoundUnaryOperatorKind.Not, TypeSymbol.Bool),
+        new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negate, TypeSymbol.I32),
+        new BoundUnaryOperator(TokenKind.Plus, BoundUnaryOperatorKind.UnaryPlus, TypeSymbol.I32),
         new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.I32),
     };
 

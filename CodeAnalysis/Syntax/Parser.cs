@@ -217,8 +217,8 @@ internal sealed class Parser
         return Current.Kind switch
         {
             TokenKind.OpenParenthesis => ParseGroupExpression(),
-            TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(),
-            TokenKind.I32 => ParseNumberLiteralExpression(),
+            TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(Current.Kind),
+            TokenKind.I32 or TokenKind.F32 => ParseNumberLiteralExpression(Current.Kind),
             TokenKind.String => ParseStringLiteralExpression(),
             _ => ParseNameExpression(),
         };
@@ -232,16 +232,19 @@ internal sealed class Parser
         return new GroupExpression(left, expression, right);
     }
 
-    private Expression ParseBooleanLiteralExpression()
+    private Expression ParseBooleanLiteralExpression(TokenKind booleanTokenKind)
     {
-        var isTrue = Current.Kind == TokenKind.True;
-        var booleanToken = MatchToken(isTrue ? TokenKind.True : TokenKind.False);
-        return new LiteralExpression(booleanToken, isTrue);
+        if (!booleanTokenKind.IsBoolean())
+            throw new InvalidOperationException($"Invalid boolean token kind {booleanTokenKind}");
+        var literal = MatchToken(booleanTokenKind);
+        return new LiteralExpression(literal, booleanTokenKind is TokenKind.True);
     }
 
-    private Expression ParseNumberLiteralExpression()
+    private Expression ParseNumberLiteralExpression(TokenKind numberTokenKind)
     {
-        var literal = MatchToken(TokenKind.I32);
+        if (!numberTokenKind.IsNumber())
+            throw new InvalidOperationException($"Invalid number token kind {numberTokenKind}");
+        var literal = MatchToken(numberTokenKind);
         return new LiteralExpression(literal);
     }
 

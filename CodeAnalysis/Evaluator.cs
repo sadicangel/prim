@@ -1,5 +1,8 @@
 ﻿using CodeAnalysis.Binding;
 using CodeAnalysis.Symbols;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace CodeAnalysis;
 
@@ -79,52 +82,125 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
     object IBoundExpressionVisitor<object>.Visit(BoundUnaryExpression expression)
     {
-        var operation = GetOperation(expression.Operator.Kind);
+        var operation = expression.GetOperation();
         var value = expression.Operand.Accept(this);
 
         return operation.Invoke(value);
-
-        static Func<object, object> GetOperation(BoundUnaryOperatorKind kind) => kind switch
-        {
-            BoundUnaryOperatorKind.Identity => value => value,
-            BoundUnaryOperatorKind.Negation => value => -(int)value,
-            BoundUnaryOperatorKind.LogicalNegation => value => !(bool)value,
-            BoundUnaryOperatorKind.OnesComplement => value => ~(int)value,
-            _ => throw new InvalidOperationException($"Unexpected unary operator {kind}"),
-        };
     }
 
     object IBoundExpressionVisitor<object>.Visit(BoundBinaryExpression expression)
     {
-        var operation = GetOperation(expression.Operator.Kind, expression.Left.Type, expression.Right.Type);
+        var operation = expression.GetOperation();
         var left = expression.Left.Accept(this);
         var right = expression.Right.Accept(this);
 
         return operation.Invoke(left, right);
+    }
+}
 
-        static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind, TypeSymbol leftType, TypeSymbol rightType) => kind switch
+file static class BoundExpressionExtensions
+{
+    private readonly record struct UnaryExpressionCacheKey(BoundUnaryOperatorKind Kind, TypeSymbol OperandType);
+    private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, ConcurrentDictionary<UnaryExpressionCacheKey, Func<object, object>>> UnaryExpressionCache = new();
+    private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, Func<Expression, UnaryExpression>> UnaryOperatorCache = new();
+
+    private readonly record struct BinaryExpressionCacheKey(BoundBinaryOperatorKind Kind, TypeSymbol LeftType, TypeSymbol RightType);
+    private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, ConcurrentDictionary<BinaryExpressionCacheKey, Func<object, object, object>>> BinaryExpressionCache = new();
+    private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, Func<Expression, Expression, BinaryExpression>> BinaryOperatorCache = new();
+
+    public static Func<Expression, UnaryExpression> GetExpressionFactory(this BoundUnaryOperatorKind kind)
+    {
+        return UnaryOperatorCache.GetOrAdd(kind, static kind =>
         {
-            BoundBinaryOperatorKind.Addition when leftType == TypeSymbol.String => static (l, r) => (string)l + (string)r,
-            BoundBinaryOperatorKind.Addition => static (l, r) => (int)l + (int)r,
-            BoundBinaryOperatorKind.And when leftType == TypeSymbol.Bool => static (l, r) => (bool)l & (bool)r,
-            BoundBinaryOperatorKind.And when leftType == TypeSymbol.I32 => static (l, r) => (int)l & (int)r,
-            BoundBinaryOperatorKind.AndAlso => static (l, r) => (bool)l && (bool)r,
-            BoundBinaryOperatorKind.Division => static (l, r) => (int)l / (int)r,
-            BoundBinaryOperatorKind.Equals => static (l, r) => Equals(l, r),
-            BoundBinaryOperatorKind.ExclusiveOr when leftType == TypeSymbol.Bool => static (l, r) => (bool)l ^ (bool)r,
-            BoundBinaryOperatorKind.ExclusiveOr when leftType == TypeSymbol.I32 => static (l, r) => (int)l ^ (int)r,
-            BoundBinaryOperatorKind.GreaterThan => static (l, r) => (int)l > (int)r,
-            BoundBinaryOperatorKind.GreaterThanOrEqualTo => static (l, r) => (int)l >= (int)r,
-            BoundBinaryOperatorKind.LessThan => static (l, r) => (int)l < (int)r,
-            BoundBinaryOperatorKind.LessThanOrEqualTo => static (l, r) => (int)l <= (int)r,
-            BoundBinaryOperatorKind.Modulo => static (l, r) => (int)l % (int)r,
-            BoundBinaryOperatorKind.Multiplication => static (l, r) => (int)l * (int)r,
-            BoundBinaryOperatorKind.NotEquals => static (l, r) => !Equals(l, r),
-            BoundBinaryOperatorKind.Or when leftType == TypeSymbol.Bool => static (l, r) => (bool)l | (bool)r,
-            BoundBinaryOperatorKind.Or when leftType == TypeSymbol.I32 => static (l, r) => (int)l | (int)r,
-            BoundBinaryOperatorKind.OrElse => static (l, r) => (bool)l || (bool)r,
-            BoundBinaryOperatorKind.Subtraction => static (l, r) => (int)l - (int)r,
-            _ => throw new InvalidOperationException($"Unexpected binary operator {kind}"),
-        };
+            var operand = Expression.Parameter(typeof(Expression), "operand");
+            var method = typeof(Expression).GetMethod(kind.ToString(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression) });
+            if (method is null)
+                throw new InvalidOperationException($"Unexpected binary operator {kind}");
+
+            var body = Expression.Call(
+                instance: null,
+                method,
+                operand);
+
+            var func = Expression.Lambda<Func<Expression, UnaryExpression>>(body, operand);
+            return func.Compile();
+        });
+    }
+
+    public static Func<Expression, Expression, BinaryExpression> GetExpressionFactory(this BoundBinaryOperatorKind kind)
+    {
+        return BinaryOperatorCache.GetOrAdd(kind, static kind =>
+        {
+            var left = Expression.Parameter(typeof(Expression), "left");
+            var right = Expression.Parameter(typeof(Expression), "right");
+            var method = typeof(Expression).GetMethod(kind.ToString(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression), typeof(Expression) });
+            if (method is null)
+                throw new InvalidOperationException($"Unexpected binary operator {kind}");
+
+            var body = Expression.Call(
+                instance: null,
+                method,
+                left,
+                right);
+
+            var func = Expression.Lambda<Func<Expression, Expression, BinaryExpression>>(body, left, right);
+            return func.Compile();
+        });
+    }
+
+    public static Func<object, object> GetOperation(this BoundUnaryExpression expression)
+    {
+        var cacheNode = UnaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<UnaryExpressionCacheKey, Func<object, object>>());
+
+        return cacheNode.GetOrAdd(new UnaryExpressionCacheKey(expression.Operator.Kind, expression.Operand.Type), CreateOperation);
+
+        static Func<object, object> CreateOperation(UnaryExpressionCacheKey key)
+        {
+            var (kind, operandType) = key;
+            var operandClrType = operandType.GetClrType();
+
+            var operand = Expression.Parameter(typeof(object), "operand");
+            var expr = kind.GetExpressionFactory();
+            var body = Expression.Convert(expr.Invoke(Expression.Convert(operand, operandClrType)), typeof(object));
+            var expression = Expression.Lambda<Func<object, object>>(body, operand);
+
+            return expression.Compile();
+        }
+    }
+
+    public static Func<object, object, object> GetOperation(this BoundBinaryExpression expression)
+    {
+        var cacheNode = BinaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<BinaryExpressionCacheKey, Func<object, object, object>>());
+
+        return cacheNode.GetOrAdd(new BinaryExpressionCacheKey(expression.Operator.Kind, expression.Left.Type, expression.Right.Type), CreateOperation);
+
+        static Func<object, object, object> CreateOperation(BinaryExpressionCacheKey key)
+        {
+            var (kind, leftType, rightType) = key;
+            var leftClrType = leftType.GetClrType();
+            var rightClrType = rightType.GetClrType();
+            Expression<Func<object, object, object>> expression;
+            if (kind == BoundBinaryOperatorKind.Add && (leftClrType == typeof(string) || rightClrType == typeof(string)))
+            {
+                var left = Expression.Parameter(typeof(object), "left");
+                var right = Expression.Parameter(typeof(object), "right");
+
+                var method = typeof(string).GetMethod(nameof(String.Concat), new[] { typeof(object), typeof(object) });
+                if (method is null)
+                    throw new InvalidOperationException($"Could not find {nameof(String.Concat)} method");
+
+                var body = Expression.Convert(Expression.Call(instance: null, method, left, right), typeof(object));
+                expression = Expression.Lambda<Func<object, object, object>>(body, left, right);
+            }
+            else
+            {
+                var left = Expression.Parameter(typeof(object), "left");
+                var right = Expression.Parameter(typeof(object), "right");
+                var expr = kind.GetExpressionFactory();
+                var body = Expression.Convert(expr.Invoke(Expression.Convert(left, leftClrType), Expression.Convert(right, rightClrType)), typeof(object));
+                expression = Expression.Lambda<Func<object, object, object>>(body, left, right);
+            }
+            return expression.Compile();
+        }
     }
 }

@@ -14,15 +14,9 @@ public abstract record class Symbol(string Name, SymbolKind Kind) : INode
 
         writer.WriteColored((object)indent, ConsoleColor.DarkGray);
         writer.WriteColored((object)marker, ConsoleColor.DarkGray);
-        writer.WriteColored(Kind, ConsoleColor.Cyan);
+        writer.WriteColored(Name, ConsoleColor.Cyan);
         writer.WriteLine();
     }
 
-    public override string ToString()
-    {
-        INode node = this;
-        using var writer = new StringWriter();
-        node.WriteTo(writer);
-        return writer.ToString();
-    }
+    public override string ToString() => Name;
 }

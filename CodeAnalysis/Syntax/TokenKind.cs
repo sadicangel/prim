@@ -49,6 +49,7 @@ public enum TokenKind
     // Variable
     WhiteSpace,
     I32,
+    F32,
     String,
     Identifier,
 }

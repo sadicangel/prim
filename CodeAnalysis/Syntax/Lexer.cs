@@ -173,6 +173,7 @@ internal sealed class Lexer
                 break;
 
             case ['0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
+            case ['.', '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
                 ReadNumberToken();
                 break;
 
@@ -235,14 +236,30 @@ internal sealed class Lexer
         {
             _position++;
         }
-        while (Char.IsDigit(Current));
+        while (Char.IsDigit(Current) || Current == '.');
 
         var text = _text[_start.._position];
-        if (!Int32.TryParse(text, out var value))
-            _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), TypeSymbol.I32);
+        (_kind, _value) = Count(text, '.') switch
+        {
+            0 => (TokenKind.I32, EnsureCorrectType<int>(text, TypeSymbol.I32)),
+            _ => (TokenKind.F32, EnsureCorrectType<float>(text, TypeSymbol.F32)),
+        };
 
-        _kind = TokenKind.I32;
-        _value = value;
+        object EnsureCorrectType<T>(ReadOnlySpan<char> text, TypeSymbol type) where T : unmanaged, ISpanParsable<T>
+        {
+            if (!T.TryParse(text, provider: null, out T value))
+                _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), type);
+            return value;
+        }
+
+        static int Count(ReadOnlySpan<char> text, char c)
+        {
+            var count = 0;
+            for (var i = 0; i < text.Length; ++i)
+                if (text[i] == c)
+                    count++;
+            return count;
+        }
     }
 
     private void ReadStringToken()

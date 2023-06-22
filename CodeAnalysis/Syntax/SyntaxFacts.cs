@@ -54,7 +54,10 @@ public static class SyntaxFacts
         _ => TokenKind.Identifier,
     };
 
-    public static bool IsNumber(this TokenKind kind) => kind is TokenKind.I32;
+    public static bool IsNumber(this TokenKind kind) => kind
+        is TokenKind.I32
+        or TokenKind.F32;
+
     public static bool IsBoolean(this TokenKind kind) => kind is TokenKind.True or TokenKind.False;
     public static bool IsLiteral(this TokenKind kind) => kind.IsNumber() || kind.IsBoolean();
 

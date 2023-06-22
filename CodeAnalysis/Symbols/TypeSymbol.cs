@@ -4,6 +4,8 @@ public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Typ
 {
     public static readonly TypeSymbol Never = new("never");
 
+    public static readonly TypeSymbol Any = new("any");
+
     public static readonly TypeSymbol Void = new("void");
 
     public static readonly TypeSymbol Bool = new("bool");
@@ -22,8 +24,38 @@ public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Typ
     public static readonly TypeSymbol F64 = new("f64");
 
     public static readonly TypeSymbol String = new("string");
+
     public bool Equals(TypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() => base.ToString();
+
+    public bool IsAssignableFrom(TypeSymbol from) => CanAssign(from, this);
+    public bool IsAssignableTo(TypeSymbol to) => CanAssign(this, to);
+
+    private static bool CanAssign(TypeSymbol from, TypeSymbol to) => from is not null && to is not null && (to == Any || to == from);
+
+    public Type GetClrType()
+    {
+        return Name switch
+        {
+            "never" => typeof(void),
+            "any" => typeof(object),
+            "void" => typeof(void),
+            "bool" => typeof(bool),
+            "i8" => typeof(sbyte),
+            "i16" => typeof(short),
+            "i32" => typeof(int),
+            "i64" => typeof(long),
+            "u8" => typeof(byte),
+            "u16" => typeof(ushort),
+            "u32" => typeof(uint),
+            "u64" => typeof(ulong),
+            "f32" => typeof(float),
+            "f64" => typeof(double),
+            "string" => typeof(string),
+            _ => throw new NotImplementedException(Name)
+        };
+    }
 
     public static TypeSymbol TypeOf(object? value)
     {
