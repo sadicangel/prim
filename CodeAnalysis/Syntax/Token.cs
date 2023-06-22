@@ -4,7 +4,7 @@ namespace CodeAnalysis.Syntax;
 
 public sealed record class Token(TokenKind Kind, int Position, string Text, object? Value = null) : INode
 {
-    public bool IsMissing { get => Text is null; }
+    public bool IsMissing { get => String.IsNullOrEmpty(Text); }
 
     public TextSpan Span { get => new(Position, Text.Length); }
 
