@@ -134,7 +134,8 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     private BoundExpression BindExpression(Expression expression, TypeSymbol targetType)
     {
         var boundExpression = BindExpression(expression);
-        if (boundExpression.Type != targetType)
+
+        if (boundExpression.Type != TypeSymbol.Never && targetType != TypeSymbol.Never && boundExpression.Type != targetType)
             _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
         return boundExpression;
     }
@@ -201,7 +202,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     {
         var name = expression.IdentifierToken.Text;
 
-        if (String.IsNullOrEmpty(name))
+        if (expression.IdentifierToken.IsMissing)
         {
             return new BoundNeverExpression();
         }
