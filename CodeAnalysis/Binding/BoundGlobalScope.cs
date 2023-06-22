@@ -1,3 +1,5 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Symbols;
 
-internal sealed record class BoundGlobalScope(IEnumerable<Diagnostic> Diagnostics, IEnumerable<Variable> Variables, BoundStatement Statement, BoundGlobalScope? Previous = null);
+namespace CodeAnalysis.Binding;
+
+internal sealed record class BoundGlobalScope(IEnumerable<Diagnostic> Diagnostics, IEnumerable<VariableSymbol> Variables, BoundStatement Statement, BoundGlobalScope? Previous = null);

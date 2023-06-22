@@ -1,24 +1,25 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Symbols;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, Type OperandType, Type ResultType)
+internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, TypeSymbol OperandType, TypeSymbol ResultType)
 {
     private static readonly BoundUnaryOperator[] Operators =
     {
-        new BoundUnaryOperator(TokenKind.Bang, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
-        new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negation, typeof(int)),
-        new BoundUnaryOperator(TokenKind.Plus, BoundUnaryOperatorKind.Identity, typeof(int)),
-        new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, typeof(int)),
+        new BoundUnaryOperator(TokenKind.Bang, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
+        new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negation, TypeSymbol.I32),
+        new BoundUnaryOperator(TokenKind.Plus, BoundUnaryOperatorKind.Identity, TypeSymbol.I32),
+        new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.I32),
     };
 
-    public BoundUnaryOperator(TokenKind tokenKind, BoundUnaryOperatorKind kind, Type operandType)
+    public BoundUnaryOperator(TokenKind tokenKind, BoundUnaryOperatorKind kind, TypeSymbol operandType)
         : this(tokenKind, kind, operandType, operandType)
     {
 
     }
 
-    public static BoundUnaryOperator? Bind(TokenKind tokenKind, Type operandType)
+    public static BoundUnaryOperator? Bind(TokenKind tokenKind, TypeSymbol operandType)
     {
         foreach (var @operator in Operators)
         {

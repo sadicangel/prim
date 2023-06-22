@@ -1,6 +1,8 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Symbols;
 
-internal sealed record class BoundForStatement(Variable Variable, BoundExpression LowerBound, BoundExpression UpperBound, BoundStatement Body) : BoundStatement(BoundNodeKind.ForStatement)
+namespace CodeAnalysis.Binding;
+
+internal sealed record class BoundForStatement(VariableSymbol Variable, BoundExpression LowerBound, BoundExpression UpperBound, BoundStatement Body) : BoundStatement(BoundNodeKind.ForStatement)
 {
     public override void Accept(IBoundStatementVisitor visitor) => visitor.Accept(this);
     public override IEnumerable<INode> GetChildren()

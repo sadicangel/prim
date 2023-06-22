@@ -1,17 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Symbols;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<Variable>? Variables = null)
+internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<VariableSymbol>? Variables = null)
 {
-    private readonly Dictionary<string, Variable> _variables = Variables?.ToDictionary(v => v.Name) ?? new();
+    private readonly Dictionary<string, VariableSymbol> _variables = Variables?.ToDictionary(v => v.Name) ?? new();
 
 
-    public IReadOnlyCollection<Variable> Variables { get => _variables.Values; }
+    public IReadOnlyCollection<VariableSymbol> Variables { get => _variables.Values; }
 
-    public bool TryDeclare(Variable variable) => _variables.TryAdd(variable.Name, variable);
+    public bool TryDeclare(VariableSymbol variable) => _variables.TryAdd(variable.Name, variable);
 
-    public bool TryDeclare(Variable variable, [MaybeNullWhen(true)] out Variable existingVariable)
+    public bool TryDeclare(VariableSymbol variable, [MaybeNullWhen(true)] out VariableSymbol existingVariable)
     {
         if (_variables.TryGetValue(variable.Name, out existingVariable))
             return false;
@@ -20,7 +21,7 @@ internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<
         return true;
     }
 
-    public bool TryLookup(string name, [MaybeNullWhen(false)] out Variable variable)
+    public bool TryLookup(string name, [MaybeNullWhen(false)] out VariableSymbol variable)
     {
         if (_variables.TryGetValue(name, out variable))
             return true;

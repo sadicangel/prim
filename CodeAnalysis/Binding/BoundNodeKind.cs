@@ -14,4 +14,5 @@ internal enum BoundNodeKind
     IfStatement,
     WhileStatement,
     ForStatement,
+    ErrorExpression,
 }

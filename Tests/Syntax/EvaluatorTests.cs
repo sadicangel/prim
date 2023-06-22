@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Symbols;
+
+namespace CodeAnalysis.Syntax;
 public sealed class EvaluatorTests
 {
     [Theory]
@@ -7,7 +9,7 @@ public sealed class EvaluatorTests
     {
         var syntaxTree = SyntaxTree.Parse(text.AsMemory());
         var compilation = new Compilation(syntaxTree);
-        var variables = new Dictionary<Variable, object>();
+        var variables = new Dictionary<VariableSymbol, object>();
         var result = compilation.Evaluate(variables);
 
         Assert.Empty(result.Diagnostics);
@@ -80,7 +82,7 @@ public sealed class EvaluatorTests
         var annotated = AnnotatedText.Parse(annotatedText);
         var syntaxTree = SyntaxTree.Parse(annotated.Text);
         var compilation = new Compilation(syntaxTree);
-        var result = compilation.Evaluate(new Dictionary<Variable, object>());
+        var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
 
         var expectedDiagnostics = expectedDiagnosticText.Split(Environment.NewLine);
 
@@ -148,19 +150,19 @@ public sealed class EvaluatorTests
                     ⟨x = false⟩;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(typeof(int), typeof(bool))}"
+                $"{DiagnosticMessage.InvalidConversion(TypeSymbol.I32, TypeSymbol.Bool)}"
             },
             new object[]
             {
                 $"Reports {nameof(DiagnosticMessage.UndefinedUnaryOperator)}",
                 "⟨+⟩true",
-                $"{DiagnosticMessage.UndefinedUnaryOperator("+", typeof(bool))}"
+                $"{DiagnosticMessage.UndefinedUnaryOperator("+", TypeSymbol.Bool)}"
             },
             new object[]
             {
                 $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
                 "10 ⟨+⟩ true",
-                $"{DiagnosticMessage.UndefinedBinaryOperator("+", typeof(int), typeof(bool))}"
+                $"{DiagnosticMessage.UndefinedBinaryOperator("+", TypeSymbol.I32, TypeSymbol.Bool)}"
             },
             new object[]
             {
@@ -190,7 +192,7 @@ public sealed class EvaluatorTests
                         x = 10;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(typeof(int), typeof(bool))}"
+                $"{DiagnosticMessage.InvalidConversion(TypeSymbol.I32, TypeSymbol.Bool)}"
             },
             new object[]
             {
@@ -202,7 +204,7 @@ public sealed class EvaluatorTests
                         x = 10;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(typeof(int), typeof(bool))}"
+                $"{DiagnosticMessage.InvalidConversion(TypeSymbol.I32, TypeSymbol.Bool)}"
             },
             new object[]
             {
@@ -214,7 +216,7 @@ public sealed class EvaluatorTests
                         result = result + i;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(typeof(bool), typeof(int))}"
+                $"{DiagnosticMessage.InvalidConversion(TypeSymbol.Bool, TypeSymbol.I32)}"
             },
             new object[]
             {
@@ -226,7 +228,7 @@ public sealed class EvaluatorTests
                         result = result + i;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(typeof(bool), typeof(int))}"
+                $"{DiagnosticMessage.InvalidConversion(TypeSymbol.Bool, TypeSymbol.I32)}"
             },
             new object[]
             {

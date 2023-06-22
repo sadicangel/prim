@@ -1,15 +1,16 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Symbols;
 
 namespace CodeAnalysis;
 
 internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStatementVisitor
 {
     private readonly BoundStatement _boundStatement;
-    private readonly Dictionary<Variable, object> _variables;
+    private readonly Dictionary<VariableSymbol, object> _variables;
 
     private object? _lastValue;
 
-    public Evaluator(BoundStatement boundStatement, Dictionary<Variable, object> variables)
+    public Evaluator(BoundStatement boundStatement, Dictionary<VariableSymbol, object> variables)
     {
         _boundStatement = boundStatement;
         _variables = variables;
@@ -61,6 +62,8 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
     private object EvaluateExpression(BoundExpression expression) => expression.Accept(this);
 
+    object IBoundExpressionVisitor<object>.Visit(BoundNeverExpression expression) => _lastValue!;
+
     object IBoundExpressionVisitor<object>.Visit(BoundIfExpression expression)
     {
         var isTrue = (bool)EvaluateExpression(expression.Condition);
@@ -99,16 +102,16 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
 
         return operation.Invoke(left, right);
 
-        static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind, Type leftType, Type rightType) => kind switch
+        static Func<object, object, object> GetOperation(BoundBinaryOperatorKind kind, TypeSymbol leftType, TypeSymbol rightType) => kind switch
         {
             BoundBinaryOperatorKind.Addition => static (l, r) => (int)l + (int)r,
-            BoundBinaryOperatorKind.And when leftType == typeof(bool) => static (l, r) => (bool)l & (bool)r,
-            BoundBinaryOperatorKind.And when leftType == typeof(int) => static (l, r) => (int)l & (int)r,
+            BoundBinaryOperatorKind.And when leftType == TypeSymbol.Bool => static (l, r) => (bool)l & (bool)r,
+            BoundBinaryOperatorKind.And when leftType == TypeSymbol.I32 => static (l, r) => (int)l & (int)r,
             BoundBinaryOperatorKind.AndAlso => static (l, r) => (bool)l && (bool)r,
             BoundBinaryOperatorKind.Division => static (l, r) => (int)l / (int)r,
             BoundBinaryOperatorKind.Equals => static (l, r) => Equals(l, r),
-            BoundBinaryOperatorKind.ExclusiveOr when leftType == typeof(bool) => static (l, r) => (bool)l ^ (bool)r,
-            BoundBinaryOperatorKind.ExclusiveOr when leftType == typeof(int) => static (l, r) => (int)l ^ (int)r,
+            BoundBinaryOperatorKind.ExclusiveOr when leftType == TypeSymbol.Bool => static (l, r) => (bool)l ^ (bool)r,
+            BoundBinaryOperatorKind.ExclusiveOr when leftType == TypeSymbol.I32 => static (l, r) => (int)l ^ (int)r,
             BoundBinaryOperatorKind.GreaterThan => static (l, r) => (int)l > (int)r,
             BoundBinaryOperatorKind.GreaterThanOrEqualTo => static (l, r) => (int)l >= (int)r,
             BoundBinaryOperatorKind.LessThan => static (l, r) => (int)l < (int)r,
@@ -116,8 +119,8 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object>, IBoundStateme
             BoundBinaryOperatorKind.Modulo => static (l, r) => (int)l % (int)r,
             BoundBinaryOperatorKind.Multiplication => static (l, r) => (int)l * (int)r,
             BoundBinaryOperatorKind.NotEquals => static (l, r) => !Equals(l, r),
-            BoundBinaryOperatorKind.Or when leftType == typeof(bool) => static (l, r) => (bool)l | (bool)r,
-            BoundBinaryOperatorKind.Or when leftType == typeof(int) => static (l, r) => (int)l | (int)r,
+            BoundBinaryOperatorKind.Or when leftType == TypeSymbol.Bool => static (l, r) => (bool)l | (bool)r,
+            BoundBinaryOperatorKind.Or when leftType == TypeSymbol.I32 => static (l, r) => (int)l | (int)r,
             BoundBinaryOperatorKind.OrElse => static (l, r) => (bool)l || (bool)r,
             BoundBinaryOperatorKind.Subtraction => static (l, r) => (int)l - (int)r,
             _ => throw new InvalidOperationException($"Unexpected binary operator {kind}"),

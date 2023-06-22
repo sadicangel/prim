@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundLiteralExpression(object? Value) : BoundExpression(BoundNodeKind.LiteralExpression, TypeSymbol.TypeOf(Value))
+internal sealed record class BoundNeverExpression() : BoundExpression(BoundNodeKind.ErrorExpression, TypeSymbol.Never)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();

@@ -1,18 +1,19 @@
 ﻿using CodeAnalysis;
+using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace Repl;
 internal sealed class PrimRepl : ReplBase
 {
-    private readonly Dictionary<Variable, object> _variables;
+    private readonly Dictionary<VariableSymbol, object> _variables;
     private bool _showTree;
     private bool _showProgram;
     private Compilation? _previousCompilation;
 
     public PrimRepl()
     {
-        _variables = new Dictionary<Variable, object>();
+        _variables = new Dictionary<VariableSymbol, object>();
         _showTree = false;
         _showProgram = false;
     }

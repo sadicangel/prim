@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Text;
+﻿using CodeAnalysis.Symbols;
+using CodeAnalysis.Text;
 using System.Text;
 
 namespace CodeAnalysis.Syntax;
@@ -238,7 +239,7 @@ internal sealed class Lexer
 
         var text = _text[_start.._position];
         if (!Int32.TryParse(text, out var value))
-            _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), typeof(int));
+            _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), TypeSymbol.I32);
 
         _kind = TokenKind.I32;
         _value = value;

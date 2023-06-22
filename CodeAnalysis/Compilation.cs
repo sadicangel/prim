@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis;
@@ -28,7 +29,7 @@ public sealed class Compilation
         }
     }
 
-    public EvaluationResult Evaluate(Dictionary<Variable, object> variables)
+    public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
     {
         var boundStatement = GlobalScope.Statement;
 
