@@ -16,6 +16,8 @@ public static class DiagnosticMessage
 
     public static string UndefinedName(string identifier) => $"'{identifier}' is undefined";
 
+    public static string UndefinedType(string typeName) => $"Type '{typeName}' is undefined";
+
     public static string InvalidConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Invalid conversion from type '{sourceType}' to '{destinationType}'";
 
     public static string InvalidImplicitConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
@@ -30,7 +32,9 @@ public static class DiagnosticMessage
 
     public static string InvalidArgumentType(string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => $"Parameter '{parameterName}' cannot be converted from type '{actualType}' to '{expectedType}'";
 
-    public static string InvalidExpressionType(TypeSymbol type) => $"Invalid expression of type '{type}'";
+    public static string InvalidExpressionType(TypeSymbol actualType) => $"Invalid expression of type '{actualType}'";
+
+    public static string InvalidExpressionType(TypeSymbol expectedType, TypeSymbol actualType) => $"Invalid expression of type '{actualType}'. Expected '{expectedType}'";
 
     public static string InvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
 }

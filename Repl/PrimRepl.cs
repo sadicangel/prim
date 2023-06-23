@@ -6,7 +6,7 @@ using CodeAnalysis.Text;
 namespace Repl;
 internal sealed class PrimRepl : ReplBase
 {
-    private readonly Dictionary<VariableSymbol, object?> _variables;
+    private readonly Dictionary<Symbol, object?> _symbols;
     private bool _showTree;
     private bool _showProgram;
     private bool _showResultType = true;
@@ -14,7 +14,7 @@ internal sealed class PrimRepl : ReplBase
 
     public PrimRepl()
     {
-        _variables = new Dictionary<VariableSymbol, object?>();
+        _symbols = new Dictionary<Symbol, object?>();
         _showTree = false;
         _showProgram = false;
         Console.ForegroundColor = ConsoleColor.White;
@@ -111,7 +111,7 @@ internal sealed class PrimRepl : ReplBase
         if (_showProgram)
             compilation.WriteTo(Console.Out);
 
-        var result = compilation.Evaluate(_variables);
+        var result = compilation.Evaluate(_symbols);
 
         var diagnostics = result.Diagnostics;
 

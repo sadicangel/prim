@@ -64,18 +64,18 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
     }
 }
 
-file readonly record struct NodeProperty(string Name, Func<INode, object> GetValue);
+file readonly record struct NodePropertyAccessor(string Name, Func<INode, object> GetValue);
 
 file static class NodePropertyCache
 {
-    private static readonly ConcurrentDictionary<Type, IReadOnlyList<NodeProperty>> Cache = new();
+    private static readonly ConcurrentDictionary<Type, IReadOnlyList<NodePropertyAccessor>> Cache = new();
 
-    public static IReadOnlyList<NodeProperty> GetProperties(INode node)
+    public static IReadOnlyList<NodePropertyAccessor> GetProperties(INode node)
     {
         var type = node.GetType();
         if (!Cache.TryGetValue(type, out var properties))
         {
-            var list = new List<NodeProperty>();
+            var list = new List<NodePropertyAccessor>();
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Reverse())
             {
                 if (property.Name is nameof(INode.Span) or nameof(BoundNode.Kind) or nameof(BoundBinaryExpression.Operator))
@@ -84,13 +84,13 @@ file static class NodePropertyCache
                 if (typeof(BoundNode).IsAssignableFrom(property.PropertyType) || typeof(IEnumerable<BoundNode>).IsAssignableFrom(property.PropertyType))
                     continue;
 
-                var param = LinqExpr.Parameter(typeof(INode), "node");
-                var body = LinqExpr.Convert(LinqExpr.Property(LinqExpr.Convert(param, type), property), typeof(object));
-                var func = LinqExpr.Lambda<Func<INode, object>>(body, param).Compile();
+                var parameter = LinqExpr.Parameter(typeof(INode), "node");
+                var body = LinqExpr.Convert(LinqExpr.Property(LinqExpr.Convert(parameter, type), property), typeof(object));
+                var func = LinqExpr.Lambda<Func<INode, object>>(body, parameter).Compile();
 
                 var value = property.GetValue(node);
                 if (value is not null)
-                    list.Add(new NodeProperty(property.Name, func));
+                    list.Add(new NodePropertyAccessor(property.Name, func));
             }
             Cache[type] = properties = list;
         }

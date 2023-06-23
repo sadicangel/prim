@@ -12,19 +12,19 @@ public sealed record class Conversion(bool Exists, bool IsIdentity, bool IsImpli
 
     public static Conversion Classify(TypeSymbol from, TypeSymbol to)
     {
-        if (from == TypeSymbol.Never || to == TypeSymbol.Never)
+        if (from == BuiltinTypes.Never || to == BuiltinTypes.Never)
             return None;
 
         if (from == to)
             return Identity;
 
-        if (to == TypeSymbol.Any)
+        if (to == BuiltinTypes.Any)
             return Implicit;
 
-        if (from == TypeSymbol.I32 && to == TypeSymbol.F32)
+        if (from == BuiltinTypes.I32 && to == BuiltinTypes.F32)
             return Explicit;
 
-        if (from == TypeSymbol.F32 && to == TypeSymbol.I32)
+        if (from == BuiltinTypes.F32 && to == BuiltinTypes.I32)
             return Explicit;
 
         return None;

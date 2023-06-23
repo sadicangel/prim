@@ -1,5 +1,5 @@
 ﻿namespace CodeAnalysis.Symbols;
-public sealed record class FunctionSymbol(string Name, TypeSymbol Type, params ParameterSymbol[] Parameters) : Symbol(Name, SymbolKind.Function)
+public sealed record class FunctionSymbol(string Name, TypeSymbol Type, params ParameterSymbol[] Parameters) : Symbol(SymbolKind.Function, Name, Type)
 {
     public bool Equals(FunctionSymbol? other) => other is not null && Name == other.Name && Type == other.Type && Parameters.SequenceEqual(other.Parameters);
     public override int GetHashCode()

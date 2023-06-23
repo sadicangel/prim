@@ -7,61 +7,64 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 {
     private static readonly BoundBinaryOperator[] Operators =
     {
+        // cast operator
+        new BoundBinaryOperator(TokenKind.As, BoundBinaryOperatorKind.ExplicitCast, BuiltinTypes.Any, BuiltinTypes.Type, BuiltinTypes.Any),
+
         // i32 operators
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, TypeSymbol.I32),
-        new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtract, TypeSymbol.I32),
-        new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiply, TypeSymbol.I32),
-        new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Divide, TypeSymbol.I32),
-        new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulo, TypeSymbol.I32),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.I32),
+        new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtract, BuiltinTypes.I32),
+        new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiply, BuiltinTypes.I32),
+        new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Divide, BuiltinTypes.I32),
+        new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulo, BuiltinTypes.I32),
 
-        new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, TypeSymbol.I32),
-        new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, TypeSymbol.I32),
-        new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, TypeSymbol.I32),
+        new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, BuiltinTypes.I32),
+        new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, BuiltinTypes.I32),
+        new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, BuiltinTypes.I32),
 
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, TypeSymbol.I32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, TypeSymbol.I32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.I32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.I32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
 
-        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, TypeSymbol.I32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqual, TypeSymbol.I32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, TypeSymbol.I32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqual, TypeSymbol.I32, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, BuiltinTypes.I32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqual, BuiltinTypes.I32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, BuiltinTypes.I32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqual, BuiltinTypes.I32, BuiltinTypes.Bool),
 
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, TypeSymbol.F32),
-        new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtract, TypeSymbol.F32),
-        new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiply, TypeSymbol.F32),
-        new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Divide, TypeSymbol.F32),
-        new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulo, TypeSymbol.F32),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.F32),
+        new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtract, BuiltinTypes.F32),
+        new BoundBinaryOperator(TokenKind.Star, BoundBinaryOperatorKind.Multiply, BuiltinTypes.F32),
+        new BoundBinaryOperator(TokenKind.Slash, BoundBinaryOperatorKind.Divide, BuiltinTypes.F32),
+        new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulo, BuiltinTypes.F32),
         
         // f32 operators
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, TypeSymbol.F32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, TypeSymbol.F32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.F32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.F32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
 
-        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, TypeSymbol.F32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqual, TypeSymbol.F32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, TypeSymbol.F32, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqual, TypeSymbol.F32, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, BuiltinTypes.F32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.LessEquals, BoundBinaryOperatorKind.LessThanOrEqual, BuiltinTypes.F32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, BuiltinTypes.F32, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.GreaterEquals, BoundBinaryOperatorKind.GreaterThanOrEqual, BuiltinTypes.F32, BuiltinTypes.Bool),
         
         // bool operators
-        new BoundBinaryOperator(TokenKind.AmpersandAmpersand, BoundBinaryOperatorKind.AndAlso, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.PipePipe, BoundBinaryOperatorKind.OrElse, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.AmpersandAmpersand, BoundBinaryOperatorKind.AndAlso, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.PipePipe, BoundBinaryOperatorKind.OrElse, BuiltinTypes.Bool),
 
-        new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, BuiltinTypes.Bool),
         
         // str operators
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, TypeSymbol.String),
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, TypeSymbol.String, TypeSymbol.Any, TypeSymbol.String),
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, TypeSymbol.Any, TypeSymbol.String, TypeSymbol.String),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.String),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.String, BuiltinTypes.Any, BuiltinTypes.String),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Any, BuiltinTypes.String, BuiltinTypes.String),
 
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, TypeSymbol.String, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, TypeSymbol.String, TypeSymbol.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, TypeSymbol.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.String, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.String, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
     };
 
     public BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, TypeSymbol operandType)
@@ -75,15 +78,40 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 
     }
 
-    public static BoundBinaryOperator? Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType)
+    public static BoundBinaryOperator? Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType, TypeSymbol? resultType)
     {
-        var matchingOperators = new List<BoundBinaryOperator>();
+        var matchingOperator = default(BoundBinaryOperator);
         foreach (var @operator in Operators)
         {
-            if (@operator.TokenKind == tokenKind && @operator.LeftType.IsAssignableFrom(leftType) && @operator.RightType.IsAssignableFrom(rightType))
-                matchingOperators.Add(@operator);
+            if (@operator.TokenKind == tokenKind &&
+                @operator.LeftType.IsAssignableFrom(leftType) &&
+                @operator.RightType.IsAssignableFrom(rightType) &&
+                (resultType is null || @operator.ResultType.IsAssignableFrom(resultType)))
+            {
+                matchingOperator = @operator;
+                break;
+            }
         }
 
-        return matchingOperators.FirstOrDefault();
+        if (matchingOperator?.Kind is BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast)
+        {
+            if (resultType is null)
+                return null;
+
+            var conversion = Conversion.Classify(leftType, resultType);
+            if (!conversion.Exists)
+                return null;
+
+            //if(!conversion.IsIdentity)
+            //Report unnecessary conversion.
+
+            matchingOperator = matchingOperator with
+            {
+                LeftType = leftType,
+                ResultType = resultType,
+            };
+        }
+
+        return matchingOperator;
     }
 }

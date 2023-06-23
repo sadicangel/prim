@@ -273,8 +273,8 @@ internal sealed class Lexer
         var text = _text[_start.._position];
 
         (_kind, _value) = isInteger
-            ? (TokenKind.I32, EnsureCorrectType<int>(text, TypeSymbol.I32))
-            : (TokenKind.F32, EnsureCorrectType<float>(text, TypeSymbol.F32));
+            ? (TokenKind.I32, EnsureCorrectType<int>(text, BuiltinTypes.I32))
+            : (TokenKind.F32, EnsureCorrectType<float>(text, BuiltinTypes.F32));
 
         object EnsureCorrectType<T>(ReadOnlySpan<char> text, TypeSymbol type) where T : unmanaged, ISpanParsable<T>
         {

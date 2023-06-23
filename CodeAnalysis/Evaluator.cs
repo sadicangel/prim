@@ -9,14 +9,14 @@ namespace CodeAnalysis;
 internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatementVisitor
 {
     private readonly BoundStatement _boundStatement;
-    private readonly Dictionary<VariableSymbol, object?> _variables;
+    private readonly Dictionary<Symbol, object?> _symbols;
 
     private object? _lastValue;
 
-    public Evaluator(BoundStatement boundStatement, Dictionary<VariableSymbol, object?> variables)
+    public Evaluator(BoundStatement boundStatement, Dictionary<Symbol, object?> symbols)
     {
         _boundStatement = boundStatement;
-        _variables = variables;
+        _symbols = symbols;
     }
 
     public object? Evaluate()
@@ -54,12 +54,12 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
 
         for (var i = lowerBound; i < upperBound; ++i)
         {
-            _variables[statement.Variable] = i;
+            _symbols[statement.Variable] = i;
             EvaluateStatement(statement.Body);
         }
     }
 
-    void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _variables[statement.Variable] = EvaluateExpression(statement.Expression);
+    void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _symbols[statement.Variable] = EvaluateExpression(statement.Expression);
 
     void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
 
@@ -76,7 +76,25 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundLiteralExpression expression) => expression.Value!;
 
-    object? IBoundExpressionVisitor<object?>.Visit(BoundVariableExpression expression) => _variables[expression.Variable];
+    object? IBoundExpressionVisitor<object?>.Visit(BoundSymbolExpression expression)
+    {
+        var symbol = expression.Symbol;
+
+        switch (symbol.Kind)
+        {
+            case SymbolKind.Type when BuiltinTypes.TryLookup(symbol.Name, out var type):
+                return type;
+            case SymbolKind.Variable:
+                return _symbols[expression.Symbol];
+            case SymbolKind.Function:
+                break;
+            case SymbolKind.Parameter:
+                break;
+            default:
+                throw new InvalidOperationException($"Invalid symbol {symbol.Kind}");
+        }
+        return null;
+    }
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundCallExpression expression)
     {
@@ -105,7 +123,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundConvertExpression expression) => expression.Type.Convert(EvaluateExpression(expression.Expression));
 
-    object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _variables[expression.Variable] = expression.Expression.Accept(this);
+    object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _symbols[expression.Variable] = expression.Expression.Accept(this);
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundUnaryExpression expression)
     {
@@ -140,7 +158,7 @@ file static class BoundExpressionExtensions
         return UnaryOperatorCache.GetOrAdd(kind, static kind =>
         {
             var operand = Expression.Parameter(typeof(Expression), "operand");
-            var method = typeof(Expression).GetMethod(kind.ToString(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression) });
+            var method = typeof(Expression).GetMethod(kind.GetLinqExpressionName(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression) });
             if (method is null)
                 throw new InvalidOperationException($"Unexpected binary operator {kind}");
 
@@ -160,7 +178,7 @@ file static class BoundExpressionExtensions
         {
             var left = Expression.Parameter(typeof(Expression), "left");
             var right = Expression.Parameter(typeof(Expression), "right");
-            var method = typeof(Expression).GetMethod(kind.ToString(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression), typeof(Expression) });
+            var method = typeof(Expression).GetMethod(kind.GetLinqExpressionName(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression), typeof(Expression) });
             if (method is null)
                 throw new InvalidOperationException($"Unexpected binary operator {kind}");
 
@@ -199,7 +217,15 @@ file static class BoundExpressionExtensions
     {
         var cacheNode = BinaryExpressionCache.GetOrAdd(expression.Operator.Kind, kind => new ConcurrentDictionary<BinaryExpressionCacheKey, Func<object?, object?, object?>>());
 
-        return cacheNode.GetOrAdd(new BinaryExpressionCacheKey(expression.Operator.Kind, expression.Left.Type, expression.Right.Type), CreateOperation);
+        var rightType = expression.Right.Type;
+        if (expression.Operator.Kind is BoundBinaryOperatorKind.ImplicitCast or BoundBinaryOperatorKind.ExplicitCast)
+        {
+            var symbolExpression = (BoundSymbolExpression)expression.Right;
+            if (!BuiltinTypes.TryLookup(symbolExpression.Symbol.Name, out rightType))
+                throw new InvalidOperationException($"Could not find type {symbolExpression.Symbol.Name}");
+        }
+
+        return cacheNode.GetOrAdd(new BinaryExpressionCacheKey(expression.Operator.Kind, expression.Left.Type, rightType), CreateOperation);
 
         static Func<object?, object?, object?> CreateOperation(BinaryExpressionCacheKey key)
         {
@@ -207,7 +233,7 @@ file static class BoundExpressionExtensions
             var leftClrType = leftType.GetClrType();
             var rightClrType = rightType.GetClrType();
             Expression<Func<object?, object?, object?>> expression;
-            if (kind == BoundBinaryOperatorKind.Add && (leftClrType == typeof(string) || rightClrType == typeof(string)))
+            if (kind is BoundBinaryOperatorKind.Add && (leftClrType == typeof(string) || rightClrType == typeof(string)))
             {
                 var left = Expression.Parameter(typeof(object), "left");
                 var right = Expression.Parameter(typeof(object), "right");
@@ -217,6 +243,14 @@ file static class BoundExpressionExtensions
                     throw new InvalidOperationException($"Could not find {nameof(String.Concat)} method");
 
                 var body = Expression.Convert(Expression.Call(instance: null, method, left, right), typeof(object));
+                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
+            }
+            else if (kind is BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast)
+            {
+                var left = Expression.Parameter(typeof(object), "left");
+                var right = Expression.Parameter(typeof(object), "right");
+
+                var body = Expression.Convert(Expression.Convert(Expression.Convert(left, leftClrType), rightClrType), typeof(object));
                 expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
             }
             else

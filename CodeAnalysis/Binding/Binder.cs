@@ -1,5 +1,6 @@
 ﻿using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding;
@@ -55,7 +56,10 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var root = new BoundScope(null);
         foreach (var function in BuiltinFunctions.All)
             if (!root.TryDeclare(function))
-                throw new InvalidOperationException($"Could not declare builtin function {function.Name}");
+                throw new InvalidOperationException($"Could not declare built in function {function.Name}");
+        foreach (var type in BuiltinTypes.All)
+            if (!root.TryDeclare(type))
+                throw new InvalidOperationException($"Could not declare built in type {type.Name}");
         return root;
     }
 
@@ -77,7 +81,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         BoundExpression expression;
         if (statement.HasTypeDeclaration)
         {
-            if (TypeSymbol.GetTypeSymbol(statement.TypeToken.Text) is TypeSymbol type)
+            if (BuiltinTypes.TryLookup(statement.TypeToken.Text, out var type))
             {
                 expression = BindExpression(statement.Expression, type);
             }
@@ -103,7 +107,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(IfStatement statement)
     {
-        var condition = BindExpression(statement.Condition, TypeSymbol.Bool);
+        var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
         var then = BindStatement(statement.Then);
         var @else = statement.HasElseClause ? BindStatement(statement.Else) : null;
         return new BoundIfStatement(condition, then, @else);
@@ -111,9 +115,20 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(WhileStatement statement)
     {
-        var condition = BindExpression(statement.Condition, TypeSymbol.Bool);
+        var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
         var body = BindStatement(statement.Body);
         return new BoundWhileStatement(condition, body);
+    }
+
+    private bool TryLookupSymbol(Token identifierToken, [NotNullWhen(true)] out Symbol? symbol)
+    {
+        if (!_scope.TryLookup(identifierToken.Text, out symbol))
+        {
+            _diagnostics.ReportUndefinedName(identifierToken);
+
+            return false;
+        }
+        return true;
     }
 
     private bool TryLookupSymbol<T>(Token identifierToken, [NotNullWhen(true)] out T? symbol) where T : notnull, Symbol
@@ -132,15 +147,15 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ForStatement statement)
     {
-        var lowerBound = BindExpression(statement.LowerBound, TypeSymbol.I32);
-        var upperBound = BindExpression(statement.UpperBound, TypeSymbol.I32);
+        var lowerBound = BindExpression(statement.LowerBound, BuiltinTypes.I32);
+        var upperBound = BindExpression(statement.UpperBound, BuiltinTypes.I32);
 
         _scope = new BoundScope(_scope);
 
         VariableSymbol variable;
         if (statement.DeclaresVariable)
         {
-            variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, TypeSymbol.I32);
+            variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, BuiltinTypes.I32);
             // Check outer scope for name.
             if (_scope.Parent!.TryLookup(variable.Name, out _) || !_scope.TryDeclare(variable))
                 _diagnostics.ReportRedeclaration(statement.IdentifierToken);
@@ -149,7 +164,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         {
             if (!TryLookupSymbol(statement.IdentifierToken, out variable!))
             {
-                variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, TypeSymbol.I32);
+                variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, BuiltinTypes.I32);
             }
             else if (variable.IsReadOnly)
             {
@@ -188,7 +203,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         }
         else
         {
-            if (boundExpression.Type != TypeSymbol.Never && targetType != TypeSymbol.Never)
+            if (boundExpression.Type != BuiltinTypes.Never && targetType != BuiltinTypes.Never)
                 _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
         }
 
@@ -200,7 +215,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     private BoundExpression BindExpression(Expression expression, bool allowVoid)
     {
         var result = expression.Accept(this);
-        if (!allowVoid && result.Type == TypeSymbol.Void)
+        if (!allowVoid && result.Type == BuiltinTypes.Void)
         {
             _diagnostics.ReportInvalidExpressionType(expression.Span, result.Type);
             return new BoundNeverExpression();
@@ -211,7 +226,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(IfExpression expression)
     {
-        var condition = BindExpression(expression.Condition, TypeSymbol.Bool);
+        var condition = BindExpression(expression.Condition, BuiltinTypes.Bool);
         var then = BindExpression(expression.Then);
         var @else = BindExpression(expression.Else);
 
@@ -229,7 +244,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     {
         var boundOperand = BindExpression(expression.Operand);
 
-        if (boundOperand.Type == TypeSymbol.Never)
+        if (boundOperand.Type == BuiltinTypes.Never)
             return new BoundNeverExpression();
 
         var boundOperator = BoundUnaryOperator.Bind(expression.OperatorToken.Kind, boundOperand.Type);
@@ -246,13 +261,31 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var boundLeft = BindExpression(expression.Left);
         var boundRight = BindExpression(expression.Right);
 
-        if (boundLeft.Type == TypeSymbol.Never || boundRight.Type == TypeSymbol.Never)
+        if (boundLeft.Type == BuiltinTypes.Never || boundRight.Type == BuiltinTypes.Never)
             return new BoundNeverExpression();
 
-        var boundOperator = BoundBinaryOperator.Bind(expression.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
+        var resultType = default(TypeSymbol);
+        if (expression.OperatorToken.Kind is TokenKind.As)
+        {
+            if (boundRight is not BoundSymbolExpression symbolExpression || BuiltinTypes.Type != symbolExpression.Type)
+            {
+                _diagnostics.ReportInvalidExpressionType(expression.Right.Span, BuiltinTypes.Type, boundRight.Type);
+                return new BoundNeverExpression();
+            }
+
+            if (!BuiltinTypes.TryLookup(symbolExpression.Symbol.Name, out resultType))
+            {
+                _diagnostics.ReportUndefinedType(expression.Right.Span, symbolExpression.Symbol.Name);
+                return new BoundNeverExpression();
+            }
+        }
+        var boundOperator = BoundBinaryOperator.Bind(expression.OperatorToken.Kind, boundLeft.Type, boundRight.Type, resultType);
         if (boundOperator is null)
         {
-            _diagnostics.ReportUndefinedBinaryOperator(expression.OperatorToken, boundLeft.Type, boundRight.Type);
+            if (expression.OperatorToken.Kind is TokenKind.As)
+                _diagnostics.ReportInvalidConversion(TextSpan.FromBounds(expression.OperatorToken.Span.Start, expression.Right.Span.End), boundLeft.Type, resultType!);
+            else
+                _diagnostics.ReportUndefinedBinaryOperator(expression.OperatorToken, boundLeft.Type, boundRight.Type);
             return new BoundNeverExpression();
         }
         return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
@@ -271,12 +304,12 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
             return new BoundNeverExpression();
         }
 
-        if (!TryLookupSymbol(expression.IdentifierToken, out VariableSymbol? variable))
+        if (!TryLookupSymbol(expression.IdentifierToken, out var symbol))
         {
             return new BoundNeverExpression();
         }
 
-        return new BoundVariableExpression(variable);
+        return new BoundSymbolExpression(symbol);
     }
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(CallExpression expression)
     {
@@ -312,7 +345,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     {
         var boundExpression = BindExpression(expression.Expression);
 
-        if (boundExpression.Type == TypeSymbol.Never)
+        if (boundExpression.Type == BuiltinTypes.Never)
             return new BoundNeverExpression();
 
         if (!TryLookupSymbol(expression.IdentifierToken, out VariableSymbol? variable))
@@ -337,7 +370,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
     {
         var boundExpression = BindExpression(expression.Expression);
-        if (TypeSymbol.GetTypeSymbol(expression.TypeToken.Text) is not TypeSymbol type)
+        if (!BuiltinTypes.TryLookup(expression.TypeToken.Text, out var type))
         {
             _diagnostics.ReportUndefinedName(expression.TypeToken);
             return new BoundNeverExpression();
@@ -345,7 +378,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var conversion = Conversion.Classify(boundExpression.Type, type);
         if (!conversion.Exists)
         {
-            if (boundExpression.Type != TypeSymbol.Never && type != TypeSymbol.Never)
+            if (boundExpression.Type != BuiltinTypes.Never && type != BuiltinTypes.Never)
                 _diagnostics.ReportInvalidConversion(expression.AsToken.Span, boundExpression.Type, type);
             return new BoundNeverExpression();
         }

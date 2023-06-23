@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using System.Linq.Expressions;
+
+namespace CodeAnalysis.Binding;
 
 internal enum BoundBinaryOperatorKind
 {
@@ -20,4 +22,15 @@ internal enum BoundBinaryOperatorKind
     Modulo,
     AndAlso,
     OrElse,
+    ExplicitCast,
+    ImplicitCast,
+}
+
+internal static class BoundBinaryOperatorKindExtensions
+{
+    public static string GetLinqExpressionName(this BoundBinaryOperatorKind kind) => kind switch
+    {
+        BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast => nameof(Expression.Convert),
+        _ => kind.ToString(),
+    };
 }

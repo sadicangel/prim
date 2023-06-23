@@ -3,8 +3,17 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Symbols;
 
-public abstract record class Symbol(string Name, SymbolKind Kind) : INode
+public abstract record class Symbol(SymbolKind Kind, string Name, TypeSymbol Type) : INode
 {
+    //// A little hack to allow TypeSymbol to use itself as Type.
+    //private protected Symbol(SymbolKind kind, string name)
+    //    : this(kind, name, Type: null!)
+    //{
+    //    Type = (TypeSymbol)this;
+    //}
+
+    //public TypeSymbol Type { get; init; } = Type;
+
     TextSpan INode.Span { get; }
 
     IEnumerable<INode> INode.GetChildren() => Enumerable.Empty<INode>();
@@ -17,8 +26,6 @@ public abstract record class Symbol(string Name, SymbolKind Kind) : INode
         writer.WriteColored(Name, ConsoleColor.Cyan);
         writer.WriteLine();
     }
-
-    public override string ToString() => Name;
 
     public static SymbolKind GetKind<T>()
     {

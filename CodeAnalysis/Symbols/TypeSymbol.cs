@@ -1,49 +1,16 @@
-﻿using System.Collections.Concurrent;
-using System.Reflection;
+﻿namespace CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Symbols;
-
-public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Type)
+public sealed record class TypeSymbol(string Name) : Symbol(SymbolKind.Type, Name, BuiltinTypes.Type)
 {
-    private static readonly Lazy<ConcurrentDictionary<string, TypeSymbol>> TypeMap = new(() => new ConcurrentDictionary<string, TypeSymbol>(typeof(TypeSymbol)
-        .GetFields(BindingFlags.Public | BindingFlags.Static)
-        .Where(f => f.FieldType == typeof(TypeSymbol))
-        .Select(f => (TypeSymbol)f.GetValue(null)!)
-        .ToDictionary(f => f.Name)));
 
-    public static readonly TypeSymbol Never = new("never");
-
-    public static readonly TypeSymbol Any = new("any");
-
-    public static readonly TypeSymbol Void = new("void");
-
-    public static readonly TypeSymbol Bool = new("bool");
-
-    public static readonly TypeSymbol I8 = new("i8");
-    public static readonly TypeSymbol I16 = new("i16");
-    public static readonly TypeSymbol I32 = new("i32");
-    public static readonly TypeSymbol I64 = new("i64");
-
-    public static readonly TypeSymbol U8 = new("u8");
-    public static readonly TypeSymbol U16 = new("u16");
-    public static readonly TypeSymbol U32 = new("u32");
-    public static readonly TypeSymbol U64 = new("u64");
-
-    public static readonly TypeSymbol F32 = new("f32");
-    public static readonly TypeSymbol F64 = new("f64");
-
-    public static readonly TypeSymbol String = new("str");
-
-    public static TypeSymbol? GetTypeSymbol(string name) => TypeMap.Value.GetValueOrDefault(name);
-
-    public bool Equals(TypeSymbol? other) => base.Equals(other);
-    public override int GetHashCode() => base.GetHashCode();
-    public override string ToString() => base.ToString();
+    public bool Equals(TypeSymbol? other) => other is not null && Name == other.Name;
+    public override int GetHashCode() => Name.GetHashCode();
+    public override string ToString() => Name;
 
     public bool IsAssignableFrom(TypeSymbol from) => CanAssign(from, this);
     public bool IsAssignableTo(TypeSymbol to) => CanAssign(this, to);
 
-    private static bool CanAssign(TypeSymbol from, TypeSymbol to) => from is not null && to is not null && (to == Any || to == from);
+    private static bool CanAssign(TypeSymbol from, TypeSymbol to) => from is not null && to is not null && (to == BuiltinTypes.Any || to == from);
 
     public Type GetClrType()
     {
@@ -52,6 +19,7 @@ public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Typ
             "never" => typeof(void),
             "any" => typeof(object),
             "void" => typeof(void),
+            "type" => typeof(Type),
             "bool" => typeof(bool),
             "i8" => typeof(sbyte),
             "i16" => typeof(short),
@@ -95,24 +63,26 @@ public sealed record class TypeSymbol(string Name) : Symbol(Name, SymbolKind.Typ
     {
         return value switch
         {
-            null => Void,
+            null => BuiltinTypes.Void,
 
-            bool => Bool,
+            bool => BuiltinTypes.Bool,
 
-            sbyte => I8,
-            short => I16,
-            int => I32,
-            long => I64,
+            sbyte => BuiltinTypes.I8,
+            short => BuiltinTypes.I16,
+            int => BuiltinTypes.I32,
+            long => BuiltinTypes.I64,
 
-            byte => U8,
-            ushort => U16,
-            uint => U32,
-            ulong => U32,
+            byte => BuiltinTypes.U8,
+            ushort => BuiltinTypes.U16,
+            uint => BuiltinTypes.U32,
+            ulong => BuiltinTypes.U32,
 
-            float => F32,
-            double => F64,
+            float => BuiltinTypes.F32,
+            double => BuiltinTypes.F64,
 
-            string => String,
+            string => BuiltinTypes.String,
+
+            TypeSymbol => BuiltinTypes.Type,
 
             _ => throw new InvalidOperationException($"Unexpected literal of type {value?.GetType()}"),
         };

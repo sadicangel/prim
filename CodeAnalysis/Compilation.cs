@@ -29,7 +29,7 @@ public sealed class Compilation
         }
     }
 
-    public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)
+    public EvaluationResult Evaluate(Dictionary<Symbol, object?> symbols)
     {
         var boundStatement = GlobalScope.Statement;
 
@@ -38,7 +38,7 @@ public sealed class Compilation
         {
             return new EvaluationResult(null, diagnostics);
         }
-        var evaluator = new Evaluator(boundStatement, variables);
+        var evaluator = new Evaluator(boundStatement, symbols);
         var value = evaluator.Evaluate();
 
         return new EvaluationResult(value, Array.Empty<Diagnostic>());

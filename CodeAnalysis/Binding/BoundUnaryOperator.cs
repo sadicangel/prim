@@ -7,10 +7,10 @@ internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryO
 {
     private static readonly BoundUnaryOperator[] Operators =
     {
-        new BoundUnaryOperator(TokenKind.Bang, BoundUnaryOperatorKind.Not, TypeSymbol.Bool),
-        new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negate, TypeSymbol.I32),
-        new BoundUnaryOperator(TokenKind.Plus, BoundUnaryOperatorKind.UnaryPlus, TypeSymbol.I32),
-        new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, TypeSymbol.I32),
+        new BoundUnaryOperator(TokenKind.Bang, BoundUnaryOperatorKind.Not, BuiltinTypes.Bool),
+        new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negate, BuiltinTypes.I32),
+        new BoundUnaryOperator(TokenKind.Plus, BoundUnaryOperatorKind.UnaryPlus, BuiltinTypes.I32),
+        new BoundUnaryOperator(TokenKind.Tilde, BoundUnaryOperatorKind.OnesComplement, BuiltinTypes.I32),
     };
 
     public BoundUnaryOperator(TokenKind tokenKind, BoundUnaryOperatorKind kind, TypeSymbol operandType)

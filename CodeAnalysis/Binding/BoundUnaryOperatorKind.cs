@@ -9,3 +9,11 @@ internal enum BoundUnaryOperatorKind
     Not,
     OnesComplement
 }
+
+internal static class BoundUnaryOperatorKindExtensions
+{
+    public static string GetLinqExpressionName(this BoundUnaryOperatorKind kind) => kind switch
+    {
+        _ => kind.ToString()
+    };
+}

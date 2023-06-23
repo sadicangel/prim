@@ -8,7 +8,7 @@ internal interface IBoundExpressionVisitor<out TResult>
     TResult Visit(BoundUnaryExpression expression);
     TResult Visit(BoundBinaryExpression expression);
     TResult Visit(BoundLiteralExpression expression);
-    TResult Visit(BoundVariableExpression expression);
+    TResult Visit(BoundSymbolExpression expression);
     TResult Visit(BoundAssignmentExpression expression);
     TResult Visit(BoundIfExpression expression);
     TResult Visit(BoundCallExpression expression);
