@@ -1,5 +1,6 @@
 ﻿using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding;
 
@@ -115,6 +116,20 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundWhileStatement(condition, body);
     }
 
+    private bool TryLookupSymbol<T>(Token identifierToken, [NotNullWhen(true)] out T? symbol) where T : notnull, Symbol
+    {
+        if (!_scope.TryLookup(identifierToken.Text, out symbol, out var existingSymbol))
+        {
+            if (existingSymbol is not null)
+                _diagnostics.ReportInvalidSymbol(identifierToken, Symbol.GetKind<T>(), existingSymbol.Kind);
+            else
+                _diagnostics.ReportUndefinedName(identifierToken);
+
+            return false;
+        }
+        return true;
+    }
+
     BoundStatement IStatementVisitor<BoundStatement>.Accept(ForStatement statement)
     {
         var lowerBound = BindExpression(statement.LowerBound, TypeSymbol.I32);
@@ -127,15 +142,14 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         {
             variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, TypeSymbol.I32);
             // Check outer scope for name.
-            if (_scope.Parent!.TryLookup(variable.Name, out VariableSymbol? _) || !_scope.TryDeclare(variable))
+            if (_scope.Parent!.TryLookup(variable.Name, out _) || !_scope.TryDeclare(variable))
                 _diagnostics.ReportRedeclaration(statement.IdentifierToken);
         }
         else
         {
-            if (!_scope.TryLookup(statement.IdentifierToken.Text, out variable!))
+            if (!TryLookupSymbol(statement.IdentifierToken, out variable!))
             {
                 variable = new VariableSymbol(statement.IdentifierToken.Text, IsReadOnly: true, TypeSymbol.I32);
-                _diagnostics.ReportUndefinedName(statement.IdentifierToken);
             }
             else if (variable.IsReadOnly)
             {
@@ -174,7 +188,8 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         }
         else
         {
-            _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
+            if (boundExpression.Type != TypeSymbol.Never && targetType != TypeSymbol.Never)
+                _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
         }
 
         return boundExpression;
@@ -251,16 +266,13 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(NameExpression expression)
     {
-        var name = expression.IdentifierToken.Text;
-
         if (expression.IdentifierToken.IsMissing)
         {
             return new BoundNeverExpression();
         }
 
-        if (!_scope.TryLookup(name, out VariableSymbol? variable))
+        if (!TryLookupSymbol(expression.IdentifierToken, out VariableSymbol? variable))
         {
-            _diagnostics.ReportUndefinedName(expression.IdentifierToken);
             return new BoundNeverExpression();
         }
 
@@ -270,9 +282,8 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     {
         var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
 
-        if (!_scope.TryLookup(expression.Identifier.Text, out FunctionSymbol? function))
+        if (!TryLookupSymbol(expression.IdentifierToken, out FunctionSymbol? function))
         {
-            _diagnostics.ReportUndefinedName(expression.Identifier);
             return new BoundNeverExpression();
         }
 
@@ -299,21 +310,19 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(AssignmentExpression expression)
     {
-        var name = expression.IdentifierToken.Text;
         var boundExpression = BindExpression(expression.Expression);
 
         if (boundExpression.Type == TypeSymbol.Never)
             return new BoundNeverExpression();
 
-        if (!_scope.TryLookup(name, out VariableSymbol? variable))
+        if (!TryLookupSymbol(expression.IdentifierToken, out VariableSymbol? variable))
         {
-            _diagnostics.ReportUndefinedName(expression.IdentifierToken);
             return boundExpression;
         }
 
         if (variable.IsReadOnly)
         {
-            _diagnostics.ReportReadOnlyAssignment(expression.EqualsToken.Span, name);
+            _diagnostics.ReportReadOnlyAssignment(expression.EqualsToken.Span, expression.IdentifierToken.Text);
         }
 
         if (boundExpression.Type != variable.Type)
@@ -336,7 +345,8 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         var conversion = Conversion.Classify(boundExpression.Type, type);
         if (!conversion.Exists)
         {
-            _diagnostics.ReportInvalidConversion(expression.AsToken.Span, boundExpression.Type, type);
+            if (boundExpression.Type != TypeSymbol.Never && type != TypeSymbol.Never)
+                _diagnostics.ReportInvalidConversion(expression.AsToken.Span, boundExpression.Type, type);
             return new BoundNeverExpression();
         }
         return new BoundConvertExpression(boundExpression, type);

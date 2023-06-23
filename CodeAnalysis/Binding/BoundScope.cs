@@ -3,54 +3,42 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<VariableSymbol>? Variables = null, IReadOnlyCollection<FunctionSymbol>? Functions = null)
+internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<Symbol>? Symbols = null)
 {
-    private Dictionary<string, VariableSymbol>? _variables = Variables?.ToDictionary(v => v.Name);
-    private Dictionary<string, FunctionSymbol>? _functions = Functions?.ToDictionary(v => v.Name);
+    private Dictionary<string, Symbol>? _symbols = Symbols?.ToDictionary(v => v.Name);
 
-    public IReadOnlyCollection<VariableSymbol> Variables { get => _variables?.Values ?? (IReadOnlyCollection<VariableSymbol>)Array.Empty<VariableSymbol>(); }
+    public IEnumerable<VariableSymbol> Variables { get => _symbols?.Values.OfType<VariableSymbol>() ?? Array.Empty<VariableSymbol>(); }
 
-    public IReadOnlyCollection<FunctionSymbol> Functions { get => _functions?.Values ?? (IReadOnlyCollection<FunctionSymbol>)Array.Empty<FunctionSymbol>(); }
+    public IEnumerable<FunctionSymbol> Functions { get => _symbols?.Values.OfType<FunctionSymbol>() ?? Array.Empty<FunctionSymbol>(); }
 
-    public bool TryDeclare(VariableSymbol variable) => (_variables ??= new()).TryAdd(variable.Name, variable);
+    public IEnumerable<TypeSymbol> Types { get => _symbols?.Values.OfType<TypeSymbol>() ?? Array.Empty<TypeSymbol>(); }
 
-    public bool TryDeclare(VariableSymbol variable, [MaybeNullWhen(true)] out VariableSymbol existingVariable)
+    public bool TryDeclare(Symbol symbol) => (_symbols ??= new()).TryAdd(symbol.Name, symbol);
+
+    public bool TryDeclare<T>(T symbol, [MaybeNullWhen(true)] out Symbol existingSymbol) where T : notnull, Symbol
     {
-        if ((_variables ??= new()).TryGetValue(variable.Name, out existingVariable))
+        if ((_symbols ??= new()).TryGetValue(symbol.Name, out existingSymbol))
             return false;
 
-        _variables[variable.Name] = variable;
+        _symbols[symbol.Name] = symbol;
         return true;
     }
 
-    public bool TryLookup(string name, [MaybeNullWhen(false)] out VariableSymbol variable)
+    public bool TryLookup(string name, [MaybeNullWhen(false)] out Symbol symbol)
     {
-        variable = null;
+        symbol = null;
 
-        if (_variables is not null && _variables.TryGetValue(name, out variable))
+        if (_symbols is not null && _symbols.TryGetValue(name, out symbol))
             return true;
 
-        return Parent is not null && Parent.TryLookup(name, out variable);
+        return Parent is not null && Parent.TryLookup(name, out symbol);
     }
 
-    public bool TryDeclare(FunctionSymbol function) => (_functions ??= new()).TryAdd(function.Name, function);
-
-    public bool TryDeclare(FunctionSymbol function, [MaybeNullWhen(true)] out FunctionSymbol existingFunction)
+    public bool TryLookup<T>(string name, [NotNullWhen(true)] out T? symbol, [NotNullWhen(true)] out Symbol? existingSymbol) where T : notnull, Symbol
     {
-        if ((_functions ??= new()).TryGetValue(function.Name, out existingFunction))
-            return false;
-
-        _functions[function.Name] = function;
-        return true;
-    }
-
-    public bool TryLookup(string name, [MaybeNullWhen(false)] out FunctionSymbol function)
-    {
-        function = null;
-
-        if (_functions is not null && _functions.TryGetValue(name, out function))
-            return true;
-
-        return Parent is not null && Parent.TryLookup(name, out function);
+        symbol = null;
+        if (TryLookup(name, out existingSymbol) && existingSymbol is T existingSymbolAsT)
+            symbol = existingSymbolAsT;
+        return symbol is not null;
     }
 }

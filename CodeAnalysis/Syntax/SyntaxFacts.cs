@@ -31,6 +31,7 @@ public static class SyntaxFacts
         TokenKind.Ampersand or
         TokenKind.AmpersandAmpersand => 2,
 
+        TokenKind.As or
         TokenKind.Pipe or
         TokenKind.PipePipe or
         TokenKind.Hat => 1,

@@ -174,23 +174,23 @@ internal sealed class Parser
             return new AssignmentExpression(identifierToken, operatorToken, right);
         }
 
-        if (Peek(1).Kind == TokenKind.As)
-        {
-            var expression = ParseBinaryExpression();
-            var asToken = MatchToken(TokenKind.As);
-            var typeIdentifierToken = MatchToken(TokenKind.Identifier);
-            return new ConvertExpression(expression, asToken, typeIdentifierToken);
-        }
+        //if (Peek(1).Kind == TokenKind.As)
+        //{
+        //    var expression = ParseBinaryExpression();
+        //    var asToken = MatchToken(TokenKind.As);
+        //    var typeIdentifierToken = MatchToken(TokenKind.Identifier);
+        //    return new ConvertExpression(expression, asToken, typeIdentifierToken);
+        //}
 
-        if (Peek(0).Kind == TokenKind.If)
-        {
-            var ifToken = MatchToken(TokenKind.If);
-            var condition = ParseAssignmentExpression();
-            var then = ParseAssignmentExpression();
-            var elseToken = MatchToken(TokenKind.Else);
-            var @else = ParseAssignmentExpression();
-            return new IfExpression(ifToken, condition, then, elseToken, @else);
-        }
+        //if (Peek(0).Kind == TokenKind.If)
+        //{
+        //    var ifToken = MatchToken(TokenKind.If);
+        //    var condition = ParseAssignmentExpression();
+        //    var then = ParseAssignmentExpression();
+        //    var elseToken = MatchToken(TokenKind.Else);
+        //    var @else = ParseAssignmentExpression();
+        //    return new IfExpression(ifToken, condition, then, elseToken, @else);
+        //}
 
         return ParseBinaryExpression();
     }

@@ -31,4 +31,6 @@ public static class DiagnosticMessage
     public static string InvalidArgumentType(string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => $"Parameter '{parameterName}' cannot be converted from type '{actualType}' to '{expectedType}'";
 
     public static string InvalidExpressionType(TypeSymbol type) => $"Invalid expression of type '{type}'";
+
+    public static string InvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
 }

@@ -19,4 +19,21 @@ public abstract record class Symbol(string Name, SymbolKind Kind) : INode
     }
 
     public override string ToString() => Name;
+
+    public static SymbolKind GetKind<T>()
+    {
+        switch (typeof(T))
+        {
+            case Type t when t == typeof(FunctionSymbol):
+                return SymbolKind.Function;
+            case Type t when t == typeof(ParameterSymbol):
+                return SymbolKind.Parameter;
+            case Type t when t == typeof(TypeSymbol):
+                return SymbolKind.Type;
+            case Type t when t == typeof(VariableSymbol):
+                return SymbolKind.Variable;
+            default:
+                throw new InvalidOperationException($"Type '{typeof(T)}' is not a {nameof(Symbol)}");
+        }
+    }
 }
