@@ -83,7 +83,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         {
             if (BuiltinTypes.TryLookup(statement.TypeToken.Text, out var type))
             {
-                expression = BindExpression(statement.Expression, type);
+                expression = BindExpression(statement.Expression, type, isExplicit: true);
             }
             else
             {
@@ -170,6 +170,10 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
             {
                 _diagnostics.ReportReadOnlyAssignment(statement.IdentifierToken.Span, statement.IdentifierToken.Text);
             }
+            else if (variable.Type != BuiltinTypes.I32)
+            {
+                _diagnostics.ReportInvalidVariableType(statement.IdentifierToken.Span, BuiltinTypes.I32, variable.Type);
+            }
         }
 
         var body = BindStatement(statement.Body);
@@ -185,30 +189,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundExpressionStatement(expression);
     }
 
-    private BoundExpression BindExpression(Expression expression, TypeSymbol targetType)
-    {
-        var boundExpression = BindExpression(expression);
-
-        var conversion = Conversion.Classify(boundExpression.Type, targetType);
-
-        if (conversion.Exists)
-        {
-            if (!conversion.IsIdentity)
-            {
-                if (conversion.IsImplicit)
-                    boundExpression = new BoundConvertExpression(boundExpression, targetType);
-                else
-                    _diagnostics.ReportInvalidImplicitConversion(expression.Span, boundExpression.Type, targetType);
-            }
-        }
-        else
-        {
-            if (boundExpression.Type != BuiltinTypes.Never && targetType != BuiltinTypes.Never)
-                _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
-        }
-
-        return boundExpression;
-    }
+    private BoundExpression BindExpression(Expression expression, TypeSymbol targetType, bool isExplicit = false) => BindConversion(expression, targetType, isExplicit);
 
     private BoundExpression BindExpression(Expression expression) => BindExpression(expression, allowVoid: false);
 
@@ -277,6 +258,12 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
             {
                 _diagnostics.ReportUndefinedType(expression.Right.Span, symbolExpression.Symbol.Name);
                 return new BoundNeverExpression();
+            }
+
+            // Prevent redundant cast.
+            if (boundLeft.Type == resultType)
+            {
+                return boundLeft;
             }
         }
         var boundOperator = BoundBinaryOperator.Bind(expression.OperatorToken.Kind, boundLeft.Type, boundRight.Type, resultType);
@@ -369,19 +356,34 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     BoundExpression IExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
     {
-        var boundExpression = BindExpression(expression.Expression);
-        if (!BuiltinTypes.TryLookup(expression.TypeToken.Text, out var type))
+        if (!BuiltinTypes.TryLookup(expression.TypeToken.Text, out var targetType))
         {
             _diagnostics.ReportUndefinedName(expression.TypeToken);
             return new BoundNeverExpression();
         }
-        var conversion = Conversion.Classify(boundExpression.Type, type);
+
+        return BindConversion(expression.Expression, targetType, isExplicit: true);
+    }
+
+    private BoundExpression BindConversion(Expression expression, TypeSymbol targetType, bool isExplicit)
+    {
+        var boundExpression = BindExpression(expression);
+
+        if (boundExpression.Type == BuiltinTypes.Never || targetType == BuiltinTypes.Never)
+            return boundExpression;
+
+        var conversion = Conversion.Classify(boundExpression.Type, targetType);
         if (!conversion.Exists)
         {
-            if (boundExpression.Type != BuiltinTypes.Never && type != BuiltinTypes.Never)
-                _diagnostics.ReportInvalidConversion(expression.AsToken.Span, boundExpression.Type, type);
-            return new BoundNeverExpression();
+            _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
         }
-        return new BoundConvertExpression(boundExpression, type);
+        else if (!conversion.IsIdentity)
+        {
+            if (conversion.IsImplicit || isExplicit)
+                return new BoundConvertExpression(boundExpression, targetType);
+
+            _diagnostics.ReportInvalidImplicitConversion(expression.Span, boundExpression.Type, targetType);
+        }
+        return boundExpression;
     }
 }

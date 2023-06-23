@@ -116,6 +116,12 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
             case string name when name == BuiltinFunctions.Random.Name:
                 return Random.Shared.Next((int)EvaluateExpression(expression.Arguments[0])!);
 
+            case string name when name == BuiltinFunctions.TypeOf.Name:
+                return expression.Arguments[0].Type;
+
+            case string name when name == BuiltinFunctions.CrlType.Name:
+                return (EvaluateExpression(expression.Arguments[0])?.GetType() ?? typeof(void)).Name;
+
             default:
                 throw new InvalidOperationException($"Undefined function {expression.Function.Name}");
         }

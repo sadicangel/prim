@@ -26,11 +26,13 @@ internal static class BuiltinTypes
     public static readonly TypeSymbol I16 = new("i16");
     public static readonly TypeSymbol I32 = new("i32");
     public static readonly TypeSymbol I64 = new("i64");
+    public static readonly TypeSymbol ISize = new("isize");
 
     public static readonly TypeSymbol U8 = new("u8");
     public static readonly TypeSymbol U16 = new("u16");
     public static readonly TypeSymbol U32 = new("u32");
     public static readonly TypeSymbol U64 = new("u64");
+    public static readonly TypeSymbol USize = new("usize");
 
     public static readonly TypeSymbol F32 = new("f32");
     public static readonly TypeSymbol F64 = new("f64");

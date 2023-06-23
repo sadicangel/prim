@@ -32,6 +32,7 @@ public sealed class DiagnosticBag : IEnumerable<Diagnostic>
     public void ReportInvalidArgumentCount(TextSpan span, string functionName, int expectedCount, int actualCount) => ReportError(span, DiagnosticMessage.InvalidArgumentCount(functionName, expectedCount, actualCount));
     public void ReportInvalidArgumentType(TextSpan span, string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidArgumentType(parameterName, expectedType, actualType));
     public void ReportInvalidExpressionType(TextSpan span, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidExpressionType(actualType));
+    public void ReportInvalidVariableType(TextSpan span, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidVariableType(expectedType, actualType));
     public void ReportInvalidExpressionType(TextSpan span, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     public void ReportInvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Span, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));
 }
