@@ -35,7 +35,7 @@ internal static class BuiltinTypes
     public static readonly TypeSymbol F32 = new("f32");
     public static readonly TypeSymbol F64 = new("f64");
 
-    public static readonly TypeSymbol String = new("str");
+    public static readonly TypeSymbol Str = new("str");
 
     public static IEnumerable<TypeSymbol> All { get => TypeMap.Value.Values; }
 

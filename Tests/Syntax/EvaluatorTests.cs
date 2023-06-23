@@ -138,6 +138,16 @@ public sealed class EvaluatorTests
             },
             new object[]
             {
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)}",
+                """
+                {
+                    10 as ⟨string⟩;
+                }
+                """,
+                $"{DiagnosticMessage.UndefinedName("string")}"
+            },
+            new object[]
+            {
                 $"Reports {nameof(DiagnosticMessage.ReadOnlyAssignment)}",
                 """
                 {
@@ -290,6 +300,27 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.InvalidNumber)} for multiple '.' in a number",
                 "⟨1.1.1⟩",
                 $"{DiagnosticMessage.InvalidNumber("1.1.1", BuiltinTypes.F32)}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidExpressionType)}",
+                """
+                {
+                    const string = "";
+                    10 as ⟨string⟩;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidExpressionType(BuiltinTypes.Type, BuiltinTypes.Str)}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidConversion)}",
+                """
+                {
+                    10 ⟨as str⟩;
+                }
+                """,
+                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.I32, BuiltinTypes.Str)}"
             },
         };
     }

@@ -80,7 +80,7 @@ public sealed record class TypeSymbol(string Name) : Symbol(SymbolKind.Type, Nam
             float => BuiltinTypes.F32,
             double => BuiltinTypes.F64,
 
-            string => BuiltinTypes.String,
+            string => BuiltinTypes.Str,
 
             TypeSymbol => BuiltinTypes.Type,
 

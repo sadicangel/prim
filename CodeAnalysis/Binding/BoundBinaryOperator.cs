@@ -57,13 +57,13 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, BuiltinTypes.Bool),
         
         // str operators
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.String),
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.String, BuiltinTypes.Any, BuiltinTypes.String),
-        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Any, BuiltinTypes.String, BuiltinTypes.String),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Str),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Str, BuiltinTypes.Any, BuiltinTypes.Str),
+        new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Any, BuiltinTypes.Str, BuiltinTypes.Str),
 
-        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.String, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.Str, BuiltinTypes.Bool),
         new BoundBinaryOperator(TokenKind.EqualsEquals, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.String, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Str, BuiltinTypes.Bool),
         new BoundBinaryOperator(TokenKind.BangEquals, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
     };
 
