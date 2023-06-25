@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public enum NodeKind
+public enum SyntaxNodeKind
 {
     // Expressions
     LiteralExpression,

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CodeAnalysis;
 
-internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatementVisitor
+internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisitor<object?>
 {
     private readonly BoundStatement _boundStatement;
     private readonly Dictionary<Symbol, object?> _symbols;
@@ -27,12 +27,12 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
 
     private void EvaluateStatement(BoundStatement statement) => statement.Accept(this);
 
-    void IBoundStatementVisitor.Accept(BoundBlockStatement statement)
+    void IBoundStatementVisitor.Visit(BoundBlockStatement statement)
     {
         foreach (var s in statement.Statements)
             EvaluateStatement(s);
     }
-    void IBoundStatementVisitor.Accept(BoundIfStatement statement)
+    void IBoundStatementVisitor.Visit(BoundIfStatement statement)
     {
         var condition = (bool)EvaluateExpression(statement.Condition)!;
         if (condition)
@@ -41,13 +41,13 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
             EvaluateStatement(statement.Else);
     }
 
-    void IBoundStatementVisitor.Accept(BoundWhileStatement statement)
+    void IBoundStatementVisitor.Visit(BoundWhileStatement statement)
     {
         while ((bool)EvaluateExpression(statement.Condition)!)
             EvaluateStatement(statement.Body);
     }
 
-    void IBoundStatementVisitor.Accept(BoundForStatement statement)
+    void IBoundStatementVisitor.Visit(BoundForStatement statement)
     {
         var lowerBound = (int)EvaluateExpression(statement.LowerBound)!;
         var upperBound = (int)EvaluateExpression(statement.UpperBound)!;
@@ -59,11 +59,11 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>, IBoundStatem
         }
     }
 
-    void IBoundStatementVisitor.Accept(BoundDeclarationStatement statement) => _lastValue = _symbols[statement.Variable] = EvaluateExpression(statement.Expression);
+    void IBoundStatementVisitor.Visit(BoundDeclarationStatement statement) => _lastValue = _symbols[statement.Variable] = EvaluateExpression(statement.Expression);
 
-    void IBoundStatementVisitor.Accept(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
+    void IBoundStatementVisitor.Visit(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
 
-    private object? EvaluateExpression(BoundExpression expression) => expression.Accept(this);
+    private object? EvaluateExpression(BoundExpression expression) => expression.Accept<object?>(this);
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundNeverExpression expression) => _lastValue;
 

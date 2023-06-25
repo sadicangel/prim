@@ -1,9 +1,9 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class WhileStatement(Token WhileToken, Expression Condition, Statement Body) : Statement(NodeKind.WhileStatement)
+public sealed record class WhileStatement(Token WhileToken, Expression Condition, Statement Body) : Statement(SyntaxNodeKind.WhileStatement)
 {
-    public override T Accept<T>(IStatementVisitor<T> visitor) => visitor.Accept(this);
-    public override IEnumerable<Node> GetChildren()
+    public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
+    public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return WhileToken;
         yield return Condition;

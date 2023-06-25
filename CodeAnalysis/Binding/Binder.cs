@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVisitor<BoundStatement>
+internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISyntaxStatementVisitor<BoundStatement>
 {
     private readonly DiagnosticBag _diagnostics = new();
     private BoundScope _scope;
@@ -65,7 +65,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
     private BoundStatement BindStatement(Statement statement) => statement.Accept(this);
 
-    BoundStatement IStatementVisitor<BoundStatement>.Accept(BlockStatement statement)
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(BlockStatement statement)
     {
         var boundStatements = new List<BoundStatement>();
         _scope = new BoundScope(_scope);
@@ -74,7 +74,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         _scope = _scope.Parent ?? throw new InvalidOperationException("Scope cannot be null");
         return new BoundBlockStatement(boundStatements);
     }
-    BoundStatement IStatementVisitor<BoundStatement>.Accept(DeclarationStatement statement)
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(DeclarationStatement statement)
     {
         var name = statement.IdentifierToken.Text;
         var isReadOnly = statement.StorageToken.Kind == TokenKind.Const;
@@ -105,7 +105,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundDeclarationStatement(variable, expression);
     }
 
-    BoundStatement IStatementVisitor<BoundStatement>.Accept(IfStatement statement)
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(IfStatement statement)
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
         var then = BindStatement(statement.Then);
@@ -113,7 +113,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundIfStatement(condition, then, @else);
     }
 
-    BoundStatement IStatementVisitor<BoundStatement>.Accept(WhileStatement statement)
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(WhileStatement statement)
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
         var body = BindStatement(statement.Body);
@@ -145,7 +145,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return true;
     }
 
-    BoundStatement IStatementVisitor<BoundStatement>.Accept(ForStatement statement)
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ForStatement statement)
     {
         var lowerBound = BindExpression(statement.LowerBound, BuiltinTypes.I32);
         var upperBound = BindExpression(statement.UpperBound, BuiltinTypes.I32);
@@ -183,7 +183,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundForStatement(variable, lowerBound, upperBound, body);
     }
 
-    BoundStatement IStatementVisitor<BoundStatement>.Accept(ExpressionStatement statement)
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ExpressionStatement statement)
     {
         var expression = BindExpression(statement.Expression, allowVoid: true);
         return new BoundExpressionStatement(expression);
@@ -205,7 +205,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
     }
 
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(IfExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(IfExpression expression)
     {
         var condition = BindExpression(expression.Condition, BuiltinTypes.Bool);
         var then = BindExpression(expression.Then);
@@ -219,9 +219,9 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundIfExpression(condition, then, @else, then.Type);
     }
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(GroupExpression expression) => expression.Expression.Accept(this);
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(GroupExpression expression) => expression.Expression.Accept(this);
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(UnaryExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(UnaryExpression expression)
     {
         var boundOperand = BindExpression(expression.Operand);
 
@@ -237,7 +237,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundUnaryExpression(boundOperator, boundOperand);
     }
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(BinaryExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(BinaryExpression expression)
     {
         var boundLeft = BindExpression(expression.Left);
         var boundRight = BindExpression(expression.Right);
@@ -278,13 +278,13 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
     }
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(LiteralExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(LiteralExpression expression)
     {
         var value = expression.Value ?? 0;
         return new BoundLiteralExpression(value);
     }
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(NameExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(NameExpression expression)
     {
         if (expression.IdentifierToken.IsMissing)
         {
@@ -298,7 +298,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
 
         return new BoundSymbolExpression(symbol);
     }
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(CallExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(CallExpression expression)
     {
         var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
 
@@ -328,7 +328,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundCallExpression(function, boundArguments);
     }
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(AssignmentExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(AssignmentExpression expression)
     {
         var boundExpression = BindExpression(expression.Expression);
 
@@ -354,7 +354,7 @@ internal sealed class Binder : IExpressionVisitor<BoundExpression>, IStatementVi
         return new BoundAssignmentExpression(variable, boundExpression);
     }
 
-    BoundExpression IExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
     {
         if (!BuiltinTypes.TryLookup(expression.TypeToken.Text, out var targetType))
         {

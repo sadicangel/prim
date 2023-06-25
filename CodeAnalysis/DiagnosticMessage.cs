@@ -1,6 +1,7 @@
 ﻿using CodeAnalysis.Symbols;
+using CodeAnalysis.Syntax;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis;
 
 public static class DiagnosticMessage
 {

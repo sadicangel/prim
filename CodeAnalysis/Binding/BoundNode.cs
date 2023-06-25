@@ -5,7 +5,7 @@ using LinqExpr = System.Linq.Expressions.Expression;
 
 namespace CodeAnalysis.Binding;
 
-internal abstract record class BoundNode(BoundNodeKind Kind) : INode
+internal abstract record class BoundNode(BoundNodeKind NodeKind) : INode
 {
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
@@ -29,8 +29,8 @@ internal abstract record class BoundNode(BoundNodeKind Kind) : INode
         {
             BoundBinaryExpression e => ($"{e.Operator.Kind}Expression ", ConsoleColor.Blue),
             BoundUnaryExpression e => ($"{e.Operator.Kind}Expression ", ConsoleColor.Blue),
-            BoundExpression e => ($"{e.Kind} ", ConsoleColor.Blue),
-            BoundStatement s => ($"{s.Kind} ", ConsoleColor.Cyan),
+            BoundExpression e => ($"{e.NodeKind} ", ConsoleColor.Blue),
+            BoundStatement s => ($"{s.NodeKind} ", ConsoleColor.Cyan),
             _ => throw new InvalidOperationException($"Invalid node type '{node?.GetType()}' in bound tree")
         };
 
@@ -75,7 +75,7 @@ file static class NodePropertyCache
             var list = new List<NodePropertyAccessor>();
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Reverse())
             {
-                if (property.Name is nameof(Node.Span) or nameof(BoundNode.Kind) or nameof(BoundBinaryExpression.Operator))
+                if (property.Name is nameof(SyntaxNode.Span) or nameof(BoundNode.NodeKind) or nameof(BoundBinaryExpression.Operator))
                     continue;
 
                 if (typeof(BoundNode).IsAssignableFrom(property.PropertyType) || typeof(IEnumerable<BoundNode>).IsAssignableFrom(property.PropertyType))

@@ -19,29 +19,29 @@ public sealed class ParserTests
         if (op1Precedence >= op2Precedence)
         {
             using var e = new AssertingEnumerator(expr);
-            e.AssertNode(NodeKind.BinaryExpression);
-            e.AssertNode(NodeKind.BinaryExpression);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.BinaryExpression);
+            e.AssertNode(SyntaxNodeKind.BinaryExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "a");
             e.AssertToken(op1, op1Text!);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "b");
             e.AssertToken(op2, op2Text!);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "c");
         }
         else
         {
             using var e = new AssertingEnumerator(expr);
-            e.AssertNode(NodeKind.BinaryExpression);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.BinaryExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "a");
             e.AssertToken(op1, op1Text!);
-            e.AssertNode(NodeKind.BinaryExpression);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.BinaryExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "b");
             e.AssertToken(op2, op2Text!);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "c");
         }
     }
@@ -70,25 +70,25 @@ public sealed class ParserTests
         if (unaryPrecedence >= binaryPrecedence)
         {
             using var e = new AssertingEnumerator(expr);
-            e.AssertNode(NodeKind.BinaryExpression);
-            e.AssertNode(NodeKind.UnaryExpression);
+            e.AssertNode(SyntaxNodeKind.BinaryExpression);
+            e.AssertNode(SyntaxNodeKind.UnaryExpression);
             e.AssertToken(unaryKind, unaryText!);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "a");
             e.AssertToken(binaryKind, binaryText!);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "b");
         }
         else
         {
             using var e = new AssertingEnumerator(expr);
-            e.AssertNode(NodeKind.UnaryExpression);
+            e.AssertNode(SyntaxNodeKind.UnaryExpression);
             e.AssertToken(unaryKind, unaryText!);
-            e.AssertNode(NodeKind.BinaryExpression);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.BinaryExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "a");
             e.AssertToken(binaryKind, binaryText!);
-            e.AssertNode(NodeKind.NameExpression);
+            e.AssertNode(SyntaxNodeKind.NameExpression);
             e.AssertToken(TokenKind.Identifier, "b");
         }
     }

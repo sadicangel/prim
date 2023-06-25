@@ -38,12 +38,12 @@ internal sealed class AssertingEnumerator : IDisposable
         _enumerator.Dispose();
     }
 
-    public void AssertNode(NodeKind nodeKind)
+    public void AssertNode(SyntaxNodeKind nodeKind)
     {
         try
         {
             Assert.True(_enumerator.MoveNext());
-            var node = Assert.IsAssignableFrom<Node>(_enumerator.Current);
+            var node = Assert.IsAssignableFrom<SyntaxNode>(_enumerator.Current);
             Assert.Equal(nodeKind, node.NodeKind);
         }
         catch when (MarkFailed())

@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class SeparatedNodeList<T>(params Node[] Nodes) : IReadOnlyList<T> where T : Node
+public sealed record class SeparatedNodeList<T>(params SyntaxNode[] Nodes) : IReadOnlyList<T> where T : SyntaxNode
 {
     public int Count { get => (Nodes.Length + 1) / 2; }
 

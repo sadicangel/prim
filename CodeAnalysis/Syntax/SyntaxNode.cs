@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Syntax;
 
-public abstract record class Node(NodeKind NodeKind) : INode
+public abstract record class SyntaxNode(SyntaxNodeKind NodeKind) : INode
 {
     public abstract TextSpan Span { get; }
 
@@ -28,7 +28,7 @@ public abstract record class Node(NodeKind NodeKind) : INode
             child.WriteTo(writer, indent, child == lastChild);
     }
 
-    public abstract IEnumerable<Node> GetChildren();
+    public abstract IEnumerable<SyntaxNode> GetChildren();
 
     IEnumerable<INode> INode.GetChildren() => GetChildren();
 
