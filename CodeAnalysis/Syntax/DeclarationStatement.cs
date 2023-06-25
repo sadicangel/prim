@@ -12,7 +12,7 @@ public sealed record class DeclarationStatement(Token StorageToken, Token Identi
 
     public override T Accept<T>(IStatementVisitor<T> visitor) => visitor.Accept(this);
 
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<Node> GetChildren()
     {
         yield return StorageToken;
         yield return IdentifierToken;

@@ -4,8 +4,6 @@ namespace CodeAnalysis.Syntax;
 
 public sealed record class SyntaxTree(SourceText Text, IEnumerable<Diagnostic> Diagnostics, CompilationUnit Root) : INode
 {
-    TextSpan INode.Span { get => ((INode)Root).Span; }
-
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Root.WriteTo(writer, indent, isLast);
     IEnumerable<INode> INode.GetChildren() => ((INode)Root).GetChildren();
 

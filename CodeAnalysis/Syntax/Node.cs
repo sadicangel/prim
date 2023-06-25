@@ -2,9 +2,9 @@
 
 namespace CodeAnalysis.Syntax;
 
-public abstract record class Node(NodeKind Kind) : INode
+public abstract record class Node(NodeKind NodeKind) : INode
 {
-    public TextSpan Span { get => TextSpan.FromBounds(GetChildren().First().Span.Start, GetChildren().Last().Span.End); }
+    public abstract TextSpan Span { get; }
 
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
@@ -12,7 +12,12 @@ public abstract record class Node(NodeKind Kind) : INode
 
         writer.WriteColored(indent, ConsoleColor.DarkGray);
         writer.WriteColored(marker, ConsoleColor.DarkGray);
-        writer.WriteColored(Kind, ConsoleColor.Cyan);
+        writer.WriteColored(NodeKind, ConsoleColor.Cyan);
+        if (this is Token { Value: not null } token)
+        {
+            writer.Write(' ');
+            writer.WriteColored(token.Value, ConsoleColor.DarkGreen);
+        }
         writer.WriteLine();
 
         indent += isLast ? "   " : "│  ";
@@ -23,7 +28,9 @@ public abstract record class Node(NodeKind Kind) : INode
             child.WriteTo(writer, indent, child == lastChild);
     }
 
-    public abstract IEnumerable<INode> GetChildren();
+    public abstract IEnumerable<Node> GetChildren();
+
+    IEnumerable<INode> INode.GetChildren() => GetChildren();
 
     public override string ToString()
     {

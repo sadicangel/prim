@@ -283,7 +283,7 @@ internal sealed class Parser
 
         SeparatedNodeList<Expression> ParseArguments()
         {
-            var nodes = new List<INode>();
+            var nodes = new List<Node>();
 
             while (Current.Kind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
             {

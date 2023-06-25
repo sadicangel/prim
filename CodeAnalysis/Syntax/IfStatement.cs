@@ -10,7 +10,7 @@ public sealed record class IfStatement(Token IfToken, Expression Condition, Stat
     public bool HasElseClause { get => ElseToken is not null && Else is not null; }
 
     public override T Accept<T>(IStatementVisitor<T> visitor) => visitor.Accept(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<Node> GetChildren()
     {
         yield return IfToken;
         yield return Condition;

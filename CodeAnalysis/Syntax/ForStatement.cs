@@ -8,7 +8,7 @@ public sealed record class ForStatement(Token ForToken, Token? VarToken, Token I
     public bool DeclaresVariable { get => VarToken is not null; }
 
     public override T Accept<T>(IStatementVisitor<T> visitor) => visitor.Accept(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<Node> GetChildren()
     {
         yield return ForToken;
         if (VarToken is not null)

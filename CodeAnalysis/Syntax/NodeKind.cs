@@ -2,6 +2,7 @@
 
 public enum NodeKind
 {
+    // Expressions
     LiteralExpression,
     UnaryExpression,
     BinaryExpression,
@@ -9,12 +10,20 @@ public enum NodeKind
     NameExpression,
     AssignmentExpression,
     IfExpression,
+    CallExpression,
+    ConvertExpression,
+
+    // Statements
     BlockStatement,
     ExpressionStatement,
     DeclarationStatement,
     IfStatement,
     WhileStatement,
     ForStatement,
-    CallExpression,
-    ConvertExpression,
+
+    // Token
+    Token,
+
+    // Compilation Unit
+    CompilationUnit,
 }

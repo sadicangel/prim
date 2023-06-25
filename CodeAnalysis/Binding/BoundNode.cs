@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Text;
 using System.Collections.Concurrent;
 using System.Reflection;
 using LinqExpr = System.Linq.Expressions.Expression;
@@ -8,8 +7,6 @@ namespace CodeAnalysis.Binding;
 
 internal abstract record class BoundNode(BoundNodeKind Kind) : INode
 {
-    TextSpan INode.Span { get; }
-
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
         var marker = isLast ? "└──" : "├──";
@@ -78,7 +75,7 @@ file static class NodePropertyCache
             var list = new List<NodePropertyAccessor>();
             foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Reverse())
             {
-                if (property.Name is nameof(INode.Span) or nameof(BoundNode.Kind) or nameof(BoundBinaryExpression.Operator))
+                if (property.Name is nameof(Node.Span) or nameof(BoundNode.Kind) or nameof(BoundBinaryExpression.Operator))
                     continue;
 
                 if (typeof(BoundNode).IsAssignableFrom(property.PropertyType) || typeof(IEnumerable<BoundNode>).IsAssignableFrom(property.PropertyType))

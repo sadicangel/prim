@@ -35,6 +35,7 @@ public static class DiagnosticMessage
     public static string InvalidExpressionType(TypeSymbol actualType) => $"Invalid expression of type '{actualType}'";
 
     public static string InvalidExpressionType(TypeSymbol expectedType, TypeSymbol actualType) => $"Invalid expression of type '{actualType}'. Expected '{expectedType}'";
+
     public static string InvalidVariableType(TypeSymbol expectedType, TypeSymbol actualType) => $"Expected variable of type '{expectedType}'. Got '{actualType}'";
 
     public static string InvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
