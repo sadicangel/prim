@@ -1,12 +1,12 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class ConvertExpression(Expression Expression, Token AsToken, Token TypeToken) : Expression(SyntaxNodeKind.ConvertExpression)
+public sealed record class ConvertExpression(Expression Expression, Token As, Token Type) : Expression(SyntaxNodeKind.ConvertExpression)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return Expression;
-        yield return AsToken;
-        yield return TypeToken;
+        yield return As;
+        yield return Type;
     }
 }

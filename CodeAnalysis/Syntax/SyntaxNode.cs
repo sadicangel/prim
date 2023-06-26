@@ -6,17 +6,33 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind) : INode
 {
     public abstract TextSpan Span { get; }
 
+    public Token GetLastToken()
+    {
+        if (this is Token token)
+            return token;
+
+        return GetChildren().Last().GetLastToken();
+    }
+
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
         var marker = isLast ? "└──" : "├──";
 
         writer.WriteColored(indent, ConsoleColor.DarkGray);
         writer.WriteColored(marker, ConsoleColor.DarkGray);
-        writer.WriteColored(NodeKind, ConsoleColor.Cyan);
-        if (this is Token { Value: not null } token)
+        switch (this)
         {
-            writer.Write(' ');
-            writer.WriteColored(token.Value, ConsoleColor.DarkGreen);
+            case Token token:
+                writer.WriteColored($"{token.TokenKind}Token", ConsoleColor.Blue);
+                if (token.Value is not null)
+                {
+                    writer.Write(' ');
+                    writer.WriteColored(token.Value, ConsoleColor.DarkGreen);
+                }
+                break;
+            default:
+                writer.WriteColored(NodeKind, ConsoleColor.Cyan);
+                break;
         }
         writer.WriteLine();
 

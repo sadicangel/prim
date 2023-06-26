@@ -11,7 +11,7 @@ internal enum BoundNodeKind
     NeverExpression,
     IfExpression,
     BlockStatement,
-    DeclarationStatement,
+    Declaration,
     ExpressionStatement,
     IfStatement,
     WhileStatement,

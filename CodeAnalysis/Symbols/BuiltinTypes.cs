@@ -39,6 +39,8 @@ internal static class BuiltinTypes
 
     public static readonly TypeSymbol Str = new("str");
 
+    public static readonly TypeSymbol Func = new("func");
+
     public static IEnumerable<TypeSymbol> All { get => TypeMap.Value.Values; }
 
     public static bool TryLookup(string name, [MaybeNullWhen(false)] out TypeSymbol type) => TypeMap.Value.TryGetValue(name, out type);

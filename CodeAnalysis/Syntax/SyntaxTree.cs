@@ -22,7 +22,7 @@ public sealed record class SyntaxTree(SourceText Text, IEnumerable<Diagnostic> D
         while (true)
         {
             var token = lexer.NextToken();
-            if (token.Kind == TokenKind.EOF)
+            if (token.TokenKind == TokenKind.EOF)
                 break;
             yield return token;
         }

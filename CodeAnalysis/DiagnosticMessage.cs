@@ -23,7 +23,7 @@ public static class DiagnosticMessage
 
     public static string InvalidImplicitConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
 
-    public static string Redeclaration(string identifier) => $"Redeclaration of '{identifier}'";
+    public static string Redeclaration(string identifier, string type) => $"Redeclaration of {type} '{identifier}'";
 
     public static string ReadOnlyAssignment(string identifier) => $"Invalid assignment to read-only '{identifier}'";
 

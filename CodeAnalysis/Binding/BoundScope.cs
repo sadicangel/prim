@@ -3,9 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundScope(BoundScope? Parent, IReadOnlyCollection<Symbol>? Symbols = null)
+internal sealed record class BoundScope(BoundScope? Parent, IEnumerable<Symbol>? Symbols = null)
 {
-    private Dictionary<string, Symbol>? _symbols = Symbols?.ToDictionary(v => v.Name);
+    private Dictionary<string, Symbol>? _symbols = Symbols?.ToDictionary(s => s.Name);
 
     public IEnumerable<VariableSymbol> Variables { get => _symbols?.Values.OfType<VariableSymbol>() ?? Array.Empty<VariableSymbol>(); }
 

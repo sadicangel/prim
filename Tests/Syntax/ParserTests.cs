@@ -1,7 +1,14 @@
 ﻿namespace CodeAnalysis.Syntax;
 public sealed class ParserTests
 {
-    private static Expression ParseExpression(ReadOnlyMemory<char> text) => Assert.IsType<ExpressionStatement>(SyntaxTree.Parse(text).Root.Statement).Expression;
+    private static Expression ParseExpression(ReadOnlyMemory<char> text)
+    {
+        var syntaxTree = SyntaxTree.Parse(text);
+        var syntaxNode = Assert.Single(syntaxTree.Root.Nodes);
+        var globalStatement = Assert.IsType<GlobalStatement>(syntaxNode);
+        var statement = Assert.IsType<ExpressionStatement>(globalStatement.Statement);
+        return statement.Expression;
+    }
 
     [Theory]
     [MemberData(nameof(GetBinaryOperatorsPairsData))]

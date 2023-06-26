@@ -2,9 +2,9 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class SeparatedNodeList<T>(params SyntaxNode[] Nodes) : IReadOnlyList<T> where T : SyntaxNode
+public sealed record class SeparatedNodeList<T>(IReadOnlyList<SyntaxNode> Nodes) : IReadOnlyList<T> where T : SyntaxNode
 {
-    public int Count { get => (Nodes.Length + 1) / 2; }
+    public int Count { get => (Nodes.Count + 1) / 2; }
 
     public T this[int index] => (T)Nodes[index * 2];
 

@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class IfStatement(Token IfToken, Expression Condition, Statement Then, Token? ElseToken, Statement? Else) : Statement(SyntaxNodeKind.IfStatement)
+public sealed record class IfStatement(Token If, Expression Condition, Statement Then, Token? ElseToken, Statement? Else) : Statement(SyntaxNodeKind.IfStatement)
 {
     public IfStatement(Token ifToken, Expression condition, Statement then) : this(ifToken, condition, then, ElseToken: null, Else: null) { }
 
@@ -12,7 +12,7 @@ public sealed record class IfStatement(Token IfToken, Expression Condition, Stat
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return IfToken;
+        yield return If;
         yield return Condition;
         yield return Then;
         if (HasElseClause)

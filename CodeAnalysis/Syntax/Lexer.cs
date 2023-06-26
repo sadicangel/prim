@@ -42,6 +42,11 @@ internal sealed class Lexer
         switch (span)
         {
             // Punctuation
+            case ['=', '>', ..]:
+                _kind = TokenKind.Arrow;
+                _position += 2;
+                break;
+
             case ['{', ..]:
                 _kind = TokenKind.OpenBrace;
                 _position++;
@@ -89,7 +94,7 @@ internal sealed class Lexer
                 break;
 
             case ['!', '=', ..]:
-                _kind = TokenKind.BangEquals;
+                _kind = TokenKind.BangEqual;
                 _position += 2;
                 break;
 
@@ -99,17 +104,17 @@ internal sealed class Lexer
                 break;
 
             case ['=', '=', ..]:
-                _kind = TokenKind.EqualsEquals;
+                _kind = TokenKind.EqualEqual;
                 _position += 2;
                 break;
 
             case ['=', ..]:
-                _kind = TokenKind.Equals;
+                _kind = TokenKind.Equal;
                 _position++;
                 break;
 
             case ['>', '=', ..]:
-                _kind = TokenKind.GreaterEquals;
+                _kind = TokenKind.GreaterEqual;
                 _position += 2;
                 break;
 
@@ -124,7 +129,7 @@ internal sealed class Lexer
                 break;
 
             case ['<', '=', ..]:
-                _kind = TokenKind.LessEquals;
+                _kind = TokenKind.LessEqual;
                 _position += 2;
                 break;
 

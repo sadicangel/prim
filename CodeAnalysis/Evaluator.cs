@@ -8,20 +8,22 @@ namespace CodeAnalysis;
 
 internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisitor<object?>
 {
-    private readonly BoundStatement _boundStatement;
-    private readonly Dictionary<Symbol, object?> _symbols;
+    private readonly BoundProgram _program;
+    private readonly Dictionary<Symbol, object?> _globals;
+    private readonly Stack<Dictionary<Symbol, object?>> _locals;
 
     private object? _lastValue;
 
-    public Evaluator(BoundStatement boundStatement, Dictionary<Symbol, object?> symbols)
+    public Evaluator(BoundProgram program, Dictionary<Symbol, object?> globals)
     {
-        _boundStatement = boundStatement;
-        _symbols = symbols;
+        _program = program;
+        _globals = globals;
+        _locals = new();
     }
 
     public object? Evaluate()
     {
-        EvaluateStatement(_boundStatement);
+        EvaluateStatement(_program.Statement);
         return _lastValue;
     }
 
@@ -54,18 +56,25 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
 
         for (var i = lowerBound; i < upperBound; ++i)
         {
-            _symbols[statement.Variable] = i;
+            _globals[statement.Variable] = i;
             EvaluateStatement(statement.Body);
         }
     }
 
-    void IBoundStatementVisitor.Visit(BoundDeclarationStatement statement) => _lastValue = _symbols[statement.Variable] = EvaluateExpression(statement.Expression);
+    void IBoundStatementVisitor.Visit(BoundVariableDeclaration statement)
+    {
+        _globals[statement.Variable] = EvaluateExpression(statement.Expression);
+    }
+    void IBoundStatementVisitor.Visit(BoundFunctionDeclaration statement)
+    {
+        _globals[statement.Function] = statement.Body;
+    }
 
-    void IBoundStatementVisitor.Visit(BoundExpressionStatement statement) => _lastValue = EvaluateExpression(statement.Expression);
+    void IBoundStatementVisitor.Visit(BoundExpressionStatement statement) => EvaluateExpression(statement.Expression);
 
-    private object? EvaluateExpression(BoundExpression expression) => expression.Accept<object?>(this);
+    private object? EvaluateExpression(BoundExpression expression) => _lastValue = expression.Accept(this);
 
-    object? IBoundExpressionVisitor<object?>.Visit(BoundNeverExpression expression) => _lastValue;
+    object? IBoundExpressionVisitor<object?>.Visit(BoundNeverExpression expression) => null;
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundIfExpression expression)
     {
@@ -76,6 +85,14 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundLiteralExpression expression) => expression.Value!;
 
+    private object? GetSymbolValue(Symbol symbol)
+    {
+        if (!_locals.TryPeek(out var locals) || !locals.TryGetValue(symbol, out var value))
+            value = _globals[symbol];
+
+        return value;
+    }
+
     object? IBoundExpressionVisitor<object?>.Visit(BoundSymbolExpression expression)
     {
         var symbol = expression.Symbol;
@@ -84,16 +101,17 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
         {
             case SymbolKind.Type when BuiltinTypes.TryLookup(symbol.Name, out var type):
                 return type;
+            case SymbolKind.Variable when _locals.TryPeek(out var locals) && locals.TryGetValue(symbol, out var value):
+                return value;
             case SymbolKind.Variable:
-                return _symbols[expression.Symbol];
-            case SymbolKind.Function:
-                break;
+                return _globals[expression.Symbol];
+            case SymbolKind.Function when BuiltinFunctions.TryLookup(symbol.Name, out var function):
+                return function;
             case SymbolKind.Parameter:
-                break;
+                return _locals.Peek().GetValueOrDefault(symbol);
             default:
                 throw new InvalidOperationException($"Invalid symbol {symbol.Kind}");
         }
-        return null;
     }
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundCallExpression expression)
@@ -122,14 +140,35 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
             case string name when name == BuiltinFunctions.CrlType.Name:
                 return (EvaluateExpression(expression.Arguments[0])?.GetType() ?? typeof(void)).Name;
 
+            case string name when _globals.Keys.SingleOrDefault(n => n.Name == name) is FunctionSymbol function:
+                return EvaluateFunction(expression);
+
             default:
                 throw new InvalidOperationException($"Undefined function {expression.Function.Name}");
+        }
+
+        object? EvaluateFunction(BoundCallExpression expression)
+        {
+            var locals = new Dictionary<Symbol, object?>();
+            for (var i = 0; i < expression.Arguments.Count; ++i)
+            {
+                var parameter = expression.Function.Parameters[i];
+                var parameterValue = EvaluateExpression(expression.Arguments[i]);
+                locals[parameter] = parameterValue;
+            }
+
+            _locals.Push(locals);
+            if (GetSymbolValue(expression.Function) is not BoundStatement statement)
+                throw new InvalidOperationException($"Function {expression.Function.Name} was not bound correctly");
+            EvaluateStatement(statement);
+            _locals.Pop();
+            return _lastValue;
         }
     }
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundConvertExpression expression) => expression.Type.Convert(EvaluateExpression(expression.Expression));
 
-    object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _symbols[expression.Variable] = expression.Expression.Accept(this);
+    object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _globals[expression.Variable] = EvaluateExpression(expression.Expression);
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundUnaryExpression expression)
     {

@@ -30,7 +30,7 @@ public sealed class LexerTests
         var tokens = SyntaxTree.ParseTokens(text.AsMemory());
 
         var token = Assert.Single(tokens);
-        Assert.Equal(kind, token.Kind);
+        Assert.Equal(kind, token.TokenKind);
         Assert.Equal(text, token.Text);
     }
 
@@ -43,9 +43,9 @@ public sealed class LexerTests
         var tokens = SyntaxTree.ParseTokens((t1.Text + t2.Text).AsMemory()).ToArray();
 
         Assert.Equal(2, tokens.Length);
-        Assert.Equal(t1.Kind, tokens[0].Kind);
+        Assert.Equal(t1.Kind, tokens[0].TokenKind);
         Assert.Equal(t1.Text, tokens[0].Text);
-        Assert.Equal(t2.Kind, tokens[1].Kind);
+        Assert.Equal(t2.Kind, tokens[1].TokenKind);
         Assert.Equal(t2.Text, tokens[1].Text);
     }
 
@@ -58,11 +58,11 @@ public sealed class LexerTests
         var tokens = SyntaxTree.ParseTokens((t1.Text + separator.Text + t2.Text).AsMemory()).ToArray();
 
         Assert.Equal(3, tokens.Length);
-        Assert.Equal(t1.Kind, tokens[0].Kind);
+        Assert.Equal(t1.Kind, tokens[0].TokenKind);
         Assert.Equal(t1.Text, tokens[0].Text);
-        Assert.Equal(separator.Kind, tokens[1].Kind);
+        Assert.Equal(separator.Kind, tokens[1].TokenKind);
         Assert.Equal(separator.Text, tokens[1].Text);
-        Assert.Equal(t2.Kind, tokens[2].Kind);
+        Assert.Equal(t2.Kind, tokens[2].TokenKind);
         Assert.Equal(t2.Text, tokens[2].Text);
     }
 
@@ -138,16 +138,16 @@ public sealed class LexerTests
         if (k1 is TokenKind.String && k2 is TokenKind.String)
             return true;
 
-        if (k1 is TokenKind.Bang && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
+        if (k1 is TokenKind.Bang && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow)
             return true;
 
-        if (k1 is TokenKind.Equals && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
+        if (k1 is TokenKind.Equal && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow or TokenKind.Greater or TokenKind.GreaterEqual)
             return true;
 
-        if (k1 is TokenKind.Less && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
+        if (k1 is TokenKind.Less && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow)
             return true;
 
-        if (k1 is TokenKind.Greater && k2 is TokenKind.Equals or TokenKind.EqualsEquals)
+        if (k1 is TokenKind.Greater && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow)
             return true;
 
         if (k1 is TokenKind.Ampersand && k2 is TokenKind.Ampersand or TokenKind.AmpersandAmpersand)

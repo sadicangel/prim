@@ -4,8 +4,6 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis;
 
-public sealed record class EvaluationResult(object? Value, IReadOnlyList<Diagnostic> Diagnostics);
-
 public sealed class Compilation
 {
     private BoundGlobalScope? _globalScope;
@@ -19,30 +17,32 @@ public sealed class Compilation
     public SyntaxTree SyntaxTree { get; }
     public Compilation? Previous { get; }
 
-    internal BoundGlobalScope GlobalScope
+    private BoundGlobalScope GetOrCreateGlobalScope()
     {
-        get
-        {
-            if (_globalScope is null)
-                Interlocked.CompareExchange(ref _globalScope, Binder.BindGlobalScope(SyntaxTree.Root, Previous?.GlobalScope), null);
-            return _globalScope;
-        }
+        if (_globalScope is null)
+            Interlocked.CompareExchange(ref _globalScope, Binder.BindGlobalScope(SyntaxTree.Root, Previous?._globalScope), comparand: null);
+        return _globalScope;
     }
 
-    public EvaluationResult Evaluate(Dictionary<Symbol, object?> symbols)
+    public EvaluationResult Evaluate(Dictionary<Symbol, object?> globals)
     {
-        var boundStatement = GlobalScope.Statement;
-
-        var diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToArray();
+        var diagnostics = SyntaxTree.Diagnostics.Concat(GetOrCreateGlobalScope().Diagnostics).ToArray();
         if (diagnostics.Any())
-        {
-            return new EvaluationResult(null, diagnostics);
-        }
-        var evaluator = new Evaluator(boundStatement, symbols);
+            return new EvaluationResult(diagnostics);
+
+        var program = Binder.BindProgram(GetOrCreateGlobalScope());
+        if (program.Diagnostics.Any())
+            return new EvaluationResult(program.Diagnostics);
+
+        var evaluator = new Evaluator(program, globals);
         var value = evaluator.Evaluate();
 
-        return new EvaluationResult(value, Array.Empty<Diagnostic>());
+        return new EvaluationResult(value);
     }
 
-    public void WriteTo(TextWriter writer) => GlobalScope.Statement.WriteTo(writer);
+    public void WriteTo(TextWriter writer)
+    {
+        foreach (var statement in GetOrCreateGlobalScope().Statements)
+            statement.WriteTo(writer);
+    }
 }

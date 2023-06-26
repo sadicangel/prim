@@ -21,12 +21,12 @@ public static class SyntaxFacts
         TokenKind.Plus or
         TokenKind.Minus => 4,
 
-        TokenKind.EqualsEquals or
-        TokenKind.BangEquals or
+        TokenKind.EqualEqual or
+        TokenKind.BangEqual or
         TokenKind.Less or
-        TokenKind.LessEquals or
+        TokenKind.LessEqual or
         TokenKind.Greater or
-        TokenKind.GreaterEquals => 3,
+        TokenKind.GreaterEqual => 3,
 
         TokenKind.Ampersand or
         TokenKind.AmpersandAmpersand => 2,
@@ -86,12 +86,12 @@ public static class SyntaxFacts
     public static bool IsBinaryOperator(this TokenKind kind) => kind
         is TokenKind.Ampersand
         or TokenKind.AmpersandAmpersand
-        or TokenKind.BangEquals
-        or TokenKind.EqualsEquals
+        or TokenKind.BangEqual
+        or TokenKind.EqualEqual
         or TokenKind.Greater
-        or TokenKind.GreaterEquals
+        or TokenKind.GreaterEqual
         or TokenKind.Less
-        or TokenKind.LessEquals
+        or TokenKind.LessEqual
         or TokenKind.Minus
         or TokenKind.Percent
         or TokenKind.Pipe
@@ -108,26 +108,27 @@ public static class SyntaxFacts
     {
         TokenKind.Ampersand => "&",
         TokenKind.AmpersandAmpersand => "&&",
+        TokenKind.Arrow => "=>",
         TokenKind.As => "as",
         TokenKind.Bang => "!",
-        TokenKind.BangEquals => "!=",
+        TokenKind.BangEqual => "!=",
         TokenKind.CloseBrace => "}",
         TokenKind.CloseParenthesis => ")",
         TokenKind.Colon => ":",
         TokenKind.Comma => ",",
         TokenKind.Const => "const",
         TokenKind.Else => "else",
-        TokenKind.Equals => "=",
-        TokenKind.EqualsEquals => "==",
+        TokenKind.Equal => "=",
+        TokenKind.EqualEqual => "==",
         TokenKind.False => "false",
         TokenKind.For => "for",
         TokenKind.Greater => ">",
-        TokenKind.GreaterEquals => ">=",
+        TokenKind.GreaterEqual => ">=",
         TokenKind.Hat => "^",
         TokenKind.If => "if",
         TokenKind.In => "in",
         TokenKind.Less => "<",
-        TokenKind.LessEquals => "<=",
+        TokenKind.LessEqual => "<=",
         TokenKind.Minus => "-",
         TokenKind.OpenBrace => "{",
         TokenKind.OpenParenthesis => "(",

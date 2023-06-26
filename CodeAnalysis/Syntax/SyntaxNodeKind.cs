@@ -26,4 +26,6 @@ public enum SyntaxNodeKind
 
     // Compilation Unit
     CompilationUnit,
+    GlobalStatement,
+    Parameter,
 }

@@ -11,7 +11,7 @@ public sealed class SyntaxFactsTests
 
         var tokens = SyntaxTree.ParseTokens(text.AsMemory());
         var token = Assert.Single(tokens);
-        Assert.Equal(kind, token.Kind);
+        Assert.Equal(kind, token.TokenKind);
         Assert.Equal(text, token.Text);
     }
 

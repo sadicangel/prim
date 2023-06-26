@@ -6,6 +6,7 @@ public readonly record struct TextSpan(int Start, int Length)
     public Range Range => Start..(Start + Length);
 
     public static TextSpan FromBounds(int start, int end) => new(start, end - start);
+    public static TextSpan FromBounds(TextSpan start, TextSpan end) => FromBounds(start.Start, end.End);
 
     public static implicit operator Range(TextSpan span) => span.Range;
 

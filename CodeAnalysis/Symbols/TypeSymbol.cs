@@ -84,6 +84,8 @@ public sealed record class TypeSymbol(string Name) : Symbol(SymbolKind.Type, Nam
 
             TypeSymbol => BuiltinTypes.Type,
 
+            FunctionSymbol => BuiltinTypes.Func,
+
             _ => throw new InvalidOperationException($"Unexpected literal of type {value?.GetType()}"),
         };
     }

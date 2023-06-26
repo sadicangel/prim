@@ -1,13 +1,13 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class BlockStatement(Token OpenBraceToken, IReadOnlyList<Statement> Statements, Token CloseBraceToken) : Statement(SyntaxNodeKind.BlockStatement)
+public sealed record class BlockStatement(Token OpenBrace, IReadOnlyList<Statement> Statements, Token CloseBrace) : Statement(SyntaxNodeKind.BlockStatement)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return OpenBraceToken;
+        yield return OpenBrace;
         foreach (var statement in Statements)
             yield return statement;
-        yield return CloseBraceToken;
+        yield return CloseBrace;
     }
 }

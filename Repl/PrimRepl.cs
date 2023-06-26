@@ -6,7 +6,7 @@ using CodeAnalysis.Text;
 namespace Repl;
 internal sealed class PrimRepl : ReplBase
 {
-    private readonly Dictionary<Symbol, object?> _symbols;
+    private readonly Dictionary<Symbol, object?> _globals;
     private bool _showTree;
     private bool _showProgram;
     private bool _showResultType = true;
@@ -14,7 +14,7 @@ internal sealed class PrimRepl : ReplBase
 
     public PrimRepl()
     {
-        _symbols = new Dictionary<Symbol, object?>();
+        _globals = new Dictionary<Symbol, object?>();
         _showTree = false;
         _showProgram = false;
         Console.ForegroundColor = ConsoleColor.White;
@@ -25,7 +25,7 @@ internal sealed class PrimRepl : ReplBase
         var tokens = SyntaxTree.ParseTokens(line.AsMemory());
         foreach (var token in tokens)
         {
-            var color = token.Kind switch
+            var color = token.TokenKind switch
             {
                 TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
                 TokenKind.String => ConsoleColor.Magenta,
@@ -40,16 +40,37 @@ internal sealed class PrimRepl : ReplBase
 
     protected override bool IsCompleteInput(ReadOnlyMemory<char> text)
     {
-        if (text.Length == 0)
+        if (text.Length == 0 || LastTwoLinesAreBlank(text))
             return true;
 
         var syntaxTree = SyntaxTree.Parse(text);
 
-        INode node = syntaxTree.Root.Statement;
-        if (node.GetLastToken().IsMissing)
+        // We need to skip EOF.
+        if (syntaxTree.Root.Nodes.Last().GetLastToken().IsMissing)
             return false;
 
         return true;
+
+        static bool LastTwoLinesAreBlank(ReadOnlyMemory<char> text)
+        {
+            var textSpan = text.Span;
+            var index = textSpan.LastIndexOf(Environment.NewLine);
+            if (index >= 0)
+            {
+                textSpan = textSpan[..index];
+                if (text.Span.IsWhiteSpace())
+                {
+                    index = textSpan.LastIndexOf(Environment.NewLine);
+                    if (index >= 0)
+                    {
+                        textSpan = textSpan[..index];
+                        if (text.Span.IsWhiteSpace())
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     protected override bool EvaluateCommand(ReadOnlySpan<char> input)
@@ -111,7 +132,7 @@ internal sealed class PrimRepl : ReplBase
         if (_showProgram)
             compilation.WriteTo(Console.Out);
 
-        var result = compilation.Evaluate(_symbols);
+        var result = compilation.Evaluate(_globals);
 
         var diagnostics = result.Diagnostics;
 

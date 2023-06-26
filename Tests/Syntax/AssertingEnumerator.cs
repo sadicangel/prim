@@ -58,7 +58,7 @@ internal sealed class AssertingEnumerator : IDisposable
         {
             Assert.True(_enumerator.MoveNext());
             var token = Assert.IsType<Token>(_enumerator.Current);
-            Assert.Equal(kind, token.Kind);
+            Assert.Equal(kind, token.TokenKind);
             Assert.Equal(text, token.Text);
         }
         catch when (MarkFailed())

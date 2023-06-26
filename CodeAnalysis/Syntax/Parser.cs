@@ -17,10 +17,10 @@ internal sealed class Parser
         do
         {
             token = lexer.NextToken();
-            if (token.Kind is not TokenKind.WhiteSpace and not TokenKind.Invalid)
+            if (token.TokenKind is not TokenKind.WhiteSpace and not TokenKind.Invalid)
                 _tokens.Add(token);
         }
-        while (token.Kind != TokenKind.EOF);
+        while (token.TokenKind != TokenKind.EOF);
         _diagnostics.AddRange(lexer.Diagnostics);
     }
 
@@ -57,7 +57,7 @@ internal sealed class Parser
 
     private bool TryMatchToken(TokenKind kind, [MaybeNullWhen(false)] out Token token)
     {
-        if (Current.Kind == kind)
+        if (Current.TokenKind == kind)
         {
             token = NextToken();
             return true;
@@ -68,18 +68,54 @@ internal sealed class Parser
 
     public CompilationUnit ParseCompilationUnit()
     {
-        var statement = ParseStatement();
+        var nodes = ParseGlobalNodes();
         var eofToken = MatchToken(TokenKind.EOF);
-        return new CompilationUnit(statement, eofToken);
+        return new CompilationUnit(nodes, eofToken);
+    }
+
+    private IReadOnlyList<GlobalSyntaxNode> ParseGlobalNodes()
+    {
+        var nodes = new List<GlobalSyntaxNode>();
+        while (Current.TokenKind is not TokenKind.EOF)
+        {
+            var startToken = Current;
+
+            var node = ParseGlobalNode();
+            nodes.Add(node);
+
+            // No tokens consumed. Skip the current token to avoid infinite loop.
+            // No need to report any extra error as parse methods already failed.
+            if (Current == startToken)
+                NextToken();
+        }
+        return nodes;
+    }
+
+    private GlobalSyntaxNode ParseGlobalNode()
+    {
+        switch (Current.TokenKind)
+        {
+            //case TokenKind.Const:
+            //case TokenKind.Var: // mutable global?
+            //    return ParseGlobalDeclaration();
+            default:
+                return ParseGlobalStatement();
+        }
+    }
+
+    private GlobalStatement ParseGlobalStatement()
+    {
+        var statement = ParseStatement();
+        return new GlobalStatement(statement);
     }
 
     private Statement ParseStatement()
     {
-        return Current.Kind switch
+        return Current.TokenKind switch
         {
             TokenKind.OpenBrace => ParseBlockStatement(),
             TokenKind.Const or
-            TokenKind.Var => ParseDeclarationStatement(),
+            TokenKind.Var => ParseDeclaration(),
             TokenKind.If => ParseIfStatement(),
             TokenKind.While => ParseWhileStatement(),
             TokenKind.For => ParseForStatement(),
@@ -91,7 +127,7 @@ internal sealed class Parser
     {
         var statements = new List<Statement>();
         var openBraceToken = MatchToken(TokenKind.OpenBrace);
-        while (Current.Kind is not TokenKind.EOF and not TokenKind.CloseBrace)
+        while (Current.TokenKind is not TokenKind.EOF and not TokenKind.CloseBrace)
         {
             var startToken = Current;
 
@@ -107,17 +143,84 @@ internal sealed class Parser
         return new BlockStatement(openBraceToken, statements, closeBraceToken);
     }
 
-    private Statement ParseDeclarationStatement()
+    private Declaration ParseDeclaration()
     {
-        var keyword = MatchToken(Current.Kind is TokenKind.Const ? TokenKind.Const : TokenKind.Var);
+        var modifier = MatchToken(Current.TokenKind);
+        if (modifier.TokenKind is not TokenKind.Const and not TokenKind.Var)
+            throw new InvalidOperationException("Invalid declaration");
         var identifier = MatchToken(TokenKind.Identifier);
-        var typeToken = default(Token);
-        if (TryMatchToken(TokenKind.Colon, out var colonToken))
-            typeToken = MatchToken(TokenKind.Identifier);
-        var equals = MatchToken(TokenKind.Equals);
-        var expression = ParseExpression();
-        var semicolon = MatchToken(TokenKind.Semicolon);
-        return new DeclarationStatement(keyword, identifier, colonToken, typeToken, equals, expression, semicolon);
+
+        var hasTypeDeclaration = Current.TokenKind is TokenKind.Colon;
+        if (hasTypeDeclaration)
+        {
+            switch (Peek(1).TokenKind)
+            {
+                // Function declaration.
+                case TokenKind.OpenParenthesis:
+                    return ParseFunctionDeclaration();
+
+                // Variable declaration.
+                default:
+                    return ParseVariableDeclaration(hasTypeDeclaration);
+
+            }
+        }
+        else
+        {
+            return ParseVariableDeclaration(hasTypeDeclaration);
+        }
+
+        FunctionDeclaration ParseFunctionDeclaration()
+        {
+            var colon = MatchToken(TokenKind.Colon);
+            var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
+            var parameters = ParseParameters();
+            var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
+            var arrow = MatchToken(TokenKind.Arrow);
+            var type = MatchToken(TokenKind.Identifier);
+            var equal = MatchToken(TokenKind.Equal);
+            var body = (BlockStatement)ParseBlockStatement();
+            var semicolon = MatchToken(TokenKind.Semicolon);
+            return new FunctionDeclaration(modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
+
+
+            SeparatedNodeList<Parameter> ParseParameters()
+            {
+                var nodes = new List<SyntaxNode>();
+
+                while (Current.TokenKind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
+                {
+                    var identifier = MatchToken(TokenKind.Identifier);
+                    var colon = MatchToken(TokenKind.Colon);
+                    var type = MatchToken(TokenKind.Identifier);
+                    var parameter = new Parameter(identifier, colon, type);
+                    nodes.Add(parameter);
+
+                    if (Current.TokenKind is not TokenKind.CloseParenthesis)
+                    {
+                        var commaToken = MatchToken(TokenKind.Comma);
+                        nodes.Add(commaToken);
+                    }
+                }
+
+                return new SeparatedNodeList<Parameter>(nodes.ToArray());
+            }
+        }
+
+        VariableDeclaration ParseVariableDeclaration(bool hasTypeDeclaration)
+        {
+            var colon = default(Token);
+            var type = default(Token);
+            if (hasTypeDeclaration)
+            {
+                colon = MatchToken(TokenKind.Colon);
+                type = MatchToken(TokenKind.Identifier);
+            }
+            var equal = MatchToken(TokenKind.Equal);
+            var expression = ParseExpression();
+            var semicolon = MatchToken(TokenKind.Semicolon);
+            return new VariableDeclaration(modifier, identifier, colon, type, equal, expression, semicolon);
+        }
     }
 
     private Statement ParseIfStatement()
@@ -166,10 +269,10 @@ internal sealed class Parser
 
     private Expression ParseAssignmentExpression()
     {
-        if (Peek(0).Kind == TokenKind.Identifier && Peek(1).Kind == TokenKind.Equals)
+        if (Peek(0).TokenKind == TokenKind.Identifier && Peek(1).TokenKind == TokenKind.Equal)
         {
             var identifierToken = MatchToken(TokenKind.Identifier);
-            var operatorToken = MatchToken(TokenKind.Equals);
+            var operatorToken = MatchToken(TokenKind.Equal);
             var right = ParseAssignmentExpression();
             return new AssignmentExpression(identifierToken, operatorToken, right);
         }
@@ -198,7 +301,7 @@ internal sealed class Parser
     private Expression ParseBinaryExpression(int parentPrecedence = 0)
     {
         Expression left;
-        var unaryPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
+        var unaryPrecedence = Current.TokenKind.GetUnaryOperatorPrecedence();
         if (unaryPrecedence != 0 && unaryPrecedence >= parentPrecedence)
         {
             var operationToken = NextToken();
@@ -212,7 +315,7 @@ internal sealed class Parser
 
         while (true)
         {
-            var precedence = Current.Kind.GetBinaryOperatorPrecedence();
+            var precedence = Current.TokenKind.GetBinaryOperatorPrecedence();
             if (precedence == 0 || precedence <= parentPrecedence)
                 break;
 
@@ -225,11 +328,11 @@ internal sealed class Parser
 
     private Expression ParsePrimaryExpression()
     {
-        return Current.Kind switch
+        return Current.TokenKind switch
         {
             TokenKind.OpenParenthesis => ParseGroupExpression(),
-            TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(Current.Kind),
-            TokenKind.I32 or TokenKind.F32 => ParseNumberLiteralExpression(Current.Kind),
+            TokenKind.False or TokenKind.True => ParseBooleanLiteralExpression(Current.TokenKind),
+            TokenKind.I32 or TokenKind.F32 => ParseNumberLiteralExpression(Current.TokenKind),
             TokenKind.String => ParseStringLiteralExpression(),
             _ => ParseNameOrCallExpression(),
         };
@@ -267,7 +370,7 @@ internal sealed class Parser
 
     private Expression ParseNameOrCallExpression()
     {
-        if (Current.Kind is TokenKind.Identifier && Peek(1).Kind is TokenKind.OpenParenthesis)
+        if (Current.TokenKind is TokenKind.Identifier && Peek(1).TokenKind is TokenKind.OpenParenthesis)
             return ParseCallExpression();
         else
             return ParseNameExpression();
@@ -285,12 +388,12 @@ internal sealed class Parser
         {
             var nodes = new List<SyntaxNode>();
 
-            while (Current.Kind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
+            while (Current.TokenKind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
             {
                 var expression = ParseExpression();
                 nodes.Add(expression);
 
-                if (Current.Kind is not TokenKind.CloseParenthesis)
+                if (Current.TokenKind is not TokenKind.CloseParenthesis)
                 {
                     var commaToken = MatchToken(TokenKind.Comma);
                     nodes.Add(commaToken);
