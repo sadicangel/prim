@@ -101,17 +101,17 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
         {
             case SymbolKind.Type when BuiltinTypes.TryLookup(symbol.Name, out var type):
                 return type;
-            case SymbolKind.Variable when _locals.TryPeek(out var locals) && locals.TryGetValue(symbol, out var value):
-                return value;
-            case SymbolKind.Variable:
-                return _globals[expression.Symbol];
             case SymbolKind.Function when BuiltinFunctions.TryLookup(symbol.Name, out var function):
                 return function;
-            case SymbolKind.Parameter:
-                return _locals.Peek().GetValueOrDefault(symbol);
-            default:
-                throw new InvalidOperationException($"Invalid symbol {symbol.Kind}");
         }
+
+        if (!_locals.TryPeek(out var locals) || !locals.TryGetValue(symbol, out var value))
+            value = _globals[symbol];
+
+        if (symbol.Kind is SymbolKind.Function)
+            return symbol;
+
+        return value;
     }
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundCallExpression expression)

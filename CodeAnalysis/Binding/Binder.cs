@@ -21,7 +21,7 @@ internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISynta
             scope = scope.Parent;
         }
         while (scope != null);
-        Console.WriteLine($"Scope: {level}");
+        //Console.WriteLine($"Scope: {level}");
     }
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
 
