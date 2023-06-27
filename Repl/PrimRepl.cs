@@ -151,7 +151,7 @@ internal sealed class PrimRepl : ReplBase
         }
         else
         {
-            foreach (var diagnostic in diagnostics)
+            foreach (var diagnostic in diagnostics.OrderBy(d => d.Span))
             {
                 var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
                 var lineNumber = lineIndex + 1;

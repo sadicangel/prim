@@ -66,6 +66,10 @@ internal abstract class ReplBase
             case ConsoleModifiers.Shift:
                 switch (key.Key)
                 {
+                    case ConsoleKey.Enter:
+                        HandleShiftEnter(document, view);
+                        break;
+
                     case ConsoleKey when key.KeyChar >= ' ':
                         HandleTyping(document, view, key.KeyChar.ToString());
                         break;
@@ -151,9 +155,15 @@ internal abstract class ReplBase
         InsertLine(document, view);
     }
 
-    private void HandleControlEnter(ObservableCollection<string> document, InputView view)
+    private void HandleShiftEnter(ObservableCollection<string> document, InputView view)
     {
         InsertLine(document, view);
+    }
+
+    private void HandleControlEnter(ObservableCollection<string> document, InputView view)
+    {
+        _done = true;
+        return;
     }
 
     private static void InsertLine(ObservableCollection<string> document, InputView view)

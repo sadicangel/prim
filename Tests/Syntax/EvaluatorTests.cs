@@ -323,6 +323,33 @@ public sealed class EvaluatorTests
                 """,
                 $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.I32, BuiltinTypes.Str)}"
             },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} for wrong argument lists",
+                """
+                writeLine("G"⟨⟨=⟩⟩⟨)⟩⟨;⟩
+                """,
+                $"""
+                {DiagnosticMessage.UnexpectedToken(TokenKind.CloseParenthesis, TokenKind.Equal)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.Equal)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.CloseParenthesis)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.Semicolon)}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} for wrong parameter lists",
+                """
+                const greet: (name: str⟨⟨=⟩⟩⟨)⟩ => void = {
+                    writeLine(name);
+                };
+                """,
+                $"""
+                {DiagnosticMessage.UnexpectedToken(TokenKind.CloseParenthesis, TokenKind.Equal)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.Equal)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.CloseParenthesis)}
+                """
+            },
         };
     }
 }

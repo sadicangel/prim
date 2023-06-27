@@ -7,6 +7,8 @@ internal sealed class Parser
 {
     private readonly List<Token> _tokens;
     private readonly DiagnosticBag _diagnostics = new();
+    private int _successiveMatchTokenErrors = 0;
+    private const int MaxSuccessiveMatchTokenErrors = 1;
 
     public Parser(SourceText text)
     {
@@ -49,9 +51,12 @@ internal sealed class Parser
     {
         if (!TryMatchToken(kind, out var token))
         {
-            _diagnostics.ReportUnexpectedToken(kind, Current);
-            token = new Token(kind, Current.Position, "", null);
+
+            if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
+                _diagnostics.ReportUnexpectedToken(kind, Current);
+            return new Token(kind, Current.Position, "", null);
         }
+        _successiveMatchTokenErrors = 0;
         return token;
     }
 
@@ -143,6 +148,30 @@ internal sealed class Parser
         return new BlockStatement(openBraceToken, statements, closeBraceToken);
     }
 
+    private SeparatedNodeList<T> ParseSeparatedList<T>(Func<T> parseNode) where T : SyntaxNode
+    {
+        var nodes = new List<SyntaxNode>();
+
+        var parseNext = true;
+        while (parseNext && Current.TokenKind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
+        {
+            var node = parseNode();
+            nodes.Add(node);
+
+            if (Current.TokenKind is TokenKind.Comma)
+            {
+                var commaToken = MatchToken(TokenKind.Comma);
+                nodes.Add(commaToken);
+            }
+            else
+            {
+                parseNext = false;
+            }
+        }
+
+        return new SeparatedNodeList<T>(nodes.ToArray());
+    }
+
     private Declaration ParseDeclaration()
     {
         var modifier = MatchToken(Current.TokenKind);
@@ -162,7 +191,6 @@ internal sealed class Parser
                 // Variable declaration.
                 default:
                     return ParseVariableDeclaration(hasTypeDeclaration);
-
             }
         }
         else
@@ -174,7 +202,7 @@ internal sealed class Parser
         {
             var colon = MatchToken(TokenKind.Colon);
             var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
-            var parameters = ParseParameters();
+            var parameters = ParseSeparatedList(ParseParameter);
             var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
             var arrow = MatchToken(TokenKind.Arrow);
             var type = MatchToken(TokenKind.Identifier);
@@ -183,27 +211,12 @@ internal sealed class Parser
             var semicolon = MatchToken(TokenKind.Semicolon);
             return new FunctionDeclaration(modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
 
-
-            SeparatedNodeList<Parameter> ParseParameters()
+            Parameter ParseParameter()
             {
-                var nodes = new List<SyntaxNode>();
-
-                while (Current.TokenKind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
-                {
-                    var identifier = MatchToken(TokenKind.Identifier);
-                    var colon = MatchToken(TokenKind.Colon);
-                    var type = MatchToken(TokenKind.Identifier);
-                    var parameter = new Parameter(identifier, colon, type);
-                    nodes.Add(parameter);
-
-                    if (Current.TokenKind is not TokenKind.CloseParenthesis)
-                    {
-                        var commaToken = MatchToken(TokenKind.Comma);
-                        nodes.Add(commaToken);
-                    }
-                }
-
-                return new SeparatedNodeList<Parameter>(nodes.ToArray());
+                var identifier = MatchToken(TokenKind.Identifier);
+                var colon = MatchToken(TokenKind.Colon);
+                var type = MatchToken(TokenKind.Identifier);
+                return new Parameter(identifier, colon, type);
             }
         }
 
@@ -380,28 +393,9 @@ internal sealed class Parser
     {
         var identifierToken = MatchToken(TokenKind.Identifier);
         var openParenthesisToken = MatchToken(TokenKind.OpenParenthesis);
-        var arguments = ParseArguments();
+        var arguments = ParseSeparatedList(ParseExpression);
         var closeParenthesisToken = MatchToken(TokenKind.CloseParenthesis);
         return new CallExpression(identifierToken, openParenthesisToken, arguments, closeParenthesisToken);
-
-        SeparatedNodeList<Expression> ParseArguments()
-        {
-            var nodes = new List<SyntaxNode>();
-
-            while (Current.TokenKind is not TokenKind.CloseParenthesis and not TokenKind.EOF)
-            {
-                var expression = ParseExpression();
-                nodes.Add(expression);
-
-                if (Current.TokenKind is not TokenKind.CloseParenthesis)
-                {
-                    var commaToken = MatchToken(TokenKind.Comma);
-                    nodes.Add(commaToken);
-                }
-            }
-
-            return new SeparatedNodeList<Expression>(nodes.ToArray());
-        }
     }
 
     private Expression ParseNameExpression()

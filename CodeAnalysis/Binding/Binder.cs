@@ -130,13 +130,18 @@ internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISynta
             parameters[i] = new ParameterSymbol(parameterName, parameterType);
 
         }
-        var type = GetSymbolOrDefault(statement.Type, BuiltinTypes.Never);
-        if (type != BuiltinTypes.Void)
-            throw new NotImplementedException($"Functions of type {type}");
+        var type = BuiltinTypes.Never;
+        if (!statement.Type.IsMissing)
+        {
+            type = GetSymbolOrDefault(statement.Type, BuiltinTypes.Never);
+            if (type != BuiltinTypes.Void)
+                _diagnostics.ReportNotSupported(statement.Type.Span, $"functions of type '{type}'");
+        }
 
         var function = new FunctionSymbol(statement.Identifier.Text, type, parameters);
         if (!_scope.TryDeclare(function))
         {
+            //if (type != BuiltinTypes.Never)
             _diagnostics.ReportRedeclaration(statement.Identifier, "function");
         }
 

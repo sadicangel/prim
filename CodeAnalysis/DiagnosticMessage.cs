@@ -40,4 +40,6 @@ public static class DiagnosticMessage
     public static string InvalidVariableType(TypeSymbol expectedType, TypeSymbol actualType) => $"Expected variable of type '{expectedType}'. Got '{actualType}'";
 
     public static string InvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
+
+    public static string NotSupported(string @object) => $"Not supported: {@object}";
 }
