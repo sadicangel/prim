@@ -44,12 +44,12 @@ public static class SyntaxFacts
     public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
         "as" => TokenKind.As,
-        "const" => TokenKind.Const,
         "else" => TokenKind.Else,
         "false" => TokenKind.False,
         "for" => TokenKind.For,
         "if" => TokenKind.If,
         "in" => TokenKind.In,
+        "let" => TokenKind.Let,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
         "while" => TokenKind.While,
@@ -65,12 +65,12 @@ public static class SyntaxFacts
 
     public static bool IsKeyword(this TokenKind kind) => kind
         is TokenKind.As
-        or TokenKind.Const
         or TokenKind.Else
         or TokenKind.False
         or TokenKind.For
         or TokenKind.If
         or TokenKind.In
+        or TokenKind.Let
         or TokenKind.True
         or TokenKind.Var
         or TokenKind.While;
@@ -116,7 +116,6 @@ public static class SyntaxFacts
         TokenKind.CloseParenthesis => ")",
         TokenKind.Colon => ":",
         TokenKind.Comma => ",",
-        TokenKind.Const => "const",
         TokenKind.Else => "else",
         TokenKind.Equal => "=",
         TokenKind.EqualEqual => "==",
@@ -129,6 +128,7 @@ public static class SyntaxFacts
         TokenKind.In => "in",
         TokenKind.Less => "<",
         TokenKind.LessEqual => "<=",
+        TokenKind.Let => "let",
         TokenKind.Minus => "-",
         TokenKind.OpenBrace => "{",
         TokenKind.OpenParenthesis => "(",

@@ -71,6 +71,16 @@ internal sealed class Parser
         return false;
     }
 
+    private bool TryMatchTokenSequence(ReadOnlySpan<TokenKind> kinds)
+    {
+        for (var i = 0; i < kinds.Length; ++i)
+        {
+            if (Peek(i).TokenKind != kinds[i])
+                return false;
+        }
+        return true;
+    }
+
     public CompilationUnit ParseCompilationUnit()
     {
         var nodes = ParseGlobalNodes();
@@ -119,7 +129,7 @@ internal sealed class Parser
         return Current.TokenKind switch
         {
             TokenKind.OpenBrace => ParseBlockStatement(),
-            TokenKind.Const or
+            TokenKind.Let or
             TokenKind.Var => ParseDeclaration(),
             TokenKind.If => ParseIfStatement(),
             TokenKind.While => ParseWhileStatement(),
@@ -174,65 +184,56 @@ internal sealed class Parser
 
     private Declaration ParseDeclaration()
     {
-        var modifier = MatchToken(Current.TokenKind);
-        if (modifier.TokenKind is not TokenKind.Const and not TokenKind.Var)
-            throw new InvalidOperationException("Invalid declaration");
+        ReadOnlySpan<TokenKind> funcSequence = stackalloc TokenKind[]
+        {
+            TokenKind.Let,
+            TokenKind.Identifier,
+            TokenKind.Colon,
+            TokenKind.OpenParenthesis
+        };
+
+        if (TryMatchTokenSequence(funcSequence))
+            return ParseFunctionDeclaration();
+
+        return ParseVariableDeclaration();
+    }
+
+    private Declaration ParseVariableDeclaration()
+    {
+        var modifier = MatchToken(Current.TokenKind is TokenKind.Var ? TokenKind.Var : TokenKind.Let);
         var identifier = MatchToken(TokenKind.Identifier);
-
-        var hasTypeDeclaration = Current.TokenKind is TokenKind.Colon;
-        if (hasTypeDeclaration)
+        var type = default(Token);
+        if (TryMatchToken(TokenKind.Colon, out var colon))
         {
-            switch (Peek(1).TokenKind)
-            {
-                // Function declaration.
-                case TokenKind.OpenParenthesis:
-                    return ParseFunctionDeclaration();
-
-                // Variable declaration.
-                default:
-                    return ParseVariableDeclaration(hasTypeDeclaration);
-            }
+            type = MatchToken(TokenKind.Identifier);
         }
-        else
-        {
-            return ParseVariableDeclaration(hasTypeDeclaration);
-        }
+        var equal = MatchToken(TokenKind.Equal);
+        var expression = ParseExpression();
+        var semicolon = MatchToken(TokenKind.Semicolon);
+        return new VariableDeclaration(modifier, identifier, colon, type, equal, expression, semicolon);
+    }
 
-        FunctionDeclaration ParseFunctionDeclaration()
+    private Declaration ParseFunctionDeclaration()
+    {
+        var modifier = MatchToken(TokenKind.Let);
+        var identifier = MatchToken(TokenKind.Identifier);
+        var colon = MatchToken(TokenKind.Colon);
+        var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
+        var parameters = ParseSeparatedList(ParseParameter);
+        var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
+        var arrow = MatchToken(TokenKind.Arrow);
+        var type = MatchToken(TokenKind.Identifier);
+        var equal = MatchToken(TokenKind.Equal);
+        var body = (BlockStatement)ParseBlockStatement();
+        var semicolon = MatchToken(TokenKind.Semicolon);
+        return new FunctionDeclaration(modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
+
+        Parameter ParseParameter()
         {
+            var identifier = MatchToken(TokenKind.Identifier);
             var colon = MatchToken(TokenKind.Colon);
-            var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
-            var parameters = ParseSeparatedList(ParseParameter);
-            var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
-            var arrow = MatchToken(TokenKind.Arrow);
             var type = MatchToken(TokenKind.Identifier);
-            var equal = MatchToken(TokenKind.Equal);
-            var body = (BlockStatement)ParseBlockStatement();
-            var semicolon = MatchToken(TokenKind.Semicolon);
-            return new FunctionDeclaration(modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
-
-            Parameter ParseParameter()
-            {
-                var identifier = MatchToken(TokenKind.Identifier);
-                var colon = MatchToken(TokenKind.Colon);
-                var type = MatchToken(TokenKind.Identifier);
-                return new Parameter(identifier, colon, type);
-            }
-        }
-
-        VariableDeclaration ParseVariableDeclaration(bool hasTypeDeclaration)
-        {
-            var colon = default(Token);
-            var type = default(Token);
-            if (hasTypeDeclaration)
-            {
-                colon = MatchToken(TokenKind.Colon);
-                type = MatchToken(TokenKind.Identifier);
-            }
-            var equal = MatchToken(TokenKind.Equal);
-            var expression = ParseExpression();
-            var semicolon = MatchToken(TokenKind.Semicolon);
-            return new VariableDeclaration(modifier, identifier, colon, type, equal, expression, semicolon);
+            return new Parameter(identifier, colon, type);
         }
     }
 

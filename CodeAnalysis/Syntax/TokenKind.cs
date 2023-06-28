@@ -42,7 +42,7 @@ public enum TokenKind
     // Keywords
     True,
     False,
-    Const,
+    Let,
     Var,
     If,
     Else,

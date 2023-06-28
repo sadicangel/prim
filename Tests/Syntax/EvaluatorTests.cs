@@ -61,7 +61,7 @@ public sealed class EvaluatorTests
             new object[] { "!true", false },
             new object[] { "!false", true },
             new object[] { "var a = 10;", 10 },
-            new object[] { "const a = 10;", 10 },
+            new object[] { "let a = 10;", 10 },
             new object[] { "{ var a = 10; (a = 10) * a }", 100 },
             new object[] { "{ var a = 10; (a * a) }", 100 },
             new object[] { "{ var a = 0; if a == 0 a = 10 a }", 10 },
@@ -73,9 +73,9 @@ public sealed class EvaluatorTests
             new object[] { """
                 "Hello" + " " + "World!"
                 """, "Hello World!" },
-            new object[] { "const f = 10 as f32;", 10f },
-            new object[] { "const f = 10.0 as i32;", 10 },
-            new object[] { "const f = 11.4 as i32;", 11 }
+            new object[] { "let f = 10 as f32;", 10f },
+            new object[] { "let f = 10.0 as i32;", 10 },
+            new object[] { "let f = 11.4 as i32;", 11 }
         };
     }
 
@@ -151,7 +151,7 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.ReadOnlyAssignment)}",
                 """
                 {
-                    const x = 10;
+                    let x = 10;
                     x ⟨=⟩ 5;
                 }
                 """,
@@ -280,7 +280,7 @@ public sealed class EvaluatorTests
                 """
                 {
                     var result = 0;
-                    const i = 0;
+                    let i = 0;
                     for ⟨i⟩ in 1..10
                         result = result + i;
                 }
@@ -306,7 +306,7 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.InvalidExpressionType)}",
                 """
                 {
-                    const string = "";
+                    let string = "";
                     10 as ⟨string⟩;
                 }
                 """,
@@ -336,7 +336,7 @@ public sealed class EvaluatorTests
             {
                 $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} for wrong parameter lists",
                 """
-                const greet: (name: str⟨=⟩⟨)⟩ => void = ⟨{⟩
+                let greet: (name: str⟨=⟩⟨)⟩ => void = ⟨{⟩
                     writeLine(name);
                 }⟨;⟩
                 """,

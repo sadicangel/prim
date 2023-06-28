@@ -159,7 +159,7 @@ internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISynta
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(VariableDeclaration statement)
     {
         var name = statement.Identifier.Text;
-        var isReadOnly = statement.Modifier.TokenKind == TokenKind.Const;
+        var isReadOnly = statement.Modifier.TokenKind == TokenKind.Let;
         BoundExpression expression;
         if (statement.HasTypeDeclaration)
         {
