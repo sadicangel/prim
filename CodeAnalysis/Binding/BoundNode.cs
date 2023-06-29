@@ -9,46 +9,7 @@ internal abstract record class BoundNode(BoundNodeKind NodeKind) : INode
 {
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {
-        var marker = isLast ? "└──" : "├──";
-
-        writer.WriteColored(indent, ConsoleColor.DarkGray);
-        writer.WriteColored(marker, ConsoleColor.DarkGray);
-        var (text, color) = GetTextAndColor(this);
-        writer.WriteColored(text, color);
-        WriteProperties(writer, this);
-        writer.WriteLine();
-
-        indent += isLast ? "   " : "│  ";
-
-        var lastChild = GetChildren().LastOrDefault();
-
-        foreach (var child in GetChildren())
-            child.WriteTo(writer, indent, child == lastChild);
-
-        static (string Text, ConsoleColor Color) GetTextAndColor(INode node) => node switch
-        {
-            BoundBinaryExpression e => ($"{e.Operator.Kind}Expression ", ConsoleColor.Blue),
-            BoundUnaryExpression e => ($"{e.Operator.Kind}Expression ", ConsoleColor.Blue),
-            BoundExpression e => ($"{e.NodeKind} ", ConsoleColor.Blue),
-            BoundStatement s => ($"{s.NodeKind} ", ConsoleColor.Cyan),
-            _ => throw new InvalidOperationException($"Invalid node type '{node?.GetType()}' in bound tree")
-        };
-
-        static void WriteProperties(TextWriter writer, INode node)
-        {
-            var isFirst = true;
-            foreach (var property in NodePropertyCache.GetProperties(node))
-            {
-                if (isFirst)
-                    isFirst = false;
-                else
-                    writer.WriteColored(", ", ConsoleColor.DarkGray);
-
-                writer.WriteColored(property.Name, ConsoleColor.Yellow);
-                writer.WriteColored(" = ", ConsoleColor.DarkGray);
-                writer.WriteColored(property.GetValue(node), ConsoleColor.DarkYellow);
-            }
-        };
+        BoundNodeWriterExtensions.WriteTo(this, writer);
     }
 
     public abstract IEnumerable<INode> GetChildren();
