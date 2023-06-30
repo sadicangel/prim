@@ -6,4 +6,5 @@ public enum SymbolKind
     Variable,
     Function,
     Parameter,
+    Label,
 }

@@ -9,7 +9,7 @@ internal sealed record class BoundIfStatement(BoundExpression Condition, BoundSt
     [MemberNotNullWhen(true, nameof(Else))]
     public bool HasElseClause { get => Else is not null; }
 
-    public override void Accept(IBoundStatementVisitor visitor) => visitor.Visit(this);
+    public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren()
     {
         yield return Condition;

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CodeAnalysis;
 
-internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisitor<object?>
+internal sealed class Evaluator : IBoundStatementVisitor<Unit>, IBoundExpressionVisitor<object?>
 {
     private readonly BoundProgram _program;
     private readonly Dictionary<Symbol, object?> _globals;
@@ -23,56 +23,134 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
 
     public object? Evaluate()
     {
-        EvaluateStatement(_program.Statement);
+        var labelIndices = new Dictionary<LabelSymbol, int>();
+        var statements = _program.Statement.Statements;
+        for (var i = 0; i < statements.Count; ++i)
+            if (statements[i] is BoundLabelStatement labelStatement)
+                labelIndices[labelStatement.Label] = i + 1;
+
+        var index = 0;
+        while (index < statements.Count)
+        {
+            var statement = statements[index];
+            switch (statement.NodeKind)
+            {
+                case BoundNodeKind.ExpressionStatement:
+                case BoundNodeKind.FunctionDeclaration:
+                case BoundNodeKind.VariableDeclaration:
+                    EvaluateStatement(statement);
+                    index++;
+                    break;
+                case BoundNodeKind.GotoStatement:
+                    index = labelIndices[((BoundGotoStatement)statement).Label];
+                    break;
+                case BoundNodeKind.ConditionalGotoStatement:
+                    var s = (BoundConditionalGotoStatement)statement;
+                    var condition = (bool)EvaluateExpression(s.Condition)!;
+                    index = condition == s.JumpIfTrue ? labelIndices[s.Label] : index + 1;
+                    break;
+                case BoundNodeKind.LabelStatement:
+                    index++;
+                    break;
+                case BoundNodeKind.BreakStatement:
+                case BoundNodeKind.ContinueStatement:
+                default:
+                    break;
+            }
+        }
+
         return _lastValue;
     }
 
-    private void EvaluateStatement(BoundStatement statement) => statement.Accept(this);
-
-    void IBoundStatementVisitor.Visit(BoundBlockStatement statement)
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundVariableDeclaration statement)
     {
+        _globals[statement.Variable] = EvaluateExpression(statement.Expression);
+        return Unit.Value;
+    }
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundFunctionDeclaration statement)
+    {
+        _globals[statement.Function] = statement.Body;
+        return Unit.Value;
+    }
+
+
+    private void EvaluateStatement(BoundStatement statement)
+    {
+        statement.Accept(this);
+    }
+
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundBlockStatement statement)
+    {
+        throw new NotSupportedException(nameof(BoundIfStatement));
         foreach (var s in statement.Statements)
             EvaluateStatement(s);
+        return Unit.Value;
     }
-    void IBoundStatementVisitor.Visit(BoundIfStatement statement)
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundIfStatement statement)
     {
+        throw new NotSupportedException(nameof(BoundIfStatement));
         var condition = (bool)EvaluateExpression(statement.Condition)!;
         if (condition)
             EvaluateStatement(statement.Then);
         else if (statement.HasElseClause)
             EvaluateStatement(statement.Else);
+        return Unit.Value;
     }
 
-    void IBoundStatementVisitor.Visit(BoundWhileStatement statement)
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundWhileStatement statement)
     {
+        throw new NotSupportedException(nameof(BoundWhileStatement));
         while ((bool)EvaluateExpression(statement.Condition)!)
             EvaluateStatement(statement.Body);
+        return Unit.Value;
     }
 
-    void IBoundStatementVisitor.Visit(BoundForStatement statement)
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundForStatement statement)
     {
+        throw new NotSupportedException(nameof(BoundForStatement));
         var lowerBound = (int)EvaluateExpression(statement.LowerBound)!;
         var upperBound = (int)EvaluateExpression(statement.UpperBound)!;
-
         for (var i = lowerBound; i < upperBound; ++i)
         {
             _globals[statement.Variable] = i;
             EvaluateStatement(statement.Body);
         }
+        return Unit.Value;
     }
 
-    void IBoundStatementVisitor.Visit(BoundVariableDeclaration statement)
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundLabelStatement statement)
     {
-        _globals[statement.Variable] = EvaluateExpression(statement.Expression);
-    }
-    void IBoundStatementVisitor.Visit(BoundFunctionDeclaration statement)
-    {
-        _globals[statement.Function] = statement.Body;
+        throw new NotImplementedException();
     }
 
-    void IBoundStatementVisitor.Visit(BoundExpressionStatement statement) => EvaluateExpression(statement.Expression);
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundGotoStatement statement)
+    {
+        throw new NotImplementedException();
+    }
+
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundConditionalGotoStatement statement)
+    {
+        throw new NotImplementedException();
+    }
+
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundBreakStatement statement)
+    {
+        return Unit.Value;
+    }
+
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundContinueStatement statement)
+    {
+        return Unit.Value;
+    }
 
     private object? EvaluateExpression(BoundExpression expression) => _lastValue = expression.Accept(this);
+
+    Unit IBoundStatementVisitor<Unit>.Visit(BoundExpressionStatement statement)
+    {
+        EvaluateExpression(statement.Expression);
+        return Unit.Value;
+    }
+
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundNeverExpression expression) => null;
 
@@ -173,7 +251,7 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
     object? IBoundExpressionVisitor<object?>.Visit(BoundUnaryExpression expression)
     {
         var operation = expression.GetOperation();
-        var value = expression.Operand.Accept(this);
+        var value = EvaluateExpression(expression.Operand);
 
         return operation.Invoke(value);
     }
@@ -181,8 +259,8 @@ internal sealed class Evaluator : IBoundStatementVisitor, IBoundExpressionVisito
     object? IBoundExpressionVisitor<object?>.Visit(BoundBinaryExpression expression)
     {
         var operation = expression.GetOperation();
-        var left = expression.Left.Accept(this);
-        var right = expression.Right.Accept(this);
+        var left = EvaluateExpression(expression.Left);
+        var right = EvaluateExpression(expression.Right);
 
         return operation.Invoke(left, right);
     }

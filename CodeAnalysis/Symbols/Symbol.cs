@@ -22,6 +22,8 @@ public abstract record class Symbol(SymbolKind Kind, string Name, TypeSymbol Typ
         {
             case Type t when t == typeof(FunctionSymbol):
                 return SymbolKind.Function;
+            case Type t when t == typeof(LabelSymbol):
+                return SymbolKind.Label;
             case Type t when t == typeof(ParameterSymbol):
                 return SymbolKind.Parameter;
             case Type t when t == typeof(TypeSymbol):

@@ -49,6 +49,8 @@ public enum TokenKind
     While,
     For,
     In,
+    Continue,
+    Break,
 
     // Variable
     WhiteSpace,

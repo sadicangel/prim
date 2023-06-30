@@ -1,13 +1,17 @@
 ﻿namespace CodeAnalysis.Binding;
 
-internal interface IBoundStatementVisitor
+internal interface IBoundStatementVisitor<out TResult>
 {
-    void Visit(BoundVariableDeclaration statement);
-    void Visit(BoundFunctionDeclaration statement);
-
-    void Visit(BoundBlockStatement statement);
-    void Visit(BoundExpressionStatement statement);
-    void Visit(BoundIfStatement statement);
-    void Visit(BoundWhileStatement statement);
-    void Visit(BoundForStatement statement);
+    TResult Visit(BoundVariableDeclaration statement);
+    TResult Visit(BoundFunctionDeclaration statement);
+    TResult Visit(BoundBlockStatement statement);
+    TResult Visit(BoundExpressionStatement statement);
+    TResult Visit(BoundIfStatement statement);
+    TResult Visit(BoundWhileStatement statement);
+    TResult Visit(BoundForStatement statement);
+    TResult Visit(BoundLabelStatement statement);
+    TResult Visit(BoundGotoStatement statement);
+    TResult Visit(BoundConditionalGotoStatement statement);
+    TResult Visit(BoundBreakStatement statement);
+    TResult Visit(BoundContinueStatement statement);
 }

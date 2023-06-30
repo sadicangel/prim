@@ -1,6 +1,8 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Lowering;
 using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
+using System.Diagnostics;
 
 namespace CodeAnalysis;
 
@@ -34,7 +36,11 @@ public sealed class Compilation
         if (program.Diagnostics.Any())
             return new EvaluationResult(program.Diagnostics);
 
-        var evaluator = new Evaluator(program, globals);
+        var lowered = Lowerer.Lower(program);
+
+        Debug.WriteLine(lowered.Statement);
+
+        var evaluator = new Evaluator(lowered, globals);
         var value = evaluator.Evaluate();
 
         return new EvaluationResult(value);
@@ -42,7 +48,7 @@ public sealed class Compilation
 
     public void WriteTo(TextWriter writer)
     {
-        foreach (var statement in GetOrCreateGlobalScope().Statements)
-            statement.WriteTo(writer);
+        var lowered = Lowerer.Lower(Binder.BindProgram(GetOrCreateGlobalScope()));
+        lowered.Statement.WriteTo(writer);
     }
 }

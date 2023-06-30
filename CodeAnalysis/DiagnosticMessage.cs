@@ -42,4 +42,5 @@ public static class DiagnosticMessage
     public static string InvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
 
     public static string NotSupported(string @object) => $"Not supported: {@object}";
+    public static string InvalidBreakOrContinue() => "No enclosing loop out of which to break or continue";
 }

@@ -5,10 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISyntaxStatementVisitor<BoundStatement>
+internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxExpressionVisitor<BoundExpression>
 {
     private readonly DiagnosticBag _diagnostics = new();
     private BoundScope _scope;
+    private int _loopLevel = 0;
 
     private Binder(BoundScope? parentScope)
     {
@@ -105,6 +106,33 @@ internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISynta
         return root;
     }
 
+    private T GetSymbolOrDefault<T>(Token identifier, T defaultValue) where T : Symbol => TryGetSymbol<T>(identifier, out var symbol) ? symbol : defaultValue;
+
+    private bool TryGetSymbol(Token identifier, [NotNullWhen(true)] out Symbol? symbol)
+    {
+        if (!_scope.TryLookup(identifier.Text, out symbol))
+        {
+            _diagnostics.ReportUndefinedName(identifier);
+
+            return false;
+        }
+        return true;
+    }
+
+    private bool TryGetSymbol<T>(Token identifier, [NotNullWhen(true)] out T? symbol) where T : notnull, Symbol
+    {
+        if (!_scope.TryLookup(identifier.Text, out symbol, out var existingSymbol))
+        {
+            if (existingSymbol is not null)
+                _diagnostics.ReportInvalidSymbol(identifier, Symbol.GetKind<T>(), existingSymbol.Kind);
+            else
+                _diagnostics.ReportUndefinedName(identifier);
+
+            return false;
+        }
+        return true;
+    }
+
     private BoundStatement BindStatement(Statement statement) => statement.Accept(this);
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(BlockStatement statement)
@@ -198,35 +226,10 @@ internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISynta
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(WhileStatement statement)
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
+        _loopLevel++;
         var body = BindStatement(statement.Body);
+        _loopLevel--;
         return new BoundWhileStatement(condition, body);
-    }
-
-    private T GetSymbolOrDefault<T>(Token identifier, T defaultValue) where T : Symbol => TryGetSymbol<T>(identifier, out var symbol) ? symbol : defaultValue;
-
-    private bool TryGetSymbol(Token identifier, [NotNullWhen(true)] out Symbol? symbol)
-    {
-        if (!_scope.TryLookup(identifier.Text, out symbol))
-        {
-            _diagnostics.ReportUndefinedName(identifier);
-
-            return false;
-        }
-        return true;
-    }
-
-    private bool TryGetSymbol<T>(Token identifier, [NotNullWhen(true)] out T? symbol) where T : notnull, Symbol
-    {
-        if (!_scope.TryLookup(identifier.Text, out symbol, out var existingSymbol))
-        {
-            if (existingSymbol is not null)
-                _diagnostics.ReportInvalidSymbol(identifier, Symbol.GetKind<T>(), existingSymbol.Kind);
-            else
-                _diagnostics.ReportUndefinedName(identifier);
-
-            return false;
-        }
-        return true;
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ForStatement statement)
@@ -234,37 +237,38 @@ internal sealed class Binder : ISyntaxExpressionVisitor<BoundExpression>, ISynta
         var lowerBound = BindExpression(statement.LowerBound, BuiltinTypes.I32);
         var upperBound = BindExpression(statement.UpperBound, BuiltinTypes.I32);
 
+        var variable = new VariableSymbol(statement.Identifier.Text, IsReadOnly: true, BuiltinTypes.I32);
+
+        // Check outer scope for name. Should this be a warning instead?
+        if (_scope.TryLookup(variable.Name, out _))
+            _diagnostics.ReportRedeclaration(statement.Identifier, "variable");
+
         _scope = new BoundScope(_scope);
 
-        VariableSymbol variable;
-        if (statement.HasVariableDeclaration)
-        {
-            variable = new VariableSymbol(statement.Identifier.Text, IsReadOnly: true, BuiltinTypes.I32);
-            // Check outer scope for name.
-            if (_scope.Parent!.TryLookup(variable.Name, out _) || !_scope.TryDeclare(variable))
-                _diagnostics.ReportRedeclaration(statement.Identifier, "variable");
-        }
-        else
-        {
-            if (!TryGetSymbol(statement.Identifier, out variable!))
-            {
-                variable = new VariableSymbol(statement.Identifier.Text, IsReadOnly: true, BuiltinTypes.I32);
-            }
-            else if (variable.Type != BuiltinTypes.I32)
-            {
-                _diagnostics.ReportInvalidVariableType(statement.Identifier.Span, BuiltinTypes.I32, variable.Type);
-            }
-            else if (variable.IsReadOnly)
-            {
-                _diagnostics.ReportReadOnlyAssignment(statement.Identifier.Span, statement.Identifier.Text);
-            }
-        }
+        if (!_scope.TryDeclare(variable))
+            throw new InvalidOperationException($"Could not declare variable '{variable}'");
 
+        _loopLevel++;
         var body = BindStatement(statement.Body);
+        _loopLevel--;
 
         _scope = _scope.Parent!;
 
         return new BoundForStatement(variable, lowerBound, upperBound, body);
+    }
+
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(BreakStatement statement)
+    {
+        if (_loopLevel == 0)
+            _diagnostics.ReportInvalidBreakOrContinue(statement.Span);
+        return new BoundBreakStatement();
+    }
+
+    BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ContinueStatement statement)
+    {
+        if (_loopLevel == 0)
+            _diagnostics.ReportInvalidBreakOrContinue(statement.Span);
+        return new BoundContinueStatement();
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ExpressionStatement statement)

@@ -1,3 +1,3 @@
 ﻿namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundProgram(BoundStatement Statement, IReadOnlyList<Diagnostic> Diagnostics);
+internal sealed record class BoundProgram(BoundBlockStatement Statement, IReadOnlyList<Diagnostic> Diagnostics);

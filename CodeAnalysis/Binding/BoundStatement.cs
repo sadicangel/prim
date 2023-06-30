@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Binding;
 
-internal abstract record class BoundStatement(BoundNodeKind Kind) : BoundNode(Kind)
+internal abstract record class BoundStatement(BoundNodeKind NodeKind) : BoundNode(NodeKind)
 {
-    public abstract void Accept(IBoundStatementVisitor visitor);
+    public abstract T Accept<T>(IBoundStatementVisitor<T> visitor);
+    public override string ToString() => base.ToString();
 }

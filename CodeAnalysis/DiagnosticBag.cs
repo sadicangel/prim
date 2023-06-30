@@ -44,4 +44,5 @@ public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
     public void ReportInvalidExpressionType(TextSpan span, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     public void ReportInvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Span, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));
     public void ReportNotSupported(TextSpan span, string @object) => ReportError(span, DiagnosticMessage.NotSupported(@object));
+    public void ReportInvalidBreakOrContinue(TextSpan span) => ReportError(span, DiagnosticMessage.InvalidBreakOrContinue());
 }

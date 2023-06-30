@@ -2,12 +2,11 @@
 
 namespace CodeAnalysis.Binding;
 
-internal sealed record class BoundFunctionDeclaration(FunctionSymbol Function, BoundStatement Body) : BoundDeclaration(Function, BoundNodeKind.FunctionDeclaration)
+internal sealed record class BoundConditionalGotoStatement(LabelSymbol Label, BoundExpression Condition, bool JumpIfTrue = true) : BoundStatement(BoundNodeKind.ConditionalGotoStatement)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren()
     {
-        yield return Function;
-        yield return Body;
+        yield return Label;
     }
 }

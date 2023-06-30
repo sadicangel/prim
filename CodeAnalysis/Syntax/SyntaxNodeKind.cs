@@ -28,4 +28,6 @@ public enum SyntaxNodeKind
     CompilationUnit,
     GlobalStatement,
     Parameter,
+    BreakStatement,
+    ContinueStatement,
 }

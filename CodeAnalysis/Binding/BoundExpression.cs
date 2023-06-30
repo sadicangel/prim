@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding;
 
-internal abstract record class BoundExpression(BoundNodeKind Kind, TypeSymbol Type) : BoundNode(Kind)
+internal abstract record class BoundExpression(BoundNodeKind NodeKind, TypeSymbol Type) : BoundNode(NodeKind)
 {
     public abstract T Accept<T>(IBoundExpressionVisitor<T> visitor);
 }

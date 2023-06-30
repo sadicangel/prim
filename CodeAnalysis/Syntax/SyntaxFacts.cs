@@ -44,6 +44,8 @@ public static class SyntaxFacts
     public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
         "as" => TokenKind.As,
+        "break" => TokenKind.Break,
+        "continue" => TokenKind.Continue,
         "else" => TokenKind.Else,
         "false" => TokenKind.False,
         "for" => TokenKind.For,
@@ -65,6 +67,8 @@ public static class SyntaxFacts
 
     public static bool IsKeyword(this TokenKind kind) => kind
         is TokenKind.As
+        or TokenKind.Break
+        or TokenKind.Continue
         or TokenKind.Else
         or TokenKind.False
         or TokenKind.For
@@ -112,10 +116,12 @@ public static class SyntaxFacts
         TokenKind.As => "as",
         TokenKind.Bang => "!",
         TokenKind.BangEqual => "!=",
+        TokenKind.Break => "break",
         TokenKind.CloseBrace => "}",
         TokenKind.CloseParenthesis => ")",
         TokenKind.Colon => ":",
         TokenKind.Comma => ",",
+        TokenKind.Continue => "continue",
         TokenKind.Else => "else",
         TokenKind.Equal => "=",
         TokenKind.EqualEqual => "==",

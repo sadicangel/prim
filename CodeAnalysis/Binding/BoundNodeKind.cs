@@ -18,4 +18,9 @@ internal enum BoundNodeKind
     ForStatement,
     ConvertExpression,
     FunctionDeclaration,
+    BreakStatement,
+    ContinueStatement,
+    GotoStatement,
+    ConditionalGotoStatement,
+    LabelStatement,
 }

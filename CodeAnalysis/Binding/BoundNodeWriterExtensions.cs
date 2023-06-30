@@ -66,6 +66,21 @@ internal static class BoundNodeWriterExtensions
             case BoundNodeKind.FunctionDeclaration:
                 writer.WriteNode((BoundFunctionDeclaration)node);
                 break;
+            case BoundNodeKind.BreakStatement:
+                writer.WriteNode((BoundBreakStatement)node);
+                break;
+            case BoundNodeKind.ContinueStatement:
+                writer.WriteNode((BoundContinueStatement)node);
+                break;
+            case BoundNodeKind.GotoStatement:
+                writer.WriteNode((BoundGotoStatement)node);
+                break;
+            case BoundNodeKind.ConditionalGotoStatement:
+                writer.WriteNode((BoundConditionalGotoStatement)node);
+                break;
+            case BoundNodeKind.LabelStatement:
+                writer.WriteNode((BoundLabelStatement)node);
+                break;
             default:
                 throw new NotSupportedException(node?.GetType()?.Name);
         }
@@ -105,6 +120,7 @@ internal static class BoundNodeWriterExtensions
     private static void WriteNode(this IndentedTextWriter writer, BoundVariableDeclaration node)
     {
         writer.WritePunctuation(node.Variable.IsReadOnly ? TokenKind.Let : TokenKind.Var);
+        writer.Write(" ");
         writer.WriteIdentifier(node.Variable.Name);
         writer.WritePunctuation(TokenKind.Colon);
         writer.Write(" ");
@@ -168,7 +184,9 @@ internal static class BoundNodeWriterExtensions
     {
         writer.WriteKeyword(TokenKind.If);
         writer.Write(" ");
+        writer.WritePunctuation(TokenKind.OpenParenthesis);
         writer.WriteNode(node.Condition);
+        writer.WritePunctuation(TokenKind.CloseParenthesis);
         writer.WriteLine();
         writer.WriteNestedStatement(node.Then);
         if (node.HasElseClause)
@@ -182,7 +200,9 @@ internal static class BoundNodeWriterExtensions
     {
         writer.WriteKeyword(TokenKind.While);
         writer.Write(" ");
+        writer.WritePunctuation(TokenKind.OpenParenthesis);
         writer.WriteNode(node.Condition);
+        writer.WritePunctuation(TokenKind.CloseParenthesis);
         writer.WriteLine();
         writer.WriteNestedStatement(node.Body);
     }
@@ -192,14 +212,56 @@ internal static class BoundNodeWriterExtensions
         writer.Write(" ");
         writer.WriteKeyword(TokenKind.Var);
         writer.Write(" ");
+        writer.WritePunctuation(TokenKind.OpenParenthesis);
         writer.WriteIdentifier(node.Variable.Name);
         writer.Write(" ");
         writer.WriteKeyword(TokenKind.In);
+        writer.Write(" ");
         writer.WriteNode(node.LowerBound);
         writer.WritePunctuation(TokenKind.Range);
         writer.WriteNode(node.UpperBound);
+        writer.WritePunctuation(TokenKind.CloseParenthesis);
         writer.WriteLine();
         writer.WriteNestedStatement(node.Body);
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundBreakStatement node)
+    {
+        writer.WriteKeyword(TokenKind.Break);
+        writer.WritePunctuation(TokenKind.Semicolon);
+        writer.WriteLine();
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundContinueStatement node)
+    {
+        writer.WriteKeyword(TokenKind.Continue);
+        writer.WritePunctuation(TokenKind.Semicolon);
+        writer.WriteLine();
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundGotoStatement node)
+    {
+        writer.Write($"goto {node.Label.Name}");
+        writer.WritePunctuation(TokenKind.Semicolon);
+        writer.WriteLine();
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundConditionalGotoStatement node)
+    {
+        writer.Write($"goto {node.Label.Name}");
+        writer.Write(" when ");
+        writer.WriteNode(node.Condition);
+        writer.Write(" is ");
+        writer.Write(node.JumpIfTrue);
+        writer.WritePunctuation(TokenKind.Semicolon);
+        writer.WriteLine();
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundLabelStatement node)
+    {
+        var hasIndentation = writer.Indent > 0;
+        if (hasIndentation)
+            writer.Indent--;
+        writer.Write(node.Label.Name);
+        writer.Write(":");
+        writer.WriteLine();
+        if (hasIndentation)
+            writer.Indent++;
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundNeverExpression node)
     {
@@ -268,7 +330,9 @@ internal static class BoundNodeWriterExtensions
     {
         writer.WriteKeyword(TokenKind.If);
         writer.Write(" ");
+        writer.WritePunctuation(TokenKind.OpenParenthesis);
         writer.WriteNode(node.Condition);
+        writer.WritePunctuation(TokenKind.CloseParenthesis);
         writer.Write(" ");
         writer.WriteNode(node.Then);
         writer.WriteKeyword(TokenKind.Else);

@@ -240,33 +240,39 @@ internal sealed class Parser
     private Statement ParseIfStatement()
     {
         var ifToken = MatchToken(TokenKind.If);
+        var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
         var condition = ParseExpression();
+        var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var then = ParseStatement();
         if (!TryMatchToken(TokenKind.Else, out var elseToken))
-            return new IfStatement(ifToken, condition, then);
+            return new IfStatement(ifToken, openParenthesis, condition, closeParenthesis, then);
         var @else = ParseStatement();
-        return new IfStatement(ifToken, condition, then, elseToken, @else);
+        return new IfStatement(ifToken, openParenthesis, condition, closeParenthesis, then, elseToken, @else);
     }
 
     private Statement ParseWhileStatement()
     {
         var whileToken = MatchToken(TokenKind.While);
+        var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
         var condition = ParseAssignmentExpression();
+        var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var body = ParseStatement();
-        return new WhileStatement(whileToken, condition, body);
+        return new WhileStatement(whileToken, openParenthesis, condition, closeParenthesis, body);
     }
 
     private Statement ParseForStatement()
     {
         var forToken = MatchToken(TokenKind.For);
-        TryMatchToken(TokenKind.Var, out var varToken);
+        var openParenthesis = MatchToken(TokenKind.OpenParenthesis);
+        var let = MatchToken(TokenKind.Let);
         var identifier = MatchToken(TokenKind.Identifier);
-        var equals = MatchToken(TokenKind.In);
+        var @in = MatchToken(TokenKind.In);
         var lowerBound = ParseExpression();
         var rangeToken = MatchToken(TokenKind.Range);
         var upperBound = ParseExpression();
+        var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var body = ParseStatement();
-        return new ForStatement(forToken, varToken, identifier, equals, lowerBound, rangeToken, upperBound, body);
+        return new ForStatement(forToken, openParenthesis, let, identifier, @in, lowerBound, rangeToken, upperBound, closeParenthesis, body);
     }
 
     private Statement ParseExpressionStatement()
