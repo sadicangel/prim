@@ -139,10 +139,9 @@ internal abstract class ReplBase
 
     private void HandleEscape(ObservableCollection<string> document, InputView view)
     {
-        document[view.CurrentLineIndex] = String.Empty;
         document.Clear();
         document.Add(String.Empty);
-        view.CurrentLineIndex = 0;
+        view.CurrentCharacter = 0;
     }
 
     private void HandleEnter(ObservableCollection<string> document, InputView view)
