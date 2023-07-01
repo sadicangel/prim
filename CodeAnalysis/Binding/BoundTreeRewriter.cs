@@ -68,7 +68,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var body = Rewrite(node.Body);
         if (condition == node.Condition && body == node.Body)
             return node;
-        return new BoundWhileStatement(condition, body);
+        return new BoundWhileStatement(condition, body, node.Break, node.Continue);
     }
 
     protected virtual BoundStatement Rewrite(BoundForStatement node)
@@ -78,10 +78,10 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var body = Rewrite(node.Body);
         if (lowerBound == upperBound && upperBound == node.UpperBound && body == node.Body)
             return node;
-        return new BoundForStatement(node.Variable, lowerBound, upperBound, body);
+        return new BoundForStatement(node.Variable, lowerBound, upperBound, body, node.Break, node.Continue);
     }
 
-    protected virtual BoundStatement Rewrite(BoundLabelStatement node) => node;
+    protected virtual BoundStatement Rewrite(BoundLabelDeclaration node) => node;
     protected virtual BoundStatement Rewrite(BoundGotoStatement node) => node;
     protected virtual BoundStatement Rewrite(BoundConditionalGotoStatement node)
     {
@@ -90,9 +90,6 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
             return node;
         return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
     }
-    protected virtual BoundStatement Rewrite(BoundBreakStatement node) => node;
-    protected virtual BoundStatement Rewrite(BoundContinueStatement node) => node;
-
     public BoundExpression Rewrite(BoundExpression expression) => expression.Accept(this);
     protected virtual BoundExpression Rewrite(BoundNeverExpression node) => node;
     protected virtual BoundExpression Rewrite(BoundUnaryExpression node)
@@ -141,8 +138,6 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundIfStatement statement) => Rewrite(statement);
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundWhileStatement statement) => Rewrite(statement);
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundForStatement statement) => Rewrite(statement);
-    BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundBreakStatement statement) => Rewrite(statement);
-    BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundContinueStatement statement) => Rewrite(statement);
 
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundNeverExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundUnaryExpression expression) => Rewrite(expression);
@@ -153,7 +148,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundIfExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundCallExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundConvertExpression expression) => Rewrite(expression);
-    BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundLabelStatement statement) => Rewrite(statement);
+    BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundLabelDeclaration statement) => Rewrite(statement);
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundGotoStatement statement) => Rewrite(statement);
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundConditionalGotoStatement statement) => Rewrite(statement);
     #endregion

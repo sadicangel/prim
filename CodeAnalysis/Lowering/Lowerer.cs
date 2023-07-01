@@ -60,12 +60,12 @@ internal sealed class Lowerer : BoundTreeRewriter
             //
             var endLabel = NewLabel();
             var gotoEndIfFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, JumpIfTrue: false);
-            var endLabelStatement = new BoundLabelStatement(endLabel);
+            var endLabelDeclaration = new BoundLabelDeclaration(endLabel);
             var result = new BoundBlockStatement(new List<BoundStatement>
             {
                 gotoEndIfFalse,
                 node.Then,
-                endLabelStatement
+                endLabelDeclaration
             });
             return Rewrite(result);
         }
@@ -92,16 +92,16 @@ internal sealed class Lowerer : BoundTreeRewriter
             var gotoElseIfFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, JumpIfTrue: false);
             var gotoEnd = new BoundGotoStatement(endLabel);
 
-            var elseLabelStatement = new BoundLabelStatement(elseLabel);
-            var endLabelStatement = new BoundLabelStatement(endLabel);
+            var elseLabelDeclaration = new BoundLabelDeclaration(elseLabel);
+            var endLabelDeclaration = new BoundLabelDeclaration(endLabel);
             var result = new BoundBlockStatement(new List<BoundStatement>
             {
                 gotoElseIfFalse,
                 node.Then,
                 gotoEnd,
-                elseLabelStatement,
+                elseLabelDeclaration,
                 node.Else,
-                endLabelStatement
+                endLabelDeclaration
             });
             return Rewrite(result);
         }
@@ -122,24 +122,22 @@ internal sealed class Lowerer : BoundTreeRewriter
         //  end:
         //
 
-        var continueLabel = NewLabel();
         var checkLabel = NewLabel();
-        var endLabel = NewLabel();
 
         var gotoCheck = new BoundGotoStatement(checkLabel);
-        var continueLabelStatement = new BoundLabelStatement(continueLabel);
-        var checkLabelStatement = new BoundLabelStatement(checkLabel);
-        var gotoContinueIfTrue = new BoundConditionalGotoStatement(continueLabel, node.Condition);
-        var endLabelStatement = new BoundLabelStatement(endLabel);
+        var continueLabelDeclaration = new BoundLabelDeclaration(node.Continue);
+        var checkLabelDeclaration = new BoundLabelDeclaration(checkLabel);
+        var gotoContinueIfTrue = new BoundConditionalGotoStatement(node.Continue, node.Condition);
+        var breakLabelDeclaration = new BoundLabelDeclaration(node.Break);
 
         var result = new BoundBlockStatement(new List<BoundStatement>
         {
             gotoCheck,
-            continueLabelStatement,
+            continueLabelDeclaration,
             node.Body,
-            checkLabelStatement,
+            checkLabelDeclaration,
             gotoContinueIfTrue,
-            endLabelStatement
+            breakLabelDeclaration
         });
         return Rewrite(result);
     }
@@ -155,17 +153,19 @@ internal sealed class Lowerer : BoundTreeRewriter
         //      let <upperBound> = <upper>
         //      while (<var> < <upperBound>) {
         //          <body>
+        //          continue:
         //          <var> = <var> + 1;
         //  }
 
         var variableDeclaration = new BoundVariableDeclaration(node.Variable, node.LowerBound);
         var variableExpression = new BoundSymbolExpression(node.Variable);
-        var upperBoundSymbol = new VariableSymbol("<>upperBound", true, node.Variable.Type);
+        var upperBoundSymbol = new VariableSymbol("<upperBound>", true, node.Variable.Type);
         var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
         var condition = new BoundBinaryExpression(
             variableExpression,
             BoundBinaryOperator.Bind(TokenKind.Less, BuiltinTypes.I32, BuiltinTypes.I32, BuiltinTypes.Bool)!,
             new BoundSymbolExpression(upperBoundSymbol));
+        var continueLabelDeclaration = new BoundLabelDeclaration(node.Continue);
         var increment = new BoundExpressionStatement(
             new BoundAssignmentExpression(
                 node.Variable,
@@ -175,8 +175,11 @@ internal sealed class Lowerer : BoundTreeRewriter
                     new BoundLiteralExpression(1)
                 )));
 
-        var body = new BoundBlockStatement(new List<BoundStatement> { node.Body, increment });
-        var @while = new BoundWhileStatement(condition, body);
+        var body = new BoundBlockStatement(new List<BoundStatement> {
+            node.Body,
+            continueLabelDeclaration,
+            increment });
+        var @while = new BoundWhileStatement(condition, body, node.Break, new LabelSymbol("<continue>"));
 
         var result = new BoundBlockStatement(new List<BoundStatement> { variableDeclaration, upperBoundDeclaration, @while });
 

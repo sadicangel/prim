@@ -132,8 +132,10 @@ internal sealed class Parser
             TokenKind.Let or
             TokenKind.Var => ParseDeclaration(),
             TokenKind.If => ParseIfStatement(),
-            TokenKind.While => ParseWhileStatement(),
             TokenKind.For => ParseForStatement(),
+            TokenKind.While => ParseWhileStatement(),
+            TokenKind.Break => ParseBreakStatement(),
+            TokenKind.Continue => ParseContinueStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -273,6 +275,20 @@ internal sealed class Parser
         var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var body = ParseStatement();
         return new ForStatement(forToken, openParenthesis, let, identifier, @in, lowerBound, rangeToken, upperBound, closeParenthesis, body);
+    }
+
+    private Statement ParseBreakStatement()
+    {
+        var @break = MatchToken(TokenKind.Break);
+        var semicolon = MatchToken(TokenKind.Semicolon);
+        return new BreakStatement(@break, semicolon);
+    }
+
+    private Statement ParseContinueStatement()
+    {
+        var @continue = MatchToken(TokenKind.Continue);
+        var semicolon = MatchToken(TokenKind.Semicolon);
+        return new ContinueStatement(@continue, semicolon);
     }
 
     private Statement ParseExpressionStatement()

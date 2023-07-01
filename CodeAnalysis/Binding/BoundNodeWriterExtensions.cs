@@ -66,12 +66,6 @@ internal static class BoundNodeWriterExtensions
             case BoundNodeKind.FunctionDeclaration:
                 writer.WriteNode((BoundFunctionDeclaration)node);
                 break;
-            case BoundNodeKind.BreakStatement:
-                writer.WriteNode((BoundBreakStatement)node);
-                break;
-            case BoundNodeKind.ContinueStatement:
-                writer.WriteNode((BoundContinueStatement)node);
-                break;
             case BoundNodeKind.GotoStatement:
                 writer.WriteNode((BoundGotoStatement)node);
                 break;
@@ -79,31 +73,76 @@ internal static class BoundNodeWriterExtensions
                 writer.WriteNode((BoundConditionalGotoStatement)node);
                 break;
             case BoundNodeKind.LabelStatement:
-                writer.WriteNode((BoundLabelStatement)node);
+                writer.WriteNode((BoundLabelDeclaration)node);
                 break;
             default:
                 throw new NotSupportedException(node?.GetType()?.Name);
         }
     }
+    /*
+            var color = token.TokenKind switch
+            {
+                TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
+                TokenKind.String => ConsoleColor.Magenta,
+                TokenKind.Identifier => ConsoleColor.DarkYellow,
+                TokenKind k when k.IsKeyword() => ConsoleColor.Blue,
+                _ => ConsoleColor.DarkGray,
+            };
+     */
+
+    private static void WriteColored(this IndentedTextWriter writer, ConsoleColor color, ReadOnlySpan<char> text)
+    {
+        if (writer.InnerWriter == Console.Out)
+            Console.ForegroundColor = color;
+
+        writer.Write(text);
+
+        if (writer.InnerWriter == Console.Out)
+            Console.ResetColor();
+    }
 
     private static void WritePunctuation(this IndentedTextWriter writer, TokenKind token)
     {
-        writer.Write(token.GetText() ?? throw new InvalidOperationException($"Token {token} has no text"));
+        writer.WriteColored(ConsoleColor.DarkGray, token.GetText() ?? throw new InvalidOperationException($"Token {token} has no text"));
     }
 
     private static void WriteKeyword(this IndentedTextWriter writer, TokenKind token)
     {
-        writer.Write(token.GetText() ?? throw new InvalidOperationException($"Token {token} has no text"));
+        writer.WriteKeyword(token.GetText() ?? throw new InvalidOperationException($"Token {token} has no text"));
     }
 
-    private static void WriteIdentifier(this IndentedTextWriter writer, ReadOnlySpan<char> text)
+    private static void WriteKeyword(this IndentedTextWriter writer, ReadOnlySpan<char> keyword)
     {
-        writer.Write(text);
+        var color = keyword switch
+        {
+            "if" or "while" or "for" or "goto" or "break" or "continue" => ConsoleColor.DarkMagenta,
+            _ => ConsoleColor.DarkBlue,
+        };
+        writer.WriteColored(color, keyword);
     }
 
-    private static void WriteType(this IndentedTextWriter writer, ReadOnlySpan<char> text)
+    private static void WriteSymbol(this IndentedTextWriter writer, Symbol symbol)
     {
-        writer.Write(text);
+        var color = symbol.Kind switch
+        {
+            SymbolKind.Type => ConsoleColor.DarkGreen,
+            SymbolKind.Variable => ConsoleColor.Blue,
+            SymbolKind.Function => ConsoleColor.DarkYellow,
+            SymbolKind.Parameter => ConsoleColor.DarkGray,
+            SymbolKind.Label => ConsoleColor.DarkGray,
+            _ => throw new InvalidOperationException($"Unexpected symbol {symbol}"),
+        };
+        writer.WriteColored(color, symbol.Name);
+    }
+
+    private static void WriteNumber(this IndentedTextWriter writer, object? value)
+    {
+        writer.WriteColored(ConsoleColor.Cyan, value?.ToString() ?? "undefined");
+    }
+
+    private static void WriteString(this IndentedTextWriter writer, object? value)
+    {
+        writer.WriteColored(ConsoleColor.Magenta, value?.ToString() ?? "undefined");
     }
 
     private static void WriteNode(this IndentedTextWriter writer, BoundBlockStatement node)
@@ -119,12 +158,12 @@ internal static class BoundNodeWriterExtensions
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundVariableDeclaration node)
     {
-        writer.WritePunctuation(node.Variable.IsReadOnly ? TokenKind.Let : TokenKind.Var);
+        writer.WriteKeyword(node.Variable.IsReadOnly ? TokenKind.Let : TokenKind.Var);
         writer.Write(" ");
-        writer.WriteIdentifier(node.Variable.Name);
+        writer.WriteSymbol(node.Variable);
         writer.WritePunctuation(TokenKind.Colon);
         writer.Write(" ");
-        writer.WriteType(node.Variable.Type.Name);
+        writer.WriteSymbol(node.Variable.Type);
         writer.Write(" ");
         writer.WritePunctuation(TokenKind.Equal);
         writer.Write(" ");
@@ -134,20 +173,22 @@ internal static class BoundNodeWriterExtensions
     }
     private static void WriteNode(this IndentedTextWriter writer, ParameterSymbol parameter)
     {
-        writer.WriteIdentifier(parameter.Name);
+        writer.WriteSymbol(parameter);
         writer.WritePunctuation(TokenKind.Colon);
-        writer.WriteType(parameter.Type.Name);
+        writer.Write(" ");
+        writer.WriteSymbol(parameter.Type);
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundFunctionDeclaration node)
     {
         writer.WriteKeyword(TokenKind.Let);
-        writer.WriteIdentifier(node.Function.Name);
+        writer.Write(" ");
+        writer.WriteSymbol(node.Function);
         writer.WritePunctuation(TokenKind.Colon);
         writer.Write(" ");
         writer.WritePunctuation(TokenKind.OpenParenthesis);
         if (node.Function.Parameters.Count > 0)
         {
-            writer.Write(node.Function.Parameters[0]);
+            writer.WriteNode(node.Function.Parameters[0]);
             foreach (var parameter in node.Function.Parameters.Skip(1))
             {
                 writer.WritePunctuation(TokenKind.Comma);
@@ -159,9 +200,10 @@ internal static class BoundNodeWriterExtensions
         writer.Write(" ");
         writer.WritePunctuation(TokenKind.Arrow);
         writer.Write(" ");
-        writer.WriteType(node.Function.Type.Name);
+        writer.WriteSymbol(node.Function.Type);
         writer.Write(" ");
         writer.WritePunctuation(TokenKind.Equal);
+        writer.Write(" ");
         writer.WriteNestedStatement(node.Body);
 
     }
@@ -213,7 +255,7 @@ internal static class BoundNodeWriterExtensions
         writer.WriteKeyword(TokenKind.Var);
         writer.Write(" ");
         writer.WritePunctuation(TokenKind.OpenParenthesis);
-        writer.WriteIdentifier(node.Variable.Name);
+        writer.WriteSymbol(node.Variable);
         writer.Write(" ");
         writer.WriteKeyword(TokenKind.In);
         writer.Write(" ");
@@ -224,40 +266,32 @@ internal static class BoundNodeWriterExtensions
         writer.WriteLine();
         writer.WriteNestedStatement(node.Body);
     }
-    private static void WriteNode(this IndentedTextWriter writer, BoundBreakStatement node)
-    {
-        writer.WriteKeyword(TokenKind.Break);
-        writer.WritePunctuation(TokenKind.Semicolon);
-        writer.WriteLine();
-    }
-    private static void WriteNode(this IndentedTextWriter writer, BoundContinueStatement node)
-    {
-        writer.WriteKeyword(TokenKind.Continue);
-        writer.WritePunctuation(TokenKind.Semicolon);
-        writer.WriteLine();
-    }
     private static void WriteNode(this IndentedTextWriter writer, BoundGotoStatement node)
     {
-        writer.Write($"goto {node.Label.Name}");
+        writer.WriteKeyword("goto");
+        writer.Write(" ");
+        writer.WriteSymbol(node.Label);
         writer.WritePunctuation(TokenKind.Semicolon);
         writer.WriteLine();
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundConditionalGotoStatement node)
     {
-        writer.Write($"goto {node.Label.Name}");
-        writer.Write(" when ");
+        writer.WriteKeyword("goto");
+        writer.Write(" ");
+        writer.WriteSymbol(node.Label);
+        writer.Write(" ");
+        writer.WriteKeyword($"{(node.JumpIfTrue ? "when" : "unless")}");
+        writer.Write(" ");
         writer.WriteNode(node.Condition);
-        writer.Write(" is ");
-        writer.Write(node.JumpIfTrue);
         writer.WritePunctuation(TokenKind.Semicolon);
         writer.WriteLine();
     }
-    private static void WriteNode(this IndentedTextWriter writer, BoundLabelStatement node)
+    private static void WriteNode(this IndentedTextWriter writer, BoundLabelDeclaration node)
     {
         var hasIndentation = writer.Indent > 0;
         if (hasIndentation)
             writer.Indent--;
-        writer.Write(node.Label.Name);
+        writer.WriteSymbol(node.Label);
         writer.Write(":");
         writer.WriteLine();
         if (hasIndentation)
@@ -265,7 +299,7 @@ internal static class BoundNodeWriterExtensions
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundNeverExpression node)
     {
-        writer.Write("<never>");
+        writer.WriteSymbol(BuiltinTypes.Never);
     }
     private static void WriteNestedExpression(this IndentedTextWriter writer, int parentPrecedence, BoundExpression node)
     {
@@ -309,6 +343,18 @@ internal static class BoundNodeWriterExtensions
     {
         switch (node.Type)
         {
+            case var _ when node.Type == BuiltinTypes.Bool:
+                writer.WriteKeyword(node.Value is true ? TokenKind.True : TokenKind.False);
+                break;
+
+            case var _ when node.Type == BuiltinTypes.Str:
+                writer.WriteString(node.Value);
+                break;
+
+            case var _ when node.Type.IsNumber():
+                writer.WriteNumber(node.Value);
+                break;
+
             default:
                 writer.Write(node.Value);
                 break;
@@ -316,11 +362,11 @@ internal static class BoundNodeWriterExtensions
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundSymbolExpression node)
     {
-        writer.WriteIdentifier(node.Symbol.Name);
+        writer.WriteSymbol(node.Symbol);
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundAssignmentExpression node)
     {
-        writer.WriteIdentifier(node.Variable.Name);
+        writer.WriteSymbol(node.Variable);
         writer.Write(" ");
         writer.WritePunctuation(TokenKind.Equal);
         writer.Write(" ");
@@ -341,7 +387,7 @@ internal static class BoundNodeWriterExtensions
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundCallExpression node)
     {
-        writer.WriteIdentifier(node.Function.Name);
+        writer.WriteSymbol(node.Function);
         writer.WritePunctuation(TokenKind.OpenParenthesis);
         if (node.Arguments.Count > 0)
         {
@@ -361,6 +407,6 @@ internal static class BoundNodeWriterExtensions
         writer.Write(" ");
         writer.WriteKeyword(TokenKind.As);
         writer.Write(" ");
-        writer.WriteType(node.Type.Name);
+        writer.WriteSymbol(node.Type);
     }
 }

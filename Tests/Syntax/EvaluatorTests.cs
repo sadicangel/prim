@@ -63,6 +63,18 @@ public sealed class EvaluatorTests
             new object[] { "let a = 10;", 10 },
             new object[] { "{ var a = 10; (a = 10) * a }", 100 },
             new object[] { "{ var a = 10; (a * a) }", 100 },
+            new object[] { """
+                {
+                    let f: (n: i32) => void = {
+                        var result = 0;
+                        for (let i in 1..n) {
+                            result = result + i;
+                        }
+                        result
+                    };
+                    f(10);
+                }
+                """, 45},
             new object[] { "{ var a = 0; if (a == 0) a = 10; a }", 10 },
             new object[] { "{ var a = 0; if (a == 4) a = 10; a }", 0 },
             new object[] { "{ var a = 0; if (a == 0) a = 10; else a = 5; a }", 10 },
@@ -70,6 +82,8 @@ public sealed class EvaluatorTests
             new object[] { "{ var i = 10; var result = 0; while (i > 0) { result = result + i; i = i - 1; } result }", 55 },
             new object[] { "{ var result = 0; for (let i in 1..10) { result = result + i; } result}", 45 },
             new object[] { "{ var a = 10; for (let i in 0..(a = a - 1)) { } a }", 9 },
+            new object[] { "{ var result = 0; for (let i in 0..10) { if (i == 5) break; result = result + i; } result}", 10 },
+            new object[] { "{ var result = 0; for (let i in 0..10) { if (i < 5) continue; result = result + i; } result}", 35 },
             new object[] { """
                 "Hello" + " " + "World!"
                 """, "Hello World!" },

@@ -29,8 +29,8 @@ internal sealed class PrimRepl : ReplBase
             {
                 TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
                 TokenKind.String => ConsoleColor.Magenta,
-                TokenKind.Identifier => ConsoleColor.DarkYellow,
-                TokenKind k when k.IsKeyword() => ConsoleColor.Blue,
+                TokenKind.Identifier => ConsoleColor.Blue,
+                TokenKind k when k.IsKeyword() => ConsoleColor.DarkBlue,
                 _ => ConsoleColor.DarkGray,
             };
 
@@ -46,7 +46,7 @@ internal sealed class PrimRepl : ReplBase
         var syntaxTree = SyntaxTree.Parse(text);
 
         // We need to skip EOF.
-        if (syntaxTree.Root.Nodes.Last().GetLastToken().IsMissing)
+        if (syntaxTree.Root.Nodes.Count == 0 || syntaxTree.Root.Nodes[^1].GetLastToken().IsMissing)
             return false;
 
         return true;

@@ -9,7 +9,8 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 {
     private readonly DiagnosticBag _diagnostics = new();
     private BoundScope _scope;
-    private int _loopLevel = 0;
+    private readonly Stack<(LabelSymbol Break, LabelSymbol Continue)> _loopStack = new();
+    private int _labelCount = 0;
 
     private Binder(BoundScope? parentScope)
     {
@@ -223,13 +224,22 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         return new BoundIfStatement(condition, then, @else);
     }
 
+    private BoundStatement BindLoopBody(Statement body, out LabelSymbol @break, out LabelSymbol @continue)
+    {
+        _labelCount++;
+        @break = new LabelSymbol($"break{_labelCount}");
+        @continue = new LabelSymbol($"continue{_labelCount}");
+        _loopStack.Push((@break, @continue));
+        var boundBody = BindStatement(body);
+        _loopStack.Pop();
+        return boundBody;
+    }
+
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(WhileStatement statement)
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
-        _loopLevel++;
-        var body = BindStatement(statement.Body);
-        _loopLevel--;
-        return new BoundWhileStatement(condition, body);
+        var body = BindLoopBody(statement.Body, out var @break, out var @continue);
+        return new BoundWhileStatement(condition, body, @break, @continue);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ForStatement statement)
@@ -248,27 +258,31 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!_scope.TryDeclare(variable))
             throw new InvalidOperationException($"Could not declare variable '{variable}'");
 
-        _loopLevel++;
-        var body = BindStatement(statement.Body);
-        _loopLevel--;
+        var body = BindLoopBody(statement.Body, out var @break, out var @continue);
 
         _scope = _scope.Parent!;
 
-        return new BoundForStatement(variable, lowerBound, upperBound, body);
+        return new BoundForStatement(variable, lowerBound, upperBound, body, @break, @continue);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(BreakStatement statement)
     {
-        if (_loopLevel == 0)
-            _diagnostics.ReportInvalidBreakOrContinue(statement.Span);
-        return new BoundBreakStatement();
+        if (!_loopStack.TryPeek(out var jumps))
+        {
+            _diagnostics.ReportInvalidBreakOrContinue(statement.Break.Span);
+            return new BoundExpressionStatement(new BoundNeverExpression());
+        }
+        return new BoundGotoStatement(jumps.Break);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ContinueStatement statement)
     {
-        if (_loopLevel == 0)
-            _diagnostics.ReportInvalidBreakOrContinue(statement.Span);
-        return new BoundContinueStatement();
+        if (!_loopStack.TryPeek(out var jumps))
+        {
+            _diagnostics.ReportInvalidBreakOrContinue(statement.Continue.Span);
+            return new BoundExpressionStatement(new BoundNeverExpression());
+        }
+        return new BoundGotoStatement(jumps.Continue);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ExpressionStatement statement)

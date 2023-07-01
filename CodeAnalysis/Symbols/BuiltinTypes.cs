@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace CodeAnalysis.Symbols;
 
@@ -44,4 +45,50 @@ internal static class BuiltinTypes
     public static IEnumerable<TypeSymbol> All { get => TypeMap.Value.Values; }
 
     public static bool TryLookup(string name, [MaybeNullWhen(false)] out TypeSymbol type) => TypeMap.Value.TryGetValue(name, out type);
+
+
+
+    public static int SizeOf(this TypeSymbol type) => type.Name switch
+    {
+        "bool" => sizeof(bool),
+        "i8" => sizeof(sbyte),
+        "i16" => sizeof(short),
+        "i32" => sizeof(int),
+        "i64" => sizeof(long),
+        "isize" => Unsafe.SizeOf<nint>(),
+        "u8" => sizeof(byte),
+        "u16" => sizeof(ushort),
+        "u32" => sizeof(uint),
+        "u64" => sizeof(ulong),
+        "usize" => Unsafe.SizeOf<nuint>(),
+        "f32" => sizeof(float),
+        "f64" => sizeof(double),
+        _ => throw new InvalidOperationException($"Size of {type} is not known at compile time")
+    };
+
+    public static bool IsNumber(this TypeSymbol type)
+        => IsInteger(type)
+        || IsFloatingPoint(type);
+
+    public static bool IsInteger(this TypeSymbol type)
+        => IsSignedInteger(type)
+        || IsUnsignedInteger(type);
+
+    public static bool IsSignedInteger(this TypeSymbol type)
+        => type == BuiltinTypes.I8
+        || type == BuiltinTypes.I16
+        || type == BuiltinTypes.I32
+        || type == BuiltinTypes.I64
+        || type == BuiltinTypes.ISize;
+
+    public static bool IsUnsignedInteger(this TypeSymbol type)
+        => type == BuiltinTypes.U8
+        || type == BuiltinTypes.U16
+        || type == BuiltinTypes.U32
+        || type == BuiltinTypes.U64
+        || type == BuiltinTypes.USize;
+
+    public static bool IsFloatingPoint(this TypeSymbol type)
+        => type == BuiltinTypes.F32
+        || type == BuiltinTypes.F64;
 }
