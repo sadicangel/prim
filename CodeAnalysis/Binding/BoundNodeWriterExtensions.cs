@@ -280,7 +280,7 @@ internal static class BoundNodeWriterExtensions
         writer.Write(" ");
         writer.WriteSymbol(node.Label);
         writer.Write(" ");
-        writer.WriteKeyword($"{(node.JumpIfTrue ? "when" : "unless")}");
+        writer.WriteKeyword($"{(node.JumpIfTrue ? "if" : "unless")}");
         writer.Write(" ");
         writer.WriteNode(node.Condition);
         writer.WritePunctuation(TokenKind.Semicolon);

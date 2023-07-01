@@ -79,6 +79,7 @@ public sealed class EvaluatorTests
             new object[] { "{ var a = 0; if (a == 4) a = 10; a }", 0 },
             new object[] { "{ var a = 0; if (a == 0) a = 10; else a = 5; a }", 10 },
             new object[] { "{ var a = 0; if (a == 4) a = 10; else a = 5; a }", 5 },
+            new object[] { "{ var i = 0; while (i < 5) { i = i + 1; if (i == 5) continue; } i }", 5},
             new object[] { "{ var i = 10; var result = 0; while (i > 0) { result = result + i; i = i - 1; } result }", 55 },
             new object[] { "{ var result = 0; for (let i in 1..10) { result = result + i; } result}", 45 },
             new object[] { "{ var a = 10; for (let i in 0..(a = a - 1)) { } a }", 9 },
