@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Symbols;
 
-public abstract record class Symbol(SymbolKind Kind, string Name, TypeSymbol Type) : INode
+public abstract record class Symbol(SymbolKind SymbolKind, string Name, TypeSymbol Type) : INode
 {
     IEnumerable<INode> INode.GetChildren() => Enumerable.Empty<INode>();
 

@@ -123,7 +123,7 @@ internal static class BoundNodeWriterExtensions
 
     private static void WriteSymbol(this IndentedTextWriter writer, Symbol symbol)
     {
-        var color = symbol.Kind switch
+        var color = symbol.SymbolKind switch
         {
             SymbolKind.Type => ConsoleColor.DarkGreen,
             SymbolKind.Variable => ConsoleColor.Blue,

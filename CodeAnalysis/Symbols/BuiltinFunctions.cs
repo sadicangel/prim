@@ -6,8 +6,8 @@ namespace CodeAnalysis.Symbols;
 
 internal static class BuiltinFunctions
 {
-    public static readonly FunctionSymbol WriteLine = new("writeLine", BuiltinTypes.Void, new ParameterSymbol("value", BuiltinTypes.Any));
-    public static readonly FunctionSymbol ReadLine = new("readLine", BuiltinTypes.Str, Array.Empty<ParameterSymbol>());
+    public static readonly FunctionSymbol Print = new("print", BuiltinTypes.Void, new ParameterSymbol("value", BuiltinTypes.Any));
+    public static readonly FunctionSymbol Scan = new("scan", BuiltinTypes.Str, Array.Empty<ParameterSymbol>());
     public static readonly FunctionSymbol ToStr = new("toStr", BuiltinTypes.Str, new ParameterSymbol("value", BuiltinTypes.Any));
     public static readonly FunctionSymbol IsSame = new("isSame", BuiltinTypes.Bool, new ParameterSymbol("left", BuiltinTypes.Any), new ParameterSymbol("right", BuiltinTypes.Any));
     public static readonly FunctionSymbol Random = new("random", BuiltinTypes.I32, new ParameterSymbol("max", BuiltinTypes.I32));

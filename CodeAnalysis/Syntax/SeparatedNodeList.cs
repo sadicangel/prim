@@ -8,7 +8,7 @@ public sealed record class SeparatedNodeList<T>(IReadOnlyList<SyntaxNode> Nodes)
 
     public T this[int index] => (T)Nodes[index * 2];
 
-    public Token GetSeparator(int index) => (Token)Nodes[index * 2 + 1];
+    public Token GetSeparator(Index index) => (Token)Nodes[index.GetOffset(Nodes.Count) * 2 + 1];
 
     public IEnumerator<T> GetEnumerator()
     {

@@ -125,7 +125,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!_scope.TryLookup(identifier.Text, out symbol, out var existingSymbol))
         {
             if (existingSymbol is not null)
-                _diagnostics.ReportInvalidSymbol(identifier, Symbol.GetKind<T>(), existingSymbol.Kind);
+                _diagnostics.ReportInvalidSymbol(identifier, Symbol.GetKind<T>(), existingSymbol.SymbolKind);
             else
                 _diagnostics.ReportUndefinedName(identifier);
 
@@ -206,11 +206,13 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         {
             expression = BindExpression(statement.Expression);
         }
+
         var variable = new VariableSymbol(name, isReadOnly, expression.Type);
 
         if (!_scope.TryDeclare(variable))
         {
             _diagnostics.ReportRedeclaration(statement.Identifier, "variable");
+            return new BoundExpressionStatement(new BoundNeverExpression());
         }
 
         return new BoundVariableDeclaration(variable, expression);
@@ -402,18 +404,32 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     }
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(CallExpression expression)
     {
-        var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
 
         if (!TryGetSymbol(expression.Identifier, out FunctionSymbol? function))
         {
             return new BoundNeverExpression();
         }
 
-        if (boundArguments.Length != function.Parameters.Count)
+        if (expression.Arguments.Count != function.Parameters.Count)
         {
-            _diagnostics.ReportInvalidArgumentCount(expression.Span, function.Name, function.Parameters.Count, boundArguments.Length);
+            TextSpan span;
+            if (expression.Arguments.Count > function.Parameters.Count)
+            {
+                SyntaxNode firstExceedingNode = function.Parameters.Count > 0
+                    ? expression.Arguments.GetSeparator(function.Parameters.Count - 1)
+                    : expression.Arguments[0];
+                var lastExceedingArgument = expression.Arguments[^1];
+                span = TextSpan.FromBounds(firstExceedingNode.Span.Start, lastExceedingArgument.Span.End);
+            }
+            else
+            {
+                span = expression.CloseParenthesis.Span;
+            }
+            _diagnostics.ReportInvalidArgumentCount(span, function.Name, function.Parameters.Count, expression.Arguments.Count);
             return new BoundNeverExpression();
         }
+
+        var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
 
         for (int i = 0; i < boundArguments.Length; ++i)
         {

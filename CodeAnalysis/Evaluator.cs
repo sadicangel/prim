@@ -109,7 +109,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
     {
         var symbol = expression.Symbol;
 
-        switch (symbol.Kind)
+        switch (symbol.SymbolKind)
         {
             case SymbolKind.Type when BuiltinTypes.TryLookup(symbol.Name, out var type):
                 return type;
@@ -120,7 +120,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
         if (!_locals.TryPeek(out var locals) || !locals.TryGetValue(symbol, out var value))
             value = _globals[symbol];
 
-        if (symbol.Kind is SymbolKind.Function)
+        if (symbol.SymbolKind is SymbolKind.Function)
             return symbol;
 
         return value;
@@ -130,10 +130,10 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
     {
         switch (expression.Function.Name)
         {
-            case string name when name == BuiltinFunctions.ReadLine.Name:
+            case string name when name == BuiltinFunctions.Scan.Name:
                 return Console.ReadLine();
 
-            case string name when name == BuiltinFunctions.WriteLine.Name:
+            case string name when name == BuiltinFunctions.Print.Name:
                 Console.WriteLine(EvaluateExpression(expression.Arguments[0]));
                 return null;
 

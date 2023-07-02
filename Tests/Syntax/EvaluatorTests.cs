@@ -341,7 +341,7 @@ public sealed class EvaluatorTests
             {
                 $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} for wrong argument lists",
                 """
-                writeLine("G"⟨=⟩);
+                print("G"⟨=⟩);
                 """,
                 $"""
                 {DiagnosticMessage.UnexpectedToken(TokenKind.CloseParenthesis, TokenKind.Equal)}
@@ -352,7 +352,7 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} for wrong parameter lists",
                 """
                 let greet: (name: str⟨=⟩⟨)⟩ => void = ⟨{⟩
-                    writeLine(name);
+                    print(name);
                 }⟨;⟩
                 """,
                 $"""
@@ -360,6 +360,32 @@ public sealed class EvaluatorTests
                 {DiagnosticMessage.UnexpectedToken(TokenKind.OpenBrace, TokenKind.CloseParenthesis)}
                 {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.OpenBrace)}
                 {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.Semicolon)}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidArgumentCount)} for missing arguments",
+                """
+                {
+                    let greet: (name: str) => void = { print(name); };
+                    greet(⟨)⟩;
+                }
+                """,
+                $"""
+                {DiagnosticMessage.InvalidArgumentCount("greet", 1, 0)}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidArgumentCount)} for exceeding arguments",
+                """
+                {
+                    let greet: (name: str) => void = { print(name); };
+                    greet("John"⟨, "Jane", "Jack"⟩);
+                }
+                """,
+                $"""
+                {DiagnosticMessage.InvalidArgumentCount("greet", 1, 3)}
                 """
             },
         };
