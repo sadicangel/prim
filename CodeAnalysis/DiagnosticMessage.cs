@@ -41,6 +41,11 @@ public static class DiagnosticMessage
 
     public static string InvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
 
-    public static string NotSupported(string @object) => $"Not supported: {@object}";
     public static string InvalidBreakOrContinue() => "No enclosing loop out of which to break or continue";
+
+    public static string InvalidReturn() => "No enclosing function out of which to return";
+
+    public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
+
+    public static string InvalidReturnExpression(string functionName, TypeSymbol expectedType) => $"Function '{functionName}' expects an expression of a type convertible to '{expectedType}'";
 }

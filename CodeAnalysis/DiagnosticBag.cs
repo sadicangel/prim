@@ -43,6 +43,8 @@ public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
     public void ReportInvalidVariableType(TextSpan span, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidVariableType(expectedType, actualType));
     public void ReportInvalidExpressionType(TextSpan span, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(span, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     public void ReportInvalidSymbol(Token identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Span, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));
-    public void ReportNotSupported(TextSpan span, string @object) => ReportError(span, DiagnosticMessage.NotSupported(@object));
     public void ReportInvalidBreakOrContinue(TextSpan span) => ReportError(span, DiagnosticMessage.InvalidBreakOrContinue());
+    public void ReportInvalidReturn(TextSpan span) => ReportError(span, DiagnosticMessage.InvalidReturn());
+    public void ReportInvalidReturnExpression(TextSpan span, string functionName) => ReportError(span, DiagnosticMessage.InvalidReturnExpression(functionName));
+    public void ReportInvalidReturnExpression(TextSpan span, string functionName, TypeSymbol expectedType) => ReportError(span, DiagnosticMessage.InvalidReturnExpression(functionName, expectedType));
 }

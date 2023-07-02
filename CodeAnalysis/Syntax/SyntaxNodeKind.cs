@@ -30,4 +30,5 @@ public enum SyntaxNodeKind
     Parameter,
     BreakStatement,
     ContinueStatement,
+    ReturnStatement,
 }

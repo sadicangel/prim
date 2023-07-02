@@ -72,6 +72,9 @@ internal static class BoundNodeWriterExtensions
             case BoundNodeKind.ConditionalGotoStatement:
                 writer.WriteNode((BoundConditionalGotoStatement)node);
                 break;
+            case BoundNodeKind.ReturnStatement:
+                writer.WriteNode((BoundReturnStatement)node);
+                break;
             case BoundNodeKind.LabelStatement:
                 writer.WriteNode((BoundLabelDeclaration)node);
                 break;
@@ -283,6 +286,17 @@ internal static class BoundNodeWriterExtensions
         writer.WriteKeyword($"{(node.JumpIfTrue ? "if" : "unless")}");
         writer.Write(" ");
         writer.WriteNode(node.Condition);
+        writer.WritePunctuation(TokenKind.Semicolon);
+        writer.WriteLine();
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundReturnStatement node)
+    {
+        writer.WriteKeyword(TokenKind.Return);
+        if (node.Expression is not null)
+        {
+            writer.Write(" ");
+            writer.WriteNode(node.Expression);
+        }
         writer.WritePunctuation(TokenKind.Semicolon);
         writer.WriteLine();
     }

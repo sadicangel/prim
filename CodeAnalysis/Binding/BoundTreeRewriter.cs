@@ -90,6 +90,13 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
             return node;
         return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
     }
+    protected virtual BoundStatement Rewrite(BoundReturnStatement node)
+    {
+        var expression = node.Expression is null ? null : Rewrite(node.Expression);
+        if (expression == node.Expression)
+            return node;
+        return new BoundReturnStatement(expression);
+    }
     public BoundExpression Rewrite(BoundExpression expression) => expression.Accept(this);
     protected virtual BoundExpression Rewrite(BoundNeverExpression node) => node;
     protected virtual BoundExpression Rewrite(BoundUnaryExpression node)
@@ -151,5 +158,6 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundLabelDeclaration statement) => Rewrite(statement);
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundGotoStatement statement) => Rewrite(statement);
     BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundConditionalGotoStatement statement) => Rewrite(statement);
+    BoundStatement IBoundStatementVisitor<BoundStatement>.Visit(BoundReturnStatement statement) => Rewrite(statement);
     #endregion
 }

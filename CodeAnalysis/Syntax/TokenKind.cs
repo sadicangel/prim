@@ -58,4 +58,5 @@ public enum TokenKind
     F32,
     String,
     Identifier,
+    Return,
 }

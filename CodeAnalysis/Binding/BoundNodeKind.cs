@@ -21,4 +21,5 @@ internal enum BoundNodeKind
     GotoStatement,
     ConditionalGotoStatement,
     LabelStatement,
+    ReturnStatement,
 }

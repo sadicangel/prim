@@ -136,6 +136,7 @@ internal sealed class Parser
             TokenKind.While => ParseWhileStatement(),
             TokenKind.Break => ParseBreakStatement(),
             TokenKind.Continue => ParseContinueStatement(),
+            TokenKind.Return => ParseReturnStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -289,6 +290,18 @@ internal sealed class Parser
         var @continue = MatchToken(TokenKind.Continue);
         var semicolon = MatchToken(TokenKind.Semicolon);
         return new ContinueStatement(@continue, semicolon);
+    }
+
+    private Statement ParseReturnStatement()
+    {
+        var @return = MatchToken(TokenKind.Return);
+        Expression? expression = null;
+        if (!TryMatchToken(TokenKind.Semicolon, out var semicolon))
+        {
+            expression = ParseExpression();
+            semicolon = MatchToken(TokenKind.Semicolon);
+        }
+        return new ReturnStatement(@return, expression, semicolon);
     }
 
     private Statement ParseExpressionStatement()

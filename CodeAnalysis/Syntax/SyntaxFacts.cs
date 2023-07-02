@@ -52,6 +52,7 @@ public static class SyntaxFacts
         "if" => TokenKind.If,
         "in" => TokenKind.In,
         "let" => TokenKind.Let,
+        "return" => TokenKind.Return,
         "true" => TokenKind.True,
         "var" => TokenKind.Var,
         "while" => TokenKind.While,
@@ -75,6 +76,7 @@ public static class SyntaxFacts
         or TokenKind.If
         or TokenKind.In
         or TokenKind.Let
+        or TokenKind.Return
         or TokenKind.True
         or TokenKind.Var
         or TokenKind.While;
@@ -142,6 +144,7 @@ public static class SyntaxFacts
         TokenKind.Pipe => "|",
         TokenKind.PipePipe => "||",
         TokenKind.Plus => "+",
+        TokenKind.Return => "return",
         TokenKind.Semicolon => ";",
         TokenKind.Slash => "/",
         TokenKind.Star => "*",

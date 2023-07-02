@@ -11,4 +11,5 @@ public interface ISyntaxStatementVisitor<out TResult>
     TResult Visit(ForStatement statement);
     TResult Visit(BreakStatement statement);
     TResult Visit(ContinueStatement statement);
+    TResult Visit(ReturnStatement statement);
 }

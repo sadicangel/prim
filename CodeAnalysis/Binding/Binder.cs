@@ -9,12 +9,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 {
     private readonly DiagnosticBag _diagnostics = new();
     private BoundScope _scope;
+    private readonly FunctionSymbol? _function;
     private readonly Stack<(LabelSymbol Break, LabelSymbol Continue)> _loopStack = new();
     private int _labelCount = 0;
 
-    private Binder(BoundScope? parentScope)
+    private Binder(BoundScope? parentScope, FunctionSymbol? function = null)
     {
         _scope = new BoundScope(parentScope);
+        _function = function;
         var scope = _scope;
         var level = 0;
         do
@@ -161,11 +163,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
         var type = BuiltinTypes.Never;
         if (!statement.Type.IsMissing)
-        {
             type = GetSymbolOrDefault(statement.Type, BuiltinTypes.Never);
-            if (type != BuiltinTypes.Void)
-                _diagnostics.ReportNotSupported(statement.Type.Span, $"functions of type '{type}'");
-        }
 
         var function = new FunctionSymbol(statement.Identifier.Text, type, parameters);
         if (!_scope.TryDeclare(function))
@@ -174,13 +172,15 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             _diagnostics.ReportRedeclaration(statement.Identifier, "function");
         }
 
-        var binder = new Binder(_scope);
+        var binder = new Binder(_scope, function);
         foreach (var parameter in parameters)
         {
             if (!binder._scope.TryDeclare(parameter))
                 throw new InvalidOperationException($"Invalid parameter declaration {parameter}");
         }
         var functionBody = binder.BindStatement(statement.Body);
+
+        _diagnostics.AddRange(binder.Diagnostics);
 
         return new BoundFunctionDeclaration(function, functionBody);
     }
@@ -285,6 +285,34 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             return new BoundExpressionStatement(new BoundNeverExpression());
         }
         return new BoundGotoStatement(jumps.Continue);
+    }
+
+    public BoundStatement Visit(ReturnStatement statement)
+    {
+        if (_function is null)
+        {
+            _diagnostics.ReportInvalidReturn(statement.Return.Span);
+            return new BoundExpressionStatement(new BoundNeverExpression());
+        }
+        else if (_function.Type == BuiltinTypes.Void)
+        {
+            if (statement.Expression is not null)
+            {
+                _diagnostics.ReportInvalidReturnExpression(statement.Expression.Span, _function.Name);
+                return new BoundExpressionStatement(new BoundNeverExpression());
+            }
+            return new BoundReturnStatement();
+        }
+        else if (statement.Expression is null)
+        {
+            _diagnostics.ReportInvalidReturnExpression(statement.Return.Span, _function.Name, _function.Type);
+            return new BoundExpressionStatement(new BoundNeverExpression());
+        }
+        else
+        {
+            var expression = BindConversion(statement.Expression, _function.Type, isExplicit: false);
+            return new BoundReturnStatement(expression);
+        }
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ExpressionStatement statement)

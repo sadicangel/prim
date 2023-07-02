@@ -90,7 +90,23 @@ public sealed class EvaluatorTests
                 """, "Hello World!" },
             new object[] { "let f = 10 as f32;", 10f },
             new object[] { "let f = 10.0 as i32;", 10 },
-            new object[] { "let f = 11.4 as i32;", 11 }
+            new object[] { "let f = 11.4 as i32;", 11 },
+            new object[] { """
+                {
+                    let helloWorld: () => void = {
+                        "Hello world";
+                    };
+                    helloWorld();
+                }
+                """, "Hello world" },
+            new object[] { """
+                {
+                    let sum: (a: i32, b: i32) => i32 = {
+                        return a + b;
+                    };
+                    sum(2, 3);
+                }
+                """, 5}
         };
     }
 
@@ -386,6 +402,38 @@ public sealed class EvaluatorTests
                 """,
                 $"""
                 {DiagnosticMessage.InvalidArgumentCount("greet", 1, 3)}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidReturn)}",
+                "⟨return⟩;",
+                $"{DiagnosticMessage.InvalidReturn()}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidReturnExpression)} for void function",
+                """
+                let greet: (name: str) => void = {
+                    print(name);
+                    return ⟨0⟩;
+                };
+                """,
+                $"""
+                {DiagnosticMessage.InvalidReturnExpression("greet")}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.InvalidReturnExpression)} for non void function",
+                """
+                let greet: (name: str) => str = {
+                    let result = "Hello, " + name + "!";
+                    ⟨return⟩;
+                };
+                """,
+                $"""
+                {DiagnosticMessage.InvalidReturnExpression("greet", BuiltinTypes.Str)}
                 """
             },
         };

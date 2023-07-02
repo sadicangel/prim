@@ -49,6 +49,10 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
                     var condition = (bool)EvaluateExpression(conditionalGotoStatement.Condition)!;
                     index = condition == conditionalGotoStatement.JumpIfTrue ? labelIndices[conditionalGotoStatement.Label] : index + 1;
                     break;
+                case BoundNodeKind.ReturnStatement:
+                    var returnStatement = (BoundReturnStatement)statement;
+                    _lastValue = returnStatement.Expression is null ? null : EvaluateExpression(returnStatement.Expression);
+                    return _lastValue;
                 default:
                     EvaluateStatement(statement);
                     index++;
