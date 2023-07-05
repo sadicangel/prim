@@ -1,5 +1,7 @@
 ﻿using CodeAnalysis.Symbols;
-namespace CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax;
+
+namespace CodeAnalysis;
 public sealed class EvaluatorTests
 {
     [Theory]
@@ -63,7 +65,9 @@ public sealed class EvaluatorTests
             new object[] { "let a = 10;", 10 },
             new object[] { "{ var a = 10; (a = 10) * a }", 100 },
             new object[] { "{ var a = 10; (a * a) }", 100 },
-            new object[] { """
+            new object[]
+            {
+                """
                 {
                     let f: (n: i32) => void = {
                         var result = 0;
@@ -74,7 +78,8 @@ public sealed class EvaluatorTests
                     };
                     f(10);
                 }
-                """, 45},
+                """,
+                45},
             new object[] { "{ var a = 0; if (a == 0) a = 10; a }", 10 },
             new object[] { "{ var a = 0; if (a == 4) a = 10; a }", 0 },
             new object[] { "{ var a = 0; if (a == 0) a = 10; else a = 5; a }", 10 },
@@ -85,28 +90,59 @@ public sealed class EvaluatorTests
             new object[] { "{ var a = 10; for (let i in 0..(a = a - 1)) { } a }", 9 },
             new object[] { "{ var result = 0; for (let i in 0..10) { if (i == 5) break; result = result + i; } result}", 10 },
             new object[] { "{ var result = 0; for (let i in 0..10) { if (i < 5) continue; result = result + i; } result}", 35 },
-            new object[] { """
+            new object[]
+            {
+                """
                 "Hello" + " " + "World!"
-                """, "Hello World!" },
+                """,
+                "Hello World!"
+            },
             new object[] { "let f = 10 as f32;", 10f },
             new object[] { "let f = 10.0 as i32;", 10 },
             new object[] { "let f = 11.4 as i32;", 11 },
-            new object[] { """
+            new object[]
+            {
+                """
                 {
                     let helloWorld: () => void = {
                         "Hello world";
                     };
                     helloWorld();
                 }
-                """, "Hello world" },
-            new object[] { """
+                """,
+                "Hello world"
+            },
+            new object[]
+            {
+                """
                 {
                     let sum: (a: i32, b: i32) => i32 = {
                         return a + b;
                     };
                     sum(2, 3);
                 }
-                """, 5}
+                """,
+                5
+            },
+            new object[]
+            {
+                """
+                {
+                    let sum: (n: i32) => i32 = {
+                        var i = n;
+                        var result = 0;
+                        while (true) {
+                            if (i == 0) return result;
+                            result = result + i;
+                            i = i -1;
+                        }
+                        return -1;
+                    };
+                    sum(10);
+                }
+                """,
+                55
+            }
         };
     }
 
@@ -434,6 +470,28 @@ public sealed class EvaluatorTests
                 """,
                 $"""
                 {DiagnosticMessage.InvalidReturnExpression("greet", BuiltinTypes.Str)}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.NotAllPathsReturn)}",
+                """
+                let ⟨greet⟩: (name: str) => str = {
+                    let result = "Hello, " + name + "!";
+                };
+                """,
+                $"""
+                {DiagnosticMessage.NotAllPathsReturn()}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.NotAllPathsReturn)}",
+                """
+                let ⟨greet⟩: (name: str) => str = { };
+                """,
+                $"""
+                {DiagnosticMessage.NotAllPathsReturn()}
                 """
             },
         };

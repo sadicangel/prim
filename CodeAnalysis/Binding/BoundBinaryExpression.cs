@@ -8,4 +8,5 @@ internal sealed record class BoundBinaryExpression(BoundExpression Left, BoundBi
         yield return Left;
         yield return Right;
     }
+    public override string ToString() => base.ToString();
 }

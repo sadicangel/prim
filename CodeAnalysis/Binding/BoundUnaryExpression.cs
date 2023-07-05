@@ -7,4 +7,6 @@ internal sealed record class BoundUnaryExpression(BoundUnaryOperator Operator, B
     {
         yield return Operand;
     }
+
+    public override string ToString() => base.ToString();
 }

@@ -37,7 +37,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
             var statement = statements[index];
             switch (statement.NodeKind)
             {
-                case BoundNodeKind.LabelStatement:
+                case BoundNodeKind.LabelDeclaration:
                     index++;
                     break;
                 case BoundNodeKind.GotoStatement:

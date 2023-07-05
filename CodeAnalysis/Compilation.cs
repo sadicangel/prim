@@ -33,6 +33,7 @@ public sealed class Compilation
             return new EvaluationResult(diagnostics);
 
         var program = Binder.BindProgram(GetOrCreateGlobalScope());
+
         if (program.Diagnostics.Any())
             return new EvaluationResult(program.Diagnostics);
 

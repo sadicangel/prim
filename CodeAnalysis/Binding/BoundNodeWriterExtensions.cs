@@ -75,23 +75,13 @@ internal static class BoundNodeWriterExtensions
             case BoundNodeKind.ReturnStatement:
                 writer.WriteNode((BoundReturnStatement)node);
                 break;
-            case BoundNodeKind.LabelStatement:
+            case BoundNodeKind.LabelDeclaration:
                 writer.WriteNode((BoundLabelDeclaration)node);
                 break;
             default:
                 throw new NotSupportedException(node?.GetType()?.Name);
         }
     }
-    /*
-            var color = token.TokenKind switch
-            {
-                TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
-                TokenKind.String => ConsoleColor.Magenta,
-                TokenKind.Identifier => ConsoleColor.DarkYellow,
-                TokenKind k when k.IsKeyword() => ConsoleColor.Blue,
-                _ => ConsoleColor.DarkGray,
-            };
-     */
 
     private static void WriteColored(this IndentedTextWriter writer, ConsoleColor color, ReadOnlySpan<char> text)
     {

@@ -159,7 +159,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
         var variableDeclaration = new BoundVariableDeclaration(node.Variable, node.LowerBound);
         var variableExpression = new BoundSymbolExpression(node.Variable);
-        var upperBoundSymbol = new VariableSymbol("<upperBound>", true, node.Variable.Type);
+        var upperBoundSymbol = new VariableSymbol("#upperBound", true, node.Variable.Type);
         var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
         var condition = new BoundBinaryExpression(
             variableExpression,
@@ -179,7 +179,7 @@ internal sealed class Lowerer : BoundTreeRewriter
             node.Body,
             continueLabelDeclaration,
             increment });
-        var @while = new BoundWhileStatement(condition, body, node.Break, new LabelSymbol("<continue>"));
+        var @while = new BoundWhileStatement(condition, body, node.Break, new LabelSymbol("#continue"));
 
         var result = new BoundBlockStatement(new List<BoundStatement> { variableDeclaration, upperBoundDeclaration, @while });
 

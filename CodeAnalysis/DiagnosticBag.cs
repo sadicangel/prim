@@ -47,4 +47,5 @@ public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
     public void ReportInvalidReturn(TextSpan span) => ReportError(span, DiagnosticMessage.InvalidReturn());
     public void ReportInvalidReturnExpression(TextSpan span, string functionName) => ReportError(span, DiagnosticMessage.InvalidReturnExpression(functionName));
     public void ReportInvalidReturnExpression(TextSpan span, string functionName, TypeSymbol expectedType) => ReportError(span, DiagnosticMessage.InvalidReturnExpression(functionName, expectedType));
+    public void ReportNotAllPathsReturn(TextSpan span) => ReportError(span, DiagnosticMessage.NotAllPathsReturn());
 }

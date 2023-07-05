@@ -48,4 +48,6 @@ public static class DiagnosticMessage
     public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
 
     public static string InvalidReturnExpression(string functionName, TypeSymbol expectedType) => $"Function '{functionName}' expects an expression of a type convertible to '{expectedType}'";
+
+    public static string NotAllPathsReturn() => "Not all code paths return a value";
 }

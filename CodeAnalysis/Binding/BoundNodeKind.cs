@@ -20,6 +20,6 @@ internal enum BoundNodeKind
     FunctionDeclaration,
     GotoStatement,
     ConditionalGotoStatement,
-    LabelStatement,
+    LabelDeclaration,
     ReturnStatement,
 }

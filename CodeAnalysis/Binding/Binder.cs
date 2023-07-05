@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Symbols;
+﻿using CodeAnalysis.Lowering;
+using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using System.Diagnostics.CodeAnalysis;
@@ -180,9 +181,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
         var functionBody = binder.BindStatement(statement.Body);
 
+        var loweredBody = Lowerer.Lower(functionBody);
+
+        if (function.Type != BuiltinTypes.Void && function.Type != BuiltinTypes.Never && !ControlFlowGraph.AllPathsReturn(loweredBody))
+            binder._diagnostics.ReportNotAllPathsReturn(statement.Identifier.Span);
+
         _diagnostics.AddRange(binder.Diagnostics);
 
-        return new BoundFunctionDeclaration(function, functionBody);
+        return new BoundFunctionDeclaration(function, loweredBody);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(VariableDeclaration statement)
@@ -299,14 +305,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             if (statement.Expression is not null)
             {
                 _diagnostics.ReportInvalidReturnExpression(statement.Expression.Span, _function.Name);
-                return new BoundExpressionStatement(new BoundNeverExpression());
+                return new BoundReturnStatement(new BoundNeverExpression());
             }
             return new BoundReturnStatement();
         }
         else if (statement.Expression is null)
         {
             _diagnostics.ReportInvalidReturnExpression(statement.Return.Span, _function.Name, _function.Type);
-            return new BoundExpressionStatement(new BoundNeverExpression());
+            return new BoundReturnStatement(new BoundNeverExpression());
         }
         else
         {
