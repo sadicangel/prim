@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CodeAnalysis;
 
-internal sealed record class AnnotatedText(ReadOnlyMemory<char> Text, IReadOnlyList<TextSpan> Spans)
+internal sealed record class AnnotatedText(string Text, IReadOnlyList<TextSpan> Spans)
 {
     public static AnnotatedText Parse(string text)
     {
@@ -35,6 +35,6 @@ internal sealed record class AnnotatedText(ReadOnlyMemory<char> Text, IReadOnlyL
         if (startStack.Count > 0)
             throw new ArgumentException("Missing ']' in text", nameof(text));
 
-        return new AnnotatedText(builder.ToString().AsMemory(), spans);
+        return new AnnotatedText(builder.ToString(), spans);
     }
 }

@@ -1,7 +1,8 @@
-﻿using CodeAnalysis.Text;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Syntax;
+
+internal readonly record struct ParseResult(CompilationUnit CompilationUnit, IEnumerable<Diagnostic> Diagnostics);
 
 internal sealed class Parser
 {
@@ -10,20 +11,11 @@ internal sealed class Parser
     private int _successiveMatchTokenErrors = 0;
     private const int MaxSuccessiveMatchTokenErrors = 1;
 
-    public Parser(SourceText text)
+    private Parser(SyntaxTree syntaxTree)
     {
-        _tokens = new List<Token>();
-
-        var lexer = new Lexer(text);
-        Token token;
-        do
-        {
-            token = lexer.NextToken();
-            if (token.TokenKind is not TokenKind.WhiteSpace and not TokenKind.Invalid)
-                _tokens.Add(token);
-        }
-        while (token.TokenKind != TokenKind.EOF);
-        _diagnostics.AddRange(lexer.Diagnostics);
+        var (tokens, diagnostics) = Lexer.Lex(syntaxTree, static t => t.TokenKind is not TokenKind.WhiteSpace and not TokenKind.Invalid);
+        _tokens = new List<Token>(tokens);
+        _diagnostics.AddRange(diagnostics);
     }
 
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
@@ -81,7 +73,14 @@ internal sealed class Parser
         return true;
     }
 
-    public CompilationUnit ParseCompilationUnit()
+    public static ParseResult Parse(SyntaxTree syntaxTree)
+    {
+        var parser = new Parser(syntaxTree);
+        var compilationUnit = parser.ParseCompilationUnit();
+        return new(compilationUnit, parser.Diagnostics);
+    }
+
+    private CompilationUnit ParseCompilationUnit()
     {
         var nodes = ParseGlobalNodes();
         var eofToken = MatchToken(TokenKind.EOF);

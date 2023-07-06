@@ -21,7 +21,7 @@ internal sealed class PrimRepl : ReplBase
 
     protected override void RenderLine(string line)
     {
-        var tokens = SyntaxTree.ParseTokens(line.AsMemory());
+        var tokens = SyntaxTree.ParseTokens(line);
         foreach (var token in tokens)
         {
             var color = token.TokenKind switch
@@ -37,7 +37,7 @@ internal sealed class PrimRepl : ReplBase
         }
     }
 
-    protected override bool IsCompleteInput(ReadOnlyMemory<char> text)
+    protected override bool IsCompleteInput(string text)
     {
         if (text.Length == 0 || LastTwoLinesAreBlank(text))
             return true;
@@ -50,20 +50,19 @@ internal sealed class PrimRepl : ReplBase
 
         return true;
 
-        static bool LastTwoLinesAreBlank(ReadOnlyMemory<char> text)
+        static bool LastTwoLinesAreBlank(ReadOnlySpan<char> text)
         {
-            var textSpan = text.Span;
-            var index = textSpan.LastIndexOf(Environment.NewLine);
+            var index = text.LastIndexOf(Environment.NewLine);
             if (index >= 0)
             {
-                textSpan = textSpan[..index];
-                if (text.Span.IsWhiteSpace())
+                text = text[..index];
+                if (text.IsWhiteSpace())
                 {
-                    index = textSpan.LastIndexOf(Environment.NewLine);
+                    index = text.LastIndexOf(Environment.NewLine);
                     if (index >= 0)
                     {
-                        textSpan = textSpan[..index];
-                        if (text.Span.IsWhiteSpace())
+                        text = text[..index];
+                        if (text.IsWhiteSpace())
                             return true;
                     }
                 }
@@ -121,7 +120,7 @@ internal sealed class PrimRepl : ReplBase
 
     protected override void Evaluate(string input)
     {
-        var syntaxTree = SyntaxTree.Parse(input.AsMemory());
+        var syntaxTree = SyntaxTree.Parse(input);
 
         var compilation = new Compilation(syntaxTree, _previousCompilation);
 

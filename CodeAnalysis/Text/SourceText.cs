@@ -2,28 +2,21 @@
 
 namespace CodeAnalysis.Text;
 
-public sealed record class SourceText : IReadOnlyList<char>
+public sealed record class SourceText(string Text, string FileName = "") : IReadOnlyList<char>
 {
-    private readonly ReadOnlyMemory<char> _text;
+    private IReadOnlyList<TextLine>? _lines;
+    public IReadOnlyList<TextLine> Lines { get => _lines ??= ParseLines(Text); }
 
-    public SourceText(ReadOnlyMemory<char> text)
-    {
-        _text = text;
-        Lines = ParseLines(this, text);
-    }
+    public int Length { get => Text.Length; }
+    int IReadOnlyCollection<char>.Count { get => Text.Length; }
 
-    public IReadOnlyList<TextLine> Lines { get; }
+    public char this[int index] { get => Text[index]; }
 
-    public int Length { get => _text.Length; }
-    int IReadOnlyCollection<char>.Count { get => _text.Length; }
+    public ReadOnlySpan<char> this[TextSpan span] { get => Text.AsSpan()[(Range)span]; }
 
-    public char this[int index] { get => _text.Span[index]; }
+    public ReadOnlySpan<char> this[Range range] { get => Text.AsSpan()[range]; }
 
-    public ReadOnlySpan<char> this[TextSpan span] { get => _text.Span[(Range)span]; }
-
-    public ReadOnlySpan<char> this[Range range] { get => _text.Span[range]; }
-
-    public ReadOnlySpan<char> Slice(int start, int length) => _text.Span.Slice(start, length);
+    public ReadOnlySpan<char> Slice(int start, int length) => Text.AsSpan(start, length);
 
     public int GetLineIndex(int position)
     {
@@ -51,17 +44,17 @@ public sealed record class SourceText : IReadOnlyList<char>
         return lower - 1;
     }
 
-    public override string ToString() => _text.ToString();
+    public override string ToString() => Text.ToString();
 
     public IEnumerator<char> GetEnumerator()
     {
-        for (int i = 0; i < _text.Length; ++i)
-            yield return _text.Span[i];
+        for (int i = 0; i < Text.Length; ++i)
+            yield return Text[i];
 
     }
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private static IReadOnlyList<TextLine> ParseLines(SourceText sourceText, ReadOnlyMemory<char> text)
+    private IReadOnlyList<TextLine> ParseLines(ReadOnlySpan<char> text)
     {
         var lines = new List<TextLine>();
 
@@ -69,21 +62,21 @@ public sealed record class SourceText : IReadOnlyList<char>
         var lineStart = 0;
         while (position < text.Length)
         {
-            var lineBreakWidth = GetLineBreakWidth(text.Span, position);
+            var lineBreakWidth = GetLineBreakWidth(text, position);
             if (lineBreakWidth == 0)
             {
                 position++;
             }
             else
             {
-                lines.Add(CreateLine(sourceText, position, lineStart, lineBreakWidth));
+                lines.Add(CreateLine(position, lineStart, lineBreakWidth));
                 position += lineBreakWidth;
                 lineStart = position;
             }
         }
 
         if (position >= lineStart)
-            lines.Add(CreateLine(sourceText, position, lineStart, 0));
+            lines.Add(CreateLine(position, lineStart, 0));
 
         return lines;
 
@@ -97,11 +90,11 @@ public sealed record class SourceText : IReadOnlyList<char>
             };
         }
 
-        static TextLine CreateLine(SourceText sourceText, int position, int lineStart, int lineBreakWidth)
+        TextLine CreateLine(int position, int lineStart, int lineBreakWidth)
         {
             var lineLength = position - lineStart;
             var lineLengthIncludingLineBreak = lineLength + lineBreakWidth;
-            return new TextLine(sourceText, lineStart, lineLength, lineLengthIncludingLineBreak);
+            return new TextLine(this, lineStart, lineLength, lineLengthIncludingLineBreak);
         }
     }
 }

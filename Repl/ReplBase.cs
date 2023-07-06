@@ -147,7 +147,7 @@ internal abstract class ReplBase
     private void HandleEnter(ObservableCollection<string> document, InputView view)
     {
         var input = String.Join(Environment.NewLine, document);
-        if (input.StartsWith("\\") || IsCompleteInput(input.AsMemory()))
+        if (input.StartsWith("\\") || IsCompleteInput(input))
         {
             _done = true;
             return;
@@ -313,7 +313,7 @@ internal abstract class ReplBase
 
     protected virtual void RenderLine(string line) => Console.Write(line);
 
-    protected abstract bool IsCompleteInput(ReadOnlyMemory<char> text);
+    protected abstract bool IsCompleteInput(string text);
     protected abstract bool EvaluateCommand(ReadOnlySpan<char> input);
     protected abstract void Evaluate(string input);
 }

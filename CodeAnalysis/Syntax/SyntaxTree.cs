@@ -2,30 +2,37 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class SyntaxTree(SourceText Text, IEnumerable<Diagnostic> Diagnostics, CompilationUnit Root) : INode
+public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEnumerable<Diagnostic> Diagnostics) : INode
 {
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Root.WriteTo(writer, indent, isLast);
     IEnumerable<INode> INode.GetChildren() => ((INode)Root).GetChildren();
 
-    public static SyntaxTree Parse(ReadOnlyMemory<char> text) => Parse(new SourceText(text));
-    public static SyntaxTree Parse(SourceText text)
+    private SyntaxTree(SourceText text, Func<SyntaxTree, ParseResult> parse) : this(text, null!, null!)
     {
-        var parser = new Parser(text);
-        var compilationUnit = parser.ParseCompilationUnit();
-        return new SyntaxTree(text, parser.Diagnostics, compilationUnit);
+        (Root, Diagnostics) = parse.Invoke(this);
     }
 
-    public static IEnumerable<Token> ParseTokens(ReadOnlyMemory<char> text) => ParseTokens(new SourceText(text));
+    public static SyntaxTree Load(string fileName)
+    {
+        var text = File.ReadAllText(fileName);
+        var sourceText = new SourceText(text, fileName);
+        return new(sourceText, Parser.Parse);
+    }
+
+    public static SyntaxTree Parse(string text) => new(new SourceText(text), Parser.Parse);
+
+    public static IEnumerable<Token> ParseTokens(string text) => ParseTokens(new SourceText(text));
     public static IEnumerable<Token> ParseTokens(SourceText text)
     {
-        var lexer = new Lexer(text);
-        while (true)
+        // A little hack, as we want to go through SyntaxTree to actually get the tokens..
+        IReadOnlyList<Token> tokens = Array.Empty<Token>();
+        ParseResult ParseTokens(SyntaxTree syntaxTree)
         {
-            var token = lexer.NextToken();
-            if (token.TokenKind == TokenKind.EOF)
-                break;
-            yield return token;
+            (tokens, var diagnostics) = Lexer.Lex(syntaxTree, static t => t.TokenKind is not TokenKind.EOF);
+            return new ParseResult(new CompilationUnit(Array.Empty<GlobalSyntaxNode>(), tokens[^1]), diagnostics);
         }
+        _ = new SyntaxTree(text, ParseTokens);
+        return tokens;
     }
 
     public override string ToString()

@@ -9,7 +9,7 @@ public sealed class SyntaxFactsTests
         if (text is null)
             return;
 
-        var tokens = SyntaxTree.ParseTokens(text.AsMemory());
+        var tokens = SyntaxTree.ParseTokens(text);
         var token = Assert.Single(tokens);
         Assert.Equal(kind, token.TokenKind);
         Assert.Equal(text, token.Text);

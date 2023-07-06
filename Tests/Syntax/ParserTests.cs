@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 public sealed class ParserTests
 {
-    private static Expression ParseExpression(ReadOnlyMemory<char> text)
+    private static Expression ParseExpression(string text)
     {
         var syntaxTree = SyntaxTree.Parse(text);
         var syntaxNode = Assert.Single(syntaxTree.Root.Nodes);
@@ -20,7 +20,7 @@ public sealed class ParserTests
         var op1Text = op1.GetText();
         var op2Text = op2.GetText();
 
-        var text = $"a {op1Text} b {op2Text} c".AsMemory();
+        var text = $"a {op1Text} b {op2Text} c";
         var expr = ParseExpression(text);
 
         if (op1Precedence >= op2Precedence)
@@ -71,7 +71,7 @@ public sealed class ParserTests
         var unaryText = unaryKind.GetText();
         var binaryText = binaryKind.GetText();
 
-        var text = $"{unaryText} a {binaryText} b".AsMemory();
+        var text = $"{unaryText} a {binaryText} b";
         var expr = ParseExpression(text);
 
         if (unaryPrecedence >= binaryPrecedence)

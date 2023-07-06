@@ -8,7 +8,7 @@ public sealed class EvaluatorTests
     [MemberData(nameof(GetEvaluateResultsData))]
     public void Evaluator_Evaluates_CorrectValues(string text, object expectedValue)
     {
-        var syntaxTree = SyntaxTree.Parse(text.AsMemory());
+        var syntaxTree = SyntaxTree.Parse(text);
         var compilation = new Compilation(syntaxTree);
         var symbols = new Dictionary<Symbol, object?>();
         var result = compilation.Evaluate(symbols);

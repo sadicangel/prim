@@ -4,40 +4,60 @@ using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
+internal readonly record struct LexResult(IReadOnlyList<Token> Tokens, IEnumerable<Diagnostic> Diagnostics);
+
 internal sealed class Lexer
 {
-    private readonly SourceText _text;
+    private readonly SyntaxTree _syntaxTree;
     private readonly DiagnosticBag _diagnostics = new();
-
-    public Lexer(SourceText text)
-    {
-        _text = text;
-    }
-
-    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
 
     private int _position;
     private int _start;
     private TokenKind _kind;
     private object? _value;
 
+    private Lexer(SyntaxTree syntaxTree)
+    {
+        _syntaxTree = syntaxTree;
+    }
+
+    public SourceText Text { get => _syntaxTree.Text; }
+
+    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
+
     private char Current { get => Peek(0); }
 
-    public bool IsEOF { get => _position >= _text.Length; }
+    public bool IsEOF { get => _position >= Text.Length; }
+
+    public static LexResult Lex(SyntaxTree syntaxTree, Func<Token, bool>? predicate = null)
+    {
+        var lexer = new Lexer(syntaxTree);
+        var tokens = new List<Token>();
+        Token token;
+        do
+        {
+            token = lexer.NextToken();
+            if (predicate is null || predicate.Invoke(token))
+                tokens.Add(token);
+        }
+        while (token.TokenKind != TokenKind.EOF);
+
+        return new(tokens, lexer.Diagnostics);
+    }
 
     private char Peek(int offset)
     {
         var index = _position + offset;
-        return index < _text.Length ? _text[index] : '\0';
+        return index < Text.Length ? Text[index] : '\0';
     }
 
-    public Token NextToken()
+    private Token NextToken()
     {
         _start = _position;
         _kind = TokenKind.Invalid;
         _value = null;
 
-        ReadOnlySpan<char> span = _text[_start..];
+        ReadOnlySpan<char> span = Text[_start..];
 
         switch (span)
         {
@@ -230,7 +250,7 @@ internal sealed class Lexer
         }
         while (Char.IsLetterOrDigit(Current));
 
-        var text = _text[_start.._position];
+        var text = Text[_start.._position];
         _kind = text.GetKeywordKind();
     }
 
@@ -255,7 +275,7 @@ internal sealed class Lexer
         while (Char.IsDigit(Current));
 
         // Scan the decimal part of a floating point?
-        if (isInteger && _text[_position..] is ['.', '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..])
+        if (isInteger && Text[_position..] is ['.', '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..])
         {
             isInteger = false;
             // We stop when there is not dot after a number. This way we grab all dots in a number (which we report as incorrect).
@@ -268,14 +288,14 @@ internal sealed class Lexer
                 while (Char.IsDigit(Current));
 
                 // Keep consuming if the next input is a single '.'.
-                if (_text[_position..] is not ['.', not '.', ..])
+                if (Text[_position..] is not ['.', not '.', ..])
                     break;
             }
         }
 
 
 
-        var text = _text[_start.._position];
+        var text = Text[_start.._position];
 
         (_kind, _value) = isInteger
             ? (TokenKind.I32, EnsureCorrectType<int>(text, BuiltinTypes.I32))
@@ -296,7 +316,7 @@ internal sealed class Lexer
         _position++;
         while (!done)
         {
-            var span = _text[_position..];
+            var span = Text[_position..];
             switch (span)
             {
                 case ['\0', ..]:
