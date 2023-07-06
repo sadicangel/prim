@@ -1,7 +1,6 @@
 ﻿using CodeAnalysis;
 using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Text;
 
 namespace Repl;
 internal sealed class PrimRepl : ReplBase
@@ -151,37 +150,7 @@ internal sealed class PrimRepl : ReplBase
         }
         else
         {
-            foreach (var diagnostic in diagnostics.OrderBy(d => d.Span))
-            {
-                var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
-                var lineNumber = lineIndex + 1;
-                var line = syntaxTree.Text.Lines[lineIndex];
-                var columnIndex = diagnostic.Span.Start - line.Start;
-                var columnNumber = columnIndex + 1;
-                var diagnosticColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
-
-                Console.WriteLine();
-
-                Console.Out.WriteLineColored($"({lineNumber}, {columnNumber}): {diagnostic}", diagnosticColor);
-
-                var prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
-                var suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
-
-                var prefix = syntaxTree.Text[prefixSpan];
-                var error = syntaxTree.Text[diagnostic.Span];
-                var suffix = syntaxTree.Text[suffixSpan];
-
-                Console.Write("    ");
-                Console.Write(prefix.ToString());
-                Console.Out.WriteColored(error.ToString(), diagnosticColor);
-                Console.Write(suffix.ToString());
-                Console.WriteLine();
-
-                Console.Write(new string(' ', 4 + columnIndex));
-                Console.Write(new string('˄', error.Length));
-                Console.WriteLine();
-            }
-            Console.WriteLine();
+            diagnostics.WriteTo(Console.Out, syntaxTree);
         }
     }
 }

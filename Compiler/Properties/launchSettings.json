@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Compiler-Hello": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples/hello.pr"
+    },
+    "Compiler-Sum": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples/sum.pr"
+    }
+  }
+}
