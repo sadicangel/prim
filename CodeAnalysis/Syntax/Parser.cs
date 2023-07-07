@@ -6,6 +6,7 @@ internal readonly record struct ParseResult(CompilationUnit CompilationUnit, IEn
 
 internal sealed class Parser
 {
+    private readonly SyntaxTree _syntaxTree;
     private readonly List<Token> _tokens;
     private readonly DiagnosticBag _diagnostics = new();
     private int _successiveMatchTokenErrors = 0;
@@ -13,6 +14,7 @@ internal sealed class Parser
 
     private Parser(SyntaxTree syntaxTree)
     {
+        _syntaxTree = syntaxTree;
         var (tokens, diagnostics) = Lexer.Lex(syntaxTree, static t => t.TokenKind is not TokenKind.WhiteSpace and not TokenKind.Invalid);
         _tokens = new List<Token>(tokens);
         _diagnostics.AddRange(diagnostics);
@@ -46,7 +48,7 @@ internal sealed class Parser
 
             if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
                 _diagnostics.ReportUnexpectedToken(kind, Current);
-            return new Token(kind, Current.Position, "", null);
+            return new Token(_syntaxTree, kind, Current.Position, "", null);
         }
         _successiveMatchTokenErrors = 0;
         return token;
@@ -84,7 +86,7 @@ internal sealed class Parser
     {
         var nodes = ParseGlobalNodes();
         var eofToken = MatchToken(TokenKind.EOF);
-        return new CompilationUnit(nodes, eofToken);
+        return new CompilationUnit(_syntaxTree, nodes, eofToken);
     }
 
     private IReadOnlyList<GlobalSyntaxNode> ParseGlobalNodes()
@@ -120,7 +122,7 @@ internal sealed class Parser
     private GlobalStatement ParseGlobalStatement()
     {
         var statement = ParseStatement();
-        return new GlobalStatement(statement);
+        return new GlobalStatement(_syntaxTree, statement);
     }
 
     private Statement ParseStatement()
@@ -157,7 +159,7 @@ internal sealed class Parser
                 NextToken();
         }
         var closeBraceToken = MatchToken(TokenKind.CloseBrace);
-        return new BlockStatement(openBraceToken, statements, closeBraceToken);
+        return new BlockStatement(_syntaxTree, openBraceToken, statements, closeBraceToken);
     }
 
     private SeparatedNodeList<T> ParseSeparatedList<T>(Func<T> parseNode) where T : SyntaxNode
@@ -212,7 +214,7 @@ internal sealed class Parser
         var equal = MatchToken(TokenKind.Equal);
         var expression = ParseExpression();
         var semicolon = MatchToken(TokenKind.Semicolon);
-        return new VariableDeclaration(modifier, identifier, colon, type, equal, expression, semicolon);
+        return new VariableDeclaration(_syntaxTree, modifier, identifier, colon, type, equal, expression, semicolon);
     }
 
     private Declaration ParseFunctionDeclaration()
@@ -228,14 +230,14 @@ internal sealed class Parser
         var equal = MatchToken(TokenKind.Equal);
         var body = (BlockStatement)ParseBlockStatement();
         var semicolon = MatchToken(TokenKind.Semicolon);
-        return new FunctionDeclaration(modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
+        return new FunctionDeclaration(_syntaxTree, modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
 
         Parameter ParseParameter()
         {
             var identifier = MatchToken(TokenKind.Identifier);
             var colon = MatchToken(TokenKind.Colon);
             var type = MatchToken(TokenKind.Identifier);
-            return new Parameter(identifier, colon, type);
+            return new Parameter(_syntaxTree, identifier, colon, type);
         }
     }
 
@@ -247,9 +249,9 @@ internal sealed class Parser
         var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var then = ParseStatement();
         if (!TryMatchToken(TokenKind.Else, out var elseToken))
-            return new IfStatement(ifToken, openParenthesis, condition, closeParenthesis, then);
+            return new IfStatement(_syntaxTree, ifToken, openParenthesis, condition, closeParenthesis, then);
         var @else = ParseStatement();
-        return new IfStatement(ifToken, openParenthesis, condition, closeParenthesis, then, elseToken, @else);
+        return new IfStatement(_syntaxTree, ifToken, openParenthesis, condition, closeParenthesis, then, elseToken, @else);
     }
 
     private Statement ParseWhileStatement()
@@ -259,7 +261,7 @@ internal sealed class Parser
         var condition = ParseAssignmentExpression();
         var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var body = ParseStatement();
-        return new WhileStatement(whileToken, openParenthesis, condition, closeParenthesis, body);
+        return new WhileStatement(_syntaxTree, whileToken, openParenthesis, condition, closeParenthesis, body);
     }
 
     private Statement ParseForStatement()
@@ -274,21 +276,21 @@ internal sealed class Parser
         var upperBound = ParseExpression();
         var closeParenthesis = MatchToken(TokenKind.CloseParenthesis);
         var body = ParseStatement();
-        return new ForStatement(forToken, openParenthesis, let, identifier, @in, lowerBound, rangeToken, upperBound, closeParenthesis, body);
+        return new ForStatement(_syntaxTree, forToken, openParenthesis, let, identifier, @in, lowerBound, rangeToken, upperBound, closeParenthesis, body);
     }
 
     private Statement ParseBreakStatement()
     {
         var @break = MatchToken(TokenKind.Break);
         var semicolon = MatchToken(TokenKind.Semicolon);
-        return new BreakStatement(@break, semicolon);
+        return new BreakStatement(_syntaxTree, @break, semicolon);
     }
 
     private Statement ParseContinueStatement()
     {
         var @continue = MatchToken(TokenKind.Continue);
         var semicolon = MatchToken(TokenKind.Semicolon);
-        return new ContinueStatement(@continue, semicolon);
+        return new ContinueStatement(_syntaxTree, @continue, semicolon);
     }
 
     private Statement ParseReturnStatement()
@@ -300,14 +302,14 @@ internal sealed class Parser
             expression = ParseExpression();
             semicolon = MatchToken(TokenKind.Semicolon);
         }
-        return new ReturnStatement(@return, expression, semicolon);
+        return new ReturnStatement(_syntaxTree, @return, expression, semicolon);
     }
 
     private Statement ParseExpressionStatement()
     {
         var expression = ParseExpression();
         TryMatchToken(TokenKind.Semicolon, out var semicolonToken);
-        return new ExpressionStatement(expression, semicolonToken);
+        return new ExpressionStatement(_syntaxTree, expression, semicolonToken);
     }
 
     private Expression ParseExpression()
@@ -322,7 +324,7 @@ internal sealed class Parser
             var identifierToken = MatchToken(TokenKind.Identifier);
             var operatorToken = MatchToken(TokenKind.Equal);
             var right = ParseAssignmentExpression();
-            return new AssignmentExpression(identifierToken, operatorToken, right);
+            return new AssignmentExpression(_syntaxTree, identifierToken, operatorToken, right);
         }
 
         //if (Peek(1).Kind == TokenKind.As)
@@ -354,7 +356,7 @@ internal sealed class Parser
         {
             var operationToken = NextToken();
             var operand = ParseBinaryExpression(unaryPrecedence);
-            left = new UnaryExpression(operationToken, operand);
+            left = new UnaryExpression(_syntaxTree, operationToken, operand);
         }
         else
         {
@@ -369,7 +371,7 @@ internal sealed class Parser
 
             var operatorToken = NextToken();
             var right = ParseBinaryExpression(precedence);
-            left = new BinaryExpression(left, operatorToken, right);
+            left = new BinaryExpression(_syntaxTree, left, operatorToken, right);
         }
         return left;
     }
@@ -391,7 +393,7 @@ internal sealed class Parser
         var left = MatchToken(TokenKind.OpenParenthesis);
         var expression = ParseExpression();
         var right = MatchToken(TokenKind.CloseParenthesis);
-        return new GroupExpression(left, expression, right);
+        return new GroupExpression(_syntaxTree, left, expression, right);
     }
 
     private Expression ParseBooleanLiteralExpression(TokenKind booleanTokenKind)
@@ -399,7 +401,7 @@ internal sealed class Parser
         if (!booleanTokenKind.IsBoolean())
             throw new InvalidOperationException($"Invalid boolean token kind {booleanTokenKind}");
         var literal = MatchToken(booleanTokenKind);
-        return new LiteralExpression(literal, booleanTokenKind is TokenKind.True);
+        return new LiteralExpression(_syntaxTree, literal, booleanTokenKind is TokenKind.True);
     }
 
     private Expression ParseNumberLiteralExpression(TokenKind numberTokenKind)
@@ -407,13 +409,13 @@ internal sealed class Parser
         if (!numberTokenKind.IsNumber())
             throw new InvalidOperationException($"Invalid number token kind {numberTokenKind}");
         var literal = MatchToken(numberTokenKind);
-        return new LiteralExpression(literal);
+        return new LiteralExpression(_syntaxTree, literal);
     }
 
     private Expression ParseStringLiteralExpression()
     {
         var literal = MatchToken(TokenKind.String);
-        return new LiteralExpression(literal);
+        return new LiteralExpression(_syntaxTree, literal);
     }
 
     private Expression ParseNameOrCallExpression()
@@ -430,12 +432,12 @@ internal sealed class Parser
         var openParenthesisToken = MatchToken(TokenKind.OpenParenthesis);
         var arguments = ParseSeparatedList(ParseExpression);
         var closeParenthesisToken = MatchToken(TokenKind.CloseParenthesis);
-        return new CallExpression(identifierToken, openParenthesisToken, arguments, closeParenthesisToken);
+        return new CallExpression(_syntaxTree, identifierToken, openParenthesisToken, arguments, closeParenthesisToken);
     }
 
     private Expression ParseNameExpression()
     {
         var identifierToken = MatchToken(TokenKind.Identifier);
-        return new NameExpression(identifierToken);
+        return new NameExpression(_syntaxTree, identifierToken);
     }
 }

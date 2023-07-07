@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class IfExpression(Token If, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Expression Then, Token ElseToken, Expression Else) : Expression(SyntaxNodeKind.IfExpression)
+public sealed record class IfExpression(SyntaxTree SyntaxTree, Token If, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Expression Then, Token ElseToken, Expression Else)
+    : Expression(SyntaxNodeKind.IfExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -2,7 +2,8 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class Token(TokenKind TokenKind, int Position, string Text, object? Value = null) : SyntaxNode(SyntaxNodeKind.Token)
+public sealed record class Token(SyntaxTree SyntaxTree, TokenKind TokenKind, int Position, string Text, object? Value = null)
+    : SyntaxNode(SyntaxNodeKind.Token, SyntaxTree)
 {
     public bool IsMissing { get => String.IsNullOrEmpty(Text); }
 

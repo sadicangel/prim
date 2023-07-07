@@ -1,8 +1,9 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class ReturnStatement(Token Return, Expression? Expression, Token Semicolon) : Statement(SyntaxNodeKind.ReturnStatement)
+public sealed record class ReturnStatement(SyntaxTree SyntaxTree, Token Return, Expression? Expression, Token Semicolon)
+    : Statement(SyntaxNodeKind.ReturnStatement, SyntaxTree)
 {
-    public ReturnStatement(Token @return, Token semicolon) : this(@return, Expression: null, semicolon) { }
+    public ReturnStatement(SyntaxTree syntaxTree, Token @return, Token semicolon) : this(syntaxTree, @return, Expression: null, semicolon) { }
 
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

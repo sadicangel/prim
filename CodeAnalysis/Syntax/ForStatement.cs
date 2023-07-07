@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class ForStatement(Token For, Token OpenParenthesis, Token Let, Token Identifier, Token In, Expression LowerBound, Token RangeToken, Expression UpperBound, Token CloseParenthesis, Statement Body) : Statement(SyntaxNodeKind.ForStatement)
+public sealed record class ForStatement(SyntaxTree SyntaxTree, Token For, Token OpenParenthesis, Token Let, Token Identifier, Token In, Expression LowerBound, Token RangeToken, Expression UpperBound, Token CloseParenthesis, Statement Body)
+    : Statement(SyntaxNodeKind.ForStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

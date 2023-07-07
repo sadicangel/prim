@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class FunctionDeclaration(Token Modifier, Token Identifier, Token Colon, Token OpenParenthesis, SeparatedNodeList<Parameter> Parameters, Token CloseParenthesis, Token Arrow, Token Type, Token Equal, BlockStatement Body, Token Semicolon)
-    : Declaration(DeclarationKind.Function)
+public sealed record class FunctionDeclaration(SyntaxTree SyntaxTree, Token Modifier, Token Identifier, Token Colon, Token OpenParenthesis, SeparatedNodeList<Parameter> Parameters, Token CloseParenthesis, Token Arrow, Token Type, Token Equal, BlockStatement Body, Token Semicolon)
+    : Declaration(DeclarationKind.Function, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
 

@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class BinaryExpression(Expression Left, Token Operator, Expression Right) : Expression(SyntaxNodeKind.BinaryExpression)
+public sealed record class BinaryExpression(SyntaxTree SyntaxTree, Expression Left, Token Operator, Expression Right)
+    : Expression(SyntaxNodeKind.BinaryExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
 

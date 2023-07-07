@@ -2,10 +2,11 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class VariableDeclaration(Token Modifier, Token Identifier, Token? Colon, Token? Type, Token Equal, Expression Expression, Token Semicolon) : Declaration(DeclarationKind.Variable)
+public sealed record class VariableDeclaration(SyntaxTree SyntaxTree, Token Modifier, Token Identifier, Token? Colon, Token? Type, Token Equal, Expression Expression, Token Semicolon)
+    : Declaration(DeclarationKind.Variable, SyntaxTree)
 {
-    public VariableDeclaration(Token storageToken, Token identifierToken, Token equalsToken, Expression expression, Token semicolonToken)
-        : this(storageToken, identifierToken, Colon: null, Type: null, equalsToken, expression, semicolonToken) { }
+    public VariableDeclaration(SyntaxTree syntaxTree, Token storageToken, Token identifierToken, Token equalsToken, Expression expression, Token semicolonToken)
+        : this(syntaxTree, storageToken, identifierToken, Colon: null, Type: null, equalsToken, expression, semicolonToken) { }
 
     [MemberNotNullWhen(true, nameof(Colon), nameof(Type))]
     public bool HasTypeDeclaration { get => Colon is not null && Type is not null; }

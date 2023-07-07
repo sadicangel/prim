@@ -184,7 +184,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var loweredBody = Lowerer.Lower(functionBody);
 
         if (function.Type != BuiltinTypes.Void && function.Type != BuiltinTypes.Never && !ControlFlowGraph.AllPathsReturn(loweredBody))
-            binder._diagnostics.ReportNotAllPathsReturn(statement.Identifier.Span);
+            binder._diagnostics.ReportNotAllPathsReturn(statement.Identifier.GetLocation());
 
         _diagnostics.AddRange(binder.Diagnostics);
 
@@ -277,7 +277,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         if (!_loopStack.TryPeek(out var jumps))
         {
-            _diagnostics.ReportInvalidBreakOrContinue(statement.Break.Span);
+            _diagnostics.ReportInvalidBreakOrContinue(statement.Break.GetLocation());
             return new BoundExpressionStatement(new BoundNeverExpression());
         }
         return new BoundGotoStatement(jumps.Break);
@@ -287,7 +287,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         if (!_loopStack.TryPeek(out var jumps))
         {
-            _diagnostics.ReportInvalidBreakOrContinue(statement.Continue.Span);
+            _diagnostics.ReportInvalidBreakOrContinue(statement.Continue.GetLocation());
             return new BoundExpressionStatement(new BoundNeverExpression());
         }
         return new BoundGotoStatement(jumps.Continue);
@@ -297,21 +297,21 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         if (_function is null)
         {
-            _diagnostics.ReportInvalidReturn(statement.Return.Span);
+            _diagnostics.ReportInvalidReturn(statement.Return.GetLocation());
             return new BoundExpressionStatement(new BoundNeverExpression());
         }
         else if (_function.Type == BuiltinTypes.Void)
         {
             if (statement.Expression is not null)
             {
-                _diagnostics.ReportInvalidReturnExpression(statement.Expression.Span, _function.Name);
+                _diagnostics.ReportInvalidReturnExpression(statement.Expression.GetLocation(), _function.Name);
                 return new BoundReturnStatement(new BoundNeverExpression());
             }
             return new BoundReturnStatement();
         }
         else if (statement.Expression is null)
         {
-            _diagnostics.ReportInvalidReturnExpression(statement.Return.Span, _function.Name, _function.Type);
+            _diagnostics.ReportInvalidReturnExpression(statement.Return.GetLocation(), _function.Name, _function.Type);
             return new BoundReturnStatement(new BoundNeverExpression());
         }
         else
@@ -336,7 +336,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var result = expression.Accept(this);
         if (!allowVoid && result.Type == BuiltinTypes.Void)
         {
-            _diagnostics.ReportInvalidExpressionType(expression.Span, result.Type);
+            _diagnostics.ReportInvalidExpressionType(expression.GetLocation(), result.Type);
             return new BoundNeverExpression();
         }
         return result;
@@ -388,13 +388,13 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         {
             if (boundRight is not BoundSymbolExpression symbolExpression || BuiltinTypes.Type != symbolExpression.Type)
             {
-                _diagnostics.ReportInvalidExpressionType(expression.Right.Span, BuiltinTypes.Type, boundRight.Type);
+                _diagnostics.ReportInvalidExpressionType(expression.Right.GetLocation(), BuiltinTypes.Type, boundRight.Type);
                 return new BoundNeverExpression();
             }
 
             if (!BuiltinTypes.TryLookup(symbolExpression.Symbol.Name, out resultType))
             {
-                _diagnostics.ReportUndefinedType(expression.Right.Span, symbolExpression.Symbol.Name);
+                _diagnostics.ReportUndefinedType(expression.Right.GetLocation(), symbolExpression.Symbol.Name);
                 return new BoundNeverExpression();
             }
 
@@ -408,7 +408,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (boundOperator is null)
         {
             if (expression.Operator.TokenKind is TokenKind.As)
-                _diagnostics.ReportInvalidConversion(TextSpan.FromBounds(expression.Operator.Span.Start, expression.Right.Span.End), boundLeft.Type, resultType!);
+                _diagnostics.ReportInvalidConversion(new TextLocation(expression.SyntaxTree.Text, TextSpan.FromBounds(expression.Operator.Span.Start, expression.Right.Span.End)), boundLeft.Type, resultType!);
             else
                 _diagnostics.ReportUndefinedBinaryOperator(expression.Operator, boundLeft.Type, boundRight.Type);
             return new BoundNeverExpression();
@@ -446,20 +446,20 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         if (expression.Arguments.Count != function.Parameters.Count)
         {
-            TextSpan span;
+            TextLocation location;
             if (expression.Arguments.Count > function.Parameters.Count)
             {
                 SyntaxNode firstExceedingNode = function.Parameters.Count > 0
                     ? expression.Arguments.GetSeparator(function.Parameters.Count - 1)
                     : expression.Arguments[0];
                 var lastExceedingArgument = expression.Arguments[^1];
-                span = TextSpan.FromBounds(firstExceedingNode.Span.Start, lastExceedingArgument.Span.End);
+                location = new TextLocation(expression.SyntaxTree.Text, TextSpan.FromBounds(firstExceedingNode.Span.Start, lastExceedingArgument.Span.End));
             }
             else
             {
-                span = expression.CloseParenthesis.Span;
+                location = expression.CloseParenthesis.GetLocation();
             }
-            _diagnostics.ReportInvalidArgumentCount(span, function.Name, function.Parameters.Count, expression.Arguments.Count);
+            _diagnostics.ReportInvalidArgumentCount(location, function.Name, function.Parameters.Count, expression.Arguments.Count);
             return new BoundNeverExpression();
         }
 
@@ -472,7 +472,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
             if (!argument.Type.IsAssignableTo(parameter.Type))
             {
-                _diagnostics.ReportInvalidArgumentType(expression.Arguments[i].Span, parameter.Name, parameter.Type, argument.Type);
+                _diagnostics.ReportInvalidArgumentType(expression.Arguments[i].GetLocation(), parameter.Name, parameter.Type, argument.Type);
                 return new BoundNeverExpression();
             }
         }
@@ -494,12 +494,12 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         if (variable.IsReadOnly)
         {
-            _diagnostics.ReportReadOnlyAssignment(expression.Equal.Span, expression.Identifier.Text);
+            _diagnostics.ReportReadOnlyAssignment(expression.Equal.GetLocation(), expression.Identifier.Text);
         }
 
         if (boundExpression.Type != variable.Type)
         {
-            _diagnostics.ReportInvalidConversion(expression.Span, variable.Type, boundExpression.Type);
+            _diagnostics.ReportInvalidConversion(expression.GetLocation(), variable.Type, boundExpression.Type);
             return boundExpression;
         }
 
@@ -527,14 +527,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var conversion = Conversion.Classify(boundExpression.Type, targetType);
         if (!conversion.Exists)
         {
-            _diagnostics.ReportInvalidConversion(expression.Span, boundExpression.Type, targetType);
+            _diagnostics.ReportInvalidConversion(expression.GetLocation(), boundExpression.Type, targetType);
         }
         else if (!conversion.IsIdentity)
         {
             if (conversion.IsImplicit || isExplicit)
                 return new BoundConvertExpression(boundExpression, targetType);
 
-            _diagnostics.ReportInvalidImplicitConversion(expression.Span, boundExpression.Type, targetType);
+            _diagnostics.ReportInvalidImplicitConversion(expression.GetLocation(), boundExpression.Type, targetType);
         }
         return boundExpression;
     }

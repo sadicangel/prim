@@ -29,7 +29,7 @@ public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEn
         ParseResult ParseTokens(SyntaxTree syntaxTree)
         {
             (tokens, var diagnostics) = Lexer.Lex(syntaxTree, static t => t.TokenKind is not TokenKind.EOF);
-            return new ParseResult(new CompilationUnit(Array.Empty<GlobalSyntaxNode>(), tokens[^1]), diagnostics);
+            return new ParseResult(new CompilationUnit(syntaxTree, Array.Empty<GlobalSyntaxNode>(), tokens[^1]), diagnostics);
         }
         _ = new SyntaxTree(text, ParseTokens);
         return tokens;

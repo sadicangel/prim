@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class BreakStatement(Token Break, Token Semicolon) : Statement(SyntaxNodeKind.BreakStatement)
+public sealed record class BreakStatement(SyntaxTree SyntaxTree, Token Break, Token Semicolon) : Statement(SyntaxNodeKind.BreakStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

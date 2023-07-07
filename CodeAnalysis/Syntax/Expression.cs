@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Syntax;
 
-public abstract record class Expression(SyntaxNodeKind Kind) : SyntaxNode(Kind)
+public abstract record class Expression(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : SyntaxNode(NodeKind, SyntaxTree)
 {
     public override TextSpan Span { get => TextSpan.FromBounds(GetChildren().First().Span.Start, GetChildren().Last().Span.End); }
 

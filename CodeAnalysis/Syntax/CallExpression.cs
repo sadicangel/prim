@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class CallExpression(Token Identifier, Token OpenParenthesis, SeparatedNodeList<Expression> Arguments, Token CloseParenthesis) : Expression(SyntaxNodeKind.CallExpression)
+public sealed record class CallExpression(SyntaxTree SyntaxTree, Token Identifier, Token OpenParenthesis, SeparatedNodeList<Expression> Arguments, Token CloseParenthesis)
+    : Expression(SyntaxNodeKind.CallExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class WhileStatement(Token While, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Statement Body) : Statement(SyntaxNodeKind.WhileStatement)
+public sealed record class WhileStatement(SyntaxTree SyntaxTree, Token While, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Statement Body)
+    : Statement(SyntaxNodeKind.WhileStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

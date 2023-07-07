@@ -2,7 +2,8 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class GlobalStatement(Statement Statement) : GlobalSyntaxNode(SyntaxNodeKind.GlobalStatement)
+public sealed record class GlobalStatement(SyntaxTree SyntaxTree, Statement Statement)
+    : GlobalSyntaxNode(SyntaxNodeKind.GlobalStatement, SyntaxTree)
 {
     public override TextSpan Span { get => Statement.Span; }
 

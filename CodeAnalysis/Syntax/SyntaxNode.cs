@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Syntax;
 
-public abstract record class SyntaxNode(SyntaxNodeKind NodeKind) : INode
+public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : INode
 {
     public abstract TextSpan Span { get; }
 
@@ -13,6 +13,8 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind) : INode
 
         return GetChildren().Last().GetLastToken();
     }
+
+    public TextLocation GetLocation() => new(SyntaxTree.Text, Span);
 
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true)
     {

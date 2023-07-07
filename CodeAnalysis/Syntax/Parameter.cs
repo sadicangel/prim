@@ -2,7 +2,8 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class Parameter(Token Identifier, Token Colon, Token Type) : SyntaxNode(SyntaxNodeKind.Parameter)
+public sealed record class Parameter(SyntaxTree SyntaxTree, Token Identifier, Token Colon, Token Type)
+    : SyntaxNode(SyntaxNodeKind.Parameter, SyntaxTree)
 {
     public override TextSpan Span { get => Identifier.Span; }
 

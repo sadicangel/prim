@@ -1,6 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 
-public sealed record class ExpressionStatement(Expression Expression, Token? Semicolon = null) : Statement(SyntaxNodeKind.ExpressionStatement)
+public sealed record class ExpressionStatement(SyntaxTree SyntaxTree, Expression Expression, Token? Semicolon = null)
+    : Statement(SyntaxNodeKind.ExpressionStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<SyntaxNode> GetChildren()

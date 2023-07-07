@@ -231,7 +231,7 @@ internal sealed class Lexer
                 break;
 
             default:
-                _diagnostics.ReportInvalidCharacter(_position, Current);
+                _diagnostics.ReportInvalidCharacter(new TextLocation(Text, new TextSpan(_position, 1)), Current);
                 _kind = TokenKind.Invalid;
                 _position++;
                 break;
@@ -239,7 +239,7 @@ internal sealed class Lexer
 
         var text = SyntaxFacts.GetText(_kind) ?? span[..(_position - _start)];
 
-        return new Token(_kind, _start, text.ToString(), _value);
+        return new Token(_syntaxTree, _kind, _start, text.ToString(), _value);
     }
 
     private void ReadIdentifier()
@@ -304,7 +304,7 @@ internal sealed class Lexer
         object EnsureCorrectType<T>(ReadOnlySpan<char> text, TypeSymbol type) where T : unmanaged, ISpanParsable<T>
         {
             if (!T.TryParse(text, provider: null, out T value))
-                _diagnostics.ReportInvalidNumber(TextSpan.FromBounds(_start, _position), text.ToString(), type);
+                _diagnostics.ReportInvalidNumber(new TextLocation(Text, TextSpan.FromBounds(_start, _position)), text.ToString(), type);
             return value;
         }
     }
@@ -323,7 +323,7 @@ internal sealed class Lexer
                 case ['\r', ..]:
                 case ['\n', ..]:
                 case []:
-                    _diagnostics.ReportUnterminatedString(new TextSpan(_start, 1));
+                    _diagnostics.ReportUnterminatedString(new TextLocation(Text, new TextSpan(_start, 1)));
                     done = true;
                     break;
                 case ['\\', '"', ..]:

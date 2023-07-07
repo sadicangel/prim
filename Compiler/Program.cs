@@ -10,8 +10,8 @@ Parser.Default
 
 static void HandleArguments(ProgramArguments args)
 {
-    var sourceCode = File.ReadAllText(args.SourcePaths[0]);
-    var syntaxTree = SyntaxTree.Parse(sourceCode);
+    var path = Path.GetFullPath(args.SourcePaths[0]);
+    var syntaxTree = SyntaxTree.Load(path);
     var compilation = new Compilation(syntaxTree);
     var result = compilation.Evaluate(new Dictionary<Symbol, object?>());
 
