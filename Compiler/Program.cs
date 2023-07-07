@@ -22,6 +22,6 @@ static void HandleArguments(ProgramArguments args)
     }
     else
     {
-        result.Diagnostics.WriteTo(Console.Out, syntaxTree);
+        result.Diagnostics.WriteTo(Console.Out);
     }
 }

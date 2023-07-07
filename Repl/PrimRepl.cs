@@ -149,7 +149,7 @@ internal sealed class PrimRepl : ReplBase
         }
         else
         {
-            diagnostics.WriteTo(Console.Out, syntaxTree);
+            diagnostics.WriteTo(Console.Out);
         }
     }
 }

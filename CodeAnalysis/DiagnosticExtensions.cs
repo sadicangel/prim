@@ -5,7 +5,7 @@ namespace CodeAnalysis;
 
 public static class DiagnosticExtensions
 {
-    public static void WriteTo(this Diagnostic diagnostic, TextWriter writer, SyntaxTree syntaxTree)
+    public static void WriteTo(this Diagnostic diagnostic, TextWriter writer)
     {
         var fileName = diagnostic.Location.FileName;
         var startLine = diagnostic.Location.StartLine + 1;
@@ -14,8 +14,8 @@ public static class DiagnosticExtensions
         var endCharacter = diagnostic.Location.EndCharacter + 1;
 
         var span = diagnostic.Location.Span;
-        var lineIndex = syntaxTree.Text.GetLineIndex(span.Start);
-        var line = syntaxTree.Text.Lines[lineIndex];
+        var lineIndex = diagnostic.Location.Text.GetLineIndex(span.Start);
+        var line = diagnostic.Location.Text.Lines[lineIndex];
 
         var diagnosticColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
 
@@ -26,9 +26,9 @@ public static class DiagnosticExtensions
         var prefixSpan = TextSpan.FromBounds(line.Start, span.Start);
         var suffixSpan = TextSpan.FromBounds(span.End, line.End);
 
-        var prefix = syntaxTree.Text[prefixSpan];
-        var error = syntaxTree.Text[span];
-        var suffix = syntaxTree.Text[suffixSpan];
+        var prefix = diagnostic.Location.Text[prefixSpan];
+        var error = diagnostic.Location.Text[span];
+        var suffix = diagnostic.Location.Text[suffixSpan];
 
         writer.Write("    ");
         writer.Write(prefix.ToString());
@@ -49,10 +49,10 @@ public static class DiagnosticExtensions
         }
     }
 
-    public static void WriteTo(this IEnumerable<Diagnostic> diagnostics, TextWriter writer, SyntaxTree syntaxTree)
+    public static void WriteTo(this IEnumerable<Diagnostic> diagnostics, TextWriter writer)
     {
         foreach (var diagnostic in diagnostics.OrderBy(d => d.Location))
-            diagnostic.WriteTo(writer, syntaxTree);
+            diagnostic.WriteTo(writer);
         writer.WriteLine();
     }
 }
