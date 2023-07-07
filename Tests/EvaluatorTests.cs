@@ -162,17 +162,19 @@ public sealed class EvaluatorTests
         if (annotated.Spans.Count != expectedDiagnostics.Length)
             throw new InvalidOperationException("Invalid test: Number of marked spans does not match expected diagnostics");
 
-        Assert.Equal(expectedDiagnostics.Length, result.Diagnostics.Count);
+        var diagnostics = result.Diagnostics.ToArray();
+
+        Assert.Equal(expectedDiagnostics.Length, diagnostics.Length);
 
         for (var i = 0; i < expectedDiagnostics.Length; ++i)
         {
             var expectedMessage = expectedDiagnostics[i];
-            var actualMessage = result.Diagnostics[i].Message;
+            var actualMessage = diagnostics[i].Message;
 
             Assert.Equal(expectedMessage, actualMessage);
 
             var expectedSpan = annotated.Spans[i];
-            var actualSpan = result.Diagnostics[i].Location.Span;
+            var actualSpan = diagnostics[i].Location.Span;
 
             Assert.Equal(expectedSpan, actualSpan);
         }

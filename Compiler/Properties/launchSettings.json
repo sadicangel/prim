@@ -1,5 +1,9 @@
 {
   "profiles": {
+    "Compiler": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples"
+    },
     "Compiler-Hello": {
       "commandName": "Project",
       "commandLineArgs": "Samples/hello.pr"

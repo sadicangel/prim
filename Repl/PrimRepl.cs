@@ -122,7 +122,7 @@ internal sealed class PrimRepl : ReplBase
     {
         var syntaxTree = SyntaxTree.Parse(input);
 
-        var compilation = new Compilation(syntaxTree, _previousCompilation);
+        var compilation = new Compilation(_previousCompilation, syntaxTree);
 
         if (_showTree)
             syntaxTree.WriteTo(Console.Out);

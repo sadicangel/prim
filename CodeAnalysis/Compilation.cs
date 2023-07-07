@@ -10,25 +10,28 @@ public sealed class Compilation
 {
     private BoundGlobalScope? _globalScope;
 
-    public Compilation(SyntaxTree syntaxTree, Compilation? previous = null)
+    public Compilation(params SyntaxTree[] syntaxTrees) : this(previous: null, syntaxTrees) { }
+
+    public Compilation(Compilation? previous, params SyntaxTree[] syntaxTrees)
     {
-        SyntaxTree = syntaxTree;
+        SyntaxTrees = syntaxTrees;
         Previous = previous;
     }
 
-    public SyntaxTree SyntaxTree { get; }
+    public IReadOnlyList<SyntaxTree> SyntaxTrees { get; }
+
     public Compilation? Previous { get; }
 
     private BoundGlobalScope GetOrCreateGlobalScope()
     {
         if (_globalScope is null)
-            Interlocked.CompareExchange(ref _globalScope, Binder.BindGlobalScope(SyntaxTree.Root, Previous?._globalScope), comparand: null);
+            Interlocked.CompareExchange(ref _globalScope, Binder.BindGlobalScope(SyntaxTrees, Previous?._globalScope), comparand: null);
         return _globalScope;
     }
 
     public EvaluationResult Evaluate(Dictionary<Symbol, object?> globals)
     {
-        var diagnostics = SyntaxTree.Diagnostics.Concat(GetOrCreateGlobalScope().Diagnostics).ToArray();
+        var diagnostics = SyntaxTrees.SelectMany(tree => tree.Diagnostics).Concat(GetOrCreateGlobalScope().Diagnostics);
         if (diagnostics.Any())
             return new EvaluationResult(diagnostics);
 

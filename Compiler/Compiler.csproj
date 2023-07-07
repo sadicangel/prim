@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Samples\greet_1.pr" />
+    <None Remove="Samples\greet_2.pr" />
     <None Remove="Samples\hello.pr" />
     <None Remove="test.prim" />
   </ItemGroup>

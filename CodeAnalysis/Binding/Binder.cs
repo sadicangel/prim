@@ -56,14 +56,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         return new BoundProgram(globalStatement, diagnostics);
     }
 
-    internal static BoundGlobalScope BindGlobalScope(CompilationUnit compilationUnit, BoundGlobalScope? previousGlobalScope = null)
+    internal static BoundGlobalScope BindGlobalScope(IReadOnlyList<SyntaxTree> syntaxTrees, BoundGlobalScope? previousGlobalScope = null)
     {
         var parentScope = CreateParentScope(previousGlobalScope);
         var binder = new Binder(parentScope);
 
         var statements = new List<BoundStatement>();
 
-        foreach (var globalStatement in compilationUnit.Nodes.OfType<GlobalStatement>())
+        foreach (var globalStatement in syntaxTrees.SelectMany(tree => tree.Root.Nodes.OfType<GlobalStatement>()))
         {
             statements.Add(binder.BindStatement(globalStatement.Statement));
         }
