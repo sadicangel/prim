@@ -14,21 +14,22 @@ public enum SyntaxNodeKind
     ConvertExpression,
 
     // Statements
+    GlobalStatement,
+    GlobalDeclaration,
     BlockStatement,
     ExpressionStatement,
     DeclarationStatement,
     IfStatement,
     WhileStatement,
     ForStatement,
+    BreakStatement,
+    ContinueStatement,
+    ReturnStatement,
 
     // Token
     Token,
 
-    // Compilation Unit
-    CompilationUnit,
-    GlobalStatement,
+    // Nodes
     Parameter,
-    BreakStatement,
-    ContinueStatement,
-    ReturnStatement,
+    CompilationUnit,
 }

@@ -26,7 +26,6 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             scope = scope.Parent;
         }
         while (scope != null);
-        //Console.WriteLine($"Scope: {level}");
     }
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
 
@@ -63,10 +62,20 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         var statements = new List<BoundStatement>();
 
-        foreach (var globalStatement in syntaxTrees.SelectMany(tree => tree.Root.Nodes.OfType<GlobalStatement>()))
-        {
-            statements.Add(binder.BindStatement(globalStatement.Statement));
-        }
+        // We have 2 types of global nodes: Declarations and Statements.
+        var groupedNodes = syntaxTrees
+            .SelectMany(tree => tree.Root.Nodes)
+            .GroupBy(node => node.NodeKind)
+            .ToDictionary(g => g.Key, g => g.AsEnumerable());
+
+        // We want to make sure declaration run before statements.
+        if (groupedNodes.TryGetValue(SyntaxNodeKind.GlobalDeclaration, out var globalDeclarations))
+            foreach (var global in globalDeclarations.Cast<GlobalDeclaration>())
+                statements.Add(binder.BindStatement(global.Declaration));
+
+        if (groupedNodes.TryGetValue(SyntaxNodeKind.GlobalStatement, out var globalStatements))
+            foreach (var global in globalStatements.Cast<GlobalStatement>())
+                statements.Add(binder.BindStatement(global.Statement));
 
         var symbols = binder._scope.Symbols ?? Enumerable.Empty<Symbol>();
         var diagnostics = binder.Diagnostics;

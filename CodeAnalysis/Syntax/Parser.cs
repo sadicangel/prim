@@ -109,14 +109,15 @@ internal sealed class Parser
 
     private GlobalSyntaxNode ParseGlobalNode()
     {
-        switch (Current.TokenKind)
-        {
-            //case TokenKind.Const:
-            //case TokenKind.Var: // mutable global?
-            //    return ParseGlobalDeclaration();
-            default:
-                return ParseGlobalStatement();
-        }
+        if (Current.TokenKind is TokenKind.Let or TokenKind.Var)
+            return ParseGlobalDeclaration();
+        return ParseGlobalStatement();
+    }
+
+    private GlobalDeclaration ParseGlobalDeclaration()
+    {
+        var declaration = ParseDeclaration();
+        return new GlobalDeclaration(_syntaxTree, declaration);
     }
 
     private GlobalStatement ParseGlobalStatement()

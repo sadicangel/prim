@@ -1,0 +1,9 @@
+let fprint: (o: any) => void = {
+    print("fprint(" + o + ")");
+};
+
+let gprint: (o: any) => void = {
+    fprint("gprint(" + o + ")");
+};
+
+gprint("arg");

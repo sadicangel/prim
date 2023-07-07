@@ -6,9 +6,9 @@ using Compiler;
 
 Parser.Default
     .ParseArguments<ProgramArguments>(args)
-    .WithParsed(HandleArguments);
+    .MapResult(HandleArguments, _ => 1);
 
-static void HandleArguments(ProgramArguments args)
+static int HandleArguments(ProgramArguments args)
 {
     var (pathsFound, pathsNotFound) = FlattenPaths(args.SourcePaths);
 
@@ -16,7 +16,7 @@ static void HandleArguments(ProgramArguments args)
     {
         foreach (var file in pathsNotFound)
             Console.WriteLine($"Could not find file '{file}'");
-        return;
+        return 1;
     }
 
     var syntaxTrees = pathsFound
@@ -30,10 +30,12 @@ static void HandleArguments(ProgramArguments args)
     {
         if (result.Value is not null)
             Console.WriteLine(result.Value);
+        return 0;
     }
     else
     {
         result.Diagnostics.WriteTo(Console.Out);
+        return 1;
     }
 
     static (SortedSet<string> PathsFound, SortedSet<string> PathsNotFound) FlattenPaths(IEnumerable<string> paths)

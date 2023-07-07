@@ -11,6 +11,10 @@
     "Compiler-Sum": {
       "commandName": "Project",
       "commandLineArgs": "Samples/sum.pr"
+    },
+    "Compiler-Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples/functions.pr"
     }
   }
 }
