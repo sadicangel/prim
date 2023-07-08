@@ -52,7 +52,11 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         var globalStatement = new BoundBlockStatement(globalScope.Statements);
 
-        return new BoundProgram(globalStatement, diagnostics);
+        var program = new BoundProgram(globalStatement, diagnostics);
+
+        program = Lowerer.Lower(program);
+
+        return program;
     }
 
     internal static BoundGlobalScope BindGlobalScope(IReadOnlyList<SyntaxTree> syntaxTrees, BoundGlobalScope? previousGlobalScope = null)

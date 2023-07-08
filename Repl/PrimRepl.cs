@@ -11,7 +11,7 @@ internal sealed class PrimRepl : ReplBase
     private bool _showResultType = true;
     private Compilation? _previousCompilation;
 
-    public PrimRepl()
+    public PrimRepl() : base(commandPrefix: "\\")
     {
         _globals = new Dictionary<Symbol, object?>();
         _showTree = false;
@@ -71,57 +71,62 @@ internal sealed class PrimRepl : ReplBase
         }
     }
 
-    protected override bool EvaluateCommand(ReadOnlySpan<char> input)
+    [Command("tree", Description = "Show/hide parsed tree")]
+    private void TreeCommand()
     {
-        switch (input[1..])
-        {
-            case "help":
-                Console.Out.WriteColored("[show help]", ConsoleColor.DarkGray);
-                return true;
-
-            case "tree":
-                _showTree = !_showTree;
-                Console.Out.WriteColored("[show parse tree: ", ConsoleColor.DarkGray);
-                Console.Out.WriteColored((_showTree ? "on" : "off"), _showTree ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
-                Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
-                return true;
-
-            case "program":
-                _showProgram = !_showProgram;
-                Console.Out.WriteColored("[show bound tree: ", ConsoleColor.DarkGray);
-                Console.Out.WriteColored((_showProgram ? "on" : "off"), _showProgram ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
-                Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
-                return true;
-
-            case "type":
-                _showResultType = !_showResultType;
-                Console.Out.WriteColored("[show result type: ", ConsoleColor.DarkGray);
-                Console.Out.WriteColored((_showResultType ? "on" : "off"), _showResultType ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
-                Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
-                return true;
-
-            case "cls":
-                Console.Clear();
-                return true;
-
-            case "reset":
-                _previousCompilation = null;
-                return true;
-
-            case "exit":
-                return false;
-
-            default:
-                Console.Out.WriteLineColored("[unknown command]", ConsoleColor.DarkRed);
-                return true;
-
-        }
+        _showTree = !_showTree;
+        Console.Out.WriteColored("[show parse tree: ", ConsoleColor.DarkGray);
+        Console.Out.WriteColored((_showTree ? "on" : "off"), _showTree ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
+        Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
     }
 
-    protected override void Evaluate(string input)
+    [Command("program", Description = "Show/hide parsed program")]
+    private void ProgramCommand()
     {
-        var syntaxTree = SyntaxTree.Parse(input);
+        _showProgram = !_showProgram;
+        Console.Out.WriteColored("[show bound tree: ", ConsoleColor.DarkGray);
+        Console.Out.WriteColored((_showProgram ? "on" : "off"), _showProgram ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
+        Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
+    }
 
+    [Command("type", Description = "Show/hide result type")]
+    private void TypeCommand()
+    {
+        _showResultType = !_showResultType;
+        Console.Out.WriteColored("[show result type: ", ConsoleColor.DarkGray);
+        Console.Out.WriteColored((_showResultType ? "on" : "off"), _showResultType ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed);
+        Console.Out.WriteLineColored("]", ConsoleColor.DarkGray);
+    }
+
+    [Command("reset", Description = "Reset REPL")]
+    private void ResetCommand()
+    {
+        _previousCompilation = null;
+    }
+
+    [Command("load", Description = "Load script from file")]
+    private void LoadCommand(string filename)
+    {
+        if (String.IsNullOrWhiteSpace(filename))
+        {
+            Console.Out.WriteColored($"'{filename}' is not a valid file name", ConsoleColor.DarkRed);
+            return;
+        }
+
+        var path = Path.GetFullPath(filename);
+        if (!File.Exists(path))
+        {
+            Console.Out.WriteColored($"Could not find file '{path}'", ConsoleColor.DarkRed);
+            return;
+        }
+
+        Evaluate(SyntaxTree.Load(filename));
+    }
+
+    protected override void Evaluate(string input) => Evaluate(SyntaxTree.Parse(input));
+
+    private void Evaluate(SyntaxTree syntaxTree)
+    {
         var compilation = new Compilation(_previousCompilation, syntaxTree);
 
         if (_showTree)

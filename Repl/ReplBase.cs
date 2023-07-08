@@ -1,12 +1,46 @@
-﻿using System.Collections.ObjectModel;
+﻿using CodeAnalysis.Syntax;
+using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace Repl;
 
 internal abstract class ReplBase
 {
     private readonly List<string> _history = new();
+    private readonly string _commandPrefix;
+    private readonly SortedSet<Command> _commands;
     private int _historyIndex;
     private bool _done;
+
+    protected ReplBase(string commandPrefix)
+    {
+        if (String.IsNullOrWhiteSpace(commandPrefix))
+            throw new ArgumentException($"'{nameof(commandPrefix)}' cannot be null or whitespace.", nameof(commandPrefix));
+
+        _commandPrefix = commandPrefix;
+
+        _commands = InitCommands();
+    }
+
+    private SortedSet<Command> InitCommands()
+    {
+        var commands = new SortedSet<Command>();
+
+        const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance;
+        var methods = typeof(ReplBase).GetMethods(flags).Concat(GetType().GetMethods(flags));
+        foreach (var method in methods)
+        {
+            var attribute = method.GetCustomAttribute<CommandAttribute>();
+            if (attribute is null)
+                continue;
+
+            if (!commands.Add(new Command(attribute, method)))
+                throw new InvalidOperationException($"Command '{attribute.Name}' already defined");
+        }
+
+        return commands;
+    }
+
     public void Run()
     {
         while (true)
@@ -16,9 +50,9 @@ internal abstract class ReplBase
             if (String.IsNullOrEmpty(input))
                 return;
 
-            if (!input.Contains(Environment.NewLine) && input.StartsWith("\\"))
+            if (!input.Contains(Environment.NewLine) && input.StartsWith(_commandPrefix))
             {
-                EvaluateCommand(input);
+                EvaluateCommand(input.AsSpan(_commandPrefix.Length));
             }
             else
             {
@@ -310,10 +344,70 @@ internal abstract class ReplBase
     }
 
     protected void ClearHistory() => _history.Clear();
-
     protected virtual void RenderLine(string line) => Console.Write(line);
-
     protected abstract bool IsCompleteInput(string text);
-    protected abstract bool EvaluateCommand(ReadOnlySpan<char> input);
     protected abstract void Evaluate(string input);
+
+    private bool EvaluateCommand(ReadOnlySpan<char> input)
+    {
+        var index = input.IndexOf(' ');
+        var cmd = index >= 0 ? input[..index] : input;
+
+        foreach (var command in _commands)
+        {
+            if (command.Name.AsSpan().SequenceEqual(cmd))
+            {
+                var args = Array.Empty<string>();
+                if (index >= 0)
+                {
+                    args = new string(input[(index + 1)..]).Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+                    for (int i = 0; i < args.Length; ++i)
+                    {
+                        if (args[i] is ['\"', .., '\"'])
+                            args[i] = args[i][1..^1];
+                    }
+                }
+
+                if (args.Length != command.Parameters.Length)
+                {
+                    Console.Out.WriteLineColored($"Command '{cmd}' requires {command.Parameters.Length} arguments but was given {args.Length}", ConsoleColor.DarkRed);
+                    Console.Out.WriteColored($"Usage: ", ConsoleColor.DarkGray);
+                    Console.Write(command.DisplayName);
+                    Console.WriteLine();
+                    return true;
+                }
+
+                command.Method.Invoke(this, args);
+                return command.Name is not "exit";
+            }
+        }
+        Console.Out.WriteLineColored($"[unknown command '{cmd}']", ConsoleColor.DarkRed);
+        HelpCommand();
+        return true;
+    }
+
+    [Command("help", Description = "Show help")]
+    private void HelpCommand()
+    {
+        Console.WriteLine("Available commands:");
+        var maxDisplayNameLength = _commands.Max(cmd => cmd.DisplayName.Length);
+        Span<char> displayName = stackalloc char[maxDisplayNameLength];
+        foreach (var command in _commands)
+        {
+            displayName.Fill(' ');
+            command.DisplayName.CopyTo(displayName);
+            Console.Out.WriteColored(_commandPrefix, ConsoleColor.DarkYellow);
+            Console.Out.WriteColored(displayName, ConsoleColor.DarkYellow);
+            Console.Out.Write("    ");
+            Console.Out.Write(command.Description);
+            Console.WriteLine();
+        }
+    }
+
+    [Command("cls", Description = "Clear window")]
+    private void ClsCommand() => Console.Clear();
+
+    [Command("exit", Description = "Exit REPL")]
+    private void ExitCommand() { }
 }
