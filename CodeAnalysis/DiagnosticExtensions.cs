@@ -1,5 +1,4 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Text;
+﻿using CodeAnalysis.Text;
 
 namespace CodeAnalysis;
 

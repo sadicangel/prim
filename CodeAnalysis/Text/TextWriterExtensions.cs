@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Text;
 
 public static class TextWriterExtensions
 {

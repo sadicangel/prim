@@ -1,9 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CodeAnalysis.Syntax.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class VariableDeclaration(SyntaxTree SyntaxTree, Token Modifier, Token Identifier, Token? Colon, Token? Type, Token Equal, Expression Expression, Token Semicolon)
-    : Declaration(DeclarationKind.Variable, SyntaxTree)
+    : Declaration(SyntaxTree)
 {
     public VariableDeclaration(SyntaxTree syntaxTree, Token storageToken, Token identifierToken, Token equalsToken, Expression expression, Token semicolonToken)
         : this(syntaxTree, storageToken, identifierToken, Colon: null, Type: null, equalsToken, expression, semicolonToken) { }

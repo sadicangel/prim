@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class LiteralExpression(SyntaxTree SyntaxTree, Token LiteralToken, object? Value)
     : Expression(SyntaxNodeKind.LiteralExpression, SyntaxTree)

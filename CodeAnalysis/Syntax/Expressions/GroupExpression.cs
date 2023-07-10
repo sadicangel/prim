@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class GroupExpression(SyntaxTree SyntaxTree, Token OpenParenthesis, Expression Expression, Token CloseParenthesis)
     : Expression(SyntaxNodeKind.GroupExpression, SyntaxTree)

@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class BlockStatement(SyntaxTree SyntaxTree, Token OpenBrace, IReadOnlyList<Statement> Statements, Token CloseBrace)
     : Statement(SyntaxNodeKind.BlockStatement, SyntaxTree)

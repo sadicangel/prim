@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Expressions;
+
+namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class ReturnStatement(SyntaxTree SyntaxTree, Token Return, Expression? Expression, Token Semicolon)
     : Statement(SyntaxNodeKind.ReturnStatement, SyntaxTree)

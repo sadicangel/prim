@@ -1,4 +1,7 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Statements;
+
+namespace CodeAnalysis.Syntax;
 public sealed class ParserTests
 {
     private static Expression ParseExpression(string text)

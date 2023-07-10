@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Expressions;
+
+namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class ForStatement(SyntaxTree SyntaxTree, Token For, Token OpenParenthesis, Token Let, Token Identifier, Token In, Expression LowerBound, Token RangeToken, Expression UpperBound, Token CloseParenthesis, Statement Body)
     : Statement(SyntaxNodeKind.ForStatement, SyntaxTree)

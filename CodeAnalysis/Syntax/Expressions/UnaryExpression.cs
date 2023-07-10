@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class UnaryExpression(SyntaxTree SyntaxTree, Token Operator, Expression Operand)
     : Expression(SyntaxNodeKind.UnaryExpression, SyntaxTree)

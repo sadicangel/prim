@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Expressions;
+
+namespace CodeAnalysis.Syntax;
 
 public interface ISyntaxExpressionVisitor<out TResult>
 {

@@ -1,4 +1,4 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Text;
 using System.Collections.ObjectModel;
 using System.Reflection;
 

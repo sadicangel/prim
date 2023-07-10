@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Expressions;
+
+namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class ExpressionStatement(SyntaxTree SyntaxTree, Expression Expression, Token? Semicolon = null)
     : Statement(SyntaxNodeKind.ExpressionStatement, SyntaxTree)

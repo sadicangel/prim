@@ -1,7 +1,22 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Text;
+
+namespace CodeAnalysis.Syntax.Statements;
+
+public sealed record class Parameter(SyntaxTree SyntaxTree, Token Identifier, Token Colon, Token Type)
+    : SyntaxNode(SyntaxNodeKind.Parameter, SyntaxTree)
+{
+    public override TextSpan Span { get => Identifier.Span; }
+
+    public override IEnumerable<SyntaxNode> GetChildren()
+    {
+        yield return Identifier;
+        yield return Colon;
+        yield return Type;
+    }
+}
 
 public sealed record class FunctionDeclaration(SyntaxTree SyntaxTree, Token Modifier, Token Identifier, Token Colon, Token OpenParenthesis, SeparatedNodeList<Parameter> Parameters, Token CloseParenthesis, Token Arrow, Token Type, Token Equal, BlockStatement Body, Token Semicolon)
-    : Declaration(DeclarationKind.Function, SyntaxTree)
+    : Declaration(SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
 

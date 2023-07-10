@@ -1,6 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CodeAnalysis.Syntax.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class IfStatement(SyntaxTree SyntaxTree, Token If, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Statement Then, Token? ElseToken, Statement? Else)
     : Statement(SyntaxNodeKind.IfStatement, SyntaxTree)

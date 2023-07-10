@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Statements;
+
+namespace CodeAnalysis.Syntax;
 public interface ISyntaxStatementVisitor<out TResult>
 {
     TResult Visit(FunctionDeclaration functionDeclaration);

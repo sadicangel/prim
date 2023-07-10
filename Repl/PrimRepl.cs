@@ -1,6 +1,7 @@
 ﻿using CodeAnalysis;
 using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
 
 namespace Repl;
 internal sealed class PrimRepl : ReplBase

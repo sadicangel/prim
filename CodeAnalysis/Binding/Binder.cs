@@ -1,6 +1,8 @@
 ﻿using CodeAnalysis.Lowering;
 using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Statements;
 using CodeAnalysis.Text;
 using System.Diagnostics.CodeAnalysis;
 

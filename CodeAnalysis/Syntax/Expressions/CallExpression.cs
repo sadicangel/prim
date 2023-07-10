@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class CallExpression(SyntaxTree SyntaxTree, Token Identifier, Token OpenParenthesis, SeparatedNodeList<Expression> Arguments, Token CloseParenthesis)
     : Expression(SyntaxNodeKind.CallExpression, SyntaxTree)

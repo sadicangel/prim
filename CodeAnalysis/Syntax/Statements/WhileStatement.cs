@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Expressions;
+
+namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class WhileStatement(SyntaxTree SyntaxTree, Token While, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Statement Body)
     : Statement(SyntaxNodeKind.WhileStatement, SyntaxTree)

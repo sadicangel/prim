@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class BinaryExpression(SyntaxTree SyntaxTree, Expression Left, Token Operator, Expression Right)
     : Expression(SyntaxNodeKind.BinaryExpression, SyntaxTree)

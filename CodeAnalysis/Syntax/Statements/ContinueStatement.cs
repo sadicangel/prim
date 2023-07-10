@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class ContinueStatement(SyntaxTree SyntaxTree, Token Continue, Token Semicolon)
     : Statement(SyntaxNodeKind.ContinueStatement, SyntaxTree)

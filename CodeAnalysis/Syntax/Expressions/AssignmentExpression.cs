@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class AssignmentExpression(SyntaxTree SyntaxTree, Token Identifier, Token Equal, Expression Expression)
     : Expression(SyntaxNodeKind.AssignmentExpression, SyntaxTree)

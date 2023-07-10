@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class BreakStatement(SyntaxTree SyntaxTree, Token Break, Token Semicolon) : Statement(SyntaxNodeKind.BreakStatement, SyntaxTree)
 {

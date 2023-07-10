@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Text;
 
-namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis.Syntax.Statements;
 
 public abstract record class Statement(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : SyntaxNode(NodeKind, SyntaxTree)
 {

@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class IfExpression(SyntaxTree SyntaxTree, Token If, Token OpenParenthesis, Expression Condition, Token CloseParenthesis, Expression Then, Token ElseToken, Expression Else)
     : Expression(SyntaxNodeKind.IfExpression, SyntaxTree)
