@@ -1,4 +1,6 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Statements;
 using CodeAnalysis.Symbols;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;

@@ -1,6 +1,7 @@
-﻿using CodeAnalysis.Symbols;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundVariableDeclaration(VariableSymbol Variable, BoundExpression Expression) : BoundDeclaration(BoundNodeKind.VariableDeclaration, Variable)
 {

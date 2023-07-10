@@ -1,6 +1,7 @@
-﻿using CodeAnalysis.Symbols;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundForStatement(VariableSymbol Variable, BoundExpression LowerBound, BoundExpression UpperBound, BoundStatement Body, LabelSymbol Break, LabelSymbol Continue)
     : BoundLoopBodyStatement(BoundNodeKind.ForStatement, Break, Continue)

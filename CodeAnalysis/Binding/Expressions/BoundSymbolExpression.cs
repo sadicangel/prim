@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundSymbolExpression(Symbol Symbol) : BoundExpression(BoundNodeKind.SymbolExpression, Symbol.Type)
 {

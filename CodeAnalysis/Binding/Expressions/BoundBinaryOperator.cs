@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinaryOperatorKind Kind, TypeSymbol LeftType, TypeSymbol RightType, TypeSymbol ResultType)
 {

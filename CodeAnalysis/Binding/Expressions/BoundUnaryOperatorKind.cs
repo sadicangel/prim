@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Binding;
+﻿namespace CodeAnalysis.Binding.Expressions;
 
 internal enum BoundUnaryOperatorKind
 {

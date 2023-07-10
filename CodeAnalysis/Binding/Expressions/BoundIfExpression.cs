@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundIfExpression(BoundExpression Condition, BoundExpression Then, BoundExpression Else, TypeSymbol Type) : BoundExpression(BoundNodeKind.IfExpression, Type)
 {

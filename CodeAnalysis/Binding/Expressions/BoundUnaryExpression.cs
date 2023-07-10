@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Binding;
+﻿namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundUnaryExpression(BoundUnaryOperator Operator, BoundExpression Operand) : BoundExpression(BoundNodeKind.UnaryExpression, Operator.ResultType)
 {

@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Binding.Expressions;
+
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundExpressionStatement(BoundExpression Expression) : BoundStatement(BoundNodeKind.ExpressionStatement)
 {

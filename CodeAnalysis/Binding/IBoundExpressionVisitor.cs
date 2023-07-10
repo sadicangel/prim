@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Binding.Expressions;
+
+namespace CodeAnalysis.Binding;
 
 internal interface IBoundExpressionVisitor<out TResult>
 {

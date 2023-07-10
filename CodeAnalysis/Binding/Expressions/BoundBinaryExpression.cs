@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Binding;
+﻿namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundBinaryExpression(BoundExpression Left, BoundBinaryOperator Operator, BoundExpression Right) : BoundExpression(BoundNodeKind.BinaryExpression, Operator.ResultType)
 {

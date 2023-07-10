@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Binding.Statements;
+
+namespace CodeAnalysis.Binding;
 
 internal interface IBoundStatementVisitor<out TResult>
 {

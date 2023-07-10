@@ -1,6 +1,7 @@
-﻿using CodeAnalysis.Symbols;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundConditionalGotoStatement(LabelSymbol Label, BoundExpression Condition, bool JumpIfTrue = true) : BoundStatement(BoundNodeKind.ConditionalGotoStatement)
 {

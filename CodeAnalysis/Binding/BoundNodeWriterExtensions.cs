@@ -1,4 +1,6 @@
-﻿using CodeAnalysis.Symbols;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Statements;
+using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
 using System.CodeDom.Compiler;
 

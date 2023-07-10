@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundUnaryOperator(TokenKind TokenKind, BoundUnaryOperatorKind Kind, TypeSymbol OperandType, TypeSymbol ResultType)
 {

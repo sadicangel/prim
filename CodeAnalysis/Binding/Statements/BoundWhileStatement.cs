@@ -1,6 +1,7 @@
-﻿using CodeAnalysis.Symbols;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundWhileStatement(BoundExpression Condition, BoundStatement Body, LabelSymbol Break, LabelSymbol Continue)
     : BoundLoopBodyStatement(BoundNodeKind.WhileStatement, Break, Continue)

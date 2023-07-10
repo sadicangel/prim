@@ -1,4 +1,7 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Statements;
+
+namespace CodeAnalysis.Binding;
 
 internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatement>, IBoundExpressionVisitor<BoundExpression>
 {

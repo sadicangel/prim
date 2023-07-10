@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Binding;
+﻿namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundBlockStatement(IReadOnlyList<BoundStatement> Statements) : BoundStatement(BoundNodeKind.BlockStatement)
 {

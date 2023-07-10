@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Binding.Expressions;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundIfStatement(BoundExpression Condition, BoundStatement Then, BoundStatement? Else) : BoundStatement(BoundNodeKind.IfStatement)
 {

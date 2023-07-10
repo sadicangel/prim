@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Statements;
 
 internal sealed record class BoundFunctionDeclaration(FunctionSymbol Function, BoundStatement Body) : BoundDeclaration(BoundNodeKind.FunctionDeclaration, Function)
 {

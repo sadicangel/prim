@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Binding;
+﻿namespace CodeAnalysis.Binding.Statements;
 
 internal abstract record class BoundStatement(BoundNodeKind NodeKind) : BoundNode(NodeKind)
 {

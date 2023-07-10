@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Syntax;
 using System.Collections.Concurrent;
 using System.Reflection;
 using LinqExpr = System.Linq.Expressions.Expression;

@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Symbols;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Binding.Expressions;
 
 internal abstract record class BoundExpression(BoundNodeKind NodeKind, TypeSymbol Type) : BoundNode(NodeKind)
 {
