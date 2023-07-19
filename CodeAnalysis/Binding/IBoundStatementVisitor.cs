@@ -16,4 +16,5 @@ internal interface IBoundStatementVisitor<out TResult>
     TResult Visit(BoundGotoStatement statement);
     TResult Visit(BoundConditionalGotoStatement statement);
     TResult Visit(BoundReturnStatement statement);
+    TResult Visit(BoundNopStatement statement);
 }

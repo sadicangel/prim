@@ -18,7 +18,7 @@ internal sealed class Lowerer : BoundTreeRewriter
     {
         var lowerer = new Lowerer();
         var result = lowerer.Rewrite(statement);
-        return Flatten(result);
+        return RemoveDeadCode(Flatten(result));
 
         static BoundBlockStatement Flatten(BoundStatement statement)
         {
@@ -45,7 +45,29 @@ internal sealed class Lowerer : BoundTreeRewriter
         }
     }
 
-    private LabelSymbol NewLabel() => new($"Label{++_labelCount}");
+    private static BoundBlockStatement RemoveDeadCode(BoundBlockStatement block)
+    {
+        var controlFlow = ControlFlowGraph.Create(block);
+
+        var reachableNodes = new HashSet<BoundStatement>(controlFlow.Blocks.SelectMany(b => b.Statements));
+
+        // We should also remove jumps and labels that just fall through
+        // the next statement. Maybe inspect the graph instead?
+
+        var statements = block.Statements.ToList();
+        for (var i = statements.Count - 1; i >= 0; --i)
+        {
+            if (!reachableNodes.Contains(statements[i]))
+                statements.RemoveAt(i);
+        }
+
+        if (statements.Count != block.Statements.Count)
+            return new BoundBlockStatement(statements);
+
+        return block;
+    }
+
+    private LabelSymbol NewLabel(string prefix = "Label") => new($"{prefix}{++_labelCount}");
 
     protected override BoundStatement Rewrite(BoundIfStatement node)
     {
@@ -61,14 +83,11 @@ internal sealed class Lowerer : BoundTreeRewriter
             //  end:
             //
             var endLabel = NewLabel();
-            var gotoEndIfFalse = new BoundConditionalGotoStatement(endLabel, node.Condition, JumpIfTrue: false);
-            var endLabelDeclaration = new BoundLabelDeclaration(endLabel);
-            var result = new BoundBlockStatement(new List<BoundStatement>
-            {
-                gotoEndIfFalse,
-                node.Then,
-                endLabelDeclaration
-            });
+            var result = new BoundBlockBuilder()
+                .GotoIf(false, node.Condition, endLabel)
+                .Statement(node.Then)
+                .Label(endLabel)
+                .Build();
             return Rewrite(result);
         }
         else
@@ -91,20 +110,14 @@ internal sealed class Lowerer : BoundTreeRewriter
             var elseLabel = NewLabel();
             var endLabel = NewLabel();
 
-            var gotoElseIfFalse = new BoundConditionalGotoStatement(elseLabel, node.Condition, JumpIfTrue: false);
-            var gotoEnd = new BoundGotoStatement(endLabel);
-
-            var elseLabelDeclaration = new BoundLabelDeclaration(elseLabel);
-            var endLabelDeclaration = new BoundLabelDeclaration(endLabel);
-            var result = new BoundBlockStatement(new List<BoundStatement>
-            {
-                gotoElseIfFalse,
-                node.Then,
-                gotoEnd,
-                elseLabelDeclaration,
-                node.Else,
-                endLabelDeclaration
-            });
+            var result = new BoundBlockBuilder()
+                .GotoIf(false, node.Condition, elseLabel)
+                .Statement(node.Then)
+                .Goto(endLabel)
+                .Label(elseLabel)
+                .Statement(node.Else)
+                .Label(endLabel)
+                .Build();
             return Rewrite(result);
         }
     }
@@ -124,23 +137,16 @@ internal sealed class Lowerer : BoundTreeRewriter
         //  end:
         //
 
-        var checkLabel = NewLabel();
+        var bodyLabel = NewLabel();
 
-        var gotoContinue = new BoundGotoStatement(node.Continue);
-        var checkLabelDeclaration = new BoundLabelDeclaration(checkLabel);
-        var continueLabelDeclaration = new BoundLabelDeclaration(node.Continue);
-        var gotoContinueIfTrue = new BoundConditionalGotoStatement(checkLabel, node.Condition);
-        var breakLabelDeclaration = new BoundLabelDeclaration(node.Break);
-
-        var result = new BoundBlockStatement(new List<BoundStatement>
-        {
-            gotoContinue,
-            checkLabelDeclaration,
-            node.Body,
-            continueLabelDeclaration,
-            gotoContinueIfTrue,
-            breakLabelDeclaration
-        });
+        var result = new BoundBlockBuilder()
+            .Goto(node.Continue)
+            .Label(bodyLabel)
+            .Statement(node.Body)
+            .Label(node.Continue)
+            .GotoIf(true, node.Condition, bodyLabel)
+            .Label(node.Break)
+            .Build();
         return Rewrite(result);
     }
 
@@ -159,32 +165,107 @@ internal sealed class Lowerer : BoundTreeRewriter
         //          <var> = <var> + 1;
         //  }
 
-        var variableDeclaration = new BoundVariableDeclaration(node.Variable, node.LowerBound);
         var variableExpression = new BoundSymbolExpression(node.Variable);
-        var upperBoundSymbol = new VariableSymbol("#upperBound", true, node.Variable.Type);
-        var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol, node.UpperBound);
-        var condition = new BoundBinaryExpression(
-            variableExpression,
-            BoundBinaryOperator.Bind(TokenKind.Less, BuiltinTypes.I32, BuiltinTypes.I32, BuiltinTypes.Bool)!,
-            new BoundSymbolExpression(upperBoundSymbol));
-        var continueLabelDeclaration = new BoundLabelDeclaration(node.Continue);
-        var increment = new BoundExpressionStatement(
-            new BoundAssignmentExpression(
-                node.Variable,
-                new BoundBinaryExpression(
-                    variableExpression,
-                    BoundBinaryOperator.Bind(TokenKind.Plus, BuiltinTypes.I32, BuiltinTypes.I32, BuiltinTypes.I32)!,
-                    new BoundLiteralExpression(1)
-                )));
+        var upperBoundSymbol = new VariableSymbol("#upperBound", IsReadOnly: true, node.Variable.Type);
 
-        var body = new BoundBlockStatement(new List<BoundStatement> {
-            node.Body,
-            continueLabelDeclaration,
-            increment });
-        var @while = new BoundWhileStatement(condition, body, node.Break, new LabelSymbol("#continue"));
-
-        var result = new BoundBlockStatement(new List<BoundStatement> { variableDeclaration, upperBoundDeclaration, @while });
+        var result = new BoundBlockBuilder()
+            .Declare(node.Variable, node.LowerBound)
+            .Declare(upperBoundSymbol, node.UpperBound)
+            .While(
+                Expressions.LessThan(BuiltinTypes.I32, variableExpression, new BoundSymbolExpression(upperBoundSymbol)),
+                node.Break,
+                new LabelSymbol("#continue"),
+                body => body
+                    .Statement(node.Body)
+                    .Label(node.Continue)
+                    .Assign(node.Variable, Expressions.Increment(variableExpression)))
+            .Build();
 
         return Rewrite(result);
+    }
+
+    protected override BoundStatement Rewrite(BoundConditionalGotoStatement node)
+    {
+        if (node.Condition.ConstantValue is null)
+            return base.Rewrite(node);
+
+        var condition = (bool)node.Condition.ConstantValue.Value!;
+        condition = node.JumpIfTrue ? condition : !condition;
+        BoundStatement result = condition ? new BoundGotoStatement(node.Label) : new BoundNopStatement();
+
+        return Rewrite(result);
+    }
+}
+
+file static class Expressions
+{
+    public static BoundExpression LessThan(TypeSymbol type, BoundExpression left, BoundExpression right)
+    {
+        var @operator = BoundBinaryOperator.Bind(TokenKind.Less, type, type, BuiltinTypes.Bool) ?? throw new InvalidOperationException("Unexpected operator");
+        return new BoundBinaryExpression(left, @operator, right);
+    }
+
+    public static BoundExpression Increment(BoundExpression left)
+    {
+        var @operator = BoundBinaryOperator.Bind(TokenKind.Plus, BuiltinTypes.I32, BuiltinTypes.I32, BuiltinTypes.I32) ?? throw new InvalidOperationException("Unexpected operator");
+        return new BoundBinaryExpression(left, @operator, new BoundLiteralExpression(1));
+    }
+}
+
+file readonly struct BoundBlockBuilder
+{
+    private readonly List<BoundStatement> _statements;
+
+    public BoundBlockBuilder() => _statements = new List<BoundStatement>();
+
+    public BoundBlockStatement Build()
+    {
+        var block = new BoundBlockStatement(_statements.ToArray());
+        _statements.Clear();
+        return block;
+    }
+
+    public BoundBlockBuilder Statement(BoundStatement statement)
+    {
+        _statements.Add(statement);
+        return this;
+    }
+
+    public BoundBlockBuilder Declare(VariableSymbol variable, BoundExpression expression)
+    {
+        _statements.Add(new BoundVariableDeclaration(variable, expression));
+        return this;
+    }
+
+    public BoundBlockBuilder Label(LabelSymbol label)
+    {
+        _statements.Add(new BoundLabelDeclaration(label));
+        return this;
+    }
+
+    public BoundBlockBuilder Goto(LabelSymbol label)
+    {
+        _statements.Add(new BoundGotoStatement(label));
+        return this;
+    }
+
+    public BoundBlockBuilder GotoIf(bool jumpIfTrue, BoundExpression condition, LabelSymbol label)
+    {
+        _statements.Add(new BoundConditionalGotoStatement(label, condition, jumpIfTrue));
+        return this;
+    }
+
+    public BoundBlockBuilder Assign(VariableSymbol variable, BoundExpression expression)
+    {
+        _statements.Add(new BoundExpressionStatement(new BoundAssignmentExpression(variable, expression)));
+        return this;
+    }
+
+    public BoundBlockBuilder While(BoundExpression condition, LabelSymbol @break, LabelSymbol @continue, Action<BoundBlockBuilder> buildBody)
+    {
+        var bodyBuilder = new BoundBlockBuilder();
+        buildBody.Invoke(bodyBuilder);
+        _statements.Add(new BoundWhileStatement(condition, bodyBuilder.Build(), @break, @continue));
+        return this;
     }
 }

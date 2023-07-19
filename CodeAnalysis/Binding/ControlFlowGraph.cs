@@ -15,10 +15,10 @@ internal sealed class ControlFlowGraph : INode
         Branches = branches;
     }
 
-    private List<BasicBlock> Blocks { get; }
-    private List<BasicBranch> Branches { get; }
+    internal List<BasicBlock> Blocks { get; }
+    internal List<BasicBranch> Branches { get; }
 
-    private sealed record class BasicBlock(bool IsStart, bool IsEnd)
+    internal sealed record class BasicBlock(bool IsStart, bool IsEnd)
     {
         public BasicBlock() : this(IsStart: false, IsEnd: false) { }
 
@@ -44,7 +44,7 @@ internal sealed class ControlFlowGraph : INode
     }
 
     [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-    private sealed record class BasicBranch(BasicBlock From, BasicBlock To, BoundExpression? Condition)
+    internal sealed record class BasicBranch(BasicBlock From, BasicBlock To, BoundExpression? Condition)
     {
         public override string ToString()
         {
@@ -120,10 +120,10 @@ internal sealed class ControlFlowGraph : INode
                         case BoundNodeKind.ReturnStatement:
                             Connect(current, end);
                             break;
-                        case BoundNodeKind.FunctionDeclaration or BoundNodeKind.VariableDeclaration or BoundNodeKind.LabelDeclaration or BoundNodeKind.ExpressionStatement when isLastStatementInBlock:
+                        case BoundNodeKind.FunctionDeclaration or BoundNodeKind.VariableDeclaration or BoundNodeKind.LabelDeclaration or BoundNodeKind.ExpressionStatement or BoundNodeKind.NopStatement when isLastStatementInBlock:
                             Connect(current, next);
                             break;
-                        case BoundNodeKind.FunctionDeclaration or BoundNodeKind.VariableDeclaration or BoundNodeKind.LabelDeclaration or BoundNodeKind.ExpressionStatement:
+                        case BoundNodeKind.FunctionDeclaration or BoundNodeKind.VariableDeclaration or BoundNodeKind.LabelDeclaration or BoundNodeKind.ExpressionStatement or BoundNodeKind.NopStatement:
                             break;
                         default:
                             throw new InvalidOperationException($"Unexpected statement {statement.NodeKind}");
@@ -191,15 +191,9 @@ internal sealed class ControlFlowGraph : INode
                 {
                     switch (statement.NodeKind)
                     {
-                        case BoundNodeKind.FunctionDeclaration:
-                            block = StartBlock();
-                            if (block is not null)
-                                yield return block;
-                            foreach (var b in EnumerateBlocks((BoundBlockStatement)((BoundFunctionDeclaration)statement).Body))
-                                yield return b;
-
-                            break;
+                        case BoundNodeKind.NopStatement:
                         case BoundNodeKind.VariableDeclaration:
+                        case BoundNodeKind.FunctionDeclaration:
                         case BoundNodeKind.ExpressionStatement:
                             statements.Add(statement);
                             continue;
@@ -248,15 +242,18 @@ internal sealed class ControlFlowGraph : INode
     public static ControlFlowGraph Create(BoundBlockStatement statement)
     {
         var builder = new GraphBuilder(statement);
-        return builder.Build();
+        var graph = builder.Build();
+#if DEBUG
+        File.WriteAllText(Path.Combine(PathInfo.SolutionPath, "cfg.dot"), graph.ToString());
+#endif
+        return graph;
     }
 
     public static bool AllPathsReturn(BoundBlockStatement body)
     {
         var graph = Create(body);
-#if DEBUG
-        File.WriteAllText(Path.Combine(PathInfo.SolutionPath, "cfg.dot"), graph.ToString());
-#endif
+        if (graph.Blocks.Count == 0 || graph.Blocks[^1].Incoming.Count == 0)
+            return false;
 
         foreach (var branch in graph.Blocks[^1].Incoming)
         {

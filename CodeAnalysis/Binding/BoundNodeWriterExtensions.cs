@@ -80,6 +80,9 @@ internal static class BoundNodeWriterExtensions
             case BoundNodeKind.LabelDeclaration:
                 writer.WriteNode((BoundLabelDeclaration)node);
                 break;
+            case BoundNodeKind.NopStatement:
+                writer.WriteNode((BoundNopStatement)node);
+                break;
             default:
                 throw new NotSupportedException(node?.GetType()?.Name);
         }
@@ -302,6 +305,10 @@ internal static class BoundNodeWriterExtensions
         writer.WriteLine();
         if (hasIndentation)
             writer.Indent++;
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundNopStatement node)
+    {
+        writer.WriteLine("nop");
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundNeverExpression node)
     {

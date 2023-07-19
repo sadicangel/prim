@@ -2,9 +2,6 @@
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Statements;
 using CodeAnalysis.Symbols;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace CodeAnalysis;
 
@@ -39,6 +36,9 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
             var statement = statements[index];
             switch (statement.NodeKind)
             {
+                case BoundNodeKind.NopStatement:
+                    index++;
+                    break;
                 case BoundNodeKind.LabelDeclaration:
                     index++;
                     break;
