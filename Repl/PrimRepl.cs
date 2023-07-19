@@ -20,11 +20,28 @@ internal sealed class PrimRepl : ReplBase
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    protected override void RenderLine(string line)
+    private sealed record class RenderState(IReadOnlyList<Token> Tokens, SourceText Text);
+
+    protected override object? RenderLine(IReadOnlyList<string> lines, int lineIndex, object? state)
     {
-        var tokens = SyntaxTree.ParseTokens(line);
-        foreach (var token in tokens)
+        if (state is not RenderState renderState)
         {
+            var text = String.Join(Environment.NewLine, lines);
+            var sourceText = new SourceText(text);
+            var tokens = SyntaxTree.ParseTokens(sourceText);
+            renderState = new RenderState(tokens, sourceText);
+        }
+
+        var lineSpan = renderState.Text.Lines[lineIndex].Span;
+
+        foreach (var token in renderState.Tokens)
+        {
+            if (!lineSpan.OverlapsWith(token.Span))
+                continue;
+
+            var tokenSpan = TextSpan.FromBounds(Math.Max(token.Span.Start, lineSpan.Start), Math.Min(token.Span.End, lineSpan.End));
+            var tokenText = renderState.Text[tokenSpan];
+
             var color = token.TokenKind switch
             {
                 TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
@@ -35,8 +52,9 @@ internal sealed class PrimRepl : ReplBase
                 _ => ConsoleColor.DarkGray,
             };
 
-            Console.Out.WriteColored(token.Text, color);
+            Console.Out.WriteColored(tokenText, color);
         }
+        return state;
     }
 
     protected override bool IsCompleteInput(string text)

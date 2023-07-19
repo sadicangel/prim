@@ -188,6 +188,10 @@ internal sealed class Lexer
                 _position += 2;
                 break;
 
+            case ['/', '*', ..]:
+                ReadMultiLineComment();
+                break;
+
             case ['/', '/', ..]:
                 ReadSingleLineComment();
                 break;
@@ -267,6 +271,34 @@ internal sealed class Lexer
         while (Char.IsWhiteSpace(Current));
 
         _kind = TokenKind.WhiteSpace;
+    }
+
+    private void ReadMultiLineComment()
+    {
+        var done = false;
+        // Skip '/*'.
+        _position += 2;
+        while (!done)
+        {
+            var span = Text[_position..];
+            switch (span)
+            {
+                case ['\0', ..]:
+                case []:
+                    _diagnostics.ReportUnterminatedComment(new TextLocation(Text, new TextSpan(_start, 2)));
+                    done = true;
+                    break;
+                case ['*', '/', ..]:
+                    _position += 2;
+                    done = true;
+                    break;
+                default:
+                    _position++;
+                    break;
+            }
+        }
+
+        _kind = TokenKind.MultiLineComment;
     }
 
     private void ReadSingleLineComment()

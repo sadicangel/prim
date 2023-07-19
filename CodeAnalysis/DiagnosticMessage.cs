@@ -29,6 +29,8 @@ public static class DiagnosticMessage
 
     public static string UnterminatedString() => "Unterminated string literal";
 
+    public static string UnterminatedComment() => "Unterminated comment";
+
     public static string InvalidArgumentCount(string functionName, int expectedCount, int actualCount) => $"Function '{functionName}' requires {expectedCount} arguments but was given {actualCount}";
 
     public static string InvalidArgumentType(string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => $"Parameter '{parameterName}' cannot be converted from type '{actualType}' to '{expectedType}'";

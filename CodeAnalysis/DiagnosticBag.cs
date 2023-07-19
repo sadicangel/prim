@@ -37,6 +37,7 @@ public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
     public void ReportRedeclaration(Token identifier, string type) => ReportError(identifier.GetLocation(), DiagnosticMessage.Redeclaration(identifier.Text, type));
     public void ReportReadOnlyAssignment(TextLocation location, string name) => ReportError(location, DiagnosticMessage.ReadOnlyAssignment(name));
     public void ReportUnterminatedString(TextLocation location) => ReportError(location, DiagnosticMessage.UnterminatedString());
+    public void ReportUnterminatedComment(TextLocation location) => ReportError(location, DiagnosticMessage.UnterminatedComment());
     public void ReportInvalidArgumentCount(TextLocation location, string functionName, int expectedCount, int actualCount) => ReportError(location, DiagnosticMessage.InvalidArgumentCount(functionName, expectedCount, actualCount));
     public void ReportInvalidArgumentType(TextLocation location, string parameterName, TypeSymbol expectedType, TypeSymbol actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameterName, expectedType, actualType));
     public void ReportInvalidExpressionType(TextLocation location, TypeSymbol actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(actualType));

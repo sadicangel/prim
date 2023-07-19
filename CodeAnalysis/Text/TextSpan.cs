@@ -17,6 +17,8 @@ public readonly record struct TextSpan(int Start, int Length) : IComparable<Text
         return cmp != 0 ? cmp : Length - other.Length;
     }
 
+    public bool OverlapsWith(TextSpan other) => Start < other.End && End > other.Start;
+
     public static bool operator <(TextSpan left, TextSpan right) => left.CompareTo(right) < 0;
 
     public static bool operator <=(TextSpan left, TextSpan right) => left.CompareTo(right) <= 0;

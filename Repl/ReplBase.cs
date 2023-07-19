@@ -345,7 +345,12 @@ internal abstract class ReplBase
     }
 
     protected void ClearHistory() => _history.Clear();
-    protected virtual void RenderLine(string line) => Console.Write(line);
+    protected virtual object? RenderLine(IReadOnlyList<string> lines, int lineIndex, object? state)
+    {
+        Console.Write(lines[lineIndex]);
+        return state;
+    }
+
     protected abstract bool IsCompleteInput(string text);
     protected abstract void Evaluate(string input);
 

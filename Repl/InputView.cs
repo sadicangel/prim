@@ -3,16 +3,18 @@ using System.Collections.ObjectModel;
 
 namespace Repl;
 
+public delegate object? LineRenderer(IReadOnlyList<string> lines, int lineIndex, object? state);
+
 public sealed record class InputView
 {
-    private readonly Action<string> _lineRenderer;
+    private readonly LineRenderer _lineRenderer;
     private readonly ObservableCollection<string> _document;
     private readonly int _cursorTop;
     private int _renderedLineCount;
     private int _currentLineIndex;
     private int _currentCharacter;
 
-    public InputView(Action<string> lineRenderer, ObservableCollection<string> document)
+    public InputView(LineRenderer lineRenderer, ObservableCollection<string> document)
     {
         _lineRenderer = lineRenderer;
         _document = document;
@@ -57,13 +59,14 @@ public sealed record class InputView
         Console.CursorVisible = false;
         var lineCount = 0;
         var isFirst = true;
+        var state = default(object);
         foreach (var line in _document)
         {
             Console.SetCursorPosition(0, _cursorTop + lineCount);
             Console.Out.WriteColored(isFirst ? "» " : "· ", ConsoleColor.Green);
             if (isFirst) isFirst = false;
 
-            _lineRenderer.Invoke(line);
+            state = _lineRenderer.Invoke(_document, lineCount, state);
             Console.WriteLine(new string(' ', Console.WindowWidth - line.Length));
 
             lineCount++;

@@ -21,8 +21,8 @@ public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEn
 
     public static SyntaxTree Parse(string text) => new(new SourceText(text), Parser.Parse);
 
-    public static IEnumerable<Token> ParseTokens(string text) => ParseTokens(new SourceText(text));
-    public static IEnumerable<Token> ParseTokens(SourceText text)
+    public static IReadOnlyList<Token> ParseTokens(string text) => ParseTokens(new SourceText(text));
+    public static IReadOnlyList<Token> ParseTokens(SourceText text)
     {
         // A little hack, as we want to go through SyntaxTree to actually get the tokens..
         IReadOnlyList<Token> tokens = Array.Empty<Token>();
