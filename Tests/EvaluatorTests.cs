@@ -75,7 +75,7 @@ public sealed class EvaluatorTests
                             result = result + i;
                         }
                         result
-                    };
+                    }
                     f(10);
                 }
                 """,
@@ -106,7 +106,7 @@ public sealed class EvaluatorTests
                 {
                     let helloWorld: () => void = {
                         "Hello world";
-                    };
+                    }
                     helloWorld();
                 }
                 """,
@@ -118,7 +118,7 @@ public sealed class EvaluatorTests
                 {
                     let sum: (a: i32, b: i32) => i32 = {
                         return a + b;
-                    };
+                    }
                     sum(2, 3);
                 }
                 """,
@@ -137,7 +137,7 @@ public sealed class EvaluatorTests
                             i = i -1;
                         }
                         return -1;
-                    };
+                    }
                     sum(10);
                 }
                 """,
@@ -407,13 +407,13 @@ public sealed class EvaluatorTests
                 """
                 let greet: (name: str⟨=⟩⟨)⟩ => void = ⟨{⟩
                     print(name);
-                }⟨;⟩
+                }⟨⟩
                 """,
                 $"""
                 {DiagnosticMessage.UnexpectedToken(TokenKind.CloseParenthesis, TokenKind.Equal)}
                 {DiagnosticMessage.UnexpectedToken(TokenKind.OpenBrace, TokenKind.CloseParenthesis)}
                 {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.OpenBrace)}
-                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.Semicolon)}
+                {DiagnosticMessage.UnexpectedToken(TokenKind.CloseBrace, TokenKind.EOF)}
                 """
             },
             new object[]
@@ -421,7 +421,7 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.InvalidArgumentCount)} for missing arguments",
                 """
                 {
-                    let greet: (name: str) => void = { print(name); };
+                    let greet: (name: str) => void = { print(name); }
                     greet(⟨)⟩;
                 }
                 """,
@@ -434,7 +434,7 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.InvalidArgumentCount)} for exceeding arguments",
                 """
                 {
-                    let greet: (name: str) => void = { print(name); };
+                    let greet: (name: str) => void = { print(name); }
                     greet("John"⟨, "Jane", "Jack"⟩);
                 }
                 """,
@@ -455,7 +455,7 @@ public sealed class EvaluatorTests
                 let greet: (name: str) => void = {
                     print(name);
                     return ⟨0⟩;
-                };
+                }
                 """,
                 $"""
                 {DiagnosticMessage.InvalidReturnExpression("greet")}
@@ -468,7 +468,7 @@ public sealed class EvaluatorTests
                 let greet: (name: str) => str = {
                     let result = "Hello, " + name + "!";
                     ⟨return⟩;
-                };
+                }
                 """,
                 $"""
                 {DiagnosticMessage.InvalidReturnExpression("greet", BuiltinTypes.Str)}
@@ -480,7 +480,7 @@ public sealed class EvaluatorTests
                 """
                 let ⟨greet⟩: (name: str) => str = {
                     let result = "Hello, " + name + "!";
-                };
+                }
                 """,
                 $"""
                 {DiagnosticMessage.NotAllPathsReturn()}
@@ -490,7 +490,7 @@ public sealed class EvaluatorTests
             {
                 $"Reports {nameof(DiagnosticMessage.NotAllPathsReturn)}",
                 """
-                let ⟨greet⟩: (name: str) => str = { };
+                let ⟨greet⟩: (name: str) => str = { }
                 """,
                 $"""
                 {DiagnosticMessage.NotAllPathsReturn()}

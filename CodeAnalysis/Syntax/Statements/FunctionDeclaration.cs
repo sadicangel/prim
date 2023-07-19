@@ -15,7 +15,7 @@ public sealed record class Parameter(SyntaxTree SyntaxTree, Token Identifier, To
     }
 }
 
-public sealed record class FunctionDeclaration(SyntaxTree SyntaxTree, Token Modifier, Token Identifier, Token Colon, Token OpenParenthesis, SeparatedNodeList<Parameter> Parameters, Token CloseParenthesis, Token Arrow, Token Type, Token Equal, BlockStatement Body, Token Semicolon)
+public sealed record class FunctionDeclaration(SyntaxTree SyntaxTree, Token Modifier, Token Identifier, Token Colon, Token OpenParenthesis, SeparatedNodeList<Parameter> Parameters, Token CloseParenthesis, Token Arrow, Token Type, Token Equal, BlockStatement Body)
     : Declaration(SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
@@ -32,8 +32,6 @@ public sealed record class FunctionDeclaration(SyntaxTree SyntaxTree, Token Modi
         yield return Arrow;
         yield return Type;
         yield return Equal;
-        foreach (var node in Body.GetChildren())
-            yield return node;
-        yield return Semicolon;
+        yield return Body;
     }
 }

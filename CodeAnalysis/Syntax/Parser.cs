@@ -232,8 +232,7 @@ internal sealed class Parser
         var type = MatchToken(TokenKind.Identifier);
         var equal = MatchToken(TokenKind.Equal);
         var body = (BlockStatement)ParseBlockStatement();
-        var semicolon = MatchToken(TokenKind.Semicolon);
-        return new FunctionDeclaration(_syntaxTree, modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body, semicolon);
+        return new FunctionDeclaration(_syntaxTree, modifier, identifier, colon, openParenthesis, parameters, closeParenthesis, arrow, type, equal, body);
 
         Parameter ParseParameter()
         {
