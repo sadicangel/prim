@@ -13,6 +13,7 @@ public sealed class LexerTests
 
         var untestedTokenKinds = new SortedSet<TokenKind>(tokenKinds);
 
+        untestedTokenKinds.Remove(TokenKind.SingleLineComment);
         untestedTokenKinds.Remove(TokenKind.Invalid);
         untestedTokenKinds.Remove(TokenKind.EOF);
 
@@ -40,7 +41,7 @@ public sealed class LexerTests
     [MemberData(nameof(GetTokenPairsData))]
     public void Lexer_Lexes_TokenPairs(TokenInfo t1, TokenInfo t2)
     {
-        var tokens = SyntaxTree.ParseTokens((t1.Text + t2.Text)).ToArray();
+        var tokens = SyntaxTree.ParseTokens(t1.Text + t2.Text).ToArray();
 
         Assert.Equal(2, tokens.Length);
         Assert.Equal(t1.Kind, tokens[0].TokenKind);
@@ -55,7 +56,7 @@ public sealed class LexerTests
     [MemberData(nameof(GetTokenPairsWithSeparatorData))]
     public void Lexer_Lexes_TokenPairsWithSeparator(TokenInfo t1, TokenInfo separator, TokenInfo t2)
     {
-        var tokens = SyntaxTree.ParseTokens((t1.Text + separator.Text + t2.Text)).ToArray();
+        var tokens = SyntaxTree.ParseTokens(t1.Text + separator.Text + t2.Text).ToArray();
 
         Assert.Equal(3, tokens.Length);
         Assert.Equal(t1.Kind, tokens[0].TokenKind);
@@ -91,6 +92,7 @@ public sealed class LexerTests
             new TokenInfo(TokenKind.String, """
                                             "te\"st"
                                             """),
+            //new TokenInfo(TokenKind.SingleLineComment, "//"),
         };
     }
 
@@ -103,6 +105,7 @@ public sealed class LexerTests
             new TokenInfo(TokenKind.WhiteSpace, "\r"),
             new TokenInfo(TokenKind.WhiteSpace, "\n"),
             new TokenInfo(TokenKind.WhiteSpace, "\r\n"),
+            new TokenInfo(TokenKind.MultiLineComment, "/**/"),
         };
     }
 
@@ -156,6 +159,9 @@ public sealed class LexerTests
         if (k1 is TokenKind.Pipe && k2 is TokenKind.Pipe or TokenKind.PipePipe)
             return true;
 
+        if (k1 is TokenKind.Slash && k2 is TokenKind.Slash or TokenKind.Star or TokenKind.SingleLineComment or TokenKind.MultiLineComment)
+            return true;
+
         return false;
     }
 
@@ -173,6 +179,7 @@ public sealed class LexerTests
             foreach (var t2 in GetTokens())
                 if (RequireSeparator(t1.Kind, t2.Kind))
                     foreach (var s in GetSeparatorTokens())
-                        yield return (t1, s, t2);
+                        if (!RequireSeparator(t1.Kind, s.Kind) && !RequireSeparator(s.Kind, t2.Kind))
+                            yield return (t1, s, t2);
     }
 }

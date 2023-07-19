@@ -59,12 +59,10 @@ public static class SyntaxFacts
         _ => TokenKind.Identifier,
     };
 
-    public static bool IsNumber(this TokenKind kind) => kind
-        is TokenKind.I32
-        or TokenKind.F32;
-
+    public static bool IsNumber(this TokenKind kind) => kind is TokenKind.I32 or TokenKind.F32;
     public static bool IsBoolean(this TokenKind kind) => kind is TokenKind.True or TokenKind.False;
     public static bool IsLiteral(this TokenKind kind) => kind.IsNumber() || kind.IsBoolean();
+    public static bool IsComment(this TokenKind kind) => kind is TokenKind.SingleLineComment or TokenKind.MultiLineComment;
 
     public static bool IsKeyword(this TokenKind kind) => kind
         is TokenKind.As

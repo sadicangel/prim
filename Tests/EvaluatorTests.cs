@@ -142,6 +142,27 @@ public sealed class EvaluatorTests
                 }
                 """,
                 55
+            },
+            new object[]
+            {
+                """
+                {
+                    // Comment 1
+                    let sum: (a: i32, // Comment 2
+                              b: i32) // Comment 3
+                              => i32 =
+                    {
+                        let x = a /* Comment 4 */ + /* Comment 5 */ b;
+                        /* Comment 6 */ let y = x; // Comment 7
+                        // Comment 8
+                        return y;
+                        // Comment 9
+                    }
+                    // Comment 10
+                    sum(10, 20);
+                }
+                """,
+                30
             }
         };
     }
@@ -494,6 +515,16 @@ public sealed class EvaluatorTests
                 """,
                 $"""
                 {DiagnosticMessage.NotAllPathsReturn()}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnterminatedComment)}",
+                """
+                ⟨/*⟩ Comment
+                """,
+                $"""
+                {DiagnosticMessage.UnterminatedComment()}
                 """
             },
         };
