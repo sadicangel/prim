@@ -4,6 +4,7 @@ namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundSymbolExpression(Symbol Symbol) : BoundExpression(BoundNodeKind.SymbolExpression, Symbol.Type)
 {
+    public override ConstantValue? ConstantValue { get; } = (Symbol as VariableSymbol)?.Constant;
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren()
     {

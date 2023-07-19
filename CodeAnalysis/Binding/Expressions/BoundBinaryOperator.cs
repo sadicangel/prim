@@ -10,6 +10,10 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         // cast operator
         new BoundBinaryOperator(TokenKind.As, BoundBinaryOperatorKind.ExplicitCast, BuiltinTypes.Any, BuiltinTypes.Type, BuiltinTypes.Any),
 
+        // equals / not equals operators
+        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.Any, BuiltinTypes.Bool),
+        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Any, BuiltinTypes.Bool),
+
         // i32 operators
         new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.I32),
         new BoundBinaryOperator(TokenKind.Minus, BoundBinaryOperatorKind.Subtract, BuiltinTypes.I32),
@@ -20,11 +24,6 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.Ampersand, BoundBinaryOperatorKind.And, BuiltinTypes.I32),
         new BoundBinaryOperator(TokenKind.Pipe, BoundBinaryOperatorKind.Or, BuiltinTypes.I32),
         new BoundBinaryOperator(TokenKind.Hat, BoundBinaryOperatorKind.ExclusiveOr, BuiltinTypes.I32),
-
-        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.I32, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.I32, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
 
         new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, BuiltinTypes.I32, BuiltinTypes.Bool),
         new BoundBinaryOperator(TokenKind.LessEqual, BoundBinaryOperatorKind.LessThanOrEqual, BuiltinTypes.I32, BuiltinTypes.Bool),
@@ -38,11 +37,6 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulo, BuiltinTypes.F32),
         
         // f32 operators
-        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.F32, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.F32, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
-
         new BoundBinaryOperator(TokenKind.Less, BoundBinaryOperatorKind.LessThan, BuiltinTypes.F32, BuiltinTypes.Bool),
         new BoundBinaryOperator(TokenKind.LessEqual, BoundBinaryOperatorKind.LessThanOrEqual, BuiltinTypes.F32, BuiltinTypes.Bool),
         new BoundBinaryOperator(TokenKind.Greater, BoundBinaryOperatorKind.GreaterThan, BuiltinTypes.F32, BuiltinTypes.Bool),
@@ -60,11 +54,6 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Str),
         new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Str, BuiltinTypes.Any, BuiltinTypes.Str),
         new BoundBinaryOperator(TokenKind.Plus, BoundBinaryOperatorKind.Add, BuiltinTypes.Any, BuiltinTypes.Str, BuiltinTypes.Str),
-
-        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.Str, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Str, BuiltinTypes.Bool),
-        new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Bool),
     };
 
     public BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, TypeSymbol operandType)

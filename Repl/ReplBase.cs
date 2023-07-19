@@ -176,6 +176,7 @@ internal abstract class ReplBase
         document.Clear();
         document.Add(String.Empty);
         view.CurrentCharacter = 0;
+        view.CurrentLineIndex = 0;
     }
 
     private void HandleEnter(ObservableCollection<string> document, InputView view)

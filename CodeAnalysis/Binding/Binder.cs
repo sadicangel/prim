@@ -230,7 +230,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             expression = BindExpression(statement.Expression);
         }
 
-        var variable = new VariableSymbol(name, isReadOnly, expression.Type);
+        var variable = new VariableSymbol(name, isReadOnly, expression.Type, isReadOnly ? expression.ConstantValue : null);
 
         if (!_scope.TryDeclare(variable))
         {
