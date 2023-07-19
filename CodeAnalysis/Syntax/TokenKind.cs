@@ -16,6 +16,11 @@ public enum TokenKind
     Comma,
     Semicolon,
 
+    // Trivia
+    WhiteSpace,
+    SingleLineComment,
+    MultiLineComment,
+
     // Operators
     Ampersand,
     AmpersandAmpersand,
@@ -51,12 +56,11 @@ public enum TokenKind
     In,
     Continue,
     Break,
+    Return,
 
     // Variable
-    WhiteSpace,
     I32,
     F32,
     String,
     Identifier,
-    Return,
 }

@@ -188,6 +188,10 @@ internal sealed class Lexer
                 _position += 2;
                 break;
 
+            case ['/', '/', ..]:
+                ReadSingleLineComment();
+                break;
+
             case ['/', ..]:
                 _kind = TokenKind.Slash;
                 _position++;
@@ -263,6 +267,16 @@ internal sealed class Lexer
         while (Char.IsWhiteSpace(Current));
 
         _kind = TokenKind.WhiteSpace;
+    }
+
+    private void ReadSingleLineComment()
+    {
+        // Skip '//'.
+        _position += 2;
+        while (Current is not '\r' and not '\n' and not '\0')
+            _position++;
+
+        _kind = TokenKind.SingleLineComment;
     }
 
     private void ReadNumberToken()

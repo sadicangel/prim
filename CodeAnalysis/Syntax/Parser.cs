@@ -17,9 +17,18 @@ internal sealed class Parser
     private Parser(SyntaxTree syntaxTree)
     {
         _syntaxTree = syntaxTree;
-        var (tokens, diagnostics) = Lexer.Lex(syntaxTree, static t => t.TokenKind is not TokenKind.WhiteSpace and not TokenKind.Invalid);
+        var (tokens, diagnostics) = Lexer.Lex(syntaxTree, FilterToken);
         _tokens = new List<Token>(tokens);
         _diagnostics.AddRange(diagnostics);
+
+        static bool FilterToken(Token token)
+        {
+            return token.TokenKind is
+                not TokenKind.WhiteSpace and
+                not TokenKind.SingleLineComment and
+                not TokenKind.MultiLineComment and
+                not TokenKind.Invalid;
+        }
     }
 
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }

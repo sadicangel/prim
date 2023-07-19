@@ -31,6 +31,7 @@ internal sealed class PrimRepl : ReplBase
                 TokenKind.String => ConsoleColor.Magenta,
                 TokenKind.Identifier => ConsoleColor.Blue,
                 TokenKind k when k.IsKeyword() => ConsoleColor.DarkBlue,
+                TokenKind.SingleLineComment or TokenKind.MultiLineComment => ConsoleColor.DarkGreen,
                 _ => ConsoleColor.DarkGray,
             };
 
