@@ -9,8 +9,10 @@ internal static class ConstantFolding
         if (operand.ConstantValue is null)
             return null;
 
+        var operandValue = operand.ConstantValue.Value;
+
         var operation = @operator.GetOperation(operand);
-        var value = operation.Invoke(operand.ConstantValue);
+        var value = operation.Invoke(operandValue);
         return new ConstantValue(value);
     }
 
