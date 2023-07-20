@@ -14,6 +14,7 @@ public sealed class LexerTests
         var untestedTokenKinds = new SortedSet<TokenKind>(tokenKinds);
 
         untestedTokenKinds.Remove(TokenKind.SingleLineComment);
+        untestedTokenKinds.Remove(TokenKind.InvalidText);
         untestedTokenKinds.Remove(TokenKind.Invalid);
         untestedTokenKinds.Remove(TokenKind.EOF);
 
@@ -22,7 +23,7 @@ public sealed class LexerTests
         Assert.Empty(untestedTokenKinds);
     }
 
-    public static IEnumerable<object[]> GetTokensData() => GetTokens().Concat(GetSeparatorTokens()).Select(t => new object[] { t.Kind, t.Text });
+    public static IEnumerable<object[]> GetTokensData() => GetTokens().Select(t => new object[] { t.Kind, t.Text });
 
     [Theory]
     [MemberData(nameof(GetTokensData))]
@@ -34,6 +35,36 @@ public sealed class LexerTests
         Assert.Equal(kind, token.TokenKind);
         Assert.Equal(text, token.Text);
     }
+
+    [Theory]
+    [MemberData(nameof(GetSeparatorTokensData))]
+    public void Lexer_Lexes_Trivia(TokenKind kind, string text)
+    {
+        var tokens = SyntaxTree.ParseTokens(text, includeEof: true);
+
+        var token = Assert.Single(tokens);
+        Assert.Equal(TokenKind.EOF, token.TokenKind);
+        Assert.Equal(String.Empty, token.Text);
+        var trivia = Assert.Single(token.LeadingTrivia);
+        Assert.Equal(kind, trivia.TokenKind);
+        Assert.Equal(text, trivia.Text);
+    }
+
+    private static IEnumerable<TokenInfo> GetSeparatorTokens()
+    {
+        return new[]
+        {
+            new TokenInfo(TokenKind.WhiteSpace, " "),
+            new TokenInfo(TokenKind.WhiteSpace, "  "),
+            new TokenInfo(TokenKind.WhiteSpace, "\t"),
+            new TokenInfo(TokenKind.LineBreak, "\r"),
+            new TokenInfo(TokenKind.LineBreak, "\n"),
+            new TokenInfo(TokenKind.LineBreak, "\r\n"),
+            new TokenInfo(TokenKind.MultiLineComment, "/**/"),
+        };
+    }
+
+    public static IEnumerable<object[]> GetSeparatorTokensData() => GetSeparatorTokens().Select(x => new object[] { x.Kind, x.Text });
 
     public static IEnumerable<object[]> GetTokenPairsData() => GetTokenPairs().Select(p => new object[] { p.t1, p.t2 });
 
@@ -58,13 +89,16 @@ public sealed class LexerTests
     {
         var tokens = SyntaxTree.ParseTokens(t1.Text + separator.Text + t2.Text).ToArray();
 
-        Assert.Equal(3, tokens.Length);
+        Assert.Equal(2, tokens.Length);
         Assert.Equal(t1.Kind, tokens[0].TokenKind);
         Assert.Equal(t1.Text, tokens[0].Text);
-        Assert.Equal(separator.Kind, tokens[1].TokenKind);
-        Assert.Equal(separator.Text, tokens[1].Text);
-        Assert.Equal(t2.Kind, tokens[2].TokenKind);
-        Assert.Equal(t2.Text, tokens[2].Text);
+
+        var trivia = Assert.Single(tokens[0].TrailingTrivia);
+        Assert.Equal(separator.Kind, trivia.TokenKind);
+        Assert.Equal(separator.Text, trivia.Text);
+
+        Assert.Equal(t2.Kind, tokens[1].TokenKind);
+        Assert.Equal(t2.Text, tokens[1].Text);
     }
 
     private static IEnumerable<TokenInfo> GetTokens()
@@ -93,19 +127,6 @@ public sealed class LexerTests
                                             "te\"st"
                                             """),
             //new TokenInfo(TokenKind.SingleLineComment, "//"),
-        };
-    }
-
-    private static IEnumerable<TokenInfo> GetSeparatorTokens()
-    {
-        return new[]
-        {
-            new TokenInfo(TokenKind.WhiteSpace, " "),
-            new TokenInfo(TokenKind.WhiteSpace, "  "),
-            new TokenInfo(TokenKind.WhiteSpace, "\r"),
-            new TokenInfo(TokenKind.WhiteSpace, "\n"),
-            new TokenInfo(TokenKind.WhiteSpace, "\r\n"),
-            new TokenInfo(TokenKind.MultiLineComment, "/**/"),
         };
     }
 

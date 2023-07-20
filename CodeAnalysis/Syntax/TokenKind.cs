@@ -6,6 +6,13 @@ public enum TokenKind
     Invalid,
     EOF,
 
+    // Trivia
+    InvalidText,
+    LineBreak,
+    WhiteSpace,
+    SingleLineComment,
+    MultiLineComment,
+
     // Punctuation
     Arrow,
     OpenBrace,
@@ -15,11 +22,6 @@ public enum TokenKind
     Colon,
     Comma,
     Semicolon,
-
-    // Trivia
-    WhiteSpace,
-    SingleLineComment,
-    MultiLineComment,
 
     // Operators
     Ampersand,

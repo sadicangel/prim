@@ -6,6 +6,8 @@ namespace CodeAnalysis.Syntax;
 
 internal readonly record struct LexResult(IReadOnlyList<Token> Tokens, IEnumerable<Diagnostic> Diagnostics);
 
+internal delegate bool TransformToken(ref Token token);
+
 internal sealed class Lexer
 {
     private readonly SyntaxTree _syntaxTree;
@@ -29,7 +31,7 @@ internal sealed class Lexer
 
     public bool IsEOF { get => _position >= Text.Length; }
 
-    public static LexResult Lex(SyntaxTree syntaxTree, Func<Token, bool>? predicate = null)
+    public static LexResult Lex(SyntaxTree syntaxTree, TransformToken transform)
     {
         var lexer = new Lexer(syntaxTree);
         var tokens = new List<Token>();
@@ -37,7 +39,7 @@ internal sealed class Lexer
         do
         {
             token = lexer.NextToken();
-            if (predicate is null || predicate.Invoke(token))
+            if (transform.Invoke(ref token))
                 tokens.Add(token);
         }
         while (token.TokenKind != TokenKind.EOF);
@@ -52,6 +54,21 @@ internal sealed class Lexer
     }
 
     private Token NextToken()
+    {
+        var leadingTrivia = ReadTrivia(leading: true);
+
+        var tokenStart = _position;
+        ReadToken();
+        var text = SyntaxFacts.GetText(_kind) ?? Text[tokenStart.._position];
+        var tokenKind = _kind;
+        var tokenValue = _value;
+
+        var trailingTrivia = ReadTrivia(leading: false);
+
+        return new Token(_syntaxTree, tokenKind, tokenStart, text.ToString(), leadingTrivia, trailingTrivia, tokenValue);
+    }
+
+    private void ReadToken()
     {
         _start = _position;
         _kind = TokenKind.Invalid;
@@ -188,14 +205,6 @@ internal sealed class Lexer
                 _position += 2;
                 break;
 
-            case ['/', '*', ..]:
-                ReadMultiLineComment();
-                break;
-
-            case ['/', '/', ..]:
-                ReadSingleLineComment();
-                break;
-
             case ['/', ..]:
                 _kind = TokenKind.Slash;
                 _position++;
@@ -225,14 +234,6 @@ internal sealed class Lexer
                 ReadIdentifier();
                 break;
 
-            case [' ' or '\t' or '\n' or '\r', ..]:
-                ReadWhiteSpace();
-                break;
-
-            case [var whitespace, ..] when Char.IsWhiteSpace(whitespace):
-                ReadWhiteSpace();
-                break;
-
             // Control
             case []:
                 _kind = TokenKind.EOF;
@@ -244,31 +245,88 @@ internal sealed class Lexer
                 _position++;
                 break;
         }
-
-        var text = SyntaxFacts.GetText(_kind) ?? span[..(_position - _start)];
-
-        return new Token(_syntaxTree, _kind, _start, text.ToString(), _value);
     }
 
-    private void ReadIdentifier()
+    private IReadOnlyList<Trivia> ReadTrivia(bool leading)
     {
-        do
-        {
-            _position++;
-        }
-        while (Char.IsLetterOrDigit(Current));
+        var trivia = new List<Trivia>();
 
-        var text = Text[_start.._position];
-        _kind = text.GetKeywordKind();
+        var done = false;
+
+        while (!done)
+        {
+            _start = _position;
+            _kind = TokenKind.Invalid;
+            _value = null;
+
+            ReadOnlySpan<char> span = Text[_start..];
+
+            switch (span)
+            {
+                case ['/', '*', ..]:
+                    ReadMultiLineComment();
+                    break;
+
+                case ['/', '/', ..]:
+                    ReadSingleLineComment();
+                    break;
+
+                case ['\n' or '\r', ..] when !leading:
+                    ReadLineBreak();
+                    done = true;
+                    break;
+
+                case ['\n' or '\r', ..]:
+                    ReadLineBreak();
+                    break;
+
+                case [' ' or '\t', ..]:
+                    ReadWhiteSpace();
+                    break;
+
+                case [var whitespace, ..] when Char.IsWhiteSpace(whitespace):
+                    ReadWhiteSpace();
+                    break;
+
+                default:
+                    done = true;
+                    break;
+            }
+
+            if (_position > _start)
+                trivia.Add(new Trivia(_syntaxTree, _kind, _start, Text[_start.._position].ToString()));
+        }
+
+        return trivia;
+    }
+
+    private void ReadLineBreak()
+    {
+        if (Text[_position..] is ['\r', '\n', ..])
+            _position++;
+        _position++;
+        _kind = TokenKind.LineBreak;
     }
 
     private void ReadWhiteSpace()
     {
-        do
+        var done = false;
+        while (!done)
         {
-            _position++;
+            ReadOnlySpan<char> span = Text[_position..];
+
+            switch (span)
+            {
+                case []:
+                case ['\0' or '\r' or '\n', ..]:
+                case [var c, ..] when !Char.IsWhiteSpace(c):
+                    done = true;
+                    break;
+                default:
+                    _position++;
+                    break;
+            }
         }
-        while (Char.IsWhiteSpace(Current));
 
         _kind = TokenKind.WhiteSpace;
     }
@@ -283,8 +341,8 @@ internal sealed class Lexer
             var span = Text[_position..];
             switch (span)
             {
-                case ['\0', ..]:
                 case []:
+                case ['\0', ..]:
                     _diagnostics.ReportUnterminatedComment(new TextLocation(Text, new TextSpan(_start, 2)));
                     done = true;
                     break;
@@ -390,5 +448,17 @@ internal sealed class Lexer
 
         _kind = TokenKind.String;
         _value = builder.ToString();
+    }
+
+    private void ReadIdentifier()
+    {
+        do
+        {
+            _position++;
+        }
+        while (Char.IsLetterOrDigit(Current));
+
+        var text = Text[_start.._position];
+        _kind = text.GetKeywordKind();
     }
 }

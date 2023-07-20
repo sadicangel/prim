@@ -29,6 +29,9 @@ public enum SyntaxNodeKind
     // Token
     Token,
 
+    // Trivia
+    Trivia,
+
     // Nodes
     Parameter,
     CompilationUnit,

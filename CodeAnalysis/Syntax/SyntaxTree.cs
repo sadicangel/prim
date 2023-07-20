@@ -19,20 +19,21 @@ public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEn
         return new(sourceText, Parser.Parse);
     }
 
-    public static SyntaxTree Parse(string text) => new(new SourceText(text), Parser.Parse);
+    public static SyntaxTree Parse(string text) => Parse(new SourceText(text));
 
-    public static IReadOnlyList<Token> ParseTokens(string text) => ParseTokens(new SourceText(text));
-    public static IReadOnlyList<Token> ParseTokens(SourceText text)
+    public static SyntaxTree Parse(SourceText text) => new(text, Parser.Parse);
+
+    public static IReadOnlyList<Token> ParseTokens(string text, bool includeEof = false)
     {
         // A little hack, as we want to go through SyntaxTree to actually get the tokens..
         IReadOnlyList<Token> tokens = Array.Empty<Token>();
         ParseResult ParseTokens(SyntaxTree syntaxTree)
         {
-            (tokens, var diagnostics) = Lexer.Lex(syntaxTree, static t => t.TokenKind is not TokenKind.EOF);
-            var eof = tokens.Count > 0 ? tokens[^1] : new Token(syntaxTree, TokenKind.EOF, Position: 0, Text: "");
+            (tokens, var diagnostics) = Lexer.Lex(syntaxTree, includeEof ? static (ref Token t) => true : static (ref Token t) => t.TokenKind is not TokenKind.EOF);
+            var eof = tokens.Count > 0 ? tokens[^1] : new Token(syntaxTree, TokenKind.EOF, Position: 0, Text: "", Array.Empty<Trivia>(), Array.Empty<Trivia>());
             return new ParseResult(new CompilationUnit(syntaxTree, Array.Empty<GlobalSyntaxNode>(), eof), diagnostics);
         }
-        _ = new SyntaxTree(text, ParseTokens);
+        _ = new SyntaxTree(new SourceText(text), ParseTokens);
         return tokens;
     }
 

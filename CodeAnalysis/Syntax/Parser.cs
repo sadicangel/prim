@@ -9,26 +9,49 @@ internal readonly record struct ParseResult(CompilationUnit CompilationUnit, IEn
 internal sealed class Parser
 {
     private readonly SyntaxTree _syntaxTree;
-    private readonly List<Token> _tokens;
+    private readonly IReadOnlyList<Token> _tokens;
     private readonly DiagnosticBag _diagnostics = new();
     private int _successiveMatchTokenErrors = 0;
     private const int MaxSuccessiveMatchTokenErrors = 1;
 
     private Parser(SyntaxTree syntaxTree)
     {
-        _syntaxTree = syntaxTree;
-        var (tokens, diagnostics) = Lexer.Lex(syntaxTree, FilterToken);
-        _tokens = new List<Token>(tokens);
-        _diagnostics.AddRange(diagnostics);
-
-        static bool FilterToken(Token token)
+        var badTokens = new List<Token>();
+        var (tokens, diagnostics) = Lexer.Lex(syntaxTree, (ref Token token) =>
         {
-            return token.TokenKind is
-                not TokenKind.WhiteSpace and
-                not TokenKind.SingleLineComment and
-                not TokenKind.MultiLineComment and
-                not TokenKind.Invalid;
-        }
+            if (token.TokenKind is TokenKind.Invalid)
+            {
+                badTokens.Add(token);
+                return false;
+            }
+
+            if (badTokens.Count > 0)
+            {
+                var leadingTrivia = new List<Trivia>();
+                foreach (var badToken in badTokens)
+                {
+                    foreach (var trivia in badToken.LeadingTrivia)
+                        leadingTrivia.Add(trivia);
+
+                    leadingTrivia.Add(new Trivia(syntaxTree, TokenKind.InvalidText, badToken.Position, badToken.Text));
+
+                    foreach (var trivia in badToken.TrailingTrivia)
+                        leadingTrivia.Add(trivia);
+                }
+
+                badTokens.Clear();
+
+                leadingTrivia.AddRange(token.LeadingTrivia);
+
+                token = token with { LeadingTrivia = leadingTrivia };
+            }
+
+            return true;
+        });
+
+        _syntaxTree = syntaxTree;
+        _tokens = tokens;
+        _diagnostics.AddRange(diagnostics);
     }
 
     public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
@@ -59,7 +82,7 @@ internal sealed class Parser
 
             if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
                 _diagnostics.ReportUnexpectedToken(kind, Current);
-            return new Token(_syntaxTree, kind, Current.Position, "", null);
+            return new Token(_syntaxTree, kind, Current.Position, "", Array.Empty<Trivia>(), Array.Empty<Trivia>());
         }
         _successiveMatchTokenErrors = 0;
         return token;

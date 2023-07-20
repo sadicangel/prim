@@ -20,35 +20,25 @@ internal sealed class PrimRepl : ReplBase
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    private sealed record class RenderState(IReadOnlyList<Token> Tokens, SourceText Text);
-
     protected override object? RenderLine(IReadOnlyList<string> lines, int lineIndex, object? state)
     {
-        if (state is not RenderState renderState)
+        if (state is not SyntaxTree syntaxTree)
+            syntaxTree = SyntaxTree.Parse(String.Join(Environment.NewLine, lines));
+
+        var lineSpan = syntaxTree.Text.Lines[lineIndex].Span;
+        var classifiedSpans = Classifier.Classify(syntaxTree, lineSpan);
+
+        foreach (var classifiedSpan in classifiedSpans)
         {
-            var text = String.Join(Environment.NewLine, lines);
-            var sourceText = new SourceText(text);
-            var tokens = SyntaxTree.ParseTokens(sourceText);
-            renderState = new RenderState(tokens, sourceText);
-        }
+            var tokenText = syntaxTree.Text[classifiedSpan.Span];
 
-        var lineSpan = renderState.Text.Lines[lineIndex].Span;
-
-        foreach (var token in renderState.Tokens)
-        {
-            if (!lineSpan.OverlapsWith(token.Span))
-                continue;
-
-            var tokenSpan = TextSpan.FromBounds(Math.Max(token.Span.Start, lineSpan.Start), Math.Min(token.Span.End, lineSpan.End));
-            var tokenText = renderState.Text[tokenSpan];
-
-            var color = token.TokenKind switch
+            var color = classifiedSpan.Classification switch
             {
-                TokenKind k when k.IsNumber() => ConsoleColor.Cyan,
-                TokenKind.String => ConsoleColor.Magenta,
-                TokenKind.Identifier => ConsoleColor.Blue,
-                TokenKind k when k.IsKeyword() => ConsoleColor.DarkBlue,
-                TokenKind.SingleLineComment or TokenKind.MultiLineComment => ConsoleColor.DarkGreen,
+                Classification.Number => ConsoleColor.Cyan,
+                Classification.Keyword => ConsoleColor.DarkBlue,
+                Classification.Comment => ConsoleColor.DarkGreen,
+                Classification.String => ConsoleColor.Magenta,
+                Classification.Identifier => ConsoleColor.Blue,
                 _ => ConsoleColor.DarkGray,
             };
 
@@ -178,3 +168,73 @@ internal sealed class PrimRepl : ReplBase
         }
     }
 }
+
+internal sealed class Classifier
+{
+    private Classifier() { }
+
+    public static IReadOnlyList<ClassifiedSpan> Classify(SyntaxTree syntaxTree, TextSpan span)
+    {
+        var list = new List<ClassifiedSpan>();
+        ClassifyNode(syntaxTree.Root, span, list);
+        return list;
+
+        static void ClassifyNode(SyntaxNode node, TextSpan span, List<ClassifiedSpan> classifiedSpans)
+        {
+            if (!node.FullSpan.OverlapsWith(span))
+                return;
+
+            if (node is Token token)
+                ClassifyToken(token, span, classifiedSpans);
+
+            foreach (var child in node.GetChildren())
+                ClassifyNode(child, span, classifiedSpans);
+
+            static void ClassifyToken(Token token, TextSpan span, List<ClassifiedSpan> classifiedSpans)
+            {
+                foreach (var trivia in token.LeadingTrivia)
+                    AddClassification(trivia.TokenKind, trivia.Span, span, classifiedSpans);
+
+                AddClassification(token.TokenKind, token.Span, span, classifiedSpans);
+
+                foreach (var trivia in token.TrailingTrivia)
+                    AddClassification(trivia.TokenKind, trivia.Span, span, classifiedSpans);
+            }
+
+            static void AddClassification(TokenKind elementKind, TextSpan elementSpan, TextSpan span, List<ClassifiedSpan> classifiedSpans)
+            {
+                if (!elementSpan.OverlapsWith(span))
+                    return;
+
+                var adjustedStart = Math.Max(elementSpan.Start, span.Start);
+                var adjustedEnd = Math.Min(elementSpan.End, span.End);
+                var adjustedSpan = TextSpan.FromBounds(adjustedStart, adjustedEnd);
+                var classification = GetClassification(elementKind);
+                var classifiedSpan = new ClassifiedSpan(adjustedSpan, classification);
+                classifiedSpans.Add(classifiedSpan);
+
+                static Classification GetClassification(TokenKind kind) => kind switch
+                {
+                    TokenKind when kind.IsNumber() => Classification.Number,
+                    TokenKind when kind.IsKeyword() => Classification.Keyword,
+                    TokenKind when kind.IsComment() => Classification.Comment,
+                    TokenKind.String => Classification.String,
+                    TokenKind.Identifier => Classification.Identifier,
+                    _ => Classification.Text,
+                };
+            }
+        }
+    }
+}
+
+internal enum Classification
+{
+    Number,
+    Keyword,
+    Comment,
+    String,
+    Identifier,
+    Text
+}
+
+internal sealed record class ClassifiedSpan(TextSpan Span, Classification Classification);
