@@ -297,5 +297,5 @@ internal sealed class ControlFlowGraph : INode
 
         static string Quote(string s) => '\"' + s + '\"';
     }
-    public IEnumerable<INode> Descendants() => Enumerable.Empty<INode>();
+    public IEnumerable<INode> Children() => Enumerable.Empty<INode>();
 }

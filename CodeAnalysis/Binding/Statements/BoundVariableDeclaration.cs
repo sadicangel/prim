@@ -8,7 +8,7 @@ internal sealed record class BoundVariableDeclaration(SyntaxNode Syntax, Variabl
     : BoundDeclaration(BoundNodeKind.VariableDeclaration, Syntax, Variable)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants()
+    public override IEnumerable<INode> Children()
     {
         yield return Variable;
         yield return Expression;

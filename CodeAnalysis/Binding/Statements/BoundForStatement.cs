@@ -8,7 +8,7 @@ internal sealed record class BoundForStatement(SyntaxNode Syntax, VariableSymbol
     : BoundLoopBodyStatement(BoundNodeKind.ForStatement, Syntax, Break, Continue)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants()
+    public override IEnumerable<INode> Children()
     {
         yield return Continue;
         yield return Variable;

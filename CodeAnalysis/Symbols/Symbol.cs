@@ -4,7 +4,7 @@ namespace CodeAnalysis.Symbols;
 
 public abstract record class Symbol(SymbolKind SymbolKind, string Name, TypeSymbol Type) : INode
 {
-    IEnumerable<INode> INode.Descendants() => Enumerable.Empty<INode>();
+    IEnumerable<INode> INode.Children() => Enumerable.Empty<INode>();
 
     void INode.WriteTo(TextWriter writer, string indent, bool isLast)
     {

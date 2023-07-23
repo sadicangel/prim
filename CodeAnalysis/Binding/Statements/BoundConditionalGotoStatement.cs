@@ -8,7 +8,7 @@ internal sealed record class BoundConditionalGotoStatement(SyntaxNode Syntax, La
     : BoundStatement(BoundNodeKind.ConditionalGotoStatement, Syntax)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants()
+    public override IEnumerable<INode> Children()
     {
         yield return Label;
     }

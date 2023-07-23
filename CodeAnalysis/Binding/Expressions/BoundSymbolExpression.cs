@@ -8,7 +8,7 @@ internal sealed record class BoundSymbolExpression(SyntaxNode Syntax, Symbol Sym
 {
     public override ConstantValue? ConstantValue { get; } = (Symbol as VariableSymbol)?.Constant;
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants()
+    public override IEnumerable<INode> Children()
     {
         yield return Symbol;
     }

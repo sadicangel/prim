@@ -6,6 +6,6 @@ internal sealed record class BoundBlockStatement(SyntaxNode Syntax, IReadOnlyLis
     : BoundStatement(BoundNodeKind.BlockStatement, Syntax)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants() => Statements;
+    public override IEnumerable<INode> Children() => Statements;
     public override string ToString() => base.ToString();
 }

@@ -7,7 +7,7 @@ internal sealed record class BoundLabelDeclaration(SyntaxNode Syntax, LabelSymbo
     : BoundDeclaration(BoundNodeKind.LabelDeclaration, Syntax, Label)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants()
+    public override IEnumerable<INode> Children()
     {
         yield return Label;
     }

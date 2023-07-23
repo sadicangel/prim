@@ -6,7 +6,7 @@ namespace CodeAnalysis.Syntax;
 public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEnumerable<Diagnostic> Diagnostics) : INode
 {
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Root.WriteTo(writer, indent, isLast);
-    IEnumerable<INode> INode.Descendants() => ((INode)Root).Descendants();
+    IEnumerable<INode> INode.Children() => ((INode)Root).Children();
 
     private SyntaxTree(SourceText text, Func<SyntaxTree, ParseResult> parse) : this(text, null!, null!)
     {

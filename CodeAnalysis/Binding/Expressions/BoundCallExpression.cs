@@ -6,7 +6,7 @@ internal sealed record class BoundCallExpression(SyntaxNode Syntax, FunctionSymb
     : BoundExpression(BoundNodeKind.CallExpression, Syntax, Function.Type)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants()
+    public override IEnumerable<INode> Children()
     {
         foreach (var expression in Arguments)
             yield return expression;

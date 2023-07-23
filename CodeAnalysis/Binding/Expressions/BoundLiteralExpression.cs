@@ -9,5 +9,5 @@ internal sealed record class BoundLiteralExpression(SyntaxNode Syntax, object? V
     public object? Value { get => ConstantValue.Value; }
     public override ConstantValue ConstantValue { get; } = new ConstantValue(Value);
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> Descendants() => Enumerable.Empty<INode>();
+    public override IEnumerable<INode> Children() => Enumerable.Empty<INode>();
 }
