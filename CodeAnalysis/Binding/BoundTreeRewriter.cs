@@ -126,6 +126,14 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         return new BoundAssignmentExpression(node.Syntax, node.Variable, expression);
     }
 
+    protected virtual BoundExpression Rewrite(BoundCompoundAssignmentExpression node)
+    {
+        var expression = Rewrite(node.Expression);
+        if (expression == node.Expression)
+            return node;
+        return new BoundCompoundAssignmentExpression(node.Syntax, node.Variable, node.Operator, expression);
+    }
+
     protected virtual BoundExpression Rewrite(BoundIfExpression node)
     {
         var condition = Rewrite(node.Condition);
@@ -154,6 +162,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundLiteralExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundSymbolExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundAssignmentExpression expression) => Rewrite(expression);
+    BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundCompoundAssignmentExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundIfExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundCallExpression expression) => Rewrite(expression);
     BoundExpression IBoundExpressionVisitor<BoundExpression>.Visit(BoundConvertExpression expression) => Rewrite(expression);

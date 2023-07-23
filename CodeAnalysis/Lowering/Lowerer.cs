@@ -198,6 +198,30 @@ internal sealed class Lowerer : BoundTreeRewriter
 
         return Rewrite(result);
     }
+
+    protected override BoundExpression Rewrite(BoundCompoundAssignmentExpression node)
+    {
+        var newNode = (BoundCompoundAssignmentExpression)base.Rewrite(node);
+
+        // a <op> = b
+        //
+        // ---->
+        //
+        // a = (a <op> b)
+
+        var result = new BoundAssignmentExpression(
+            node.Syntax,
+            newNode.Variable,
+            new BoundBinaryExpression(
+                node.Syntax,
+                new BoundSymbolExpression(node.Syntax, node.Variable),
+                newNode.Operator,
+                newNode.Expression
+            )
+        );
+
+        return result;
+    }
 }
 
 file static class Expressions

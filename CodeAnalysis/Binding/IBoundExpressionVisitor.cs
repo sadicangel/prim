@@ -10,6 +10,7 @@ internal interface IBoundExpressionVisitor<out TResult>
     TResult Visit(BoundLiteralExpression expression);
     TResult Visit(BoundSymbolExpression expression);
     TResult Visit(BoundAssignmentExpression expression);
+    TResult Visit(BoundCompoundAssignmentExpression expression);
     TResult Visit(BoundIfExpression expression);
     TResult Visit(BoundCallExpression expression);
     TResult Visit(BoundConvertExpression expression);

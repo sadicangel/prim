@@ -9,6 +9,7 @@ public enum SyntaxNodeKind
     GroupExpression,
     NameExpression,
     AssignmentExpression,
+    CompoundAssignmentExpression,
     IfExpression,
     CallExpression,
     ConvertExpression,

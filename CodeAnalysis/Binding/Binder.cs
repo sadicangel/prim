@@ -525,6 +525,34 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         return new BoundAssignmentExpression(expression, variable, boundExpression);
     }
 
+    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(CompoundAssignmentExpression expression)
+    {
+        var boundExpression = BindExpression(expression.Expression);
+
+        if (boundExpression.Type == BuiltinTypes.Never)
+            return new BoundNeverExpression(expression);
+
+        if (!TryGetSymbol(expression.Identifier, out VariableSymbol? variable))
+        {
+            return boundExpression;
+        }
+
+        if (variable.IsReadOnly)
+        {
+            var location = new TextLocation(expression.Operator.SyntaxTree.Text, TextSpan.FromBounds(expression.Operator.Span, expression.Equal.Span));
+            _diagnostics.ReportReadOnlyAssignment(location, expression.Identifier.Text);
+        }
+
+        var boundOperator = BoundBinaryOperator.Bind(expression.Operator.TokenKind, variable.Type, boundExpression.Type, variable.Type);
+        if (boundOperator is null)
+        {
+            _diagnostics.ReportUndefinedBinaryOperator(expression.Operator, variable.Type, boundExpression.Type);
+            return new BoundNeverExpression(expression);
+        }
+
+        return new BoundCompoundAssignmentExpression(expression, variable, boundOperator, boundExpression);
+    }
+
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
     {
         if (!BuiltinTypes.TryLookup(expression.Type.Text, out var targetType))

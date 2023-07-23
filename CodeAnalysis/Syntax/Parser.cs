@@ -353,31 +353,38 @@ internal sealed class Parser
 
     private Expression ParseAssignmentExpression()
     {
-        if (Peek(0).TokenKind == TokenKind.Identifier && Peek(1).TokenKind == TokenKind.Equal)
+        if (Peek(0).TokenKind == TokenKind.Identifier)
         {
-            var identifierToken = MatchToken(TokenKind.Identifier);
-            var operatorToken = MatchToken(TokenKind.Equal);
-            var right = ParseAssignmentExpression();
-            return new AssignmentExpression(_syntaxTree, identifierToken, operatorToken, right);
+            var operatorOrEqual = Peek(1).TokenKind;
+            switch ((operatorOrEqual, Peek(2).TokenKind))
+            {
+                case (TokenKind.Equal, _):
+                    {
+                        var identifier = MatchToken(TokenKind.Identifier);
+                        var equal = MatchToken(TokenKind.Equal);
+                        var right = ParseAssignmentExpression();
+                        return new AssignmentExpression(_syntaxTree, identifier, equal, right);
+                    }
+                case (TokenKind.Ampersand, TokenKind.Equal):
+                case (TokenKind.Hat, TokenKind.Equal):
+                case (TokenKind.Minus, TokenKind.Equal):
+                case (TokenKind.Percent, TokenKind.Equal):
+                case (TokenKind.Pipe, TokenKind.Equal):
+                case (TokenKind.Plus, TokenKind.Equal):
+                case (TokenKind.Slash, TokenKind.Equal):
+                case (TokenKind.Star, TokenKind.Equal):
+                    {
+                        var identifier = MatchToken(TokenKind.Identifier);
+                        var @operator = MatchToken(operatorOrEqual);
+                        var equal = MatchToken(TokenKind.Equal);
+                        var right = ParseAssignmentExpression();
+                        return new CompoundAssignmentExpression(_syntaxTree, identifier, @operator, equal, right);
+                    }
+                default:
+                    break;
+            }
         }
 
-        //if (Peek(1).Kind == TokenKind.As)
-        //{
-        //    var expression = ParseBinaryExpression();
-        //    var asToken = MatchToken(TokenKind.As);
-        //    var typeIdentifierToken = MatchToken(TokenKind.Identifier);
-        //    return new ConvertExpression(expression, asToken, typeIdentifierToken);
-        //}
-
-        //if (Peek(0).Kind == TokenKind.If)
-        //{
-        //    var ifToken = MatchToken(TokenKind.If);
-        //    var condition = ParseAssignmentExpression();
-        //    var then = ParseAssignmentExpression();
-        //    var elseToken = MatchToken(TokenKind.Else);
-        //    var @else = ParseAssignmentExpression();
-        //    return new IfExpression(ifToken, condition, then, elseToken, @else);
-        //}
 
         return ParseBinaryExpression();
     }

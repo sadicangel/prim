@@ -13,3 +13,14 @@ internal sealed record class BoundAssignmentExpression(SyntaxNode Syntax, Variab
         yield return Expression;
     }
 }
+
+internal sealed record class BoundCompoundAssignmentExpression(SyntaxNode Syntax, VariableSymbol Variable, BoundBinaryOperator Operator, BoundExpression Expression)
+    : BoundExpression(BoundNodeKind.CompoundAssignmentExpression, Syntax, Expression.Type)
+{
+    public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
+    public override IEnumerable<INode> Children()
+    {
+        yield return Variable;
+        yield return Expression;
+    }
+}

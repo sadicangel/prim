@@ -163,7 +163,111 @@ public sealed class EvaluatorTests
                 }
                 """,
                 30
-            }
+            },
+            new object[]
+            {
+                """
+                var a = 2;
+                a += 1;
+                """,
+                3
+            },
+            new object[]
+            {
+                """
+                var a = 2;
+                a -= 1;
+                """,
+                1
+            },
+            new object[]
+            {
+                """
+                var a = 2;
+                a *= 2;
+                """,
+                4
+            },
+            new object[]
+            {
+                """
+                var a = 2;
+                a /= 2;
+                """,
+                1
+            },
+            new object[]
+            {
+                """
+                var a = 2;
+                a ^= 1;
+                """,
+                3
+            },
+            new object[]
+            {
+                """
+                var a = true;
+                a &= true;
+                """,
+                true
+            },
+            new object[]
+            {
+                """
+                var a = true;
+                a &= false;
+                """,
+                false
+            },
+            new object[]
+            {
+                """
+                var a = false;
+                a &= true;
+                """,
+                false
+            },
+            new object[]
+            {
+                """
+                var a = false;
+                a &= false;
+                """,
+                false
+            },
+            new object[]
+            {
+                """
+                var a = true;
+                a |= true;
+                """,
+                true
+            },
+            new object[]
+            {
+                """
+                var a = true;
+                a |= false;
+                """,
+                true
+            },
+            new object[]
+            {
+                """
+                var a = false;
+                a |= true;
+                """,
+                true
+            },
+            new object[]
+            {
+                """
+                var a = false;
+                a |= false;
+                """,
+                false
+            },
         };
     }
 
@@ -222,13 +326,25 @@ public sealed class EvaluatorTests
             },
             new object[]
             {
-                $"Reports {nameof(DiagnosticMessage.UndefinedName)}",
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)} for variable symbol",
                 "⟨x⟩ * 10",
                 $"{DiagnosticMessage.UndefinedName("x")}"
             },
             new object[]
             {
-                $"Reports {nameof(DiagnosticMessage.UndefinedName)}",
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)} for variable symbol in assignment",
+                "⟨x⟩ = 10",
+                $"{DiagnosticMessage.UndefinedName("x")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)} for variable symbol in compound assignment",
+                "⟨x⟩ *= 10",
+                $"{DiagnosticMessage.UndefinedName("x")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)} for type symbol",
                 """
                 {
                     10 as ⟨string⟩;
@@ -238,11 +354,32 @@ public sealed class EvaluatorTests
             },
             new object[]
             {
+                $"Reports {nameof(DiagnosticMessage.UndefinedName)} for function symbol",
+                """
+                {
+                    ⟨function⟩();
+                }
+                """,
+                $"{DiagnosticMessage.UndefinedName("function")}"
+            },
+            new object[]
+            {
                 $"Reports {nameof(DiagnosticMessage.ReadOnlyAssignment)}",
                 """
                 {
                     let x = 10;
                     x ⟨=⟩ 5;
+                }
+                """,
+                $"{DiagnosticMessage.ReadOnlyAssignment("x")}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.ReadOnlyAssignment)} for compound assignment",
+                """
+                {
+                    let x = 10;
+                    x ⟨*=⟩ 5;
                 }
                 """,
                 $"{DiagnosticMessage.ReadOnlyAssignment("x")}"
@@ -269,6 +406,17 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
                 "10 ⟨+⟩ true",
                 $"{DiagnosticMessage.UndefinedBinaryOperator("+", BuiltinTypes.I32, BuiltinTypes.Bool)}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)} for compound assignment",
+                """
+                {
+                    var x = 10;
+                    x ⟨&⟩= false;
+                }
+                """,
+                $"{DiagnosticMessage.UndefinedBinaryOperator("&", BuiltinTypes.I32, BuiltinTypes.Bool)}"
             },
             // No longer triggers as we allow the file to be empty?
             //new object[]

@@ -187,6 +187,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
     object? IBoundExpressionVisitor<object?>.Visit(BoundConvertExpression expression) => expression.Type.Convert(EvaluateExpression(expression.Expression));
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundAssignmentExpression expression) => _globals[expression.Variable] = EvaluateExpression(expression.Expression);
+    object? IBoundExpressionVisitor<object?>.Visit(BoundCompoundAssignmentExpression expression) => throw new InvalidOperationException($"Unexpected node '{expression.NodeKind}'");
 
     object? IBoundExpressionVisitor<object?>.Visit(BoundUnaryExpression expression)
     {

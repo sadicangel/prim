@@ -7,6 +7,7 @@ internal enum BoundNodeKind
     BinaryExpression,
     SymbolExpression,
     AssignmentExpression,
+    CompoundAssignmentExpression,
     CallExpression,
     NeverExpression,
     IfExpression,

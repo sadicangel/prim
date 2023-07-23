@@ -35,6 +35,9 @@ internal static class BoundNodeWriterExtensions
             case BoundNodeKind.AssignmentExpression:
                 writer.WriteNode((BoundAssignmentExpression)node);
                 break;
+            case BoundNodeKind.CompoundAssignmentExpression:
+                writer.WriteNode((BoundCompoundAssignmentExpression)node);
+                break;
             case BoundNodeKind.CallExpression:
                 writer.WriteNode((BoundCallExpression)node);
                 break;
@@ -381,6 +384,15 @@ internal static class BoundNodeWriterExtensions
     {
         writer.WriteSymbol(node.Variable);
         writer.Write(" ");
+        writer.WritePunctuation(TokenKind.Equal);
+        writer.Write(" ");
+        writer.WriteNode(node.Expression);
+    }
+    private static void WriteNode(this IndentedTextWriter writer, BoundCompoundAssignmentExpression node)
+    {
+        writer.WriteSymbol(node.Variable);
+        writer.Write(" ");
+        writer.WritePunctuation(node.Operator.TokenKind);
         writer.WritePunctuation(TokenKind.Equal);
         writer.Write(" ");
         writer.WriteNode(node.Expression);
