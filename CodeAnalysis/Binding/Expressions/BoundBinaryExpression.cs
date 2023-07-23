@@ -7,7 +7,7 @@ internal sealed record class BoundBinaryExpression(SyntaxNode Syntax, BoundExpre
 {
     public override ConstantValue? ConstantValue { get; } = ConstantFolding.Fold(Left, Operator, Right);
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Left;
         yield return Right;

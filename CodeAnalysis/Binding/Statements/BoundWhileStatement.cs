@@ -8,7 +8,7 @@ internal sealed record class BoundWhileStatement(SyntaxNode Syntax, BoundExpress
     : BoundLoopBodyStatement(BoundNodeKind.WhileStatement, Syntax, Break, Continue)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Continue;
         yield return Condition;

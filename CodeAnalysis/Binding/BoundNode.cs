@@ -9,7 +9,7 @@ internal abstract record class BoundNode(BoundNodeKind NodeKind, SyntaxNode Synt
         BoundNodeWriterExtensions.WriteTo(this, writer);
     }
 
-    public abstract IEnumerable<INode> GetChildren();
+    public abstract IEnumerable<INode> Descendants();
 
     public override string ToString()
     {

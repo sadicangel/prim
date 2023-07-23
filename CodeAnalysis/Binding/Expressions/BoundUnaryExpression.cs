@@ -7,7 +7,7 @@ internal sealed record class BoundUnaryExpression(SyntaxNode Syntax, BoundUnaryO
 {
     public override ConstantValue? ConstantValue { get; } = ConstantFolding.Fold(Operator, Operand);
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Operand;
     }

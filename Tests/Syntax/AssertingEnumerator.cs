@@ -19,7 +19,7 @@ internal sealed class AssertingEnumerator : IDisposable
                 var current = stack.Pop();
                 yield return current;
 
-                foreach (var child in current.GetChildren().Reverse())
+                foreach (var child in current.Descendants().Reverse())
                     stack.Push(child);
             }
         }

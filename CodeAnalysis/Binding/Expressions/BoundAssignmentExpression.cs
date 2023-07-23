@@ -7,7 +7,7 @@ internal sealed record class BoundAssignmentExpression(SyntaxNode Syntax, Variab
     : BoundExpression(BoundNodeKind.AssignmentExpression, Syntax, Expression.Type)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Variable;
         yield return Expression;

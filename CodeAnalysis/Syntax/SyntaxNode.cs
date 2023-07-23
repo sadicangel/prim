@@ -73,7 +73,7 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
 
     public abstract IEnumerable<SyntaxNode> GetChildren();
 
-    IEnumerable<INode> INode.GetChildren() => GetChildren();
+    IEnumerable<INode> INode.Descendants() => GetChildren();
 
     public override string ToString()
     {

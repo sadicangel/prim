@@ -6,7 +6,7 @@ internal sealed record class BoundConvertExpression(SyntaxNode Syntax, BoundExpr
     : BoundExpression(BoundNodeKind.ConvertExpression, Syntax, Type)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Expression;
     }

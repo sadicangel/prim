@@ -7,7 +7,7 @@ internal sealed record class BoundIfExpression(SyntaxNode Syntax, BoundExpressio
     : BoundExpression(BoundNodeKind.IfExpression, Syntax, Type)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Condition;
         yield return Then;

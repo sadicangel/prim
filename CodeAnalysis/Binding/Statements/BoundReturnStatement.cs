@@ -8,7 +8,7 @@ internal sealed record class BoundReturnStatement(SyntaxNode Syntax, BoundExpres
 {
     public BoundReturnStatement(SyntaxNode syntax) : this(syntax, Expression: null) { }
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         if (Expression is not null)
             yield return Expression;

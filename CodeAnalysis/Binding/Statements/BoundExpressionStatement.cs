@@ -7,7 +7,7 @@ internal sealed record class BoundExpressionStatement(SyntaxNode Syntax, BoundEx
     : BoundStatement(BoundNodeKind.ExpressionStatement, Syntax)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Expression;
     }

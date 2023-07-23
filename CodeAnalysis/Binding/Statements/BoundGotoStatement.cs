@@ -6,7 +6,7 @@ internal sealed record class BoundGotoStatement(SyntaxNode Syntax, LabelSymbol L
     : BoundStatement(BoundNodeKind.GotoStatement, Syntax)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Label;
     }

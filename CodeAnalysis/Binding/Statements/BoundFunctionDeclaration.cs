@@ -7,7 +7,7 @@ internal sealed record class BoundFunctionDeclaration(SyntaxNode Syntax, Functio
     : BoundDeclaration(BoundNodeKind.FunctionDeclaration, Syntax, Function)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Function;
         yield return Body;

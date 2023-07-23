@@ -13,7 +13,7 @@ internal sealed record class BoundIfStatement(SyntaxNode Syntax, BoundExpression
     public bool HasElseClause { get => Else is not null; }
 
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<INode> GetChildren()
+    public override IEnumerable<INode> Descendants()
     {
         yield return Condition;
         yield return Then;
