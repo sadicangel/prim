@@ -21,7 +21,7 @@ public sealed record class Token(SyntaxTree SyntaxTree, TokenKind TokenKind, int
         }
     }
 
-    public override IEnumerable<SyntaxNode> GetChildren() => Enumerable.Empty<SyntaxNode>();
+    public override IEnumerable<SyntaxNode> Children() => Enumerable.Empty<SyntaxNode>();
 
     private string GetDebuggerDisplay() => $"{TokenKind} {{ \"{Value ?? Text}\" }}";
 }

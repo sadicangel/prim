@@ -4,7 +4,7 @@ public sealed record class BinaryExpression(SyntaxTree SyntaxTree, Expression Le
     : Expression(SyntaxNodeKind.BinaryExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Left;
         yield return Operator;

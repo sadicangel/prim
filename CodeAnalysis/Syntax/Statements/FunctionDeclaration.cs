@@ -3,7 +3,7 @@
 public sealed record class Parameter(SyntaxTree SyntaxTree, Token Identifier, Token Colon, Token Type)
     : SyntaxNode(SyntaxNodeKind.Parameter, SyntaxTree)
 {
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Identifier;
         yield return Colon;
@@ -16,7 +16,7 @@ public sealed record class FunctionDeclaration(SyntaxTree SyntaxTree, Token Modi
     : Declaration(SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Modifier;
         yield return Identifier;

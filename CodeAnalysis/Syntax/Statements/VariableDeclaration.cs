@@ -14,7 +14,7 @@ public sealed record class VariableDeclaration(SyntaxTree SyntaxTree, Token Modi
 
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
 
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Modifier;
         yield return Identifier;

@@ -6,7 +6,7 @@ public sealed record class WhileStatement(SyntaxTree SyntaxTree, Token While, To
     : Statement(SyntaxNodeKind.WhileStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return While;
         yield return OpenParenthesis;

@@ -6,7 +6,7 @@ public sealed record class ForStatement(SyntaxTree SyntaxTree, Token For, Token 
     : Statement(SyntaxNodeKind.ForStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return For;
         yield return OpenParenthesis;

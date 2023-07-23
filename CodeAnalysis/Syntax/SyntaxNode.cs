@@ -4,15 +4,17 @@ namespace CodeAnalysis.Syntax;
 
 public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : INode
 {
-    public virtual TextSpan Span { get => TextSpan.FromBounds(GetChildren().First().Span.Start, GetChildren().Last().Span.End); }
-    public virtual TextSpan FullSpan { get => TextSpan.FromBounds(GetChildren().First().FullSpan.Start, GetChildren().Last().FullSpan.End); }
+    public virtual TextSpan Span { get => TextSpan.FromBounds(Children().First().Span.Start, Children().Last().Span.End); }
+    public virtual TextSpan FullSpan { get => TextSpan.FromBounds(Children().First().FullSpan.Start, Children().Last().FullSpan.End); }
+
+    public SyntaxNode? Parent { get => SyntaxTree.GetParent(this); }
 
     public Token GetLastToken()
     {
         if (this is Token token)
             return token;
 
-        return GetChildren().Last().GetLastToken();
+        return Children().Last().GetLastToken();
     }
 
     public TextLocation GetLocation() => new(SyntaxTree.Text, Span);
@@ -65,15 +67,46 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
 
         indent += isLast ? "   " : "│  ";
 
-        var lastChild = GetChildren().LastOrDefault();
+        var lastChild = Children().LastOrDefault();
 
-        foreach (var child in GetChildren())
+        foreach (var child in Children())
             child.WriteTo(writer, indent, child == lastChild);
     }
 
-    public abstract IEnumerable<SyntaxNode> GetChildren();
+    public abstract IEnumerable<SyntaxNode> Children();
 
-    IEnumerable<INode> INode.Children() => GetChildren();
+    IEnumerable<INode> INode.Children() => Children();
+
+    public IEnumerable<SyntaxNode> DescendantsAndSelf()
+    {
+        yield return this;
+
+        var queue = new Queue<SyntaxNode>();
+        queue.Enqueue(this);
+
+        while (queue.Count > 0)
+        {
+            var node = queue.Dequeue();
+            foreach (var child in node.Children())
+            {
+                yield return child;
+                queue.Enqueue(child);
+            }
+        }
+    }
+
+    public IEnumerable<SyntaxNode> Descendants() => DescendantsAndSelf().Skip(1);
+
+    public IEnumerable<SyntaxNode> AncestorsAndSelf()
+    {
+        var node = this;
+        while (node is not null)
+        {
+            yield return node;
+            node = node.Parent;
+        }
+    }
+    public IEnumerable<SyntaxNode> Ancestors() => AncestorsAndSelf().Skip(1);
 
     public override string ToString()
     {

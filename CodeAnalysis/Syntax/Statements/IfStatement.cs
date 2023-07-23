@@ -13,7 +13,7 @@ public sealed record class IfStatement(SyntaxTree SyntaxTree, Token If, Token Op
     public bool HasElseClause { get => ElseToken is not null && Else is not null; }
 
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return If;
         yield return Condition;

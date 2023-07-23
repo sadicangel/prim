@@ -187,7 +187,7 @@ internal sealed class Classifier
             if (node is Token token)
                 ClassifyToken(token, span, classifiedSpans);
 
-            foreach (var child in node.GetChildren())
+            foreach (var child in node.Children())
                 ClassifyNode(child, span, classifiedSpans);
 
             static void ClassifyToken(Token token, TextSpan span, List<ClassifiedSpan> classifiedSpans)

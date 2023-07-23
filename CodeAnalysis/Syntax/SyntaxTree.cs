@@ -5,12 +5,41 @@ namespace CodeAnalysis.Syntax;
 
 public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEnumerable<Diagnostic> Diagnostics) : INode
 {
+    private Dictionary<SyntaxNode, SyntaxNode?> _nodeParents;
+
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Root.WriteTo(writer, indent, isLast);
     IEnumerable<INode> INode.Children() => ((INode)Root).Children();
 
     private SyntaxTree(SourceText text, Func<SyntaxTree, ParseResult> parse) : this(text, null!, null!)
     {
         (Root, Diagnostics) = parse.Invoke(this);
+    }
+
+    internal SyntaxNode? GetParent(SyntaxNode node)
+    {
+        if (_nodeParents is null)
+            Interlocked.CompareExchange(ref _nodeParents, CreateNodeParents(Root), null);
+
+        return _nodeParents[node];
+
+        static Dictionary<SyntaxNode, SyntaxNode?> CreateNodeParents(CompilationUnit root)
+        {
+            var result = new Dictionary<SyntaxNode, SyntaxNode?>
+            {
+                [root] = null
+            };
+            CreateParentsDictionary(result, root);
+            return result;
+
+            static void CreateParentsDictionary(Dictionary<SyntaxNode, SyntaxNode?> result, SyntaxNode node)
+            {
+                foreach (var child in node.Children())
+                {
+                    result.Add(child, node);
+                    CreateParentsDictionary(result, child);
+                }
+            }
+        }
     }
 
     public static SyntaxTree Load(string fileName)

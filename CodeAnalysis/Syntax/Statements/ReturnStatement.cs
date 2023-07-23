@@ -8,7 +8,7 @@ public sealed record class ReturnStatement(SyntaxTree SyntaxTree, Token Return, 
     public ReturnStatement(SyntaxTree syntaxTree, Token @return, Token semicolon) : this(syntaxTree, @return, Expression: null, semicolon) { }
 
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Return;
         if (Expression is not null)

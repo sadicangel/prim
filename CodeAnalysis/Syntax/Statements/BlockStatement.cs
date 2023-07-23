@@ -4,7 +4,7 @@ public sealed record class BlockStatement(SyntaxTree SyntaxTree, Token OpenBrace
     : Statement(SyntaxNodeKind.BlockStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return OpenBrace;
         foreach (var statement in Statements)

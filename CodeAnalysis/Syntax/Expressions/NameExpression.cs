@@ -4,7 +4,7 @@ public sealed record class NameExpression(SyntaxTree SyntaxTree, Token Identifie
     : Expression(SyntaxNodeKind.NameExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Identifier;
     }

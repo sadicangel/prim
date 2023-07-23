@@ -4,7 +4,7 @@ public sealed record class ContinueStatement(SyntaxTree SyntaxTree, Token Contin
     : Statement(SyntaxNodeKind.ContinueStatement, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxStatementVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return Continue;
         yield return Semicolon;

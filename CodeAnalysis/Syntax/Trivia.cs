@@ -9,5 +9,5 @@ public sealed record class Trivia(SyntaxTree SyntaxTree, TokenKind TokenKind, in
 
     public override TextSpan FullSpan { get => Span; }
 
-    public override IEnumerable<SyntaxNode> GetChildren() => Enumerable.Empty<SyntaxNode>();
+    public override IEnumerable<SyntaxNode> Children() => Enumerable.Empty<SyntaxNode>();
 }

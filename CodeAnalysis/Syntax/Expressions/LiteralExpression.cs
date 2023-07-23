@@ -5,6 +5,6 @@ public sealed record class LiteralExpression(SyntaxTree SyntaxTree, Token Litera
 {
     public LiteralExpression(SyntaxTree syntaxTree, Token literal) : this(syntaxTree, literal, literal.Value) { }
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren() { yield return LiteralToken; }
+    public override IEnumerable<SyntaxNode> Children() { yield return LiteralToken; }
     public override string ToString() => base.ToString();
 }

@@ -4,7 +4,7 @@ public sealed record class IfExpression(SyntaxTree SyntaxTree, Token If, Token O
     : Expression(SyntaxNodeKind.IfExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
-    public override IEnumerable<SyntaxNode> GetChildren()
+    public override IEnumerable<SyntaxNode> Children()
     {
         yield return If;
         yield return OpenParenthesis;
