@@ -11,7 +11,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var expression = Rewrite(node.Expression);
         if (expression == node.Expression)
             return node;
-        return new BoundVariableDeclaration(node.Variable, expression);
+        return new BoundVariableDeclaration(node.Syntax, node.Variable, expression);
     }
 
     protected virtual BoundStatement Rewrite(BoundFunctionDeclaration node)
@@ -19,7 +19,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var body = Rewrite(node.Body);
         if (body == node.Body)
             return node;
-        return new BoundFunctionDeclaration(node.Function, body);
+        return new BoundFunctionDeclaration(node.Syntax, node.Function, body);
     }
 
     protected virtual BoundStatement Rewrite(BoundBlockStatement node)
@@ -36,15 +36,12 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
                     statements.Add(node.Statements[j]);
             }
 
-            if (statements is not null)
-            {
-                statements.Add(newStatement);
-            }
+            statements?.Add(newStatement);
         }
         if (statements is null)
             return node;
 
-        return new BoundBlockStatement(statements);
+        return new BoundBlockStatement(node.Syntax, statements);
     }
 
     protected virtual BoundStatement Rewrite(BoundExpressionStatement node)
@@ -52,7 +49,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var expression = Rewrite(node.Expression);
         if (expression == node.Expression)
             return node;
-        return new BoundExpressionStatement(expression);
+        return new BoundExpressionStatement(node.Syntax, expression);
     }
 
     protected virtual BoundStatement Rewrite(BoundIfStatement node)
@@ -62,7 +59,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var @else = node.Else is not null ? Rewrite(node.Else) : null;
         if (condition == node.Condition && then == node.Then && @else == node.Else)
             return node;
-        return new BoundIfStatement(condition, then, @else);
+        return new BoundIfStatement(node.Syntax, condition, then, @else);
     }
 
     protected virtual BoundStatement Rewrite(BoundWhileStatement node)
@@ -71,7 +68,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var body = Rewrite(node.Body);
         if (condition == node.Condition && body == node.Body)
             return node;
-        return new BoundWhileStatement(condition, body, node.Break, node.Continue);
+        return new BoundWhileStatement(node.Syntax, condition, body, node.Break, node.Continue);
     }
 
     protected virtual BoundStatement Rewrite(BoundForStatement node)
@@ -81,7 +78,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var body = Rewrite(node.Body);
         if (lowerBound == upperBound && upperBound == node.UpperBound && body == node.Body)
             return node;
-        return new BoundForStatement(node.Variable, lowerBound, upperBound, body, node.Break, node.Continue);
+        return new BoundForStatement(node.Syntax, node.Variable, lowerBound, upperBound, body, node.Break, node.Continue);
     }
 
     protected virtual BoundStatement Rewrite(BoundLabelDeclaration node) => node;
@@ -91,14 +88,14 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var condition = Rewrite(node.Condition);
         if (condition == node.Condition)
             return node;
-        return new BoundConditionalGotoStatement(node.Label, condition, node.JumpIfTrue);
+        return new BoundConditionalGotoStatement(node.Syntax, node.Label, condition, node.JumpIfTrue);
     }
     protected virtual BoundStatement Rewrite(BoundReturnStatement node)
     {
         var expression = node.Expression is null ? null : Rewrite(node.Expression);
         if (expression == node.Expression)
             return node;
-        return new BoundReturnStatement(expression);
+        return new BoundReturnStatement(node.Syntax, expression);
     }
     protected virtual BoundStatement Rewrite(BoundNopStatement node) => node;
 
@@ -109,7 +106,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var expression = Rewrite(node.Operand);
         if (expression == node.Operand)
             return node;
-        return new BoundUnaryExpression(node.Operator, expression);
+        return new BoundUnaryExpression(node.Syntax, node.Operator, expression);
     }
     protected virtual BoundExpression Rewrite(BoundBinaryExpression node)
     {
@@ -117,7 +114,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var right = Rewrite(node.Right);
         if (left == node.Left && right == node.Right)
             return node;
-        return new BoundBinaryExpression(left, node.Operator, right);
+        return new BoundBinaryExpression(node.Syntax, left, node.Operator, right);
     }
     protected virtual BoundExpression Rewrite(BoundLiteralExpression node) => node;
     protected virtual BoundExpression Rewrite(BoundSymbolExpression node) => node;
@@ -126,7 +123,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var expression = Rewrite(node.Expression);
         if (expression == node.Expression)
             return node;
-        return new BoundAssignmentExpression(node.Variable, expression);
+        return new BoundAssignmentExpression(node.Syntax, node.Variable, expression);
     }
 
     protected virtual BoundExpression Rewrite(BoundIfExpression node)
@@ -136,7 +133,7 @@ internal abstract class BoundTreeRewriter : IBoundStatementVisitor<BoundStatemen
         var @else = Rewrite(node.Else);
         if (condition == node.Condition && then == node.Then && @else == node.Else)
             return node;
-        return new BoundIfExpression(condition, then, @else, node.Type);
+        return new BoundIfExpression(node.Syntax, condition, then, @else, node.Type);
     }
 
     protected virtual BoundExpression Rewrite(BoundCallExpression node) => node;

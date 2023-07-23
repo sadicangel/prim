@@ -10,4 +10,5 @@ public sealed record class AssignmentExpression(SyntaxTree SyntaxTree, Token Ide
         yield return Equal;
         yield return Expression;
     }
+    public override string ToString() => base.ToString();
 }

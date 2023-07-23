@@ -66,9 +66,7 @@ internal sealed class ControlFlowGraph : INode
             var start = new BasicBlock(IsStart: true, IsEnd: false);
             var end = new BasicBlock(IsStart: false, IsEnd: true);
 
-            var blocks = new List<BasicBlock>();
-            foreach (var block in EnumerateBlocks(Block))
-                blocks.Add(block);
+            var blocks = EnumerateBlocks(Block).ToList();
 
             var branches = new List<BasicBranch>();
 
@@ -80,7 +78,6 @@ internal sealed class ControlFlowGraph : INode
             {
                 Connect(start, blocks[0]);
             }
-
             foreach (var block in blocks)
             {
                 foreach (var statement in block.Statements)
@@ -176,10 +173,10 @@ internal sealed class ControlFlowGraph : INode
             BoundExpression Negate(BoundExpression condition)
             {
                 if (condition is BoundLiteralExpression literal)
-                    return new BoundLiteralExpression(!((bool)literal.Value!));
+                    return new BoundLiteralExpression(condition.Syntax, !((bool)literal.Value!));
 
                 var @operator = BoundUnaryOperator.Bind(TokenKind.Bang, BuiltinTypes.Bool)!;
-                return new BoundUnaryExpression(@operator, condition);
+                return new BoundUnaryExpression(condition.Syntax, @operator, condition);
             }
 
             static IEnumerable<BasicBlock> EnumerateBlocks(BoundBlockStatement boundBlock)

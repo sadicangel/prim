@@ -12,4 +12,5 @@ public sealed record class ExpressionStatement(SyntaxTree SyntaxTree, Expression
         if (Semicolon is not null)
             yield return Semicolon;
     }
+    public override string ToString() => base.ToString();
 }

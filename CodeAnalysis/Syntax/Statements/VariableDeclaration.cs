@@ -27,4 +27,5 @@ public sealed record class VariableDeclaration(SyntaxTree SyntaxTree, Token Modi
         yield return Expression;
         yield return Semicolon;
     }
+    public override string ToString() => base.ToString();
 }

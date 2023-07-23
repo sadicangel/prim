@@ -10,4 +10,5 @@ public sealed record class ConvertExpression(SyntaxTree SyntaxTree, Expression E
         yield return As;
         yield return Type;
     }
+    public override string ToString() => base.ToString();
 }

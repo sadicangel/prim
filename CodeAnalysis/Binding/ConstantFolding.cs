@@ -4,7 +4,7 @@ namespace CodeAnalysis.Binding;
 
 internal static class ConstantFolding
 {
-    public static ConstantValue? Compute(BoundUnaryOperator @operator, BoundExpression operand)
+    public static ConstantValue? Fold(BoundUnaryOperator @operator, BoundExpression operand)
     {
         if (operand.ConstantValue is null)
             return null;
@@ -16,7 +16,7 @@ internal static class ConstantFolding
         return new ConstantValue(value);
     }
 
-    public static ConstantValue? Compute(BoundExpression left, BoundBinaryOperator @operator, BoundExpression right)
+    public static ConstantValue? Fold(BoundExpression left, BoundBinaryOperator @operator, BoundExpression right)
     {
         var leftConstant = left.ConstantValue;
         var leftValue = leftConstant?.Value;

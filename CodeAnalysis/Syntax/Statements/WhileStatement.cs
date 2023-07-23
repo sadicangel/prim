@@ -14,4 +14,5 @@ public sealed record class WhileStatement(SyntaxTree SyntaxTree, Token While, To
         yield return CloseParenthesis;
         yield return Body;
     }
+    public override string ToString() => base.ToString();
 }

@@ -1,8 +1,10 @@
 ﻿using CodeAnalysis.Symbols;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 
-internal sealed record class BoundNeverExpression() : BoundExpression(BoundNodeKind.NeverExpression, BuiltinTypes.Never)
+internal sealed record class BoundNeverExpression(SyntaxNode Syntax)
+    : BoundExpression(BoundNodeKind.NeverExpression, Syntax, BuiltinTypes.Never)
 {
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();

@@ -1,6 +1,9 @@
-﻿namespace CodeAnalysis.Binding.Statements;
+﻿using CodeAnalysis.Syntax;
 
-internal sealed record class BoundNopStatement() : BoundStatement(BoundNodeKind.NopStatement)
+namespace CodeAnalysis.Binding.Statements;
+
+internal sealed record class BoundNopStatement(SyntaxNode Syntax)
+    : BoundStatement(BoundNodeKind.NopStatement, Syntax)
 {
     public override T Accept<T>(IBoundStatementVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren() => Enumerable.Empty<INode>();

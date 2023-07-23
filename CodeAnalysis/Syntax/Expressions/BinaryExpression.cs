@@ -4,11 +4,11 @@ public sealed record class BinaryExpression(SyntaxTree SyntaxTree, Expression Le
     : Expression(SyntaxNodeKind.BinaryExpression, SyntaxTree)
 {
     public override T Accept<T>(ISyntaxExpressionVisitor<T> visitor) => visitor.Visit(this);
-
     public override IEnumerable<SyntaxNode> GetChildren()
     {
         yield return Left;
         yield return Operator;
         yield return Right;
     }
+    public override string ToString() => base.ToString();
 }

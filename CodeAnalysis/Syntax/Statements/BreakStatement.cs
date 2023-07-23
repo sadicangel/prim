@@ -8,4 +8,5 @@ public sealed record class BreakStatement(SyntaxTree SyntaxTree, Token Break, To
         yield return Break;
         yield return Semicolon;
     }
+    public override string ToString() => base.ToString();
 }

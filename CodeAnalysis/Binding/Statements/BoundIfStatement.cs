@@ -1,11 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using CodeAnalysis.Binding.Expressions;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Syntax;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Binding.Statements;
 
-internal sealed record class BoundIfStatement(BoundExpression Condition, BoundStatement Then, BoundStatement? Else) : BoundStatement(BoundNodeKind.IfStatement)
+internal sealed record class BoundIfStatement(SyntaxNode Syntax, BoundExpression Condition, BoundStatement Then, BoundStatement? Else)
+    : BoundStatement(BoundNodeKind.IfStatement, Syntax)
 {
-    public BoundIfStatement(BoundExpression condition, BoundStatement then) : this(condition, then, Else: null) { }
+    public BoundIfStatement(SyntaxNode syntax, BoundExpression condition, BoundStatement then) : this(syntax, condition, then, Else: null) { }
 
     [MemberNotNullWhen(true, nameof(Else))]
     public bool HasElseClause { get => Else is not null; }

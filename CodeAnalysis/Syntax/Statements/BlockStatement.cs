@@ -11,4 +11,5 @@ public sealed record class BlockStatement(SyntaxTree SyntaxTree, Token OpenBrace
             yield return statement;
         yield return CloseBrace;
     }
+    public override string ToString() => base.ToString();
 }

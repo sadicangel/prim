@@ -14,4 +14,5 @@ public sealed record class IfExpression(SyntaxTree SyntaxTree, Token If, Token O
         yield return ElseToken;
         yield return Else;
     }
+    public override string ToString() => base.ToString();
 }

@@ -19,4 +19,5 @@ public sealed record class ForStatement(SyntaxTree SyntaxTree, Token For, Token 
         yield return CloseParenthesis;
         yield return Body;
     }
+    public override string ToString() => base.ToString();
 }

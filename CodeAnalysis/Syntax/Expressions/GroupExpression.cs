@@ -10,4 +10,5 @@ public sealed record class GroupExpression(SyntaxTree SyntaxTree, Token OpenPare
         yield return Expression;
         yield return CloseParenthesis;
     }
+    public override string ToString() => base.ToString();
 }

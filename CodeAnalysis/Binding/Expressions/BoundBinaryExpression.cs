@@ -1,8 +1,11 @@
-﻿namespace CodeAnalysis.Binding.Expressions;
+﻿using CodeAnalysis.Syntax;
 
-internal sealed record class BoundBinaryExpression(BoundExpression Left, BoundBinaryOperator Operator, BoundExpression Right) : BoundExpression(BoundNodeKind.BinaryExpression, Operator.ResultType)
+namespace CodeAnalysis.Binding.Expressions;
+
+internal sealed record class BoundBinaryExpression(SyntaxNode Syntax, BoundExpression Left, BoundBinaryOperator Operator, BoundExpression Right)
+    : BoundExpression(BoundNodeKind.BinaryExpression, Syntax, Operator.ResultType)
 {
-    public override ConstantValue? ConstantValue { get; } = ConstantFolding.Compute(Left, Operator, Right);
+    public override ConstantValue? ConstantValue { get; } = ConstantFolding.Fold(Left, Operator, Right);
     public override T Accept<T>(IBoundExpressionVisitor<T> visitor) => visitor.Visit(this);
     public override IEnumerable<INode> GetChildren()
     {

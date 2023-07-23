@@ -3,4 +3,5 @@
 public abstract record class Expression(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : SyntaxNode(NodeKind, SyntaxTree)
 {
     public abstract T Accept<T>(ISyntaxExpressionVisitor<T> visitor);
+    public override string ToString() => base.ToString();
 }

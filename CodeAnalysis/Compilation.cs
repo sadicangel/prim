@@ -39,6 +39,9 @@ public sealed class Compilation
         if (program.Diagnostics.Any())
             return new EvaluationResult(program.Diagnostics);
 
+        if (program.Statement is null)
+            return new EvaluationResult(default(object));
+
         Debug.WriteLine(program.Statement);
 
         var evaluator = new Evaluator(program, globals);
@@ -50,6 +53,6 @@ public sealed class Compilation
     public void WriteTo(TextWriter writer)
     {
         var program = Binder.BindProgram(GetOrCreateGlobalScope());
-        program.Statement.WriteTo(writer);
+        program.Statement?.WriteTo(writer);
     }
 }

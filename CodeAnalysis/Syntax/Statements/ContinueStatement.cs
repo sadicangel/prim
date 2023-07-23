@@ -9,4 +9,5 @@ public sealed record class ContinueStatement(SyntaxTree SyntaxTree, Token Contin
         yield return Continue;
         yield return Semicolon;
     }
+    public override string ToString() => base.ToString();
 }

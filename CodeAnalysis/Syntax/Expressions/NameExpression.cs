@@ -8,4 +8,5 @@ public sealed record class NameExpression(SyntaxTree SyntaxTree, Token Identifie
     {
         yield return Identifier;
     }
+    public override string ToString() => base.ToString();
 }

@@ -15,4 +15,5 @@ public sealed record class ReturnStatement(SyntaxTree SyntaxTree, Token Return, 
             yield return Expression;
         yield return Semicolon;
     }
+    public override string ToString() => base.ToString();
 }

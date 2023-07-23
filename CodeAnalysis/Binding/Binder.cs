@@ -54,7 +54,9 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         //    scope = scope.Previous;
         //}
 
-        var globalStatement = new BoundBlockStatement(globalScope.Statements);
+        var globalStatement = globalScope.Statements.Count > 0
+            ? new BoundBlockStatement(globalScope.Statements[0].Syntax, globalScope.Statements)
+            : null;
 
         var program = new BoundProgram(globalStatement, diagnostics);
 
@@ -161,7 +163,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         _scope = new BoundScope(_scope);
         var boundStatements = statement.Statements.Select(BindStatement).ToList();
         _scope = _scope.Parent ?? throw new InvalidOperationException("Scope cannot be null");
-        return new BoundBlockStatement(boundStatements);
+        return new BoundBlockStatement(statement, boundStatements);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(FunctionDeclaration statement)
@@ -205,7 +207,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         _diagnostics.AddRange(binder.Diagnostics);
 
-        return new BoundFunctionDeclaration(function, loweredBody);
+        return new BoundFunctionDeclaration(statement, function, loweredBody);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(VariableDeclaration statement)
@@ -222,7 +224,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             else
             {
                 _diagnostics.ReportUndefinedName(statement.Type);
-                expression = new BoundNeverExpression();
+                expression = new BoundNeverExpression(statement);
             }
         }
         else
@@ -235,10 +237,10 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!_scope.TryDeclare(variable))
         {
             _diagnostics.ReportRedeclaration(statement.Identifier, "variable");
-            return new BoundExpressionStatement(new BoundNeverExpression());
+            return new BoundExpressionStatement(statement, new BoundNeverExpression(statement));
         }
 
-        return new BoundVariableDeclaration(variable, expression);
+        return new BoundVariableDeclaration(statement, variable, expression);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(IfStatement statement)
@@ -246,7 +248,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
         var then = BindStatement(statement.Then);
         var @else = statement.HasElseClause ? BindStatement(statement.Else) : null;
-        return new BoundIfStatement(condition, then, @else);
+        return new BoundIfStatement(statement, condition, then, @else);
     }
 
     private BoundStatement BindLoopBody(Statement body, out LabelSymbol @break, out LabelSymbol @continue)
@@ -264,7 +266,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
         var body = BindLoopBody(statement.Body, out var @break, out var @continue);
-        return new BoundWhileStatement(condition, body, @break, @continue);
+        return new BoundWhileStatement(statement, condition, body, @break, @continue);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ForStatement statement)
@@ -287,7 +289,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         _scope = _scope.Parent!;
 
-        return new BoundForStatement(variable, lowerBound, upperBound, body, @break, @continue);
+        return new BoundForStatement(statement, variable, lowerBound, upperBound, body, @break, @continue);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(BreakStatement statement)
@@ -295,9 +297,9 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!_loopStack.TryPeek(out var jumps))
         {
             _diagnostics.ReportInvalidBreakOrContinue(statement.Break.GetLocation());
-            return new BoundExpressionStatement(new BoundNeverExpression());
+            return new BoundExpressionStatement(statement, new BoundNeverExpression(statement));
         }
-        return new BoundGotoStatement(jumps.Break);
+        return new BoundGotoStatement(statement, jumps.Break);
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ContinueStatement statement)
@@ -305,9 +307,9 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!_loopStack.TryPeek(out var jumps))
         {
             _diagnostics.ReportInvalidBreakOrContinue(statement.Continue.GetLocation());
-            return new BoundExpressionStatement(new BoundNeverExpression());
+            return new BoundExpressionStatement(statement, new BoundNeverExpression(statement));
         }
-        return new BoundGotoStatement(jumps.Continue);
+        return new BoundGotoStatement(statement, jumps.Continue);
     }
 
     public BoundStatement Visit(ReturnStatement statement)
@@ -315,33 +317,33 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (_function is null)
         {
             _diagnostics.ReportInvalidReturn(statement.Return.GetLocation());
-            return new BoundExpressionStatement(new BoundNeverExpression());
+            return new BoundExpressionStatement(statement, new BoundNeverExpression(statement));
         }
         else if (_function.Type == BuiltinTypes.Void)
         {
             if (statement.Expression is not null)
             {
                 _diagnostics.ReportInvalidReturnExpression(statement.Expression.GetLocation(), _function.Name);
-                return new BoundReturnStatement(new BoundNeverExpression());
+                return new BoundReturnStatement(statement, new BoundNeverExpression(statement));
             }
-            return new BoundReturnStatement();
+            return new BoundReturnStatement(statement);
         }
         else if (statement.Expression is null)
         {
             _diagnostics.ReportInvalidReturnExpression(statement.Return.GetLocation(), _function.Name, _function.Type);
-            return new BoundReturnStatement(new BoundNeverExpression());
+            return new BoundReturnStatement(statement, new BoundNeverExpression(statement));
         }
         else
         {
             var expression = BindConversion(statement.Expression, _function.Type, isExplicit: false);
-            return new BoundReturnStatement(expression);
+            return new BoundReturnStatement(statement, expression);
         }
     }
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ExpressionStatement statement)
     {
         var expression = BindExpression(statement.Expression, allowVoid: true);
-        return new BoundExpressionStatement(expression);
+        return new BoundExpressionStatement(statement, expression);
     }
 
     private BoundExpression BindExpression(Expression expression, TypeSymbol targetType, bool isExplicit = false) => BindConversion(expression, targetType, isExplicit);
@@ -354,7 +356,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!allowVoid && result.Type == BuiltinTypes.Void)
         {
             _diagnostics.ReportInvalidExpressionType(expression.GetLocation(), result.Type);
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
         return result;
     }
@@ -371,7 +373,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         }
 
-        return new BoundIfExpression(condition, then, @else, then.Type);
+        return new BoundIfExpression(expression, condition, then, @else, then.Type);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(GroupExpression expression) => expression.Expression.Accept(this);
@@ -381,15 +383,15 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var boundOperand = BindExpression(expression.Operand);
 
         if (boundOperand.Type == BuiltinTypes.Never)
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
 
         var boundOperator = BoundUnaryOperator.Bind(expression.Operator.TokenKind, boundOperand.Type);
         if (boundOperator is null)
         {
             _diagnostics.ReportUndefinedUnaryOperator(expression.Operator, boundOperand.Type);
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
-        return new BoundUnaryExpression(boundOperator, boundOperand);
+        return new BoundUnaryExpression(expression, boundOperator, boundOperand);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(BinaryExpression expression)
@@ -398,7 +400,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var boundRight = BindExpression(expression.Right);
 
         if (boundLeft.Type == BuiltinTypes.Never || boundRight.Type == BuiltinTypes.Never)
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
 
         var resultType = default(TypeSymbol);
         if (expression.Operator.TokenKind is TokenKind.As)
@@ -406,13 +408,13 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             if (boundRight is not BoundSymbolExpression symbolExpression || BuiltinTypes.Type != symbolExpression.Type)
             {
                 _diagnostics.ReportInvalidExpressionType(expression.Right.GetLocation(), BuiltinTypes.Type, boundRight.Type);
-                return new BoundNeverExpression();
+                return new BoundNeverExpression(expression);
             }
 
             if (!BuiltinTypes.TryLookup(symbolExpression.Symbol.Name, out resultType))
             {
                 _diagnostics.ReportUndefinedType(expression.Right.GetLocation(), symbolExpression.Symbol.Name);
-                return new BoundNeverExpression();
+                return new BoundNeverExpression(expression);
             }
 
             // Prevent redundant cast.
@@ -428,37 +430,37 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
                 _diagnostics.ReportInvalidConversion(new TextLocation(expression.SyntaxTree.Text, TextSpan.FromBounds(expression.Operator.Span.Start, expression.Right.Span.End)), boundLeft.Type, resultType!);
             else
                 _diagnostics.ReportUndefinedBinaryOperator(expression.Operator, boundLeft.Type, boundRight.Type);
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
-        return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
+        return new BoundBinaryExpression(expression, boundLeft, boundOperator, boundRight);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(LiteralExpression expression)
     {
         var value = expression.Value ?? 0;
-        return new BoundLiteralExpression(value);
+        return new BoundLiteralExpression(expression, value);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(NameExpression expression)
     {
         if (expression.Identifier.IsMissing)
         {
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
 
         if (!TryGetSymbol(expression.Identifier, out var symbol))
         {
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
 
-        return new BoundSymbolExpression(symbol);
+        return new BoundSymbolExpression(expression, symbol);
     }
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(CallExpression expression)
     {
 
         if (!TryGetSymbol(expression.Identifier, out FunctionSymbol? function))
         {
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
 
         if (expression.Arguments.Count != function.Parameters.Count)
@@ -477,7 +479,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
                 location = expression.CloseParenthesis.GetLocation();
             }
             _diagnostics.ReportInvalidArgumentCount(location, function.Name, function.Parameters.Count, expression.Arguments.Count);
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
 
         var boundArguments = expression.Arguments.Select(BindExpression).ToArray();
@@ -490,11 +492,11 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             if (!argument.Type.IsAssignableTo(parameter.Type))
             {
                 _diagnostics.ReportInvalidArgumentType(expression.Arguments[i].GetLocation(), parameter.Name, parameter.Type, argument.Type);
-                return new BoundNeverExpression();
+                return new BoundNeverExpression(expression);
             }
         }
 
-        return new BoundCallExpression(function, boundArguments);
+        return new BoundCallExpression(expression, function, boundArguments);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(AssignmentExpression expression)
@@ -502,7 +504,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var boundExpression = BindExpression(expression.Expression);
 
         if (boundExpression.Type == BuiltinTypes.Never)
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
 
         if (!TryGetSymbol(expression.Identifier, out VariableSymbol? variable))
         {
@@ -520,7 +522,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             return boundExpression;
         }
 
-        return new BoundAssignmentExpression(variable, boundExpression);
+        return new BoundAssignmentExpression(expression, variable, boundExpression);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
@@ -528,7 +530,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!BuiltinTypes.TryLookup(expression.Type.Text, out var targetType))
         {
             _diagnostics.ReportUndefinedName(expression.Type);
-            return new BoundNeverExpression();
+            return new BoundNeverExpression(expression);
         }
 
         return BindConversion(expression.Expression, targetType, isExplicit: true);
@@ -549,7 +551,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         else if (!conversion.IsIdentity)
         {
             if (conversion.IsImplicit || isExplicit)
-                return new BoundConvertExpression(boundExpression, targetType);
+                return new BoundConvertExpression(expression, boundExpression, targetType);
 
             _diagnostics.ReportInvalidImplicitConversion(expression.GetLocation(), boundExpression.Type, targetType);
         }

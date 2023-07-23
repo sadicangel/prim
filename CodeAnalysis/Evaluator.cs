@@ -20,7 +20,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
         _locals = new();
     }
 
-    public object? Evaluate() => EvaluateStatement(_program.Statement);
+    public object? Evaluate() => _program.Statement is not null ? EvaluateStatement(_program.Statement) : null;
 
     private object? EvaluateStatement(BoundBlockStatement blockStatement)
     {

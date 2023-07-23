@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Text;
+using System.Runtime.CompilerServices;
 
 namespace CodeAnalysis.Syntax;
 
@@ -43,4 +44,8 @@ public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEn
         WriteTo(writer);
         return writer.ToString();
     }
+
+    public bool Equals(SyntaxTree? other) => ReferenceEquals(this, other);
+
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 }

@@ -12,4 +12,6 @@ public sealed record class CallExpression(SyntaxTree SyntaxTree, Token Identifie
             yield return node;
         yield return CloseParenthesis;
     }
+
+    public override string ToString() => base.ToString();
 }

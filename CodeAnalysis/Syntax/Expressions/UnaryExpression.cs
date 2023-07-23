@@ -9,4 +9,5 @@ public sealed record class UnaryExpression(SyntaxTree SyntaxTree, Token Operator
         yield return Operator;
         yield return Operand;
     }
+    public override string ToString() => base.ToString();
 }
