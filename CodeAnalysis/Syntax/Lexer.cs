@@ -4,8 +4,6 @@ using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
-internal readonly record struct LexResult(IReadOnlyList<Token> Tokens, IEnumerable<Diagnostic> Diagnostics);
-
 internal delegate bool TransformToken(ref Token token);
 
 internal sealed class Lexer
@@ -31,7 +29,7 @@ internal sealed class Lexer
 
     public bool IsEOF { get => _position >= Text.Length; }
 
-    public static LexResult Lex(SyntaxTree syntaxTree, TransformToken transform)
+    public static AnalysisResult<IReadOnlyList<Token>> Lex(SyntaxTree syntaxTree, TransformToken transform)
     {
         var lexer = new Lexer(syntaxTree);
         var tokens = new List<Token>();
@@ -44,7 +42,7 @@ internal sealed class Lexer
         }
         while (token.TokenKind != TokenKind.EOF);
 
-        return new(tokens, lexer.Diagnostics);
+        return new(tokens, lexer._diagnostics);
     }
 
     private char Peek(int offset)

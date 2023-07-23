@@ -10,7 +10,7 @@ public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEn
     public void WriteTo(TextWriter writer, string indent = "", bool isLast = true) => Root.WriteTo(writer, indent, isLast);
     IEnumerable<INode> INode.Children() => ((INode)Root).Children();
 
-    private SyntaxTree(SourceText text, Func<SyntaxTree, ParseResult> parse) : this(text, null!, null!)
+    private SyntaxTree(SourceText text, Func<SyntaxTree, AnalysisResult<CompilationUnit>> parse) : this(text, null!, null!)
     {
         (Root, Diagnostics) = parse.Invoke(this);
     }
@@ -57,11 +57,11 @@ public sealed record class SyntaxTree(SourceText Text, CompilationUnit Root, IEn
     {
         // A little hack, as we want to go through SyntaxTree to actually get the tokens..
         IReadOnlyList<Token> tokens = Array.Empty<Token>();
-        ParseResult ParseTokens(SyntaxTree syntaxTree)
+        AnalysisResult<CompilationUnit> ParseTokens(SyntaxTree syntaxTree)
         {
             (tokens, var diagnostics) = Lexer.Lex(syntaxTree, includeEof ? static (ref Token t) => true : static (ref Token t) => t.TokenKind is not TokenKind.EOF);
             var eof = tokens.Count > 0 ? tokens[^1] : new Token(syntaxTree, TokenKind.EOF, Position: 0, Text: "", Array.Empty<Trivia>(), Array.Empty<Trivia>());
-            return new ParseResult(new CompilationUnit(syntaxTree, Array.Empty<GlobalSyntaxNode>(), eof), diagnostics);
+            return new AnalysisResult<CompilationUnit>(new CompilationUnit(syntaxTree, Array.Empty<GlobalSyntaxNode>(), eof), diagnostics);
         }
         _ = new SyntaxTree(new SourceText(text), ParseTokens);
         return tokens;

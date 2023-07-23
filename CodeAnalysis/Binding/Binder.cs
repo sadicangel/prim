@@ -200,12 +200,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
         var functionBody = binder.BindStatement(statement.Body);
 
-        var loweredBody = Lowerer.Lower(functionBody);
+        var (loweredBody, diagnostics) = Lowerer.Lower(functionBody);
 
         if (function.Type != BuiltinTypes.Void && function.Type != BuiltinTypes.Never && !ControlFlowGraph.AllPathsReturn(loweredBody))
             binder._diagnostics.ReportNotAllPathsReturn(statement.Identifier.GetLocation());
 
         _diagnostics.AddRange(binder.Diagnostics);
+
+        _diagnostics.AddRange(diagnostics);
 
         return new BoundFunctionDeclaration(statement, function, loweredBody);
     }

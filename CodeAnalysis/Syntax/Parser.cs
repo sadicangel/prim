@@ -4,8 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Syntax;
 
-internal readonly record struct ParseResult(CompilationUnit CompilationUnit, IEnumerable<Diagnostic> Diagnostics);
-
 internal sealed class Parser
 {
     private readonly SyntaxTree _syntaxTree;
@@ -109,11 +107,11 @@ internal sealed class Parser
         return true;
     }
 
-    public static ParseResult Parse(SyntaxTree syntaxTree)
+    public static AnalysisResult<CompilationUnit> Parse(SyntaxTree syntaxTree)
     {
         var parser = new Parser(syntaxTree);
         var compilationUnit = parser.ParseCompilationUnit();
-        return new(compilationUnit, parser.Diagnostics);
+        return new(compilationUnit, parser._diagnostics);
     }
 
     private CompilationUnit ParseCompilationUnit()
