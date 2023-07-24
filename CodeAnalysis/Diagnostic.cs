@@ -2,7 +2,9 @@
 
 namespace CodeAnalysis;
 
-public sealed record class Diagnostic(bool IsError, TextLocation Location, string Message)
+public enum DiagnosticSeverity { Error, Warning }
+
+public sealed record class Diagnostic(DiagnosticSeverity Severity, TextLocation Location, string Message)
 {
     public override string ToString() => Message;
 }

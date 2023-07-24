@@ -12,13 +12,15 @@ internal sealed class PrimRepl : ReplBase
     private bool _showResultType = true;
     private Compilation? _previousCompilation;
 
-    public PrimRepl() : base(commandPrefix: "\\")
+    private PrimRepl() : base(commandPrefix: "\\")
     {
         _globals = new Dictionary<Symbol, object?>();
         _showTree = false;
         _showProgram = false;
         Console.ForegroundColor = ConsoleColor.White;
     }
+
+    public static void Start() => new PrimRepl().Run();
 
     protected override object? RenderLine(IReadOnlyList<string> lines, int lineIndex, object? state)
     {
@@ -151,7 +153,7 @@ internal sealed class PrimRepl : ReplBase
 
         Console.ResetColor();
 
-        if (!diagnostics.Any())
+        if (!diagnostics.HasErrors)
         {
             if (result.Value is not null)
             {
@@ -162,10 +164,8 @@ internal sealed class PrimRepl : ReplBase
             }
             _previousCompilation = compilation;
         }
-        else
-        {
-            diagnostics.WriteTo(Console.Out);
-        }
+
+        diagnostics.WriteTo(Console.Out);
     }
 }
 

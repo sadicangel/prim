@@ -438,6 +438,22 @@ public sealed class EvaluatorTests
             },
             new object[]
             {
+                $"Reports {nameof(DiagnosticMessage.RedundantConversion)} in expression",
+                """10 ⟨as i32⟩""",
+                $"{DiagnosticMessage.RedundantConversion()}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.RedundantConversion)} in statement",
+                """
+                let f: () => bool = {
+                    return true ⟨as bool⟩;
+                }
+                """,
+                $"{DiagnosticMessage.RedundantConversion()}"
+            },
+            new object[]
+            {
                 $"Reports {nameof(DiagnosticMessage.InvalidConversion)} in if statement condition",
                 """
                 {
@@ -675,6 +691,76 @@ public sealed class EvaluatorTests
                 {DiagnosticMessage.UnterminatedComment()}
                 """
             },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnreachableCode)} in if <then>",
+                """
+                let f: () => void = {
+                    let x = 4 * 3;
+                    if (x > 12)
+                    {
+                        ⟨print⟩("x")
+                    }
+                    else
+                    {
+                        print("x")
+                    }
+                }
+                """,
+                $"""
+                {DiagnosticMessage.UnreachableCode()}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnreachableCode)} in if <else>",
+                """
+                let f: () => i32 = {
+                    if (true)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        ⟨return⟩ 0;
+                    }
+                }
+                """,
+                $"""
+                {DiagnosticMessage.UnreachableCode()}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnreachableCode)} in while",
+                """
+                let f: () => i32 = {
+                    while (false)
+                    {
+                        ⟨print⟩("sup");
+                    }
+                    return 0;
+                }
+                """,
+                $"""
+                {DiagnosticMessage.UnreachableCode()}
+                """
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.UnreachableCode)} in for",
+                """
+                let f: () => void = {
+                    for (let i in 10..0)
+                    {
+                        ⟨print⟩(i);
+                    }
+                }
+                """,
+                $"""
+                {DiagnosticMessage.UnreachableCode()}
+                """
+            }
         };
     }
 }

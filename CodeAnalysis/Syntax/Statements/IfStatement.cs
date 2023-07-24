@@ -16,7 +16,9 @@ public sealed record class IfStatement(SyntaxTree SyntaxTree, Token If, Token Op
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return If;
+        yield return OpenParenthesis;
         yield return Condition;
+        yield return CloseParenthesis;
         yield return Then;
         if (HasElseClause)
         {

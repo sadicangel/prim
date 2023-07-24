@@ -1,29 +1,71 @@
 ﻿using CodeAnalysis.Symbols;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax.Statements;
 using CodeAnalysis.Text;
 using System.Collections;
 
 namespace CodeAnalysis;
 
-public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
+public interface IReadOnlyDiagnosticBag : IReadOnlyList<Diagnostic>
+{
+    public bool HasErrors { get; }
+    public bool HasWarnings { get; }
+
+    public IEnumerable<Diagnostic> GetErrors() => this.Where(d => d.Severity is DiagnosticSeverity.Error);
+    public IEnumerable<Diagnostic> GetWarnings() => this.Where(d => d.Severity is DiagnosticSeverity.Warning);
+}
+
+public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 {
     private readonly List<Diagnostic> _diagnostics;
 
     public int Count { get => _diagnostics.Count; }
 
+    public bool HasErrors { get; private set; }
+
+    public bool HasWarnings { get; private set; }
+
     public Diagnostic this[int index] { get => _diagnostics[index]; }
 
     public DiagnosticBag() => _diagnostics = new();
 
-    public DiagnosticBag(IEnumerable<Diagnostic> diagnostics) => _diagnostics = new(diagnostics);
+    public DiagnosticBag(IEnumerable<Diagnostic> diagnostics)
+    {
+        _diagnostics = new(diagnostics);
+        HasErrors = diagnostics.Any(d => d.Severity is DiagnosticSeverity.Error);
+        HasWarnings = diagnostics.Any(d => d.Severity is DiagnosticSeverity.Warning);
+    }
 
     public IEnumerator<Diagnostic> GetEnumerator() => _diagnostics.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public void AddRange(IEnumerable<Diagnostic> diagnostics) => _diagnostics.AddRange(diagnostics);
+    public void AddRange(IEnumerable<Diagnostic> diagnostics)
+    {
+        _diagnostics.AddRange(diagnostics);
+        HasErrors |= diagnostics.Any(d => d.Severity is DiagnosticSeverity.Error);
+        HasWarnings |= diagnostics.Any(d => d.Severity is DiagnosticSeverity.Warning);
+    }
 
-    public void ReportError(TextLocation location, string message) => _diagnostics.Add(new Diagnostic(IsError: true, location, message));
-    public void ReportWarning(TextLocation location, string message) => _diagnostics.Add(new Diagnostic(IsError: false, location, message));
+    public void Report(DiagnosticSeverity severity, TextLocation location, string message)
+    {
+        switch (severity)
+        {
+            case DiagnosticSeverity.Error:
+                HasErrors = true;
+                break;
+
+            case DiagnosticSeverity.Warning:
+                HasWarnings = true;
+                break;
+
+            default:
+                throw new InvalidOperationException($"Unexpected diagnostic severity {severity}");
+        }
+        _diagnostics.Add(new Diagnostic(severity, location, message));
+    }
+
+    public void ReportError(TextLocation location, string message) => Report(DiagnosticSeverity.Error, location, message);
+    public void ReportWarning(TextLocation location, string message) => Report(DiagnosticSeverity.Warning, location, message);
 
     public void ReportInvalidNumber(TextLocation location, string text, TypeSymbol type) => ReportError(location, DiagnosticMessage.InvalidNumber(text, type));
     public void ReportInvalidCharacter(TextLocation location, char character) => ReportError(location, DiagnosticMessage.InvalidCharacter(character));
@@ -34,6 +76,7 @@ public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
     public void ReportUndefinedType(TextLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     public void ReportInvalidConversion(TextLocation location, TypeSymbol sourceType, TypeSymbol destinationType) => ReportError(location, DiagnosticMessage.InvalidConversion(sourceType, destinationType));
     public void ReportInvalidImplicitConversion(TextLocation location, TypeSymbol sourceType, TypeSymbol destinationType) => ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceType, destinationType));
+    public void ReportRedundantConversion(TextLocation location) => ReportWarning(location, DiagnosticMessage.RedundantConversion());
     public void ReportRedeclaration(Token identifier, string type) => ReportError(identifier.GetLocation(), DiagnosticMessage.Redeclaration(identifier.Text, type));
     public void ReportReadOnlyAssignment(TextLocation location, string name) => ReportError(location, DiagnosticMessage.ReadOnlyAssignment(name));
     public void ReportUnterminatedString(TextLocation location) => ReportError(location, DiagnosticMessage.UnterminatedString());
@@ -49,4 +92,12 @@ public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
     public void ReportInvalidReturnExpression(TextLocation location, string functionName) => ReportError(location, DiagnosticMessage.InvalidReturnExpression(functionName));
     public void ReportInvalidReturnExpression(TextLocation location, string functionName, TypeSymbol expectedType) => ReportError(location, DiagnosticMessage.InvalidReturnExpression(functionName, expectedType));
     public void ReportNotAllPathsReturn(TextLocation location) => ReportError(location, DiagnosticMessage.NotAllPathsReturn());
+    public void ReportUnreachableCode(SyntaxNode unreachableNode)
+    {
+        if (unreachableNode.NodeKind is SyntaxNodeKind.BlockStatement)
+            unreachableNode = ((BlockStatement)unreachableNode).Statements.FirstOrDefault() ?? unreachableNode;
+        var location = unreachableNode.GetFirstToken().GetLocation();
+
+        ReportWarning(location, DiagnosticMessage.UnreachableCode());
+    }
 }

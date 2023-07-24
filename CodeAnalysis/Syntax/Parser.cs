@@ -52,7 +52,7 @@ internal sealed class Parser
         _diagnostics.AddRange(diagnostics);
     }
 
-    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
+    public IReadOnlyDiagnosticBag Diagnostics { get => _diagnostics; }
 
     private Token Current => Peek(0);
 
@@ -107,7 +107,7 @@ internal sealed class Parser
         return true;
     }
 
-    public static AnalysisResult<CompilationUnit> Parse(SyntaxTree syntaxTree)
+    public static PrimResult<CompilationUnit> Parse(SyntaxTree syntaxTree)
     {
         var parser = new Parser(syntaxTree);
         var compilationUnit = parser.ParseCompilationUnit();

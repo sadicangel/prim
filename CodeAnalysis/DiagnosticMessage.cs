@@ -23,6 +23,8 @@ public static class DiagnosticMessage
 
     public static string InvalidImplicitConversion(TypeSymbol sourceType, TypeSymbol destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
 
+    public static string RedundantConversion() => "Conversion is redundant";
+
     public static string Redeclaration(string identifier, string type) => $"Redeclaration of {type} '{identifier}'";
 
     public static string ReadOnlyAssignment(string identifier) => $"Invalid assignment to read-only '{identifier}'";
@@ -52,4 +54,6 @@ public static class DiagnosticMessage
     public static string InvalidReturnExpression(string functionName, TypeSymbol expectedType) => $"Function '{functionName}' expects an expression of a type convertible to '{expectedType}'";
 
     public static string NotAllPathsReturn() => "Not all code paths return a value";
+
+    public static string UnreachableCode() => "Unreachable code detected";
 }

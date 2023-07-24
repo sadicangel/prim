@@ -31,7 +31,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
         while (scope != null);
     }
-    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
+    public IReadOnlyDiagnosticBag Diagnostics { get => _diagnostics; }
 
     public static BoundProgram BindProgram(BoundGlobalScope globalScope)
     {
@@ -89,8 +89,8 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         var symbols = binder._scope.Symbols ?? Enumerable.Empty<Symbol>();
         var diagnostics = binder.Diagnostics;
-        if (previousGlobalScope is not null)
-            diagnostics = previousGlobalScope.Diagnostics.Concat(diagnostics);
+        //if (previousGlobalScope is not null)
+        //    diagnostics = previousGlobalScope.Diagnostics.Concat(diagnostics);
 
         return new BoundGlobalScope(statements, symbols, diagnostics, previousGlobalScope);
     }
@@ -200,14 +200,12 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
         var functionBody = binder.BindStatement(statement.Body);
 
-        var (loweredBody, diagnostics) = Lowerer.Lower(functionBody);
+        var loweredBody = Lowerer.Lower(functionBody);
 
         if (function.Type != BuiltinTypes.Void && function.Type != BuiltinTypes.Never && !ControlFlowGraph.AllPathsReturn(loweredBody))
             binder._diagnostics.ReportNotAllPathsReturn(statement.Identifier.GetLocation());
 
         _diagnostics.AddRange(binder.Diagnostics);
-
-        _diagnostics.AddRange(diagnostics);
 
         return new BoundFunctionDeclaration(statement, function, loweredBody);
     }
@@ -248,6 +246,13 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(IfStatement statement)
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
+        if (condition.ConstantValue is not null)
+        {
+            if (!(bool)condition.ConstantValue.Value!)
+                _diagnostics.ReportUnreachableCode(statement.Then);
+            else if (statement.HasElseClause)
+                _diagnostics.ReportUnreachableCode(statement.Else);
+        }
         var then = BindStatement(statement.Then);
         var @else = statement.HasElseClause ? BindStatement(statement.Else) : null;
         return new BoundIfStatement(statement, condition, then, @else);
@@ -267,6 +272,11 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(WhileStatement statement)
     {
         var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
+        if (condition.ConstantValue is not null)
+        {
+            if (!(bool)condition.ConstantValue.Value!)
+                _diagnostics.ReportUnreachableCode(statement.Body);
+        }
         var body = BindLoopBody(statement.Body, out var @break, out var @continue);
         return new BoundWhileStatement(statement, condition, body, @break, @continue);
     }
@@ -275,6 +285,14 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         var lowerBound = BindExpression(statement.LowerBound, BuiltinTypes.I32);
         var upperBound = BindExpression(statement.UpperBound, BuiltinTypes.I32);
+
+        if (lowerBound.ConstantValue is not null && upperBound.ConstantValue is not null)
+        {
+            var loBound = (int)lowerBound.ConstantValue.Value!;
+            var hiBound = (int)upperBound.ConstantValue.Value!;
+            if (loBound >= hiBound)
+                _diagnostics.ReportUnreachableCode(statement.Body);
+        }
 
         var variable = new VariableSymbol(statement.Identifier.Text, IsReadOnly: true, BuiltinTypes.I32);
 
@@ -337,7 +355,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
         else
         {
-            var expression = BindConversion(statement.Expression, _function.Type, isExplicit: false);
+            var expression = BindConversion(statement.Expression, _function.Type, allowExplicit: false);
             return new BoundReturnStatement(statement, expression);
         }
     }
@@ -366,16 +384,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(IfExpression expression)
     {
-        var condition = BindExpression(expression.Condition, BuiltinTypes.Bool);
-        var then = BindExpression(expression.Then);
-        var @else = BindExpression(expression.Else);
-
-        if (then.Type != @else.Type)
-        {
-
-        }
-
-        return new BoundIfExpression(expression, condition, then, @else, then.Type);
+        throw new NotSupportedException(nameof(IfExpression));
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(GroupExpression expression) => expression.Expression.Accept(this);
@@ -419,9 +428,10 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
                 return new BoundNeverExpression(expression);
             }
 
-            // Prevent redundant cast.
+            // Warn and prevent redundant cast.
             if (boundLeft.Type == resultType)
             {
+                _diagnostics.ReportRedundantConversion(new TextLocation(expression.SyntaxTree.Text, TextSpan.FromBounds(expression.Operator.Span, expression.Right.Span)));
                 return boundLeft;
             }
         }
@@ -555,18 +565,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         return new BoundCompoundAssignmentExpression(expression, variable, boundOperator, boundExpression);
     }
 
-    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(ConvertExpression expression)
-    {
-        if (!BuiltinTypes.TryLookup(expression.Type.Text, out var targetType))
-        {
-            _diagnostics.ReportUndefinedName(expression.Type);
-            return new BoundNeverExpression(expression);
-        }
-
-        return BindConversion(expression.Expression, targetType, isExplicit: true);
-    }
-
-    private BoundExpression BindConversion(Expression expression, TypeSymbol targetType, bool isExplicit)
+    private BoundExpression BindConversion(Expression expression, TypeSymbol targetType, bool allowExplicit)
     {
         var boundExpression = BindExpression(expression);
 
@@ -577,10 +576,11 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (!conversion.Exists)
         {
             _diagnostics.ReportInvalidConversion(expression.GetLocation(), boundExpression.Type, targetType);
+            return new BoundNeverExpression(expression);
         }
         else if (!conversion.IsIdentity)
         {
-            if (conversion.IsImplicit || isExplicit)
+            if (conversion.IsImplicit || allowExplicit)
                 return new BoundConvertExpression(expression, boundExpression, targetType);
 
             _diagnostics.ReportInvalidImplicitConversion(expression.GetLocation(), boundExpression.Type, targetType);

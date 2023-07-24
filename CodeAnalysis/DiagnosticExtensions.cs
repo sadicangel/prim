@@ -16,7 +16,12 @@ public static class DiagnosticExtensions
         var lineIndex = diagnostic.Location.Text.GetLineIndex(span.Start);
         var line = diagnostic.Location.Text.Lines[lineIndex];
 
-        var diagnosticColor = diagnostic.IsError ? ConsoleColor.DarkRed : ConsoleColor.DarkYellow;
+        var diagnosticColor = diagnostic.Severity switch
+        {
+            DiagnosticSeverity.Error => ConsoleColor.DarkRed,
+            DiagnosticSeverity.Warning => ConsoleColor.DarkYellow,
+            _ => throw new InvalidOperationException($"Unexpected diagnostic severity {diagnostic.Severity}")
+        };
 
         writer.WriteLine();
 
@@ -48,7 +53,7 @@ public static class DiagnosticExtensions
         }
     }
 
-    public static void WriteTo(this IEnumerable<Diagnostic> diagnostics, TextWriter writer)
+    public static void WriteTo(this IReadOnlyDiagnosticBag diagnostics, TextWriter writer)
     {
         foreach (var diagnostic in diagnostics.OrderBy(d => d.Location))
             diagnostic.WriteTo(writer);

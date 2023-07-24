@@ -28,26 +28,23 @@ public sealed class Compilation
         return _globalScope;
     }
 
-    public AnalysisResult<object?> Evaluate(Dictionary<Symbol, object?> globals)
+    public PrimResult<object?> Evaluate(Dictionary<Symbol, object?> globals)
     {
-        var diagnostics = SyntaxTrees.SelectMany(tree => tree.Diagnostics).Concat(GetOrCreateGlobalScope().Diagnostics);
-        if (diagnostics.Any())
-            return new AnalysisResult<object?>(null, diagnostics.ToList());
+        var diagnostics = new DiagnosticBag(SyntaxTrees.SelectMany(tree => tree.Diagnostics).Concat(GetOrCreateGlobalScope().Diagnostics));
+        if (diagnostics.HasErrors)
+            return new PrimResult<object?>(null, diagnostics);
 
         var program = Binder.BindProgram(GetOrCreateGlobalScope());
 
-        if (program.Diagnostics.Any())
-            return new AnalysisResult<object?>(null, program.Diagnostics);
-
-        if (program.Statement is null)
-            return default(object);
+        if (program.Statement is null || program.Diagnostics.HasErrors)
+            return new PrimResult<object?>(null, diagnostics);
 
         Debug.WriteLine(program.Statement);
 
         var evaluator = new Evaluator(program, globals);
         var value = evaluator.Evaluate();
 
-        return value;
+        return new PrimResult<object?>(value, diagnostics);
     }
 
     public void WriteTo(TextWriter writer)

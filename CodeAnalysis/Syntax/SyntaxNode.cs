@@ -9,6 +9,14 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
 
     public SyntaxNode? Parent { get => SyntaxTree.GetParent(this); }
 
+    public Token GetFirstToken()
+    {
+        if (this is Token token)
+            return token;
+
+        return Children().First().GetFirstToken();
+    }
+
     public Token GetLastToken()
     {
         if (this is Token token)

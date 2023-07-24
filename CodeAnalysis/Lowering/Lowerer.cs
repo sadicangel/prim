@@ -15,19 +15,13 @@ internal sealed class Lowerer : BoundTreeRewriter
     public static BoundProgram Lower(BoundProgram program)
     {
         if (program.Statement is not null)
-        {
-            var (value, diagnostics) = Lower(program.Statement);
-
-            diagnostics = diagnostics.Count == 0 ? program.Diagnostics : new DiagnosticBag(program.Diagnostics.Concat(diagnostics));
-
-            program = new BoundProgram(value, diagnostics);
-        }
+            program = new BoundProgram(Lower(program.Statement), program.Diagnostics);
 
         return program;
     }
 
     // TODO: Insert return in function bodies.
-    public static AnalysisResult<BoundBlockStatement> Lower(BoundStatement statement)
+    public static BoundBlockStatement Lower(BoundStatement statement)
     {
         var lowerer = new Lowerer();
         var result = lowerer.Rewrite(statement);

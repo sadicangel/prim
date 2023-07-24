@@ -23,13 +23,13 @@ internal sealed class Lexer
 
     public SourceText Text { get => _syntaxTree.Text; }
 
-    public IEnumerable<Diagnostic> Diagnostics { get => _diagnostics; }
+    public IReadOnlyDiagnosticBag Diagnostics { get => _diagnostics; }
 
     private char Current { get => Peek(0); }
 
     public bool IsEOF { get => _position >= Text.Length; }
 
-    public static AnalysisResult<IReadOnlyList<Token>> Lex(SyntaxTree syntaxTree, TransformToken transform)
+    public static PrimResult<IReadOnlyList<Token>> Lex(SyntaxTree syntaxTree, TransformToken transform)
     {
         var lexer = new Lexer(syntaxTree);
         var tokens = new List<Token>();
