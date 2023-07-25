@@ -353,36 +353,25 @@ internal sealed class Parser
     {
         if (Peek(0).TokenKind == TokenKind.Identifier)
         {
-            var operatorOrEqual = Peek(1).TokenKind;
-            switch ((operatorOrEqual, Peek(2).TokenKind))
+            switch (Peek(1).TokenKind)
             {
-                case (TokenKind.Equal, _):
-                    {
-                        var identifier = MatchToken(TokenKind.Identifier);
-                        var equal = MatchToken(TokenKind.Equal);
-                        var right = ParseAssignmentExpression();
-                        return new AssignmentExpression(_syntaxTree, identifier, equal, right);
-                    }
-                case (TokenKind.Ampersand, TokenKind.Equal):
-                case (TokenKind.Hat, TokenKind.Equal):
-                case (TokenKind.Minus, TokenKind.Equal):
-                case (TokenKind.Percent, TokenKind.Equal):
-                case (TokenKind.Pipe, TokenKind.Equal):
-                case (TokenKind.Plus, TokenKind.Equal):
-                case (TokenKind.Slash, TokenKind.Equal):
-                case (TokenKind.Star, TokenKind.Equal):
-                    {
-                        var identifier = MatchToken(TokenKind.Identifier);
-                        var @operator = MatchToken(operatorOrEqual);
-                        var equal = MatchToken(TokenKind.Equal);
-                        var right = ParseAssignmentExpression();
-                        return new CompoundAssignmentExpression(_syntaxTree, identifier, @operator, equal, right);
-                    }
-                default:
-                    break;
+                // Compound assignment.
+                case TokenKind.AmpersandEqual:
+                case TokenKind.HatEqual:
+                case TokenKind.MinusEqual:
+                case TokenKind.PercentEqual:
+                case TokenKind.PipeEqual:
+                case TokenKind.PlusEqual:
+                case TokenKind.SlashEqual:
+                case TokenKind.StarEqual:
+                // Default assignment
+                case TokenKind.Equal:
+                    var identifier = NextToken();
+                    var equal = NextToken();
+                    var right = ParseAssignmentExpression();
+                    return new AssignmentExpression(_syntaxTree, identifier, equal, right);
             }
         }
-
 
         return ParseBinaryExpression();
     }

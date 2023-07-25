@@ -123,6 +123,11 @@ internal sealed class Lexer
                 _position += 2;
                 break;
 
+            case ['&', '=', ..]:
+                _kind = TokenKind.AmpersandEqual;
+                _position += 2;
+                break;
+
             case ['&', ..]:
                 _kind = TokenKind.Ampersand;
                 _position++;
@@ -158,6 +163,11 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case ['^', '=', ..]:
+                _kind = TokenKind.HatEqual;
+                _position += 2;
+                break;
+
             case ['^', ..]:
                 _kind = TokenKind.Hat;
                 _position++;
@@ -173,14 +183,29 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case ['-', '=', ..]:
+                _kind = TokenKind.MinusEqual;
+                _position += 2;
+                break;
+
             case ['-', ..]:
                 _kind = TokenKind.Minus;
                 _position++;
                 break;
 
+            case ['%', '=', ..]:
+                _kind = TokenKind.PercentEqual;
+                _position += 2;
+                break;
+
             case ['%', ..]:
                 _kind = TokenKind.Percent;
                 _position++;
+                break;
+
+            case ['|', '=', ..]:
+                _kind = TokenKind.PipeEqual;
+                _position += 2;
                 break;
 
             case ['|', '|', ..]:
@@ -193,6 +218,11 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case ['+', '=', ..]:
+                _kind = TokenKind.PlusEqual;
+                _position += 2;
+                break;
+
             case ['+', ..]:
                 _kind = TokenKind.Plus;
                 _position++;
@@ -203,9 +233,19 @@ internal sealed class Lexer
                 _position += 2;
                 break;
 
+            case ['/', '=', ..]:
+                _kind = TokenKind.SlashEqual;
+                _position += 2;
+                break;
+
             case ['/', ..]:
                 _kind = TokenKind.Slash;
                 _position++;
+                break;
+
+            case ['*', '=', ..]:
+                _kind = TokenKind.StarEqual;
+                _position += 2;
                 break;
 
             case ['*', ..]:

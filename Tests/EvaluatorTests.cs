@@ -413,10 +413,10 @@ public sealed class EvaluatorTests
                 """
                 {
                     var x = 10;
-                    x ⟨&⟩= false;
+                    x ⟨&=⟩ false;
                 }
                 """,
-                $"{DiagnosticMessage.UndefinedBinaryOperator("&", BuiltinTypes.I32, BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.UndefinedBinaryOperator("&=", BuiltinTypes.I32, BuiltinTypes.Bool)}"
             },
             // No longer triggers as we allow the file to be empty?
             //new object[]
@@ -590,14 +590,13 @@ public sealed class EvaluatorTests
             {
                 $"Reports {nameof(DiagnosticMessage.UnexpectedToken)} for wrong parameter lists",
                 """
-                let greet: (name: str⟨=⟩⟨)⟩ => void = ⟨{⟩
+                let greet: (name: str⟨=⟩⟨)⟩ => void = {
                     print(name);
                 }⟨⟩
                 """,
                 $"""
                 {DiagnosticMessage.UnexpectedToken(TokenKind.CloseParenthesis, TokenKind.Equal)}
                 {DiagnosticMessage.UnexpectedToken(TokenKind.OpenBrace, TokenKind.CloseParenthesis)}
-                {DiagnosticMessage.UnexpectedToken(TokenKind.Identifier, TokenKind.OpenBrace)}
                 {DiagnosticMessage.UnexpectedToken(TokenKind.CloseBrace, TokenKind.EOF)}
                 """
             },

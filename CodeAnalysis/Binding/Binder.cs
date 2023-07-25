@@ -525,7 +525,21 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         if (variable.IsReadOnly)
         {
-            _diagnostics.ReportReadOnlyAssignment(expression.Equal.GetLocation(), expression.Identifier.Text);
+            _diagnostics.ReportReadOnlyAssignment(expression.Assign.GetLocation(), expression.Identifier.Text);
+        }
+
+        // Compound assignment?
+        if (expression.Assign.TokenKind is not TokenKind.Equal)
+        {
+            var operatorKind = expression.Assign.TokenKind.GetBinaryOperatorOfAssignmentOperator();
+            var boundOperator = BoundBinaryOperator.Bind(operatorKind, variable.Type, boundExpression.Type, variable.Type);
+            if (boundOperator is null)
+            {
+                _diagnostics.ReportUndefinedBinaryOperator(expression.Assign, variable.Type, boundExpression.Type);
+                return new BoundNeverExpression(expression);
+            }
+
+            return new BoundCompoundAssignmentExpression(expression, variable, boundOperator, boundExpression);
         }
 
         if (boundExpression.Type != variable.Type)
@@ -535,34 +549,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         }
 
         return new BoundAssignmentExpression(expression, variable, boundExpression);
-    }
 
-    BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(CompoundAssignmentExpression expression)
-    {
-        var boundExpression = BindExpression(expression.Expression);
-
-        if (boundExpression.Type == BuiltinTypes.Never)
-            return new BoundNeverExpression(expression);
-
-        if (!TryGetSymbol(expression.Identifier, out VariableSymbol? variable))
-        {
-            return boundExpression;
-        }
-
-        if (variable.IsReadOnly)
-        {
-            var location = new TextLocation(expression.Operator.SyntaxTree.Text, TextSpan.FromBounds(expression.Operator.Span, expression.Equal.Span));
-            _diagnostics.ReportReadOnlyAssignment(location, expression.Identifier.Text);
-        }
-
-        var boundOperator = BoundBinaryOperator.Bind(expression.Operator.TokenKind, variable.Type, boundExpression.Type, variable.Type);
-        if (boundOperator is null)
-        {
-            _diagnostics.ReportUndefinedBinaryOperator(expression.Operator, variable.Type, boundExpression.Type);
-            return new BoundNeverExpression(expression);
-        }
-
-        return new BoundCompoundAssignmentExpression(expression, variable, boundOperator, boundExpression);
     }
 
     private BoundExpression BindConversion(Expression expression, TypeSymbol targetType, bool allowExplicit)

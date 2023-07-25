@@ -132,56 +132,94 @@ public sealed class LexerTests
 
     private static bool RequireSeparator(TokenKind k1, TokenKind k2)
     {
-        var k1IsKeyword = k1.IsKeyword();
-        var k2IsKeyword = k2.IsKeyword();
-
-        if (k1 is TokenKind.Identifier && k2 is TokenKind.Identifier)
-            return true;
-
-        if (k1 is TokenKind.As || k2 is TokenKind.As)
-            return true;
-
-        if (k1IsKeyword && k2IsKeyword)
-            return true;
-
-        if (k1 is TokenKind.Identifier && k2IsKeyword)
-            return true;
-
-        if (k1IsKeyword && k2 is TokenKind.Identifier)
-            return true;
-
-        if (k1 is TokenKind.Identifier && k2.IsNumber())
-            return true;
-
-        if (k1.IsKeyword() && k2.IsNumber())
+        if ((k1 is TokenKind.Identifier || k1.IsKeyword()) && (k2 is TokenKind.Identifier || k2.IsKeyword() || k2.IsNumber()))
             return true;
 
         if (k1.IsNumber() && k2.IsNumber())
             return true;
 
-        if (k1 is TokenKind.String && k2 is TokenKind.String)
-            return true;
+        switch ((k1, k2))
+        {
+            case (TokenKind.Ampersand, TokenKind.Ampersand):
+            case (TokenKind.Ampersand, TokenKind.AmpersandAmpersand):
+            case (TokenKind.Ampersand, TokenKind.AmpersandEqual):
+            case (TokenKind.Ampersand, TokenKind.Arrow):
+            case (TokenKind.Ampersand, TokenKind.Equal):
+            case (TokenKind.Ampersand, TokenKind.EqualEqual):
+                return true;
 
-        if (k1 is TokenKind.Bang && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow)
-            return true;
+            case (TokenKind.As, TokenKind.As):
+                return true;
 
-        if (k1 is TokenKind.Equal && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow or TokenKind.Greater or TokenKind.GreaterEqual)
-            return true;
+            case (TokenKind.Bang, TokenKind.Arrow):
+            case (TokenKind.Bang, TokenKind.Equal):
+            case (TokenKind.Bang, TokenKind.EqualEqual):
+                return true;
 
-        if (k1 is TokenKind.Less && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow)
-            return true;
+            case (TokenKind.Equal, TokenKind.Arrow):
+            case (TokenKind.Equal, TokenKind.Equal):
+            case (TokenKind.Equal, TokenKind.EqualEqual):
+            case (TokenKind.Equal, TokenKind.Greater):
+            case (TokenKind.Equal, TokenKind.GreaterEqual):
+                return true;
 
-        if (k1 is TokenKind.Greater && k2 is TokenKind.Equal or TokenKind.EqualEqual or TokenKind.Arrow)
-            return true;
+            case (TokenKind.Less, TokenKind.Arrow):
+            case (TokenKind.Less, TokenKind.Equal):
+            case (TokenKind.Less, TokenKind.EqualEqual):
+                return true;
 
-        if (k1 is TokenKind.Ampersand && k2 is TokenKind.Ampersand or TokenKind.AmpersandAmpersand)
-            return true;
+            case (TokenKind.Greater, TokenKind.Arrow):
+            case (TokenKind.Greater, TokenKind.Equal):
+            case (TokenKind.Greater, TokenKind.EqualEqual):
+                return true;
 
-        if (k1 is TokenKind.Pipe && k2 is TokenKind.Pipe or TokenKind.PipePipe)
-            return true;
+            case (TokenKind.Hat, TokenKind.Arrow):
+            case (TokenKind.Hat, TokenKind.Equal):
+            case (TokenKind.Hat, TokenKind.EqualEqual):
+                return true;
 
-        if (k1 is TokenKind.Slash && k2 is TokenKind.Slash or TokenKind.Star or TokenKind.SingleLineComment or TokenKind.MultiLineComment)
-            return true;
+            case (TokenKind.Minus, TokenKind.Arrow):
+            case (TokenKind.Minus, TokenKind.Equal):
+            case (TokenKind.Minus, TokenKind.EqualEqual):
+                return true;
+
+            case (TokenKind.Percent, TokenKind.Arrow):
+            case (TokenKind.Percent, TokenKind.Equal):
+            case (TokenKind.Percent, TokenKind.EqualEqual):
+                return true;
+
+            case (TokenKind.Pipe, TokenKind.Arrow):
+            case (TokenKind.Pipe, TokenKind.Equal):
+            case (TokenKind.Pipe, TokenKind.EqualEqual):
+            case (TokenKind.Pipe, TokenKind.Pipe):
+            case (TokenKind.Pipe, TokenKind.PipeEqual):
+            case (TokenKind.Pipe, TokenKind.PipePipe):
+                return true;
+
+            case (TokenKind.Plus, TokenKind.Arrow):
+            case (TokenKind.Plus, TokenKind.Equal):
+            case (TokenKind.Plus, TokenKind.EqualEqual):
+                return true;
+
+            case (TokenKind.String, TokenKind.String):
+                return true;
+
+            case (TokenKind.Slash, TokenKind.Arrow):
+            case (TokenKind.Slash, TokenKind.Equal):
+            case (TokenKind.Slash, TokenKind.EqualEqual):
+            case (TokenKind.Slash, TokenKind.Slash):
+            case (TokenKind.Slash, TokenKind.SlashEqual):
+            case (TokenKind.Slash, TokenKind.Star):
+            case (TokenKind.Slash, TokenKind.StarEqual):
+            case (TokenKind.Slash, TokenKind.SingleLineComment):
+            case (TokenKind.Slash, TokenKind.MultiLineComment):
+                return true;
+
+            case (TokenKind.Star, TokenKind.Arrow):
+            case (TokenKind.Star, TokenKind.Equal):
+            case (TokenKind.Star, TokenKind.EqualEqual):
+                return true;
+        }
 
         return false;
     }

@@ -113,10 +113,27 @@ public static class SyntaxFacts
 
     public static IEnumerable<TokenKind> GetBinaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecedence(k) > 0);
 
+    public static TokenKind GetBinaryOperatorOfAssignmentOperator(this TokenKind kind)
+    {
+        return kind switch
+        {
+            TokenKind.AmpersandEqual => TokenKind.Ampersand,
+            TokenKind.HatEqual => TokenKind.Hat,
+            TokenKind.MinusEqual => TokenKind.Minus,
+            TokenKind.PercentEqual => TokenKind.Percent,
+            TokenKind.PipeEqual => TokenKind.Pipe,
+            TokenKind.PlusEqual => TokenKind.Plus,
+            TokenKind.SlashEqual => TokenKind.Slash,
+            TokenKind.StarEqual => TokenKind.Star,
+            _ => throw new Exception($"Unexpected syntax: '{kind}'"),
+        };
+    }
+
     public static string? GetText(this TokenKind kind) => kind switch
     {
         TokenKind.Ampersand => "&",
         TokenKind.AmpersandAmpersand => "&&",
+        TokenKind.AmpersandEqual => "&=",
         TokenKind.Arrow => "=>",
         TokenKind.As => "as",
         TokenKind.Bang => "!",
@@ -135,22 +152,29 @@ public static class SyntaxFacts
         TokenKind.Greater => ">",
         TokenKind.GreaterEqual => ">=",
         TokenKind.Hat => "^",
+        TokenKind.HatEqual => "^=",
         TokenKind.If => "if",
         TokenKind.In => "in",
         TokenKind.Less => "<",
         TokenKind.LessEqual => "<=",
         TokenKind.Let => "let",
         TokenKind.Minus => "-",
+        TokenKind.MinusEqual => "-=",
         TokenKind.OpenBrace => "{",
         TokenKind.OpenParenthesis => "(",
         TokenKind.Percent => "%",
+        TokenKind.PercentEqual => "%=",
         TokenKind.Pipe => "|",
+        TokenKind.PipeEqual => "|=",
         TokenKind.PipePipe => "||",
         TokenKind.Plus => "+",
+        TokenKind.PlusEqual => "+=",
         TokenKind.Return => "return",
         TokenKind.Semicolon => ";",
         TokenKind.Slash => "/",
+        TokenKind.SlashEqual => "/=",
         TokenKind.Star => "*",
+        TokenKind.StarEqual => "*=",
         TokenKind.Range => "..",
         TokenKind.Tilde => "~",
         TokenKind.True => "true",
