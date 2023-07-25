@@ -175,7 +175,7 @@ internal sealed class ControlFlowGraph : INode
                 if (condition is BoundLiteralExpression literal)
                     return new BoundLiteralExpression(condition.Syntax, !((bool)literal.Value!));
 
-                var @operator = BoundUnaryOperator.Bind(TokenKind.Bang, BuiltinTypes.Bool)!;
+                var @operator = BoundUnaryOperator.Bind(TokenKind.Bang, PredefinedTypes.Bool)!;
                 return new BoundUnaryExpression(condition.Syntax, @operator, condition);
             }
 

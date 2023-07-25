@@ -123,7 +123,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         foreach (var function in BuiltinFunctions.All)
             if (!root.TryDeclare(function))
                 throw new InvalidOperationException($"Could not declare built in function {function.Name}");
-        foreach (var type in BuiltinTypes.All)
+        foreach (var type in PredefinedTypes.All)
             if (!root.TryDeclare(type))
                 throw new InvalidOperationException($"Could not declare built in type {type.Name}");
         return root;
@@ -175,15 +175,15 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         {
             var parameter = statement.Parameters[i];
             var parameterName = parameter.Identifier.Text;
-            var parameterType = GetSymbolOrDefault(parameter.Type, BuiltinTypes.Never);
+            var parameterType = GetSymbolOrDefault(parameter.Type, PredefinedTypes.Never);
             if (!seenParameterNames.Add(parameterName))
                 _diagnostics.ReportRedeclaration(parameter.Identifier, "parameter");
             parameters[i] = new ParameterSymbol(parameterName, parameterType);
 
         }
-        var type = BuiltinTypes.Never;
+        var type = PredefinedTypes.Never;
         if (!statement.Type.IsMissing)
-            type = GetSymbolOrDefault(statement.Type, BuiltinTypes.Never);
+            type = GetSymbolOrDefault(statement.Type, PredefinedTypes.Never);
 
         var function = new FunctionSymbol(statement.Identifier.Text, type, parameters);
         if (!_scope.TryDeclare(function))
@@ -202,7 +202,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
         var loweredBody = Lowerer.Lower(functionBody);
 
-        if (function.Type != BuiltinTypes.Void && function.Type != BuiltinTypes.Never && !ControlFlowGraph.AllPathsReturn(loweredBody))
+        if (function.Type != PredefinedTypes.Void && function.Type != PredefinedTypes.Never && !ControlFlowGraph.AllPathsReturn(loweredBody))
             binder._diagnostics.ReportNotAllPathsReturn(statement.Identifier.GetLocation());
 
         _diagnostics.AddRange(binder.Diagnostics);
@@ -217,7 +217,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         BoundExpression expression;
         if (statement.HasTypeDeclaration)
         {
-            if (BuiltinTypes.TryLookup(statement.Type.Text, out var type))
+            if (PredefinedTypes.TryLookup(statement.Type.Text, out var type))
             {
                 expression = BindExpression(statement.Expression, type, isExplicit: true);
             }
@@ -245,7 +245,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(IfStatement statement)
     {
-        var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
+        var condition = BindExpression(statement.Condition, PredefinedTypes.Bool);
         if (condition.ConstantValue is not null)
         {
             if (!(bool)condition.ConstantValue.Value!)
@@ -271,7 +271,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(WhileStatement statement)
     {
-        var condition = BindExpression(statement.Condition, BuiltinTypes.Bool);
+        var condition = BindExpression(statement.Condition, PredefinedTypes.Bool);
         if (condition.ConstantValue is not null)
         {
             if (!(bool)condition.ConstantValue.Value!)
@@ -283,8 +283,8 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
 
     BoundStatement ISyntaxStatementVisitor<BoundStatement>.Visit(ForStatement statement)
     {
-        var lowerBound = BindExpression(statement.LowerBound, BuiltinTypes.I32);
-        var upperBound = BindExpression(statement.UpperBound, BuiltinTypes.I32);
+        var lowerBound = BindExpression(statement.LowerBound, PredefinedTypes.I32);
+        var upperBound = BindExpression(statement.UpperBound, PredefinedTypes.I32);
 
         if (lowerBound.ConstantValue is not null && upperBound.ConstantValue is not null)
         {
@@ -294,7 +294,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
                 _diagnostics.ReportUnreachableCode(statement.Body);
         }
 
-        var variable = new VariableSymbol(statement.Identifier.Text, IsReadOnly: true, BuiltinTypes.I32);
+        var variable = new VariableSymbol(statement.Identifier.Text, IsReadOnly: true, PredefinedTypes.I32);
 
         // Check outer scope for name. Should this be a warning instead?
         if (_scope.TryLookup(variable.Name, out _))
@@ -339,7 +339,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
             _diagnostics.ReportInvalidReturn(statement.Return.GetLocation());
             return new BoundExpressionStatement(statement, new BoundNeverExpression(statement));
         }
-        else if (_function.Type == BuiltinTypes.Void)
+        else if (_function.Type == PredefinedTypes.Void)
         {
             if (statement.Expression is not null)
             {
@@ -373,7 +373,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     private BoundExpression BindExpression(Expression expression, bool allowVoid)
     {
         var result = expression.Accept(this);
-        if (!allowVoid && result.Type == BuiltinTypes.Void)
+        if (!allowVoid && result.Type == PredefinedTypes.Void)
         {
             _diagnostics.ReportInvalidExpressionType(expression.GetLocation(), result.Type);
             return new BoundNeverExpression(expression);
@@ -393,7 +393,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         var boundOperand = BindExpression(expression.Operand);
 
-        if (boundOperand.Type == BuiltinTypes.Never)
+        if (boundOperand.Type == PredefinedTypes.Never)
             return new BoundNeverExpression(expression);
 
         var boundOperator = BoundUnaryOperator.Bind(expression.Operator.TokenKind, boundOperand.Type);
@@ -410,19 +410,19 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var boundLeft = BindExpression(expression.Left);
         var boundRight = BindExpression(expression.Right);
 
-        if (boundLeft.Type == BuiltinTypes.Never || boundRight.Type == BuiltinTypes.Never)
+        if (boundLeft.Type == PredefinedTypes.Never || boundRight.Type == PredefinedTypes.Never)
             return new BoundNeverExpression(expression);
 
         var resultType = default(TypeSymbol);
         if (expression.Operator.TokenKind is TokenKind.As)
         {
-            if (boundRight is not BoundSymbolExpression symbolExpression || BuiltinTypes.Type != symbolExpression.Type)
+            if (boundRight is not BoundSymbolExpression symbolExpression || PredefinedTypes.Type != symbolExpression.Type)
             {
-                _diagnostics.ReportInvalidExpressionType(expression.Right.GetLocation(), BuiltinTypes.Type, boundRight.Type);
+                _diagnostics.ReportInvalidExpressionType(expression.Right.GetLocation(), PredefinedTypes.Type, boundRight.Type);
                 return new BoundNeverExpression(expression);
             }
 
-            if (!BuiltinTypes.TryLookup(symbolExpression.Symbol.Name, out resultType))
+            if (!PredefinedTypes.TryLookup(symbolExpression.Symbol.Name, out resultType))
             {
                 _diagnostics.ReportUndefinedType(expression.Right.GetLocation(), symbolExpression.Symbol.Name);
                 return new BoundNeverExpression(expression);
@@ -515,7 +515,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         var boundExpression = BindExpression(expression.Expression);
 
-        if (boundExpression.Type == BuiltinTypes.Never)
+        if (boundExpression.Type == PredefinedTypes.Never)
             return new BoundNeverExpression(expression);
 
         if (!TryGetSymbol(expression.Identifier, out VariableSymbol? variable))
@@ -556,7 +556,7 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
     {
         var boundExpression = BindExpression(expression);
 
-        if (boundExpression.Type == BuiltinTypes.Never || targetType == BuiltinTypes.Never)
+        if (boundExpression.Type == PredefinedTypes.Never || targetType == PredefinedTypes.Never)
             return boundExpression;
 
         var conversion = Conversion.Classify(boundExpression.Type, targetType);

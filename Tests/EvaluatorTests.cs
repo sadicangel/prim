@@ -393,19 +393,19 @@ public sealed class EvaluatorTests
                     ⟨x = false⟩;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.I32, BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.InvalidConversion(PredefinedTypes.I32, PredefinedTypes.Bool)}"
             },
             new object[]
             {
                 $"Reports {nameof(DiagnosticMessage.UndefinedUnaryOperator)}",
                 "⟨+⟩true",
-                $"{DiagnosticMessage.UndefinedUnaryOperator("+", BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.UndefinedUnaryOperator("+", PredefinedTypes.Bool)}"
             },
             new object[]
             {
                 $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
                 "10 ⟨+⟩ true",
-                $"{DiagnosticMessage.UndefinedBinaryOperator("+", BuiltinTypes.I32, BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.UndefinedBinaryOperator("+", PredefinedTypes.I32, PredefinedTypes.Bool)}"
             },
             new object[]
             {
@@ -416,7 +416,7 @@ public sealed class EvaluatorTests
                     x ⟨&=⟩ false;
                 }
                 """,
-                $"{DiagnosticMessage.UndefinedBinaryOperator("&=", BuiltinTypes.I32, BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.UndefinedBinaryOperator("&=", PredefinedTypes.I32, PredefinedTypes.Bool)}"
             },
             // No longer triggers as we allow the file to be empty?
             //new object[]
@@ -462,7 +462,7 @@ public sealed class EvaluatorTests
                         x = 10;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.I32, BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.InvalidConversion(PredefinedTypes.I32, PredefinedTypes.Bool)}"
             },
             new object[]
             {
@@ -474,7 +474,7 @@ public sealed class EvaluatorTests
                         x = 10;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.I32, BuiltinTypes.Bool)}"
+                $"{DiagnosticMessage.InvalidConversion(PredefinedTypes.I32, PredefinedTypes.Bool)}"
             },
             new object[]
             {
@@ -486,7 +486,7 @@ public sealed class EvaluatorTests
                         result = result + i;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.Bool, BuiltinTypes.I32)}"
+                $"{DiagnosticMessage.InvalidConversion(PredefinedTypes.Bool, PredefinedTypes.I32)}"
             },
             new object[]
             {
@@ -498,7 +498,7 @@ public sealed class EvaluatorTests
                         result = result + i;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.Bool, BuiltinTypes.I32)}"
+                $"{DiagnosticMessage.InvalidConversion(PredefinedTypes.Bool, PredefinedTypes.I32)}"
             },
             //new object[]
             //{
@@ -553,7 +553,7 @@ public sealed class EvaluatorTests
             {
                 $"Reports {nameof(DiagnosticMessage.InvalidNumber)} for multiple '.' in a number",
                 "⟨1.1.1⟩",
-                $"{DiagnosticMessage.InvalidNumber("1.1.1", BuiltinTypes.F32)}"
+                $"{DiagnosticMessage.InvalidNumber("1.1.1", PredefinedTypes.F32)}"
             },
             new object[]
             {
@@ -564,7 +564,7 @@ public sealed class EvaluatorTests
                     10 as ⟨string⟩;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidExpressionType(BuiltinTypes.Type, BuiltinTypes.Str)}"
+                $"{DiagnosticMessage.InvalidExpressionType(PredefinedTypes.Type, PredefinedTypes.Str)}"
             },
             new object[]
             {
@@ -574,7 +574,7 @@ public sealed class EvaluatorTests
                     10 ⟨as str⟩;
                 }
                 """,
-                $"{DiagnosticMessage.InvalidConversion(BuiltinTypes.I32, BuiltinTypes.Str)}"
+                $"{DiagnosticMessage.InvalidConversion(PredefinedTypes.I32, PredefinedTypes.Str)}"
             },
             new object[]
             {
@@ -655,7 +655,7 @@ public sealed class EvaluatorTests
                 }
                 """,
                 $"""
-                {DiagnosticMessage.InvalidReturnExpression("greet", BuiltinTypes.Str)}
+                {DiagnosticMessage.InvalidReturnExpression("greet", PredefinedTypes.Str)}
                 """
             },
             new object[]

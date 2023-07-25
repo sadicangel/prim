@@ -25,17 +25,17 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
             // cast operators
             [TokenKind.As] = new()
             {
-                new BoundBinaryOperator(TokenKind.As, BoundBinaryOperatorKind.ExplicitCast, BuiltinTypes.Any, BuiltinTypes.Type, BuiltinTypes.Any)
+                new BoundBinaryOperator(TokenKind.As, BoundBinaryOperatorKind.ExplicitCast, PredefinedTypes.Any, PredefinedTypes.Type, PredefinedTypes.Any)
             },
 
             // equality operators
             [TokenKind.EqualEqual] = new()
             {
-                new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, BuiltinTypes.Any, BuiltinTypes.Bool)
+                new BoundBinaryOperator(TokenKind.EqualEqual, BoundBinaryOperatorKind.Equal, PredefinedTypes.Any, PredefinedTypes.Bool)
             },
             [TokenKind.BangEqual] = new()
             {
-                new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, BuiltinTypes.Any, BuiltinTypes.Bool),
+                new BoundBinaryOperator(TokenKind.BangEqual, BoundBinaryOperatorKind.NotEqual, PredefinedTypes.Any, PredefinedTypes.Bool),
             }
         };
 
@@ -45,26 +45,26 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         var logicalOperators = new TokenKind[] { TokenKind.AmpersandAmpersand, TokenKind.PipePipe };
 
         // integer operators
-        var integers = BuiltinTypes.All.Where(t => t.IsInteger()).ToList();
+        var integers = PredefinedTypes.All.Where(t => t.IsInteger).ToList();
         operators.Add(numberOperators, integers.Select(i => (i, i, i)));
         operators.Add(bitwiseOperators, integers.Select(i => (i, i, i)));
-        operators.Add(comparisonOperators, integers.Select(i => (i, i, BuiltinTypes.Bool)));
+        operators.Add(comparisonOperators, integers.Select(i => (i, i, PredefinedTypes.Bool)));
 
         // floating point operators
-        var floats = BuiltinTypes.All.Where(t => t.IsFloatingPoint()).ToList();
+        var floats = PredefinedTypes.All.Where(t => t.IsFloatingPoint).ToList();
         operators.Add(numberOperators, floats.Select(f => (f, f, f)));
-        operators.Add(comparisonOperators, floats.Select(f => (f, f, BuiltinTypes.Bool)));
+        operators.Add(comparisonOperators, floats.Select(f => (f, f, PredefinedTypes.Bool)));
 
         // bool operators
-        var bools = new List<TypeSymbol> { BuiltinTypes.Bool };
+        var bools = new List<TypeSymbol> { PredefinedTypes.Bool };
         operators.Add(bitwiseOperators, bools.Select(b => (b, b, b)));
         operators.Add(comparisonOperators, bools.Select(b => (b, b, b)));
         operators.Add(logicalOperators, bools.Select(b => (b, b, b)));
 
         // str operators
-        operators.Add(TokenKind.Plus, BuiltinTypes.Str, BuiltinTypes.Str, BuiltinTypes.Str);
-        operators.Add(TokenKind.Plus, BuiltinTypes.Str, BuiltinTypes.Any, BuiltinTypes.Str);
-        operators.Add(TokenKind.Plus, BuiltinTypes.Any, BuiltinTypes.Str, BuiltinTypes.Str);
+        operators.Add(TokenKind.Plus, PredefinedTypes.Str, PredefinedTypes.Str, PredefinedTypes.Str);
+        operators.Add(TokenKind.Plus, PredefinedTypes.Str, PredefinedTypes.Any, PredefinedTypes.Str);
+        operators.Add(TokenKind.Plus, PredefinedTypes.Any, PredefinedTypes.Str, PredefinedTypes.Str);
 
         return operators;
     }

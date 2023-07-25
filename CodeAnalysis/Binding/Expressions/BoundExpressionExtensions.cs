@@ -85,7 +85,7 @@ internal static class BoundExpressionExtensions
         if (@operator.Kind is BoundBinaryOperatorKind.ImplicitCast or BoundBinaryOperatorKind.ExplicitCast)
         {
             var symbolExpression = (BoundSymbolExpression)right;
-            if (!BuiltinTypes.TryLookup(symbolExpression.Symbol.Name, out rightType))
+            if (!PredefinedTypes.TryLookup(symbolExpression.Symbol.Name, out rightType))
                 throw new InvalidOperationException($"Could not find type {symbolExpression.Symbol.Name}");
         }
 

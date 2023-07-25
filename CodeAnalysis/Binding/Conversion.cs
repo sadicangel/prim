@@ -12,117 +12,117 @@ public sealed record class Conversion(bool Exists, bool IsIdentity, bool IsImpli
 
     public static Conversion Classify(TypeSymbol from, TypeSymbol to)
     {
-        if (from == BuiltinTypes.Never || to == BuiltinTypes.Never)
+        if (from == PredefinedTypes.Never || to == PredefinedTypes.Never)
             return None;
 
         if (from == to)
             return Identity;
 
-        if (to == BuiltinTypes.Any)
+        if (to == PredefinedTypes.Any)
             return Implicit;
 
         // Signed integers
-        if (to == BuiltinTypes.I8 && from.IsNumber())
+        if (to == PredefinedTypes.I8 && from.IsNumber)
         {
             return Explicit;
         }
 
-        if (to == BuiltinTypes.I16 && from.IsNumber())
+        if (to == PredefinedTypes.I16 && from.IsNumber)
         {
-            if (from == BuiltinTypes.I8 ||
-                from == BuiltinTypes.U8)
+            if (from == PredefinedTypes.I8 ||
+                from == PredefinedTypes.U8)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.I32 && from.IsNumber())
+        if (to == PredefinedTypes.I32 && from.IsNumber)
         {
-            if (from == BuiltinTypes.I8 ||
-                from == BuiltinTypes.U8 ||
-                from == BuiltinTypes.I16 ||
-                from == BuiltinTypes.U16)
+            if (from == PredefinedTypes.I8 ||
+                from == PredefinedTypes.U8 ||
+                from == PredefinedTypes.I16 ||
+                from == PredefinedTypes.U16)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.I64 && from.IsNumber())
+        if (to == PredefinedTypes.I64 && from.IsNumber)
         {
-            if (from == BuiltinTypes.I8 ||
-                from == BuiltinTypes.U8 ||
-                from == BuiltinTypes.I16 ||
-                from == BuiltinTypes.U16 ||
-                from == BuiltinTypes.I32 ||
-                from == BuiltinTypes.U32)
+            if (from == PredefinedTypes.I8 ||
+                from == PredefinedTypes.U8 ||
+                from == PredefinedTypes.I16 ||
+                from == PredefinedTypes.U16 ||
+                from == PredefinedTypes.I32 ||
+                from == PredefinedTypes.U32)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.ISize && from.IsNumber())
+        if (to == PredefinedTypes.ISize && from.IsNumber)
         {
-            if (from == BuiltinTypes.I8 ||
-                from == BuiltinTypes.U8 ||
-                from == BuiltinTypes.I16 ||
-                from == BuiltinTypes.U16)
+            if (from == PredefinedTypes.I8 ||
+                from == PredefinedTypes.U8 ||
+                from == PredefinedTypes.I16 ||
+                from == PredefinedTypes.U16)
                 return Implicit;
-            if ((from == BuiltinTypes.I32 ||
-                from == BuiltinTypes.U32 ||
-                from == BuiltinTypes.I64)
-                && from.SizeOf() <= to.SizeOf())
+            if ((from == PredefinedTypes.I32 ||
+                from == PredefinedTypes.U32 ||
+                from == PredefinedTypes.I64)
+                && from.BinarySize <= to.BinarySize)
                 return Implicit;
             return Explicit;
         }
 
         // Unsigned integers
-        if (to == BuiltinTypes.U8 && from.IsNumber())
+        if (to == PredefinedTypes.U8 && from.IsNumber)
         {
             return Explicit;
         }
 
-        if (to == BuiltinTypes.U16 && from.IsNumber())
+        if (to == PredefinedTypes.U16 && from.IsNumber)
         {
-            if (from == BuiltinTypes.U8)
+            if (from == PredefinedTypes.U8)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.U32 && from.IsNumber())
+        if (to == PredefinedTypes.U32 && from.IsNumber)
         {
-            if (from == BuiltinTypes.U8 ||
-                from == BuiltinTypes.U16)
+            if (from == PredefinedTypes.U8 ||
+                from == PredefinedTypes.U16)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.U64 && from.IsNumber())
+        if (to == PredefinedTypes.U64 && from.IsNumber)
         {
-            if (from == BuiltinTypes.U8 ||
-                from == BuiltinTypes.U16 ||
-                from == BuiltinTypes.U32)
+            if (from == PredefinedTypes.U8 ||
+                from == PredefinedTypes.U16 ||
+                from == PredefinedTypes.U32)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.USize && from.IsNumber())
+        if (to == PredefinedTypes.USize && from.IsNumber)
         {
-            if (from == BuiltinTypes.U8 ||
-                from == BuiltinTypes.U16)
+            if (from == PredefinedTypes.U8 ||
+                from == PredefinedTypes.U16)
                 return Implicit;
-            if ((from == BuiltinTypes.U32 ||
-                from == BuiltinTypes.U64)
-                && from.SizeOf() <= to.SizeOf())
+            if ((from == PredefinedTypes.U32 ||
+                from == PredefinedTypes.U64)
+                && from.BinarySize <= to.BinarySize)
                 return Implicit;
             return Explicit;
         }
 
         // Floating point
-        if (to == BuiltinTypes.F32 && from.IsNumber())
+        if (to == PredefinedTypes.F32 && from.IsNumber)
         {
-            if (from.IsInteger())
+            if (from.IsInteger)
                 return Implicit;
             return Explicit;
         }
 
-        if (to == BuiltinTypes.F64 && from.IsNumber())
+        if (to == PredefinedTypes.F64 && from.IsNumber)
         {
             return Implicit;
         }

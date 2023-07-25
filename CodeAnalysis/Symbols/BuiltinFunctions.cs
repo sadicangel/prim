@@ -6,13 +6,13 @@ namespace CodeAnalysis.Symbols;
 
 internal static class BuiltinFunctions
 {
-    public static readonly FunctionSymbol Print = new("print", BuiltinTypes.Void, new ParameterSymbol("value", BuiltinTypes.Any));
-    public static readonly FunctionSymbol Scan = new("scan", BuiltinTypes.Str, Array.Empty<ParameterSymbol>());
-    public static readonly FunctionSymbol ToStr = new("toStr", BuiltinTypes.Str, new ParameterSymbol("value", BuiltinTypes.Any));
-    public static readonly FunctionSymbol IsSame = new("isSame", BuiltinTypes.Bool, new ParameterSymbol("left", BuiltinTypes.Any), new ParameterSymbol("right", BuiltinTypes.Any));
-    public static readonly FunctionSymbol Random = new("random", BuiltinTypes.I32, new ParameterSymbol("max", BuiltinTypes.I32));
-    public static readonly FunctionSymbol TypeOf = new("typeof", BuiltinTypes.Type, new ParameterSymbol("obj", BuiltinTypes.Any));
-    public static readonly FunctionSymbol CrlType = new("clrType", BuiltinTypes.Str, new ParameterSymbol("obj", BuiltinTypes.Any));
+    public static readonly FunctionSymbol Print = new("print", PredefinedTypes.Void, new ParameterSymbol("value", PredefinedTypes.Any));
+    public static readonly FunctionSymbol Scan = new("scan", PredefinedTypes.Str, Array.Empty<ParameterSymbol>());
+    public static readonly FunctionSymbol ToStr = new("toStr", PredefinedTypes.Str, new ParameterSymbol("value", PredefinedTypes.Any));
+    public static readonly FunctionSymbol IsSame = new("isSame", PredefinedTypes.Bool, new ParameterSymbol("left", PredefinedTypes.Any), new ParameterSymbol("right", PredefinedTypes.Any));
+    public static readonly FunctionSymbol Random = new("random", PredefinedTypes.I32, new ParameterSymbol("max", PredefinedTypes.I32));
+    public static readonly FunctionSymbol TypeOf = new("typeof", PredefinedTypes.Type, new ParameterSymbol("obj", PredefinedTypes.Any));
+    public static readonly FunctionSymbol CrlType = new("clrType", PredefinedTypes.Str, new ParameterSymbol("obj", PredefinedTypes.Any));
 
     private static readonly Lazy<ConcurrentDictionary<string, FunctionSymbol>> FunctionMap = new(() => new ConcurrentDictionary<string, FunctionSymbol>(typeof(BuiltinFunctions)
         .GetFields(BindingFlags.Public | BindingFlags.Static)

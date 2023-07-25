@@ -117,7 +117,7 @@ internal sealed class Evaluator : IBoundExpressionVisitor<object?>
 
         switch (symbol.SymbolKind)
         {
-            case SymbolKind.Type when BuiltinTypes.TryLookup(symbol.Name, out var type):
+            case SymbolKind.Type when PredefinedTypes.TryLookup(symbol.Name, out var type):
                 return type;
             case SymbolKind.Function when BuiltinFunctions.TryLookup(symbol.Name, out var function):
                 return function;

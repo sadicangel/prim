@@ -315,7 +315,7 @@ internal static class BoundNodeWriterExtensions
     }
     private static void WriteNode(this IndentedTextWriter writer, BoundNeverExpression node)
     {
-        writer.WriteSymbol(BuiltinTypes.Never);
+        writer.WriteSymbol(PredefinedTypes.Never);
     }
     private static void WriteNestedExpression(this IndentedTextWriter writer, int parentPrecedence, BoundExpression node)
     {
@@ -359,15 +359,15 @@ internal static class BoundNodeWriterExtensions
     {
         switch (node.Type)
         {
-            case var _ when node.Type == BuiltinTypes.Bool:
+            case var _ when node.Type == PredefinedTypes.Bool:
                 writer.WriteKeyword(node.Value is true ? TokenKind.True : TokenKind.False);
                 break;
 
-            case var _ when node.Type == BuiltinTypes.Str:
+            case var _ when node.Type == PredefinedTypes.Str:
                 writer.WriteString(node.Value);
                 break;
 
-            case var _ when node.Type.IsNumber():
+            case var _ when node.Type.IsNumber:
                 writer.WriteNumber(node.Value);
                 break;
 
