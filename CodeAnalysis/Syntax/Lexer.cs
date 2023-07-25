@@ -243,8 +243,18 @@ internal sealed class Lexer
                 _position++;
                 break;
 
+            case ['*', '*', '=', ..]:
+                _kind = TokenKind.StarStarEqual;
+                _position += 3;
+                break;
+
             case ['*', '=', ..]:
                 _kind = TokenKind.StarEqual;
+                _position += 2;
+                break;
+
+            case ['*', '*', ..]:
+                _kind = TokenKind.StarStar;
                 _position += 2;
                 break;
 

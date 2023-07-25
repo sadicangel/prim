@@ -47,6 +47,8 @@ public enum TokenKind
     PipePipe,
     Plus,
     PlusEqual,
+    StarStar,
+    StarStarEqual,
     Range,
     Slash,
     SlashEqual,

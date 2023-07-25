@@ -211,6 +211,8 @@ public sealed class LexerTests
             case (TokenKind.Slash, TokenKind.SlashEqual):
             case (TokenKind.Slash, TokenKind.Star):
             case (TokenKind.Slash, TokenKind.StarEqual):
+            case (TokenKind.Slash, TokenKind.StarStar):
+            case (TokenKind.Slash, TokenKind.StarStarEqual):
             case (TokenKind.Slash, TokenKind.SingleLineComment):
             case (TokenKind.Slash, TokenKind.MultiLineComment):
                 return true;
@@ -218,6 +220,19 @@ public sealed class LexerTests
             case (TokenKind.Star, TokenKind.Arrow):
             case (TokenKind.Star, TokenKind.Equal):
             case (TokenKind.Star, TokenKind.EqualEqual):
+            case (TokenKind.Star, TokenKind.Star):
+            case (TokenKind.Star, TokenKind.StarEqual):
+            case (TokenKind.Star, TokenKind.StarStar):
+            case (TokenKind.Star, TokenKind.StarStarEqual):
+                return true;
+
+            case (TokenKind.StarStar, TokenKind.Arrow):
+            case (TokenKind.StarStar, TokenKind.Equal):
+            case (TokenKind.StarStar, TokenKind.EqualEqual):
+            case (TokenKind.StarStar, TokenKind.Star):
+            case (TokenKind.StarStar, TokenKind.StarEqual):
+            case (TokenKind.StarStar, TokenKind.StarStar):
+            case (TokenKind.StarStar, TokenKind.StarStarEqual):
                 return true;
         }
 

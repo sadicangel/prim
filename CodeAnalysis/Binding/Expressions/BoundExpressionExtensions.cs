@@ -44,11 +44,10 @@ internal static class BoundExpressionExtensions
         static Func<object?, object?> CreateOperation(UnaryExpressionCacheKey key)
         {
             var (kind, operandType) = key;
-            var operandClrType = operandType.GetClrType();
 
             var operand = Expression.Parameter(typeof(object), "operand");
             var expr = kind.GetExpressionFactory();
-            var body = Expression.Convert(expr.Invoke(Expression.Convert(operand, operandClrType)), typeof(object));
+            var body = Expression.Convert(expr.Invoke(Expression.Convert(operand, operandType.ClrType)), typeof(object));
             var expression = Expression.Lambda<Func<object?, object?>>(body, operand);
 
             return expression.Compile();
@@ -95,10 +94,8 @@ internal static class BoundExpressionExtensions
         static Func<object?, object?, object?> CreateOperation(BinaryExpressionCacheKey key)
         {
             var (kind, leftType, rightType) = key;
-            var leftClrType = leftType.GetClrType();
-            var rightClrType = rightType.GetClrType();
             Expression<Func<object?, object?, object?>> expression;
-            if (kind is BoundBinaryOperatorKind.Add && (leftClrType == typeof(string) || rightClrType == typeof(string)))
+            if (kind is BoundBinaryOperatorKind.Add && (leftType.ClrType == typeof(string) || rightType.ClrType == typeof(string)))
             {
                 var left = Expression.Parameter(typeof(object), "left");
                 var right = Expression.Parameter(typeof(object), "right");
@@ -110,12 +107,27 @@ internal static class BoundExpressionExtensions
                 var body = Expression.Convert(Expression.Call(instance: null, method, left, right), typeof(object));
                 expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
             }
+            else if (kind is BoundBinaryOperatorKind.Exponent)
+            {
+                var left = Expression.Parameter(typeof(object), "left");
+                var right = Expression.Parameter(typeof(object), "right");
+
+                var method = typeof(Math).GetMethod(nameof(Math.Pow), new[] { typeof(double), typeof(double) });
+                if (method is null)
+                    throw new InvalidOperationException($"Could not find {nameof(Math.Pow)} method");
+
+                var leftConv = Expression.Convert(Expression.Convert(left, leftType.ClrType), typeof(double));
+                var rightConv = Expression.Convert(Expression.Convert(right, rightType.ClrType), typeof(double));
+
+                var body = Expression.Convert(Expression.Convert(Expression.Call(instance: null, method, leftConv, rightConv), leftType.ClrType), typeof(object));
+                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
+            }
             else if (kind is BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast)
             {
                 var left = Expression.Parameter(typeof(object), "left");
                 var right = Expression.Parameter(typeof(object), "right");
 
-                var body = Expression.Convert(Expression.Convert(Expression.Convert(left, leftClrType), rightClrType), typeof(object));
+                var body = Expression.Convert(Expression.Convert(Expression.Convert(left, leftType.ClrType), rightType.ClrType), typeof(object));
                 expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
             }
             else
@@ -123,7 +135,7 @@ internal static class BoundExpressionExtensions
                 var left = Expression.Parameter(typeof(object), "left");
                 var right = Expression.Parameter(typeof(object), "right");
                 var expr = kind.GetExpressionFactory();
-                var body = Expression.Convert(expr.Invoke(Expression.Convert(left, leftClrType), Expression.Convert(right, rightClrType)), typeof(object));
+                var body = Expression.Convert(expr.Invoke(Expression.Convert(left, leftType.ClrType), Expression.Convert(right, rightType.ClrType)), typeof(object));
                 expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
             }
             return expression.Compile();

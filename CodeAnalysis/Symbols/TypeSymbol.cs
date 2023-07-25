@@ -2,6 +2,7 @@
 
 public sealed record class TypeSymbol(string Name) : Symbol(SymbolKind.Type, Name, BuiltinTypes.Type)
 {
+    public required Type ClrType { get; init; }
 
     public bool Equals(TypeSymbol? other) => other is not null && Name == other.Name;
     public override int GetHashCode() => Name.GetHashCode();
@@ -11,30 +12,6 @@ public sealed record class TypeSymbol(string Name) : Symbol(SymbolKind.Type, Nam
     public bool IsAssignableTo(TypeSymbol to) => CanAssign(this, to);
 
     private static bool CanAssign(TypeSymbol from, TypeSymbol to) => from is not null && to is not null && (to == BuiltinTypes.Any || to == from);
-
-    public Type GetClrType()
-    {
-        return Name switch
-        {
-            "never" => typeof(void),
-            "any" => typeof(object),
-            "void" => typeof(void),
-            "type" => typeof(Type),
-            "bool" => typeof(bool),
-            "i8" => typeof(sbyte),
-            "i16" => typeof(short),
-            "i32" => typeof(int),
-            "i64" => typeof(long),
-            "u8" => typeof(byte),
-            "u16" => typeof(ushort),
-            "u32" => typeof(uint),
-            "u64" => typeof(ulong),
-            "f32" => typeof(float),
-            "f64" => typeof(double),
-            "str" => typeof(string),
-            _ => throw new NotImplementedException(Name)
-        };
-    }
 
     internal object? Convert(object? value)
     {

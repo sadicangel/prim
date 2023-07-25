@@ -362,6 +362,7 @@ internal sealed class Parser
                 case TokenKind.PercentEqual:
                 case TokenKind.PipeEqual:
                 case TokenKind.PlusEqual:
+                case TokenKind.StarStarEqual:
                 case TokenKind.SlashEqual:
                 case TokenKind.StarEqual:
                 // Default assignment

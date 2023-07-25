@@ -7,13 +7,15 @@ public static class SyntaxFacts
         TokenKind.Bang or
         TokenKind.Minus or
         TokenKind.Plus or
-        TokenKind.Tilde => 6,
+        TokenKind.Tilde => 7,
 
         _ => 0,
     };
 
     public static int GetBinaryOperatorPrecedence(this TokenKind type) => type switch
     {
+        TokenKind.StarStar => 6,
+
         TokenKind.Percent or
         TokenKind.Star or
         TokenKind.Slash => 5,
@@ -107,7 +109,8 @@ public static class SyntaxFacts
         or TokenKind.PipePipe
         or TokenKind.Plus
         or TokenKind.Slash
-        or TokenKind.Star;
+        or TokenKind.Star
+        or TokenKind.StarStar;
 
     public static IEnumerable<TokenKind> GetUnaryOperators() => Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecedence(k) > 0);
 
@@ -123,6 +126,7 @@ public static class SyntaxFacts
             TokenKind.PercentEqual => TokenKind.Percent,
             TokenKind.PipeEqual => TokenKind.Pipe,
             TokenKind.PlusEqual => TokenKind.Plus,
+            TokenKind.StarStarEqual => TokenKind.StarStar,
             TokenKind.SlashEqual => TokenKind.Slash,
             TokenKind.StarEqual => TokenKind.Star,
             _ => throw new Exception($"Unexpected syntax: '{kind}'"),
@@ -175,6 +179,8 @@ public static class SyntaxFacts
         TokenKind.SlashEqual => "/=",
         TokenKind.Star => "*",
         TokenKind.StarEqual => "*=",
+        TokenKind.StarStar => "**",
+        TokenKind.StarStarEqual => "**=",
         TokenKind.Range => "..",
         TokenKind.Tilde => "~",
         TokenKind.True => "true",

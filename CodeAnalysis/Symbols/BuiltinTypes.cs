@@ -13,40 +13,95 @@ internal static class BuiltinTypes
         .Select(f => (TypeSymbol)f.GetValue(null)!)
         .ToDictionary(f => f.Name)));
 
-    public static readonly TypeSymbol Never = new("never");
+    public static readonly TypeSymbol Never = new("never")
+    {
+        ClrType = typeof(void)
+    };
 
-    public static readonly TypeSymbol Any = new("any");
+    public static readonly TypeSymbol Any = new("any")
+    {
+        ClrType = typeof(object),
+    };
 
-    public static readonly TypeSymbol Void = new("void");
+    public static readonly TypeSymbol Void = new("void")
+    {
+        ClrType = typeof(void),
+    };
 
-    public static readonly TypeSymbol Type = new("type");
+    public static readonly TypeSymbol Type = new("type")
+    {
+        ClrType = typeof(Type),
+    };
 
-    public static readonly TypeSymbol Bool = new("bool");
+    public static readonly TypeSymbol Bool = new("bool")
+    {
+        ClrType = typeof(bool),
+    };
 
-    public static readonly TypeSymbol I8 = new("i8");
-    public static readonly TypeSymbol I16 = new("i16");
-    public static readonly TypeSymbol I32 = new("i32");
-    public static readonly TypeSymbol I64 = new("i64");
-    public static readonly TypeSymbol ISize = new("isize");
+    public static readonly TypeSymbol I8 = new("i8")
+    {
+        ClrType = typeof(sbyte),
+    };
+    public static readonly TypeSymbol I16 = new("i16")
+    {
+        ClrType = typeof(short),
+    };
+    public static readonly TypeSymbol I32 = new("i32")
+    {
+        ClrType = typeof(int),
+    };
+    public static readonly TypeSymbol I64 = new("i64")
+    {
+        ClrType = typeof(long),
+    };
+    public static readonly TypeSymbol ISize = new("isize")
+    {
+        ClrType = typeof(nint),
+    };
 
-    public static readonly TypeSymbol U8 = new("u8");
-    public static readonly TypeSymbol U16 = new("u16");
-    public static readonly TypeSymbol U32 = new("u32");
-    public static readonly TypeSymbol U64 = new("u64");
-    public static readonly TypeSymbol USize = new("usize");
+    public static readonly TypeSymbol U8 = new("u8")
+    {
+        ClrType = typeof(byte),
+    };
+    public static readonly TypeSymbol U16 = new("u16")
+    {
+        ClrType = typeof(ushort),
+    };
+    public static readonly TypeSymbol U32 = new("u32")
+    {
+        ClrType = typeof(uint),
+    };
+    public static readonly TypeSymbol U64 = new("u64")
+    {
+        ClrType = typeof(ulong),
+    };
+    public static readonly TypeSymbol USize = new("usize")
+    {
+        ClrType = typeof(nuint),
+    };
 
-    public static readonly TypeSymbol F32 = new("f32");
-    public static readonly TypeSymbol F64 = new("f64");
+    public static readonly TypeSymbol F32 = new("f32")
+    {
+        ClrType = typeof(float),
+    };
+    public static readonly TypeSymbol F64 = new("f64")
+    {
+        ClrType = typeof(double),
+    };
 
-    public static readonly TypeSymbol Str = new("str");
+    public static readonly TypeSymbol Str = new("str")
+    {
+        ClrType = typeof(string),
+    };
 
-    public static readonly TypeSymbol Func = new("func");
+    public static readonly TypeSymbol Func = new("func")
+    {
+        ClrType = typeof(Delegate),
+    };
 
     public static IEnumerable<TypeSymbol> All { get => TypeMap.Value.Values; }
 
     public static bool TryLookup(string name, [MaybeNullWhen(false)] out TypeSymbol type) => TypeMap.Value.TryGetValue(name, out type);
-
-
 
     public static int SizeOf(this TypeSymbol type) => type.Name switch
     {
@@ -75,20 +130,20 @@ internal static class BuiltinTypes
         || IsUnsignedInteger(type);
 
     public static bool IsSignedInteger(this TypeSymbol type)
-        => type == BuiltinTypes.I8
-        || type == BuiltinTypes.I16
-        || type == BuiltinTypes.I32
-        || type == BuiltinTypes.I64
-        || type == BuiltinTypes.ISize;
+        => type == I8
+        || type == I16
+        || type == I32
+        || type == I64
+        || type == ISize;
 
     public static bool IsUnsignedInteger(this TypeSymbol type)
-        => type == BuiltinTypes.U8
-        || type == BuiltinTypes.U16
-        || type == BuiltinTypes.U32
-        || type == BuiltinTypes.U64
-        || type == BuiltinTypes.USize;
+        => type == U8
+        || type == U16
+        || type == U32
+        || type == U64
+        || type == USize;
 
     public static bool IsFloatingPoint(this TypeSymbol type)
-        => type == BuiltinTypes.F32
-        || type == BuiltinTypes.F64;
+        => type == F32
+        || type == F64;
 }
