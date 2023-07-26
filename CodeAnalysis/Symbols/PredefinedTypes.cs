@@ -1,17 +1,10 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeAnalysis.Symbols;
 
 internal static class PredefinedTypes
 {
-    private static readonly Lazy<ConcurrentDictionary<string, TypeSymbol>> TypeMap = new(() => new ConcurrentDictionary<string, TypeSymbol>(typeof(PredefinedTypes)
-        .GetFields(BindingFlags.Public | BindingFlags.Static)
-        .Where(f => f.FieldType == typeof(TypeSymbol))
-        .Select(f => (TypeSymbol)f.GetValue(null)!)
-        .ToDictionary(f => f.Name)));
-
     public static readonly TypeSymbol Never = new(PredefinedTypeNames.Never);
 
     public static readonly TypeSymbol Any = new(PredefinedTypeNames.Any);
@@ -41,7 +34,15 @@ internal static class PredefinedTypes
 
     public static readonly TypeSymbol Func = new(PredefinedTypeNames.Func);
 
-    public static IEnumerable<TypeSymbol> All { get => TypeMap.Value.Values; }
+    public static IReadOnlyList<TypeSymbol> All { get; } = typeof(PredefinedTypes)
+        .GetFields(BindingFlags.Public | BindingFlags.Static)
+        .Where(f => f.FieldType == typeof(TypeSymbol))
+        .Select(f => (TypeSymbol)f.GetValue(null)!)
+        .ToArray();
 
-    public static bool TryLookup(string name, [MaybeNullWhen(false)] out TypeSymbol type) => TypeMap.Value.TryGetValue(name, out type);
+    public static bool TryLookup(string name, [MaybeNullWhen(false)] out TypeSymbol type)
+    {
+        type = All.SingleOrDefault(t => t.Name == name);
+        return type is not null;
+    }
 }

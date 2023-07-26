@@ -33,9 +33,9 @@ internal static class PredefinedTypeNames
 
     public const string Func = "func";
 
-    public static IReadOnlySet<string> All { get; } = typeof(PredefinedTypeNames)
+    public static IReadOnlyList<string> All { get; } = typeof(PredefinedTypeNames)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
         .Where(f => f.IsLiteral && f.IsInitOnly)
         .Select(f => (string)f.GetValue(null)!)
-        .ToHashSet();
+        .ToArray();
 }

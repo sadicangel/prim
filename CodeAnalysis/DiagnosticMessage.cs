@@ -15,6 +15,8 @@ public static class DiagnosticMessage
 
     public static string UndefinedBinaryOperator(string @operator, TypeSymbol leftType, TypeSymbol rightType) => $"Binary operator '{@operator}' is not defined for types '{leftType.Name}' and '{rightType.Name}'";
 
+    public static string AmbiguousBinaryOperator(string @operator, TypeSymbol leftType, TypeSymbol rightType) => $"Binary operator '{@operator}' is ambiguous on operands of type '{leftType.Name}' and '{rightType.Name}'";
+
     public static string UndefinedName(string identifier) => $"'{identifier}' is undefined";
 
     public static string UndefinedType(string typeName) => $"Type '{typeName}' is undefined";

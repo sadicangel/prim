@@ -33,6 +33,7 @@ public sealed class EvaluatorTests
             new object[] { "9 / 3", 3 },
             new object[] { "4 % 2", 0 },
             new object[] { "4 % 3", 1 },
+            new object[] { "3 ** 3", 27 },
             new object[] { "12 == 3", false },
             new object[] { "3 == 3", true },
             new object[] { "12 != 3", true },
@@ -51,6 +52,40 @@ public sealed class EvaluatorTests
             new object[] { "1 & 3", 1 },
             new object[] { "0 ^ 1", 1 },
             new object[] { "1 ^ 3", 2 },
+            new object[] { "let a: i8 = 10; let b: i8 = 10; a + b", (sbyte)20 },
+            new object[] { "let a: i8 = 10; let b: u8 = 10; a + b", (short)20 },
+            new object[] { "let a: i8 = 10; let b: i16 = 10; a + b", (short)20 },
+            new object[] { "let a: i8 = 10; let b: u16 = 10; a + b", 20 },
+            new object[] { "let a: i8 = 10; let b: i32 = 10; a + b", 20 },
+            new object[] { "let a: i8 = 10; let b: u32 = 10; a + b", 20L },
+            new object[] { "let a: i8 = 10; let b: i64 = 10; a + b", 20L },
+            new object[] { "let a: i16 = 10; let b: i16 = 10; a + b", (short)20 },
+            new object[] { "let a: i16 = 10; let b: u16 = 10; a + b", 20 },
+            new object[] { "let a: i16 = 10; let b: i32 = 10; a + b", 20 },
+            new object[] { "let a: i16 = 10; let b: u32 = 10; a + b", 20L },
+            new object[] { "let a: i16 = 10; let b: i64 = 10; a + b", 20L },
+            new object[] { "let a: i32 = 10; let b: i32 = 10; a + b", 20 },
+            new object[] { "let a: i32 = 10; let b: u32 = 10; a + b", 20L },
+            new object[] { "let a: i32 = 10; let b: i64 = 10; a + b", 20L },
+            new object[] { "let a: i64 = 10; let b: i64 = 10; a + b", 20L },
+
+            new object[] { "let a: u8 = 10; let b: u8 = 10; a + b", (byte)20 },
+            new object[] { "let a: u8 = 10; let b: i8 = 10; a + b", (short)20 },
+            new object[] { "let a: u8 = 10; let b: u16 = 10; a + b", (ushort)20 },
+            new object[] { "let a: u8 = 10; let b: i16 = 10; a + b", 20 },
+            new object[] { "let a: u8 = 10; let b: u32 = 10; a + b", (uint)20 },
+            new object[] { "let a: u8 = 10; let b: i32 = 10; a + b", 20 },
+            new object[] { "let a: u8 = 10; let b: i64 = 10; a + b", 20L },
+            new object[] { "let a: u16 = 10; let b: u16 = 10; a + b", (ushort)20 },
+            new object[] { "let a: u16 = 10; let b: i16 = 10; a + b", 20 },
+            new object[] { "let a: u16 = 10; let b: u32 = 10; a + b", (uint)20 },
+            new object[] { "let a: u16 = 10; let b: i32 = 10; a + b", 20L },
+            new object[] { "let a: u16 = 10; let b: i64 = 10; a + b", 20L },
+            new object[] { "let a: u32 = 10; let b: u32 = 10; a + b", (uint)20 },
+            new object[] { "let a: u32 = 10; let b: i32 = 10; a + b", 20L },
+            new object[] { "let a: u32 = 10; let b: i64 = 10; a + b", 20L },
+            new object[] { "let a: u64 = 10; let b: u64 = 10; a + b", 20UL },
+
             new object[] { "false == false", true },
             new object[] { "true == false", false },
             new object[] { "true && true", true },
@@ -406,6 +441,18 @@ public sealed class EvaluatorTests
                 $"Reports {nameof(DiagnosticMessage.UndefinedBinaryOperator)}",
                 "10 ⟨+⟩ true",
                 $"{DiagnosticMessage.UndefinedBinaryOperator("+", PredefinedTypes.I32, PredefinedTypes.Bool)}"
+            },
+            new object[]
+            {
+                $"Reports {nameof(DiagnosticMessage.AmbiguousBinaryOperator)}",
+                """
+                {
+                    let a: i64 = 10;
+                    let b: u64 = 10;
+                    print(a ⟨+⟩ b);
+                }
+                """,
+                $"{DiagnosticMessage.AmbiguousBinaryOperator("+", PredefinedTypes.I64, PredefinedTypes.U64)}"
             },
             new object[]
             {

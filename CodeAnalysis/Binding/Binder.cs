@@ -188,7 +188,6 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         var function = new FunctionSymbol(statement.Identifier.Text, type, parameters);
         if (!_scope.TryDeclare(function))
         {
-            //if (type != BuiltinTypes.Never)
             _diagnostics.ReportRedeclaration(statement.Identifier, "function");
         }
 
@@ -396,13 +395,17 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (boundOperand.Type == PredefinedTypes.Never)
             return new BoundNeverExpression(expression);
 
-        var boundOperator = BoundUnaryOperator.Bind(expression.Operator.TokenKind, boundOperand.Type);
-        if (boundOperator is null)
+        var boundOperators = BoundUnaryOperator.Bind(expression.Operator.TokenKind, boundOperand.Type);
+        switch (boundOperators)
         {
-            _diagnostics.ReportUndefinedUnaryOperator(expression.Operator, boundOperand.Type);
-            return new BoundNeverExpression(expression);
+            case [var boundOperator]:
+                return new BoundUnaryExpression(expression, boundOperator, boundOperand);
+
+            default:
+                _diagnostics.ReportUndefinedUnaryOperator(expression.Operator, boundOperand.Type);
+                return new BoundNeverExpression(expression);
+
         }
-        return new BoundUnaryExpression(expression, boundOperator, boundOperand);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(BinaryExpression expression)
@@ -435,16 +438,24 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
                 return boundLeft;
             }
         }
-        var boundOperator = BoundBinaryOperator.Bind(expression.Operator.TokenKind, boundLeft.Type, boundRight.Type, resultType);
-        if (boundOperator is null)
+        var boundOperators = BoundBinaryOperator.Bind(expression.Operator.TokenKind, boundLeft.Type, boundRight.Type, resultType);
+        switch (boundOperators)
         {
-            if (expression.Operator.TokenKind is TokenKind.As)
+            case [var boundOperator] when boundOperator.ResultType != PredefinedTypes.Never:
+                return new BoundBinaryExpression(expression, boundLeft, boundOperator, boundRight);
+
+            case [var _]:
+                _diagnostics.ReportAmbiguousBinaryOperator(expression.Operator, boundLeft.Type, boundRight.Type);
+                return new BoundNeverExpression(expression);
+
+            case [] when expression.Operator.TokenKind is TokenKind.As:
                 _diagnostics.ReportInvalidConversion(new TextLocation(expression.SyntaxTree.Text, TextSpan.FromBounds(expression.Operator.Span.Start, expression.Right.Span.End)), boundLeft.Type, resultType!);
-            else
+                return new BoundNeverExpression(expression);
+
+            default:
                 _diagnostics.ReportUndefinedBinaryOperator(expression.Operator, boundLeft.Type, boundRight.Type);
-            return new BoundNeverExpression(expression);
+                return new BoundNeverExpression(expression);
         }
-        return new BoundBinaryExpression(expression, boundLeft, boundOperator, boundRight);
     }
 
     BoundExpression ISyntaxExpressionVisitor<BoundExpression>.Visit(LiteralExpression expression)
@@ -532,14 +543,20 @@ internal sealed class Binder : ISyntaxStatementVisitor<BoundStatement>, ISyntaxE
         if (expression.Assign.TokenKind is not TokenKind.Equal)
         {
             var operatorKind = expression.Assign.TokenKind.GetBinaryOperatorOfAssignmentOperator();
-            var boundOperator = BoundBinaryOperator.Bind(operatorKind, variable.Type, boundExpression.Type, variable.Type);
-            if (boundOperator is null)
+            var boundOperators = BoundBinaryOperator.Bind(operatorKind, variable.Type, boundExpression.Type, variable.Type);
+            switch (boundOperators)
             {
-                _diagnostics.ReportUndefinedBinaryOperator(expression.Assign, variable.Type, boundExpression.Type);
-                return new BoundNeverExpression(expression);
-            }
+                case [var boundOperator] when boundOperator.ResultType != PredefinedTypes.Never:
+                    return new BoundCompoundAssignmentExpression(expression, variable, boundOperator, boundExpression);
 
-            return new BoundCompoundAssignmentExpression(expression, variable, boundOperator, boundExpression);
+                case [var _]:
+                    _diagnostics.ReportAmbiguousBinaryOperator(expression.Assign, variable.Type, boundExpression.Type);
+                    return new BoundNeverExpression(expression);
+
+                default:
+                    _diagnostics.ReportUndefinedBinaryOperator(expression.Assign, variable.Type, boundExpression.Type);
+                    return new BoundNeverExpression(expression);
+            }
         }
 
         if (boundExpression.Type != variable.Type)

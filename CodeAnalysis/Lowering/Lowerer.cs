@@ -234,13 +234,17 @@ file static class Expressions
 {
     public static BoundExpression LessThan(SyntaxNode syntax, TypeSymbol type, BoundExpression left, BoundExpression right)
     {
-        var @operator = BoundBinaryOperator.Bind(TokenKind.Less, type, type, PredefinedTypes.Bool) ?? throw new InvalidOperationException("Unexpected operator");
+        var @operator = BoundBinaryOperator.Bind(TokenKind.Less, type, type, PredefinedTypes.Bool).SingleOrDefault();
+        if (@operator is null)
+            throw new InvalidOperationException("Unexpected null operator");
         return new BoundBinaryExpression(syntax, left, @operator, right);
     }
 
     public static BoundExpression Increment(SyntaxNode syntax, BoundExpression left)
     {
-        var @operator = BoundBinaryOperator.Bind(TokenKind.Plus, PredefinedTypes.I32, PredefinedTypes.I32, PredefinedTypes.I32) ?? throw new InvalidOperationException("Unexpected operator");
+        var @operator = BoundBinaryOperator.Bind(TokenKind.Plus, PredefinedTypes.I32, PredefinedTypes.I32, PredefinedTypes.I32).SingleOrDefault();
+        if (@operator is null)
+            throw new InvalidOperationException("Unexpected null operator");
         return new BoundBinaryExpression(syntax, left, @operator, new BoundLiteralExpression(syntax, 1));
     }
 }

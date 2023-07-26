@@ -18,6 +18,46 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 
     }
 
+    public static IReadOnlyList<BoundBinaryOperator> Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType, TypeSymbol? resultType)
+    {
+        if (!Operators.TryGetValue(tokenKind, out var operators))
+            return Array.Empty<BoundBinaryOperator>();
+
+        if (resultType is null || operators[0].Kind is not BoundBinaryOperatorKind.ExplicitCast and not BoundBinaryOperatorKind.ImplicitCast)
+        {
+            var matchingOperators = operators.Where(TypesAreAssignable);
+            // If an operator has types that match exactly, pick that one.
+            if (matchingOperators.Take(2).Any())
+            {
+                var exactMatchOperators = matchingOperators.Where(o => leftType == o.LeftType && rightType == o.RightType);
+                if (exactMatchOperators.Any())
+                    matchingOperators = exactMatchOperators;
+            }
+            return matchingOperators.ToArray();
+        }
+
+        // Return modified convert operators. Maybe cache this?
+        var convertOperators = new List<BoundBinaryOperator>();
+        foreach (var @operator in operators)
+        {
+            if (TypesAreAssignable(@operator))
+            {
+                var conversion = Conversion.Classify(leftType, resultType);
+                if (conversion.Exists)
+                {
+                    convertOperators.Add(@operator with
+                    {
+                        LeftType = leftType,
+                        ResultType = resultType,
+                    });
+                }
+            }
+        }
+        return convertOperators.ToArray();
+
+        bool TypesAreAssignable(BoundBinaryOperator o) => leftType.IsAssignableTo(o.LeftType) && rightType.IsAssignableTo(o.RightType) && (resultType?.IsAssignableTo(o.ResultType) ?? true);
+    }
+
     private static Dictionary<TokenKind, List<BoundBinaryOperator>> CreateOperators()
     {
         var operators = new Dictionary<TokenKind, List<BoundBinaryOperator>>
@@ -45,21 +85,22 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
         var logicalOperators = new TokenKind[] { TokenKind.AmpersandAmpersand, TokenKind.PipePipe };
 
         // integer operators
-        var integers = PredefinedTypes.All.Where(t => t.IsInteger).ToList();
-        operators.Add(numberOperators, integers.Select(i => (i, i, i)));
-        operators.Add(bitwiseOperators, integers.Select(i => (i, i, i)));
-        operators.Add(comparisonOperators, integers.Select(i => (i, i, PredefinedTypes.Bool)));
+        var integerCombinations = OperatorType.GetIntegerCombinations().ToList();
+        // Pick all possible combinations: current integer <op> other integer => widest integer between the two
+        operators.Add(numberOperators, integerCombinations);
+        operators.Add(bitwiseOperators, integerCombinations);
+        operators.Add(comparisonOperators, integerCombinations.Select(i => i with { Result = PredefinedTypes.Bool }));
 
         // floating point operators
-        var floats = PredefinedTypes.All.Where(t => t.IsFloatingPoint).ToList();
-        operators.Add(numberOperators, floats.Select(f => (f, f, f)));
-        operators.Add(comparisonOperators, floats.Select(f => (f, f, PredefinedTypes.Bool)));
+        var floatCombinations = OperatorType.GetFloatCombinations().ToList();
+        operators.Add(numberOperators, floatCombinations);
+        operators.Add(comparisonOperators, floatCombinations.Select(f => f with { Result = PredefinedTypes.Bool }));
 
         // bool operators
         var bools = new List<TypeSymbol> { PredefinedTypes.Bool };
-        operators.Add(bitwiseOperators, bools.Select(b => (b, b, b)));
-        operators.Add(comparisonOperators, bools.Select(b => (b, b, b)));
-        operators.Add(logicalOperators, bools.Select(b => (b, b, b)));
+        operators.Add(bitwiseOperators, bools.Select(b => new OperatorType(b, b, b)));
+        operators.Add(comparisonOperators, bools.Select(b => new OperatorType(b, b, b)));
+        operators.Add(logicalOperators, bools.Select(b => new OperatorType(b, b, b)));
 
         // str operators
         operators.Add(TokenKind.Plus, PredefinedTypes.Str, PredefinedTypes.Str, PredefinedTypes.Str);
@@ -68,55 +109,112 @@ internal sealed record class BoundBinaryOperator(TokenKind TokenKind, BoundBinar
 
         return operators;
     }
+}
 
-    private static BoundBinaryOperator[] Find(TokenKind kind, TypeSymbol left, TypeSymbol right, TypeSymbol? result)
+file readonly record struct OperatorType(TypeSymbol Left, TypeSymbol Right, TypeSymbol Result)
+{
+    public static IEnumerable<OperatorType> GetIntegerCombinations()
     {
-        if (!Operators.TryGetValue(kind, out var operators))
-            return Array.Empty<BoundBinaryOperator>();
+        var integers = PredefinedTypes.All.Where(t => t.IsInteger).ToArray();
 
-        return operators.Where(o => left.IsAssignableTo(o.LeftType) && right.IsAssignableTo(o.RightType) && (result?.IsAssignableTo(o.ResultType) ?? true)).ToArray();
-    }
-
-    public static BoundBinaryOperator? Bind(TokenKind tokenKind, TypeSymbol leftType, TypeSymbol rightType, TypeSymbol? resultType)
-    {
-        var matchingOperators = Find(tokenKind, leftType, rightType, resultType);
-
-        var matchingOperator = matchingOperators.Length == 0 ? null : matchingOperators[0];
-
-        if (matchingOperator?.Kind is BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast)
+        for (int i = 0; i < integers.Length; ++i)
         {
-            if (resultType is null)
-                return null;
-
-            var conversion = Conversion.Classify(leftType, resultType);
-            if (!conversion.Exists)
-                return null;
-
-            //if(!conversion.IsIdentity)
-            //Report unnecessary conversion.
-
-            matchingOperator = matchingOperator with
+            var t1 = integers[i];
+            yield return new OperatorType(t1, t1, t1);
+            for (int j = i + 1; j < integers.Length; ++j)
             {
-                LeftType = leftType,
-                ResultType = resultType,
-            };
+                var t2 = integers[j];
+                yield return new OperatorType(t1, t2, GetLargestType(t1, t2));
+                yield return new OperatorType(t2, t1, GetLargestType(t2, t1));
+            }
         }
 
-        return matchingOperator;
+        static TypeSymbol GetLargestType(TypeSymbol t1, TypeSymbol t2)
+        {
+            // Both signed or both unsigned or whatever is largest.
+            if (t1.IsSignedInteger == t2.IsSignedInteger)
+                return t1.BinarySize >= t2.BinarySize ? t1 : t2;
+
+            // If both are same size and different signs, pick the next larger signed
+            // integer after t1, if any; otherwise select <never>. This allows ambiguous matches.
+            return (t1.Name, t2.Name) switch
+            {
+                (PredefinedTypeNames.I8, PredefinedTypeNames.U8) => PredefinedTypes.I16,
+                (PredefinedTypeNames.I8, PredefinedTypeNames.U16) => PredefinedTypes.I32,
+                (PredefinedTypeNames.I8, PredefinedTypeNames.U32) => PredefinedTypes.I64,
+                (PredefinedTypeNames.I16, PredefinedTypeNames.U8) => PredefinedTypes.I16,
+                (PredefinedTypeNames.I16, PredefinedTypeNames.U16) => PredefinedTypes.I32,
+                (PredefinedTypeNames.I16, PredefinedTypeNames.U32) => PredefinedTypes.I64,
+                (PredefinedTypeNames.I32, PredefinedTypeNames.U8) => PredefinedTypes.I32,
+                (PredefinedTypeNames.I32, PredefinedTypeNames.U16) => PredefinedTypes.I32,
+                (PredefinedTypeNames.I32, PredefinedTypeNames.U32) => PredefinedTypes.I64,
+                (PredefinedTypeNames.I64, PredefinedTypeNames.U8) => PredefinedTypes.I64,
+                (PredefinedTypeNames.I64, PredefinedTypeNames.U16) => PredefinedTypes.I64,
+                (PredefinedTypeNames.I64, PredefinedTypeNames.U32) => PredefinedTypes.I64,
+                (PredefinedTypeNames.ISize, PredefinedTypeNames.U8) => PredefinedTypes.ISize,
+                (PredefinedTypeNames.ISize, PredefinedTypeNames.U16) => PredefinedTypes.ISize,
+                (PredefinedTypeNames.ISize, PredefinedTypeNames.U32) when IntPtr.Size == 8 => PredefinedTypes.ISize,
+
+                (PredefinedTypeNames.U8, PredefinedTypeNames.I8) => PredefinedTypes.I16,
+                (PredefinedTypeNames.U8, PredefinedTypeNames.I16) => PredefinedTypes.I32,
+                (PredefinedTypeNames.U8, PredefinedTypeNames.I32) => PredefinedTypes.I32,
+                (PredefinedTypeNames.U8, PredefinedTypeNames.I64) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U8, PredefinedTypeNames.ISize) => PredefinedTypes.ISize,
+                (PredefinedTypeNames.U16, PredefinedTypeNames.I8) => PredefinedTypes.I32,
+                (PredefinedTypeNames.U16, PredefinedTypeNames.I16) => PredefinedTypes.I32,
+                (PredefinedTypeNames.U16, PredefinedTypeNames.I32) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U16, PredefinedTypeNames.I64) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U16, PredefinedTypeNames.ISize) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U32, PredefinedTypeNames.I8) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U32, PredefinedTypeNames.I16) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U32, PredefinedTypeNames.I32) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U32, PredefinedTypeNames.I64) => PredefinedTypes.I64,
+                (PredefinedTypeNames.U32, PredefinedTypeNames.ISize) when IntPtr.Size == 8 => PredefinedTypes.ISize,
+
+                _ => PredefinedTypes.Never,
+            };
+        }
+    }
+    public static IEnumerable<OperatorType> GetFloatCombinations()
+    {
+        var floats = PredefinedTypes.All.Where(t => t.IsFloatingPoint).ToArray();
+
+        for (int i = 0; i < floats.Length; ++i)
+        {
+            var t1 = floats[i];
+            yield return new OperatorType(t1, t1, t1);
+            for (int j = i + 1; j < floats.Length; ++j)
+            {
+                var t2 = floats[j];
+                yield return new OperatorType(t1, t2, t1.BinarySize >= t2.BinarySize ? t1 : t2);
+                yield return new OperatorType(t2, t1, t2.BinarySize >= t1.BinarySize ? t2 : t1);
+            }
+        }
+
+        var integers = PredefinedTypes.All.Where(t => t.IsInteger).ToArray();
+        foreach (var t1 in floats)
+        {
+            for (int i = 0; i < integers.Length; ++i)
+            {
+                var t2 = integers[i];
+                yield return new OperatorType(t1, t2, t1);
+                yield return new OperatorType(t2, t1, t1);
+            }
+        }
     }
 }
 
 file static class OperatorMapExtensions
 {
-
-    public static void Add(this Dictionary<TokenKind, List<BoundBinaryOperator>> map, IEnumerable<TokenKind> typeOperators, IEnumerable<(TypeSymbol left, TypeSymbol right, TypeSymbol result)> types)
+    public static void Add(this Dictionary<TokenKind, List<BoundBinaryOperator>> map, IEnumerable<TokenKind> typeOperators, IEnumerable<OperatorType> infos)
     {
-        foreach (var (left, right, result) in types)
-            map.Add(typeOperators, left, right, result);
+        foreach (var info in infos)
+            map.Add(typeOperators, info);
     }
 
-    public static void Add(this Dictionary<TokenKind, List<BoundBinaryOperator>> map, IEnumerable<TokenKind> typeOperators, TypeSymbol left, TypeSymbol right, TypeSymbol result)
+    public static void Add(this Dictionary<TokenKind, List<BoundBinaryOperator>> map, IEnumerable<TokenKind> typeOperators, OperatorType info)
     {
+        var (left, right, result) = info;
         foreach (var @operator in typeOperators)
             map.Add(@operator, left, right, result);
     }

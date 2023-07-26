@@ -72,6 +72,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     public void ReportUnexpectedToken(TokenKind expected, Token actual) => ReportError(actual.GetLocation(), DiagnosticMessage.UnexpectedToken(expected, actual.TokenKind));
     public void ReportUndefinedUnaryOperator(Token @operator, TypeSymbol operandType) => ReportError(@operator.GetLocation(), DiagnosticMessage.UndefinedUnaryOperator(@operator.Text, operandType));
     public void ReportUndefinedBinaryOperator(Token @operator, TypeSymbol leftType, TypeSymbol rightType) => ReportError(@operator.GetLocation(), DiagnosticMessage.UndefinedBinaryOperator(@operator.Text, leftType, rightType));
+    public void ReportAmbiguousBinaryOperator(Token @operator, TypeSymbol leftType, TypeSymbol rightType) => ReportError(@operator.GetLocation(), DiagnosticMessage.AmbiguousBinaryOperator(@operator.Text, leftType, rightType));
     public void ReportUndefinedName(Token identifier) => ReportError(identifier.GetLocation(), DiagnosticMessage.UndefinedName(identifier.Text));
     public void ReportUndefinedType(TextLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     public void ReportInvalidConversion(TextLocation location, TypeSymbol sourceType, TypeSymbol destinationType) => ReportError(location, DiagnosticMessage.InvalidConversion(sourceType, destinationType));

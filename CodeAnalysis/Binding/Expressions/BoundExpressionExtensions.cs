@@ -12,7 +12,7 @@ internal static class BoundExpressionExtensions
     private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, ConcurrentDictionary<UnaryExpressionCacheKey, Func<object?, object?>>> UnaryExpressionCache = new();
     private readonly static ConcurrentDictionary<BoundUnaryOperatorKind, Func<Expression, UnaryExpression>> UnaryOperatorCache = new();
 
-    private readonly record struct BinaryExpressionCacheKey(BoundBinaryOperatorKind Kind, TypeSymbol LeftType, TypeSymbol RightType);
+    private readonly record struct BinaryExpressionCacheKey(BoundBinaryOperatorKind Kind, TypeSymbol LeftType, TypeSymbol RightType, TypeSymbol ResultType);
     private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, ConcurrentDictionary<BinaryExpressionCacheKey, Func<object?, object?, object?>>> BinaryExpressionCache = new();
     private readonly static ConcurrentDictionary<BoundBinaryOperatorKind, Func<Expression, Expression, BinaryExpression>> BinaryOperatorCache = new();
 
@@ -89,11 +89,11 @@ internal static class BoundExpressionExtensions
                 throw new InvalidOperationException($"Could not find type {symbolExpression.Symbol.Name}");
         }
 
-        return cacheNode.GetOrAdd(new BinaryExpressionCacheKey(@operator.Kind, left.Type, rightType), CreateOperation);
+        return cacheNode.GetOrAdd(new BinaryExpressionCacheKey(@operator.Kind, left.Type, rightType, @operator.ResultType), CreateOperation);
 
         static Func<object?, object?, object?> CreateOperation(BinaryExpressionCacheKey key)
         {
-            var (kind, leftType, rightType) = key;
+            var (kind, leftType, rightType, resultType) = key;
             Expression<Func<object?, object?, object?>> expression;
             if (kind is BoundBinaryOperatorKind.Add && (leftType.ClrType == typeof(string) || rightType.ClrType == typeof(string)))
             {
@@ -132,11 +132,33 @@ internal static class BoundExpressionExtensions
             }
             else
             {
-                var left = Expression.Parameter(typeof(object), "left");
-                var right = Expression.Parameter(typeof(object), "right");
-                var expr = kind.GetExpressionFactory();
-                var body = Expression.Convert(expr.Invoke(Expression.Convert(left, leftType.ClrType), Expression.Convert(right, rightType.ClrType)), typeof(object));
-                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
+                var leftParam = Expression.Parameter(typeof(object), "left");
+                var rightParam = Expression.Parameter(typeof(object), "right");
+
+                var leftArg = Expression.Convert(leftParam, leftType.ClrType);
+                var rightArg = Expression.Convert(rightParam, rightType.ClrType);
+
+                // C# does not support all operations for SByte and Byte. We need to cast to int and then back to result.
+                var byteResult = resultType == PredefinedTypes.I8 || resultType == PredefinedTypes.U8 ? resultType : null;
+                if (byteResult is not null)
+                    resultType = PredefinedTypes.I32;
+
+                // Ensure numbers are widened before operation.
+                if (resultType.IsNumber)
+                {
+                    if (leftType != resultType)
+                        leftArg = Expression.Convert(leftArg, resultType.ClrType);
+
+                    if (rightType != resultType)
+                        rightArg = Expression.Convert(rightArg, resultType.ClrType);
+                }
+
+                Expression expr = kind.GetExpressionFactory().Invoke(leftArg, rightArg);
+                if (byteResult is not null)
+                    expr = Expression.Convert(expr, byteResult.ClrType);
+
+                var body = Expression.Convert(expr, typeof(object));
+                expression = Expression.Lambda<Func<object?, object?, object?>>(body, leftParam, rightParam);
             }
             return expression.Compile();
         }
