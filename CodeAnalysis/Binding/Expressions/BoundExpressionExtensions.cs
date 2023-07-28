@@ -60,19 +60,15 @@ internal static class BoundExpressionExtensions
     {
         return BinaryOperatorCache.GetOrAdd(kind, static kind =>
         {
-            var left = Expression.Parameter(typeof(Expression), "left");
-            var right = Expression.Parameter(typeof(Expression), "right");
+            var leftParam = Expression.Parameter(typeof(Expression), "left");
+            var rightParam = Expression.Parameter(typeof(Expression), "right");
             var method = typeof(Expression).GetMethod(kind.GetLinqExpressionName(), BindingFlags.Public | BindingFlags.Static, new[] { typeof(Expression), typeof(Expression) });
             if (method is null)
                 throw new InvalidOperationException($"Unexpected binary operator {kind}");
 
-            var body = Expression.Call(
-                instance: null,
-                method,
-                left,
-                right);
+            var body = Expression.Call(instance: null, method, leftParam, rightParam);
 
-            var func = Expression.Lambda<Func<Expression, Expression, BinaryExpression>>(body, left, right);
+            var func = Expression.Lambda<Func<Expression, Expression, BinaryExpression>>(body, leftParam, rightParam);
             return func.Compile();
         });
     }
@@ -94,72 +90,75 @@ internal static class BoundExpressionExtensions
         static Func<object?, object?, object?> CreateOperation(BinaryExpressionCacheKey key)
         {
             var (kind, leftType, rightType, resultType) = key;
+
+            var leftParam = Expression.Parameter(typeof(object), "left");
+            var rightParam = Expression.Parameter(typeof(object), "right");
+
             Expression<Func<object?, object?, object?>> expression;
-            if (kind is BoundBinaryOperatorKind.Add && (leftType.ClrType == typeof(string) || rightType.ClrType == typeof(string)))
+            switch (kind)
             {
-                var left = Expression.Parameter(typeof(object), "left");
-                var right = Expression.Parameter(typeof(object), "right");
+                case BoundBinaryOperatorKind.Add when leftType == PredefinedTypes.Str || rightType == PredefinedTypes.Str:
+                    {
+                        var method = typeof(string).GetMethod(nameof(String.Concat), new[] { typeof(object), typeof(object) });
+                        if (method is null)
+                            throw new InvalidOperationException($"Could not find {nameof(String.Concat)} method");
 
-                var method = typeof(string).GetMethod(nameof(String.Concat), new[] { typeof(object), typeof(object) });
-                if (method is null)
-                    throw new InvalidOperationException($"Could not find {nameof(String.Concat)} method");
+                        var body = Expression.Convert(Expression.Call(instance: null, method, leftParam, rightParam), typeof(object));
+                        expression = Expression.Lambda<Func<object?, object?, object?>>(body, leftParam, rightParam);
+                    }
+                    break;
 
-                var body = Expression.Convert(Expression.Call(instance: null, method, left, right), typeof(object));
-                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
+                case BoundBinaryOperatorKind.Exponent:
+                    {
+                        var method = typeof(Math).GetMethod(nameof(Math.Pow), new[] { typeof(double), typeof(double) });
+                        if (method is null)
+                            throw new InvalidOperationException($"Could not find {nameof(Math.Pow)} method");
+
+                        var leftConv = Expression.Convert(Expression.Convert(leftParam, leftType.ClrType), typeof(double));
+                        var rightConv = Expression.Convert(Expression.Convert(rightParam, rightType.ClrType), typeof(double));
+
+                        var body = Expression.Convert(Expression.Convert(Expression.Call(instance: null, method, leftConv, rightConv), leftType.ClrType), typeof(object));
+                        expression = Expression.Lambda<Func<object?, object?, object?>>(body, leftParam, rightParam);
+                    }
+                    break;
+
+                case BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast:
+                    {
+                        var body = Expression.Convert(Expression.Convert(Expression.Convert(leftParam, leftType.ClrType), rightType.ClrType), typeof(object));
+                        expression = Expression.Lambda<Func<object?, object?, object?>>(body, leftParam, rightParam);
+                    }
+                    break;
+
+                default:
+                    {
+                        var leftArg = Expression.Convert(leftParam, leftType.ClrType);
+                        var rightArg = Expression.Convert(rightParam, rightType.ClrType);
+
+                        // C# does not support all operations for SByte and Byte. We need to cast to int and then back to result.
+                        var byteResult = resultType == PredefinedTypes.I8 || resultType == PredefinedTypes.U8 ? resultType : null;
+                        if (byteResult is not null)
+                            resultType = PredefinedTypes.I32;
+
+                        // Ensure numbers are widened before operation.
+                        if (resultType.IsNumber)
+                        {
+                            if (leftType != resultType)
+                                leftArg = Expression.Convert(leftArg, resultType.ClrType);
+
+                            if (rightType != resultType)
+                                rightArg = Expression.Convert(rightArg, resultType.ClrType);
+                        }
+
+                        Expression expr = kind.GetExpressionFactory().Invoke(leftArg, rightArg);
+                        if (byteResult is not null)
+                            expr = Expression.Convert(expr, byteResult.ClrType);
+
+                        var body = Expression.Convert(expr, typeof(object));
+                        expression = Expression.Lambda<Func<object?, object?, object?>>(body, leftParam, rightParam);
+                    }
+                    break;
             }
-            else if (kind is BoundBinaryOperatorKind.Exponent)
-            {
-                var left = Expression.Parameter(typeof(object), "left");
-                var right = Expression.Parameter(typeof(object), "right");
 
-                var method = typeof(Math).GetMethod(nameof(Math.Pow), new[] { typeof(double), typeof(double) });
-                if (method is null)
-                    throw new InvalidOperationException($"Could not find {nameof(Math.Pow)} method");
-
-                var leftConv = Expression.Convert(Expression.Convert(left, leftType.ClrType), typeof(double));
-                var rightConv = Expression.Convert(Expression.Convert(right, rightType.ClrType), typeof(double));
-
-                var body = Expression.Convert(Expression.Convert(Expression.Call(instance: null, method, leftConv, rightConv), leftType.ClrType), typeof(object));
-                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
-            }
-            else if (kind is BoundBinaryOperatorKind.ExplicitCast or BoundBinaryOperatorKind.ImplicitCast)
-            {
-                var left = Expression.Parameter(typeof(object), "left");
-                var right = Expression.Parameter(typeof(object), "right");
-
-                var body = Expression.Convert(Expression.Convert(Expression.Convert(left, leftType.ClrType), rightType.ClrType), typeof(object));
-                expression = Expression.Lambda<Func<object?, object?, object?>>(body, left, right);
-            }
-            else
-            {
-                var leftParam = Expression.Parameter(typeof(object), "left");
-                var rightParam = Expression.Parameter(typeof(object), "right");
-
-                var leftArg = Expression.Convert(leftParam, leftType.ClrType);
-                var rightArg = Expression.Convert(rightParam, rightType.ClrType);
-
-                // C# does not support all operations for SByte and Byte. We need to cast to int and then back to result.
-                var byteResult = resultType == PredefinedTypes.I8 || resultType == PredefinedTypes.U8 ? resultType : null;
-                if (byteResult is not null)
-                    resultType = PredefinedTypes.I32;
-
-                // Ensure numbers are widened before operation.
-                if (resultType.IsNumber)
-                {
-                    if (leftType != resultType)
-                        leftArg = Expression.Convert(leftArg, resultType.ClrType);
-
-                    if (rightType != resultType)
-                        rightArg = Expression.Convert(rightArg, resultType.ClrType);
-                }
-
-                Expression expr = kind.GetExpressionFactory().Invoke(leftArg, rightArg);
-                if (byteResult is not null)
-                    expr = Expression.Convert(expr, byteResult.ClrType);
-
-                var body = Expression.Convert(expr, typeof(object));
-                expression = Expression.Lambda<Func<object?, object?, object?>>(body, leftParam, rightParam);
-            }
             return expression.Compile();
         }
     }
