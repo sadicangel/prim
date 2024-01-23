@@ -1,47 +1,43 @@
 # Prim
 
-### Immutable variables
-```
-let a: str = "text";
-```
-
-### Mutable variables
-```
-var a: i32 = 29;
+### Variables
+```ts
+immutable: str = "text";
+muttable: i32 = 29;
 ```
 
 ### Functions
-```
-let add: (a: i32, b: i32) => i32 = a + b;
+```ts
+add: (a: i32, b: i32) => i32 = a + b;
+print: (name: str) => void = {
+    greet: str = "Hello, " + name + "!";
+    print(greet);  
+}
 ```
 
-```
-let f: (name: str) => void = {
-    writeLine(name);  
+### Types
+```ts
+Point2D: type = {
+    x: i32 = 0;
+    y: i32 = 0;
+
+    add: (other: Point2D) -> Point2D = {
+        x += other.x;
+        y += other.y;
+    }
 }
 ```
 
 ### Built-In Types
-| name         | description               |
-| -----------: | :------------------------ |
-| any   | top type                  |
-| never | bottom type               |
-| void  | void type (no return)     |
-| type  | represents a type         |
-||
-| bool  | boolean true or false     |
-||
-| i8    | signed 8 bit integer      |
-| i16   | signed 16 bit integer     |
-| i32   | signed 32 bit integer     |
-| i64   | signed 64 bit integer     |
-||
-| u8    | unsigned 8 bit integer    |
-| u16   | unsigned 16 bit integer   |
-| u32   | unsigned 32 bit integer   |
-| u64   | unsigned 64 bit integer   |
-|||
-| f32   | IEEE 754 single precision |
-| f64   | IEEE 754 double precision |
-|||
-| str   | sequence of code units    |
+| name  | description                               |
+| ----: | :---------------------------------------- |
+| any   | top type                                  |
+| never | bottom type                               |
+| void  | void type (no return)                     |
+| type  | represents a type                         |
+| bool  | boolean true or false                     |
+| i#    | signed # bit integer (8, 16, 32, 64)      |
+| u#    | unsigned # bit integer (8, 16, 32, 64)    |
+| f32   | IEEE 754 single precision                 |
+| f64   | IEEE 754 double precision                 |
+| str   | sequence of code units (string)           |
