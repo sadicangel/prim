@@ -8,7 +8,12 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
 {
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
-    public DiagnosticBag Diagnostics { get; } = new DiagnosticBag();
+    private SyntaxTree(Source source, Func<SyntaxTree, CompilationUnit> parse) : this(source, default(CompilationUnit)!)
+    {
+        Root = parse.Invoke(this);
+    }
+
+    public DiagnosticBag Diagnostics { get; init; } = [];
 
     internal SyntaxNode? GetParent(SyntaxNode node)
     {
@@ -37,5 +42,26 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
         }
     }
     IEnumerable<INode> INode.Children() => ((INode)Root).Children();
+
     public void WriteTo(TreeNode root) => Root.WriteTo(root);
+
+    public static IReadOnlyList<Token> Scan(Source source, bool skipEof = true)
+    {
+        _ = new SyntaxTree(source, ParseTokens);
+
+        // A little hack, as we want to go through SyntaxTree to actually get the tokens..
+        List<Token> tokens = [];
+        CompilationUnit ParseTokens(SyntaxTree syntaxTree)
+        {
+            tokens = [.. Scanner.Scan(syntaxTree)];
+            if (skipEof && tokens is [.., var last] && last.TokenKind is TokenKind.EOF)
+            {
+                tokens.Remove(last);
+                return new CompilationUnit(syntaxTree, [], last);
+            }
+
+            return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.EOF, new Range(source.Text.Length, source.Text.Length), TokenTrivia.Empty, "\0"));
+        }
+        return tokens;
+    }
 }

@@ -3,7 +3,7 @@ public sealed record class Source(string Text, string FilePath)
 {
     private IReadOnlyList<SourceLine>? _lines;
 
-    public string FileName { get; } = Path.GetFileName(FilePath);
+    public string FileName { get; } = String.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetFileName(FilePath);
 
     public IReadOnlyList<SourceLine> Lines { get => _lines ??= ParseLines(Text); }
 
@@ -34,7 +34,6 @@ public sealed record class Source(string Text, string FilePath)
     }
 
     public override string ToString() => Text.ToString();
-
 
     private List<SourceLine> ParseLines(ReadOnlySpan<char> text)
     {
@@ -68,4 +67,6 @@ public sealed record class Source(string Text, string FilePath)
 
         return lines;
     }
+
+    public static implicit operator Source(string text) => new(text);
 }
