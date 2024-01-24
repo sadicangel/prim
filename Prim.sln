@@ -3,7 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeAnalysis", "src\CodeAnalysis\CodeAnalysis.csproj", "{3B2B2188-6D9C-4DD5-8994-CB448B86116A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeAnalysis.Tests", "tests\CodeAnalysis.Tests\CodeAnalysis.Tests.csproj", "{510E6478-5BD0-4C37-83CE-89BD04B988E9}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B2B2188-6D9C-4DD5-8994-CB448B86116A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B2B2188-6D9C-4DD5-8994-CB448B86116A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B2B2188-6D9C-4DD5-8994-CB448B86116A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B2B2188-6D9C-4DD5-8994-CB448B86116A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

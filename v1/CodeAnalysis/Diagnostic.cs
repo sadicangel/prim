@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis;
 
-public enum DiagnosticSeverity { Error, Warning }
+public enum DiagnosticSeverity { Error, Warning, Information }
 
 public sealed record class Diagnostic(DiagnosticSeverity Severity, TextLocation Location, string Message)
 {
