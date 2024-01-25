@@ -47,10 +47,9 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
 
     public static IReadOnlyList<Token> Scan(Source source, bool skipEof = true)
     {
-        _ = new SyntaxTree(source, ParseTokens);
-
         // A little hack, as we want to go through SyntaxTree to actually get the tokens..
         List<Token> tokens = [];
+
         CompilationUnit ParseTokens(SyntaxTree syntaxTree)
         {
             tokens = [.. Scanner.Scan(syntaxTree)];
@@ -62,6 +61,9 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
 
             return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.EOF, new Range(source.Text.Length, source.Text.Length), TokenTrivia.Empty, "\0"));
         }
+
+        // Evaluate the syntax tree.
+        _ = new SyntaxTree(source, ParseTokens);
         return tokens;
     }
 }

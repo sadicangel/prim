@@ -68,5 +68,5 @@ public sealed record class Source(string Text, string FilePath)
         return lines;
     }
 
-    public static implicit operator Source(string text) => new(text);
+    public static implicit operator Source(string text) => new(text, string.Empty);
 }

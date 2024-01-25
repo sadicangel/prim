@@ -2,18 +2,18 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Tests.Syntax;
 
-public class Scanner_should
+public class SyntaxTree_should
 {
     [Fact]
     public void Test_all_tokens()
     {
         var tokenKinds = Enum.GetValues<TokenKind>().ToList();
 
-        var testedTokenKinds = Data.GetTokens().Concat(Data.GetSeparatorTokens()).Select(t => t.Kind);
+        var testedTokenKinds = Data.Tokens.Concat(Data.SeparatorTokens).Select(t => t.Kind);
 
         var untestedTokenKinds = new SortedSet<TokenKind>(tokenKinds);
 
-        untestedTokenKinds.Remove(TokenKind.SingleLineComment);
+        untestedTokenKinds.Remove(TokenKind.Comment_SingleLine);
         untestedTokenKinds.Remove(TokenKind.InvalidText);
         untestedTokenKinds.Remove(TokenKind.Invalid);
         untestedTokenKinds.Remove(TokenKind.EOF);
@@ -25,7 +25,7 @@ public class Scanner_should
 
     [Theory]
     [MemberData(nameof(Data.GetTokensData), MemberType = typeof(Data))]
-    public void Lexer_Lexes_Token(TokenKind kind, string text)
+    public void Scan_token(TokenKind kind, string text)
     {
         var tokens = SyntaxTree.Scan(text);
 
@@ -36,7 +36,7 @@ public class Scanner_should
 
     [Theory]
     [MemberData(nameof(Data.GetSeparatorTokensData), MemberType = typeof(Data))]
-    public void Lexer_Lexes_Trivia(TokenKind kind, string text)
+    public void Scan_trivia(TokenKind kind, string text)
     {
         var tokens = SyntaxTree.Scan(text, skipEof: false);
 
@@ -50,7 +50,7 @@ public class Scanner_should
 
     [Theory]
     [MemberData(nameof(Data.GetTokenPairsData), MemberType = typeof(Data))]
-    public void Lexer_Lexes_TokenPairs(TokenInfo t1, TokenInfo t2)
+    public void Scan_tokens_in_pairs(TokenInfo t1, TokenInfo t2)
     {
         var tokens = SyntaxTree.Scan(t1.Text + t2.Text).ToArray();
 
@@ -64,7 +64,7 @@ public class Scanner_should
 
     [Theory]
     [MemberData(nameof(Data.GetTokenPairsWithSeparatorData), MemberType = typeof(Data))]
-    public void Lexer_Lexes_TokenPairsWithSeparator(TokenInfo t1, TokenInfo separator, TokenInfo t2)
+    public void Scan_tokens_in_pairs_with_separator(TokenInfo t1, TokenInfo separator, TokenInfo t2)
     {
         var tokens = SyntaxTree.Scan(t1.Text + separator.Text + t2.Text).ToArray();
 
@@ -84,14 +84,14 @@ public readonly record struct TokenInfo(TokenKind Kind, string Text);
 
 file static class Data
 {
-    public static TheoryData<TokenKind, string> GetTokensData() => GetTokens().ToTheoryData(t => (t.Kind, t.Text));
-    public static TheoryData<TokenKind, string> GetSeparatorTokensData() => GetSeparatorTokens().ToTheoryData(t => (t.Kind, t.Text));
-    public static TheoryData<TokenInfo, TokenInfo> GetTokenPairsData() => GetTokenPairs().ToTheoryData(p => (p.t1, p.t2));
-    public static TheoryData<TokenInfo, TokenInfo, TokenInfo> GetTokenPairsWithSeparatorData() => GetTokenPairsWithSeparator().ToTheoryData(p => (p.t1, p.separator, p.t2));
+    public static TheoryData<TokenKind, string> GetTokensData() => Tokens.ToTheoryData(t => (t.Kind, t.Text));
+    public static TheoryData<TokenKind, string> GetSeparatorTokensData() => SeparatorTokens.ToTheoryData(t => (t.Kind, t.Text));
+    public static TheoryData<TokenInfo, TokenInfo> GetTokenPairsData() => TokenPairs.ToTheoryData(p => (p.t1, p.t2));
+    public static TheoryData<TokenInfo, TokenInfo, TokenInfo> GetTokenPairsWithSeparatorData() => TokenPairsWithSeparator.ToTheoryData(p => (p.t1, p.separator, p.t2));
 
-    public static IEnumerable<TokenInfo> GetTokens()
+    public static readonly IReadOnlyList<TokenInfo> Tokens = ((Func<IReadOnlyList<TokenInfo>>)(() =>
     {
-        return GetFixedTokens().Concat(GetDynamicTokens());
+        return [.. GetFixedTokens().Concat(GetDynamicTokens())];
 
         static IEnumerable<TokenInfo> GetFixedTokens() => Enum.GetValues<TokenKind>()
             .Select(k => new TokenInfo(k, k.GetText()!))
@@ -108,44 +108,52 @@ file static class Data
             new TokenInfo(TokenKind.Identifier, "a"),
             new TokenInfo(TokenKind.Identifier, "abc"),
 
-            new TokenInfo(TokenKind.String, """
+            new TokenInfo(TokenKind.Str, """
                                             "test"
                                             """),
-            new TokenInfo(TokenKind.String, """
+            new TokenInfo(TokenKind.Str, """
                                             "te\"st"
                                             """),
             //new TokenInfo(TokenKind.SingleLineComment, "//"),
         };
-    }
-    public static IEnumerable<TokenInfo> GetSeparatorTokens()
+    }))();
+
+    public static readonly IReadOnlyList<TokenInfo> SeparatorTokens = ((Func<IReadOnlyList<TokenInfo>>)(() => [
+        new TokenInfo(TokenKind.WhiteSpace, " "),
+        new TokenInfo(TokenKind.WhiteSpace, "  "),
+        new TokenInfo(TokenKind.WhiteSpace, "\t"),
+        new TokenInfo(TokenKind.LineBreak, "\r"),
+        new TokenInfo(TokenKind.LineBreak, "\n"),
+        new TokenInfo(TokenKind.LineBreak, "\r\n"),
+        new TokenInfo(TokenKind.Comment_MultiLine, "/**/"),
+    ]))();
+
+    public static readonly IReadOnlyList<(TokenInfo t1, TokenInfo t2)> TokenPairs = ((Func<IReadOnlyList<(TokenInfo t1, TokenInfo t2)>>)(() =>
     {
-        return
-        [
-            new TokenInfo(TokenKind.WhiteSpace, " "),
-            new TokenInfo(TokenKind.WhiteSpace, "  "),
-            new TokenInfo(TokenKind.WhiteSpace, "\t"),
-            new TokenInfo(TokenKind.LineBreak, "\r"),
-            new TokenInfo(TokenKind.LineBreak, "\n"),
-            new TokenInfo(TokenKind.LineBreak, "\r\n"),
-            new TokenInfo(TokenKind.MultiLineComment, "/**/"),
-        ];
-    }
-    public static IEnumerable<(TokenInfo t1, TokenInfo t2)> GetTokenPairs()
+        return [.. EnumerateTokenPairs()];
+
+        static IEnumerable<(TokenInfo t1, TokenInfo t2)> EnumerateTokenPairs()
+        {
+            foreach (var t1 in Tokens)
+                foreach (var t2 in Tokens)
+                    if (!RequireSeparator(t1.Kind, t2.Kind))
+                        yield return (t1, t2);
+        }
+    }))();
+    public static readonly IReadOnlyList<(TokenInfo t1, TokenInfo separator, TokenInfo t2)> TokenPairsWithSeparator = ((Func<IReadOnlyList<(TokenInfo t1, TokenInfo separator, TokenInfo t2)>>)(() =>
     {
-        foreach (var t1 in GetTokens())
-            foreach (var t2 in GetTokens())
-                if (!RequireSeparator(t1.Kind, t2.Kind))
-                    yield return (t1, t2);
-    }
-    public static IEnumerable<(TokenInfo t1, TokenInfo separator, TokenInfo t2)> GetTokenPairsWithSeparator()
-    {
-        foreach (var t1 in GetTokens())
-            foreach (var t2 in GetTokens())
-                if (RequireSeparator(t1.Kind, t2.Kind))
-                    foreach (var s in GetSeparatorTokens())
-                        if (!RequireSeparator(t1.Kind, s.Kind) && !RequireSeparator(s.Kind, t2.Kind))
-                            yield return (t1, s, t2);
-    }
+        return [.. EnumerateTokenPairsWithSeparator()];
+
+        static IEnumerable<(TokenInfo t1, TokenInfo separator, TokenInfo t2)> EnumerateTokenPairsWithSeparator()
+        {
+            foreach (var t1 in Tokens)
+                foreach (var t2 in Tokens)
+                    if (RequireSeparator(t1.Kind, t2.Kind))
+                        foreach (var s in SeparatorTokens)
+                            if (!RequireSeparator(t1.Kind, s.Kind) && !RequireSeparator(s.Kind, t2.Kind))
+                                yield return (t1, s, t2);
+        }
+    }))();
 
     private static bool RequireSeparator(TokenKind k1, TokenKind k2)
     {
@@ -160,52 +168,90 @@ file static class Data
             case (TokenKind.Ampersand, TokenKind.Ampersand):
             case (TokenKind.Ampersand, TokenKind.AmpersandAmpersand):
             case (TokenKind.Ampersand, TokenKind.AmpersandEqual):
-            case (TokenKind.Ampersand, TokenKind.Arrow):
+            case (TokenKind.Ampersand, TokenKind.Lambda):
             case (TokenKind.Ampersand, TokenKind.Equal):
             case (TokenKind.Ampersand, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.As, TokenKind.As):
+            case (TokenKind.Cast, TokenKind.Cast):
                 return true;
 
-            case (TokenKind.Bang, TokenKind.Arrow):
+            case (TokenKind.Bang, TokenKind.Lambda):
             case (TokenKind.Bang, TokenKind.Equal):
             case (TokenKind.Bang, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Equal, TokenKind.Arrow):
+            case (TokenKind.Dot, TokenKind.Dot):
+            case (TokenKind.Dot, TokenKind.DotDot):
+            case (TokenKind.Dot, var kind) when kind.IsNumber():
+            case (TokenKind.DotDot, TokenKind.Dot):
+                return true;
+
+            case (TokenKind.Equal, TokenKind.Lambda):
             case (TokenKind.Equal, TokenKind.Equal):
             case (TokenKind.Equal, TokenKind.EqualEqual):
             case (TokenKind.Equal, TokenKind.Greater):
             case (TokenKind.Equal, TokenKind.GreaterEqual):
+            case (TokenKind.Equal, TokenKind.GreaterGreater):
+            case (TokenKind.Equal, TokenKind.GreaterGreaterEqual):
                 return true;
 
-            case (TokenKind.Less, TokenKind.Arrow):
+            case (TokenKind.Less, TokenKind.Lambda):
+            case (TokenKind.Less, TokenKind.Less):
+            case (TokenKind.Less, TokenKind.LessEqual):
+            case (TokenKind.Less, TokenKind.LessLess):
+            case (TokenKind.Less, TokenKind.LessLessEqual):
             case (TokenKind.Less, TokenKind.Equal):
             case (TokenKind.Less, TokenKind.EqualEqual):
+            case (TokenKind.LessLess, TokenKind.Lambda):
+            case (TokenKind.LessLess, TokenKind.Equal):
+            case (TokenKind.LessLess, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Greater, TokenKind.Arrow):
+            case (TokenKind.Greater, TokenKind.Lambda):
+            case (TokenKind.Greater, TokenKind.Greater):
+            case (TokenKind.Greater, TokenKind.GreaterEqual):
+            case (TokenKind.Greater, TokenKind.GreaterGreater):
+            case (TokenKind.Greater, TokenKind.GreaterGreaterEqual):
             case (TokenKind.Greater, TokenKind.Equal):
             case (TokenKind.Greater, TokenKind.EqualEqual):
+            case (TokenKind.GreaterGreater, TokenKind.Lambda):
+            case (TokenKind.GreaterGreater, TokenKind.Equal):
+            case (TokenKind.GreaterGreater, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Hat, TokenKind.Arrow):
+            case (TokenKind.Hat, TokenKind.Lambda):
             case (TokenKind.Hat, TokenKind.Equal):
             case (TokenKind.Hat, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Minus, TokenKind.Arrow):
-            case (TokenKind.Minus, TokenKind.Equal):
-            case (TokenKind.Minus, TokenKind.EqualEqual):
+            case (TokenKind.Hook, TokenKind.Hook):
+            case (TokenKind.Hook, TokenKind.HookHook):
+            case (TokenKind.Hook, TokenKind.HookHookEqual):
+            case (TokenKind.HookHook, TokenKind.Lambda):
+            case (TokenKind.HookHook, TokenKind.Equal):
+            case (TokenKind.HookHook, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Percent, TokenKind.Arrow):
+            case (TokenKind.Minus, TokenKind.Cast):
+            case (TokenKind.Minus, TokenKind.Lambda):
+            case (TokenKind.Minus, TokenKind.Minus):
+            case (TokenKind.Minus, TokenKind.MinusEqual):
+            case (TokenKind.Minus, TokenKind.MinusMinus):
+            case (TokenKind.Minus, TokenKind.Equal):
+            case (TokenKind.Minus, TokenKind.EqualEqual):
+            case (TokenKind.Minus, TokenKind.Greater):
+            case (TokenKind.Minus, TokenKind.GreaterEqual):
+            case (TokenKind.Minus, TokenKind.GreaterGreater):
+            case (TokenKind.Minus, TokenKind.GreaterGreaterEqual):
+                return true;
+
+            case (TokenKind.Percent, TokenKind.Lambda):
             case (TokenKind.Percent, TokenKind.Equal):
             case (TokenKind.Percent, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Pipe, TokenKind.Arrow):
+            case (TokenKind.Pipe, TokenKind.Lambda):
             case (TokenKind.Pipe, TokenKind.Equal):
             case (TokenKind.Pipe, TokenKind.EqualEqual):
             case (TokenKind.Pipe, TokenKind.Pipe):
@@ -213,15 +259,18 @@ file static class Data
             case (TokenKind.Pipe, TokenKind.PipePipe):
                 return true;
 
-            case (TokenKind.Plus, TokenKind.Arrow):
+            case (TokenKind.Plus, TokenKind.Lambda):
+            case (TokenKind.Plus, TokenKind.Plus):
+            case (TokenKind.Plus, TokenKind.PlusEqual):
+            case (TokenKind.Plus, TokenKind.PlusPlus):
             case (TokenKind.Plus, TokenKind.Equal):
             case (TokenKind.Plus, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.String, TokenKind.String):
+            case (TokenKind.Str, TokenKind.Str):
                 return true;
 
-            case (TokenKind.Slash, TokenKind.Arrow):
+            case (TokenKind.Slash, TokenKind.Lambda):
             case (TokenKind.Slash, TokenKind.Equal):
             case (TokenKind.Slash, TokenKind.EqualEqual):
             case (TokenKind.Slash, TokenKind.Slash):
@@ -230,11 +279,11 @@ file static class Data
             case (TokenKind.Slash, TokenKind.StarEqual):
             case (TokenKind.Slash, TokenKind.StarStar):
             case (TokenKind.Slash, TokenKind.StarStarEqual):
-            case (TokenKind.Slash, TokenKind.SingleLineComment):
-            case (TokenKind.Slash, TokenKind.MultiLineComment):
+            case (TokenKind.Slash, TokenKind.Comment_SingleLine):
+            case (TokenKind.Slash, TokenKind.Comment_MultiLine):
                 return true;
 
-            case (TokenKind.Star, TokenKind.Arrow):
+            case (TokenKind.Star, TokenKind.Lambda):
             case (TokenKind.Star, TokenKind.Equal):
             case (TokenKind.Star, TokenKind.EqualEqual):
             case (TokenKind.Star, TokenKind.Star):
@@ -243,7 +292,7 @@ file static class Data
             case (TokenKind.Star, TokenKind.StarStarEqual):
                 return true;
 
-            case (TokenKind.StarStar, TokenKind.Arrow):
+            case (TokenKind.StarStar, TokenKind.Lambda):
             case (TokenKind.StarStar, TokenKind.Equal):
             case (TokenKind.StarStar, TokenKind.EqualEqual):
             case (TokenKind.StarStar, TokenKind.Star):
