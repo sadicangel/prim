@@ -1,2 +1,0 @@
-print("What's your name?");
-greet(scan());

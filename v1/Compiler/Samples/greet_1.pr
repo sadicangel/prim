@@ -1,3 +1,0 @@
-let greet: (name: str) => void = {
-    print("Hello, " + name + "!");
-};
