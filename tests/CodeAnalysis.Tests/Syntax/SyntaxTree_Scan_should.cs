@@ -2,7 +2,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Tests.Syntax;
 
-public class SyntaxTree_should
+public sealed class SyntaxTree_Scan_should
 {
     [Fact]
     public void Test_all_tokens()
@@ -27,7 +27,7 @@ public class SyntaxTree_should
     [MemberData(nameof(Data.GetTokensData), MemberType = typeof(Data))]
     public void Scan_token(TokenKind kind, string text)
     {
-        var tokens = SyntaxTree.Scan(text);
+        var tokens = SyntaxTree.Scan(text).SkipLast(1);
 
         var token = Assert.Single(tokens);
         Assert.Equal(kind, token.TokenKind);
@@ -38,7 +38,7 @@ public class SyntaxTree_should
     [MemberData(nameof(Data.GetSeparatorTokensData), MemberType = typeof(Data))]
     public void Scan_trivia(TokenKind kind, string text)
     {
-        var tokens = SyntaxTree.Scan(text, skipEof: false);
+        var tokens = SyntaxTree.Scan(text);
 
         var token = Assert.Single(tokens);
         Assert.Equal(TokenKind.EOF, token.TokenKind);
@@ -52,7 +52,7 @@ public class SyntaxTree_should
     [MemberData(nameof(Data.GetTokenPairsData), MemberType = typeof(Data))]
     public void Scan_tokens_in_pairs(TokenInfo t1, TokenInfo t2)
     {
-        var tokens = SyntaxTree.Scan(t1.Text + t2.Text).ToArray();
+        var tokens = SyntaxTree.Scan(t1.Text + t2.Text).SkipLast(1).ToArray();
 
         Assert.Equal(2, tokens.Length);
         Assert.Equal(t1.Kind, tokens[0].TokenKind);
@@ -66,7 +66,7 @@ public class SyntaxTree_should
     [MemberData(nameof(Data.GetTokenPairsWithSeparatorData), MemberType = typeof(Data))]
     public void Scan_tokens_in_pairs_with_separator(TokenInfo t1, TokenInfo separator, TokenInfo t2)
     {
-        var tokens = SyntaxTree.Scan(t1.Text + separator.Text + t2.Text).ToArray();
+        var tokens = SyntaxTree.Scan(t1.Text + separator.Text + t2.Text).SkipLast(1).ToArray();
 
         Assert.Equal(2, tokens.Length);
         Assert.Equal(t1.Kind, tokens[0].TokenKind);
@@ -173,7 +173,7 @@ file static class Data
             case (TokenKind.Ampersand, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Cast, TokenKind.Cast):
+            case (TokenKind.Arrow, TokenKind.Arrow):
                 return true;
 
             case (TokenKind.Bang, TokenKind.Lambda):
@@ -233,7 +233,7 @@ file static class Data
             case (TokenKind.HookHook, TokenKind.EqualEqual):
                 return true;
 
-            case (TokenKind.Minus, TokenKind.Cast):
+            case (TokenKind.Minus, TokenKind.Arrow):
             case (TokenKind.Minus, TokenKind.Lambda):
             case (TokenKind.Minus, TokenKind.Minus):
             case (TokenKind.Minus, TokenKind.MinusEqual):

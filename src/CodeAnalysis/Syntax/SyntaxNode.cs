@@ -5,15 +5,16 @@ namespace CodeAnalysis.Syntax;
 
 public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : INode
 {
-    public SyntaxNode? Parent => SyntaxTree.GetParent(this);
+    //public SyntaxNode? Parent => SyntaxTree.GetParent(this);
+
     public Token FirstToken => this is Token token ? token : Children().First().FirstToken;
     public Token LastToken => this is Token token ? token : Children().Last().LastToken;
+
 
     public virtual Range Range => Children().First().Range.Start..Children().Last().Range.End;
     public virtual Range RangeWithWhiteSpace => Children().First().RangeWithWhiteSpace.Start..Children().Last().RangeWithWhiteSpace.End;
     public virtual ReadOnlySpan<char> Text => SyntaxTree.Source[Range];
     public SourceLocation Location => new(SyntaxTree.Source, Range);
-
     public override string ToString() => Text.ToString();
 
     public abstract IEnumerable<SyntaxNode> Children();
@@ -26,24 +27,26 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
 
 public enum SyntaxNodeKind
 {
-    // Expressions
-    AssignmentExpression,
-    CompoundAssignmentExpression,
+    GlobalExpression,
+
+    BlockExpression,
+    InlineExpression,
+    EmptyExpression,
 
     LiteralExpression,
     GroupExpression,
     UnaryExpression,
     BinaryExpression,
     ConvertExpression,
-    NameExpression,
-    CallExpression,
 
-    BlockExpression,
+    DeclarationExpression,
+    AssignmentExpression,
+    NameExpression,
+
     ForExpression,
-    IfExpression,
+    IfElseExpression,
     WhileExpression,
 
-    ResultExpression,
     BreakExpression,
     ContinueExpression,
     ReturnExpression,
@@ -55,6 +58,9 @@ public enum SyntaxNodeKind
     Trivia,
 
     // Nodes
+    Type,
     Parameter,
+    ArgumentList,
     CompilationUnit,
+    SubscriptExpression,
 }

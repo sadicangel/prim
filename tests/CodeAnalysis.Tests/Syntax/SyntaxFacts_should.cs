@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Tests.Syntax;
-public class SyntaxFacts_should
+public sealed class SyntaxFacts_should
 {
     [Theory]
     [MemberData(nameof(GetTokenKindData))]
@@ -11,7 +11,7 @@ public class SyntaxFacts_should
         if (text is null)
             return;
 
-        var tokens = SyntaxTree.Scan(text);
+        var tokens = SyntaxTree.Scan(text).SkipLast(1);
         var token = Assert.Single(tokens);
         Assert.Equal(kind, token.TokenKind);
         Assert.Equal(text, token.Text);

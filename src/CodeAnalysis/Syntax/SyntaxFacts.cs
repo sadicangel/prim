@@ -20,6 +20,13 @@ public static class SyntaxFacts
 
     public static int GetBinaryOperatorPrecedence(this TokenKind type) => type switch
     {
+        TokenKind.BracketOpen or
+        TokenKind.ParenthesisOpen => 10,
+
+        TokenKind.Dot => 9,
+
+        TokenKind.DotDot => 8,
+
         TokenKind.StarStar => 7,
 
         TokenKind.Percent or
@@ -42,7 +49,7 @@ public static class SyntaxFacts
         TokenKind.Ampersand or
         TokenKind.AmpersandAmpersand => 2,
 
-        TokenKind.Cast or
+        TokenKind.Arrow or
         TokenKind.Pipe or
         TokenKind.PipePipe or
         TokenKind.Hat or
@@ -66,6 +73,7 @@ public static class SyntaxFacts
         "return" => TokenKind.Return,
 
         "any" => TokenKind.Type_Any,
+        "unknown" => TokenKind.Type_Unknown,
         "bool" => TokenKind.Type_Bool,
         "false" => TokenKind.False,
         "true" => TokenKind.True,
@@ -117,6 +125,7 @@ public static class SyntaxFacts
         or TokenKind.Continue
         or TokenKind.Return
         or TokenKind.Type_Any
+        or TokenKind.Type_Unknown
         or TokenKind.Type_Bool
         or TokenKind.False
         or TokenKind.True
@@ -125,6 +134,32 @@ public static class SyntaxFacts
         or TokenKind.Null
         or TokenKind.Type_Str
         or TokenKind.Type_Type
+        or TokenKind.Type_I8
+        or TokenKind.Type_I16
+        or TokenKind.Type_I32
+        or TokenKind.Type_I64
+        or TokenKind.Type_I128
+        or TokenKind.Type_ISize
+        or TokenKind.Type_U8
+        or TokenKind.Type_U16
+        or TokenKind.Type_U32
+        or TokenKind.Type_U64
+        or TokenKind.Type_U128
+        or TokenKind.Type_USize
+        or TokenKind.Type_F16
+        or TokenKind.Type_F32
+        or TokenKind.Type_F64
+        or TokenKind.Type_F80
+        or TokenKind.Type_F128;
+
+    public static bool IsPredefinedType(this TokenKind kind) => kind
+        is TokenKind.Type_Any
+        or TokenKind.Type_Unknown
+        or TokenKind.Type_Never
+        or TokenKind.Type_Unit
+        or TokenKind.Type_Type
+        or TokenKind.Type_Str
+        or TokenKind.Type_Bool
         or TokenKind.Type_I8
         or TokenKind.Type_I16
         or TokenKind.Type_I32
@@ -154,8 +189,9 @@ public static class SyntaxFacts
     public static bool IsBinaryOperator(this TokenKind kind) => kind
         is TokenKind.Ampersand
         or TokenKind.AmpersandAmpersand
-        or TokenKind.Cast
+        or TokenKind.Arrow
         or TokenKind.BangEqual
+        or TokenKind.BracketOpen
         or TokenKind.EqualEqual
         or TokenKind.Dot
         or TokenKind.DotDot
@@ -167,6 +203,7 @@ public static class SyntaxFacts
         or TokenKind.LessEqual
         or TokenKind.LessLess
         or TokenKind.Minus
+        or TokenKind.ParenthesisOpen
         or TokenKind.Percent
         or TokenKind.Pipe
         or TokenKind.PipePipe
@@ -207,10 +244,12 @@ public static class SyntaxFacts
         TokenKind.Invalid => null,
 
         // Punctuation
-        TokenKind.Brace_Open => "{",
-        TokenKind.Brace_Close => "}",
-        TokenKind.Parenthesis_Open => "(",
-        TokenKind.Parenthesis_Close => ")",
+        TokenKind.BraceOpen => "{",
+        TokenKind.BraceClose => "}",
+        TokenKind.ParenthesisOpen => "(",
+        TokenKind.ParenthesisClose => ")",
+        TokenKind.BracketOpen => "[",
+        TokenKind.BracketClose => "]",
         TokenKind.Colon => ":",
         TokenKind.Semicolon => ";",
         TokenKind.Comma => ",",
@@ -222,7 +261,7 @@ public static class SyntaxFacts
         TokenKind.Bang => "!",
         TokenKind.BangEqual => "!=",
         // TokenKind.Call => null,
-        TokenKind.Cast => "->",
+        TokenKind.Arrow => "->",
         TokenKind.Dot => ".",
         TokenKind.DotDot => "..",
         TokenKind.Equal => "=",
@@ -287,6 +326,7 @@ public static class SyntaxFacts
 
         // Primitive Types
         TokenKind.Type_Any => "any",
+        TokenKind.Type_Unknown => "unknown",
         TokenKind.Type_Never => "never",
         TokenKind.Type_Unit => "unit",
         TokenKind.Type_Type => "type",
@@ -326,7 +366,6 @@ public static class SyntaxFacts
 
         // EOF
         TokenKind.EOF => null,
-
         _ => throw new UnreachableException($"Unexpected syntax: '{kind}'"),
     };
 

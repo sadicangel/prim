@@ -62,25 +62,37 @@ internal static class Scanner
         {
             // Punctuation
             case ['{', ..]:
-                kind = TokenKind.Brace_Open;
+                kind = TokenKind.BraceOpen;
                 range = position..(position + 1);
                 value = null;
                 return 1;
 
             case ['}', ..]:
-                kind = TokenKind.Brace_Close;
+                kind = TokenKind.BraceClose;
                 range = position..(position + 1);
                 value = null;
                 return 1;
 
             case ['(', ..]:
-                kind = TokenKind.Parenthesis_Open;
+                kind = TokenKind.ParenthesisOpen;
                 range = position..(position + 1);
                 value = null;
                 return 1;
 
             case [')', ..]:
-                kind = TokenKind.Parenthesis_Close;
+                kind = TokenKind.ParenthesisClose;
+                range = position..(position + 1);
+                value = null;
+                return 1;
+
+            case ['[', ..]:
+                kind = TokenKind.BracketOpen;
+                range = position..(position + 1);
+                value = null;
+                return 1;
+
+            case [']', ..]:
+                kind = TokenKind.BracketClose;
                 range = position..(position + 1);
                 value = null;
                 return 1;
@@ -244,7 +256,7 @@ internal static class Scanner
                 return 1;
 
             case ['-', '>', ..]:
-                kind = TokenKind.Cast;
+                kind = TokenKind.Arrow;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -360,12 +372,12 @@ internal static class Scanner
             case ['"', ..]:
                 return ScanString(syntaxTree, position, out kind, out range, out value);
 
-            case ['0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
-            case ['.', '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..]:
+            case [var d1, ..] when Char.IsAsciiDigit(d1):
+            case ['.', var d2, ..] when Char.IsAsciiDigit(d2):
                 return ScanNumber(syntaxTree, position, out kind, out range, out value);
 
-            case ['A' or 'B' or 'C' or 'D' or 'E' or 'F' or 'G' or 'H' or 'I' or 'J' or 'K' or 'L' or 'M' or 'N' or 'O' or 'P' or 'Q' or 'R' or 'S' or 'T' or 'U' or 'V' or 'W' or 'X' or 'Y' or 'Z' or
-                 'a' or 'b' or 'c' or 'd' or 'e' or 'f' or 'g' or 'h' or 'i' or 'j' or 'k' or 'l' or 'm' or 'n' or 'o' or 'p' or 'q' or 'r' or 's' or 't' or 'u' or 'v' or 'w' or 'x' or 'y' or 'z', ..]:
+            case ['_', ..]:
+            case [var l, ..] when Char.IsAsciiLetter(l):
                 return ScanIdentifier(syntaxTree, position, out kind, out range, out value);
 
             // Control
@@ -525,7 +537,7 @@ internal static class Scanner
 
         return read;
 
-        object EnsureCorrectType<T>(ReadOnlySpan<char> text, TypeSymbol type) where T : unmanaged, ISpanParsable<T>
+        object EnsureCorrectType<T>(ReadOnlySpan<char> text, PrimType type) where T : unmanaged, ISpanParsable<T>
         {
             if (!T.TryParse(text, provider: null, out T value))
                 syntaxTree.Diagnostics.ReportInvalidNumber(new SourceLocation(syntaxTree.Source, localCopyOfRange), text.ToString(), type);
@@ -579,12 +591,19 @@ internal static class Scanner
         {
             read++;
         }
-        while (Char.IsLetterOrDigit(syntaxTree.Source[position + read]));
+        while (IsValid(syntaxTree.Source[position + read]));
 
         range = position..(position + read);
         var text = syntaxTree.Source[range];
         kind = text.GetKeywordKind();
-        value = null;
+        value = kind switch
+        {
+            TokenKind.True => true,
+            TokenKind.False => false,
+            _ => null,
+        };
         return read;
+
+        static bool IsValid(char c) => c is '_' || Char.IsAsciiLetterOrDigit(c);
     }
 }

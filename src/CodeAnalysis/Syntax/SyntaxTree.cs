@@ -1,5 +1,6 @@
 ﻿using CodeAnalysis.Text;
 using Spectre.Console;
+using System.Diagnostics;
 
 namespace CodeAnalysis.Syntax;
 
@@ -17,6 +18,7 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
 
     internal SyntaxNode? GetParent(SyntaxNode node)
     {
+        Debug.WriteLine("enter");
         if (_nodeParents is null)
             Interlocked.CompareExchange(ref _nodeParents, CreateNodeParents(Root), null);
 
@@ -45,25 +47,21 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
 
     public void WriteTo(TreeNode root) => Root.WriteTo(root);
 
-    public static IReadOnlyList<Token> Scan(Source source, bool skipEof = true)
+    public static IReadOnlyList<Token> Scan(Source source)
     {
-        // A little hack, as we want to go through SyntaxTree to actually get the tokens..
-        List<Token> tokens = [];
-
-        CompilationUnit ParseTokens(SyntaxTree syntaxTree)
+        static CompilationUnit Parse(SyntaxTree syntaxTree)
         {
-            tokens = [.. Scanner.Scan(syntaxTree)];
-            if (skipEof && tokens is [.., var last] && last.TokenKind is TokenKind.EOF)
-            {
-                tokens.Remove(last);
-                return new CompilationUnit(syntaxTree, [], last);
-            }
+            var tokens = new List<Token>(Scanner.Scan(syntaxTree));
+            var eof = tokens is [.., var last] && last.TokenKind is TokenKind.EOF
+                ? last
+                : new Token(syntaxTree, TokenKind.EOF, new Range(syntaxTree.Source.Text.Length, syntaxTree.Source.Text.Length), TokenTrivia.Empty, "\0");
 
-            return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.EOF, new Range(source.Text.Length, source.Text.Length), TokenTrivia.Empty, "\0"));
+            return new CompilationUnit(syntaxTree, tokens, eof);
         }
 
-        // Evaluate the syntax tree.
-        _ = new SyntaxTree(source, ParseTokens);
-        return tokens;
+        return [.. new SyntaxTree(source, Parse).Root.Nodes.Cast<Token>()];
     }
+
+    public static SyntaxTree Parse(Source source) => new(source, Parser.ParseCompilationUnit);
+    public static SyntaxTree ParseScript(Source source) => new(source, Parser.ParseScript);
 }

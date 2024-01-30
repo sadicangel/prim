@@ -12,7 +12,7 @@ public sealed record class Token(
 )
     : SyntaxNode(SyntaxNodeKind.Token, SyntaxTree)
 {
-    public bool IsMissing { get => SyntaxTree.Source[Range].Length == 0; }
+    public bool IsArtificial { get => SyntaxTree.Source[Range].Length == 0; }
 
     public override Range Range { get; } = Range;
 
@@ -31,16 +31,23 @@ public sealed record class Token(
     private string GetDebuggerDisplay() => $"{TokenKind} {{ \"{Value ?? Text.ToString()}\" }}";
 }
 
+public readonly record struct TokenTrivia(List<Trivia> Leading, List<Trivia> Trailing)
+{
+    public static readonly TokenTrivia Empty = new([], []);
+}
+
 public enum TokenKind
 {
     // Invalid
     Invalid,
 
     // Punctuation
-    Brace_Open,
-    Brace_Close,
-    Parenthesis_Open,
-    Parenthesis_Close,
+    BraceOpen,
+    BraceClose,
+    ParenthesisOpen,
+    ParenthesisClose,
+    BracketOpen,
+    BracketClose,
     Colon,
     Semicolon,
     Comma,
@@ -52,7 +59,7 @@ public enum TokenKind
     Bang,
     BangEqual,
     // Call,
-    Cast,
+    Arrow,
     Dot,
     DotDot,
     Equal,
@@ -119,14 +126,11 @@ public enum TokenKind
 
     // Primitive Types
     Type_Any,
+    Type_Unknown,
     Type_Never,
     Type_Unit,
     Type_Type,
-    //Type_Option,
-    //Type_Union,
-    //Type_Array,
     Type_Str,
-    //Type_Func,
     Type_Bool,
     Type_I8,
     Type_I16,
