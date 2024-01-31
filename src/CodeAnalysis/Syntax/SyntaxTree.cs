@@ -62,7 +62,7 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
                     foreach (var trivia in token.Trivia.Leading)
                         treeNode.AddNode($"[grey66]L: {trivia.TokenKind}[/]");
                     if (token.Value is not null)
-                        treeNode.AddNode($"[green3]{token.TokenKind}Token[/] [{GetLiteralColor(token.TokenKind)}]{token.Value}[/]");
+                        treeNode.AddNode($"[green3]{token.TokenKind}Token[/] {FormatLiteral(token)}");
                     else
                         treeNode.AddNode($"[green3]{token.TokenKind}Token[/]");
                     foreach (var trivia in token.Trivia.Trailing)
@@ -75,17 +75,17 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
             }
         }
 
-        static string GetLiteralColor(TokenKind kind)
+        static string FormatLiteral(Token token)
         {
-            return kind switch
+            return token.TokenKind switch
             {
-                TokenKind.I32 => "gold3",
-                TokenKind.F32 => "gold3",
-                TokenKind.Str => "darkorange3",
-                TokenKind.True => "blue3_1",
-                TokenKind.False => "blue3_1",
-                TokenKind.Null => "blue3_1",
-                _ => throw new UnreachableException($"Unexpected {nameof(TokenKind)} '{kind}'"),
+                TokenKind.I32 => $"[gold3]{token.Value}[/]",
+                TokenKind.F32 => $"[gold3]{token.Value}[/]",
+                TokenKind.Str => $"[darkorange3]\"{token.Value}\"[/]",
+                TokenKind.True => $"[blue3_1]{token.Value}[/]",
+                TokenKind.False => $"[blue3_1]{token.Value}[/]",
+                TokenKind.Null => $"[blue3_1]{token.Value}[/]",
+                _ => throw new UnreachableException($"Unexpected {nameof(TokenKind)} '{token.TokenKind}'"),
             };
         }
     }
