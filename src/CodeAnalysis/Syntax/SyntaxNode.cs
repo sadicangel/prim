@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Text;
-using Spectre.Console;
 
 namespace CodeAnalysis.Syntax;
 
@@ -19,10 +18,6 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
 
     public abstract IEnumerable<SyntaxNode> Children();
     IEnumerable<INode> INode.Children() => Children();
-
-    public void WriteTo(TreeNode parent)
-    {
-    }
 }
 
 public enum SyntaxNodeKind

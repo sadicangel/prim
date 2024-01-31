@@ -37,7 +37,7 @@ internal static class Scanner
             }
             yield return token;
         }
-        while (token.TokenKind is not TokenKind.EOF);
+        while (token.TokenKind is not TokenKind.Eof);
     }
 
     private static int ScanToken(SyntaxTree syntaxTree, int position, out Token token)
@@ -382,7 +382,7 @@ internal static class Scanner
 
             // Control
             case []:
-                kind = TokenKind.EOF;
+                kind = TokenKind.Eof;
                 range = position..position;
                 value = null;
                 return 0;
@@ -564,7 +564,7 @@ internal static class Scanner
                     break;
                 case ['\\', '"', ..]:
                     read++;
-                    builder.Append(syntaxTree.Source[read]);
+                    builder.Append(span[1]);
                     read++;
                     break;
                 case ['"', ..]:
@@ -572,7 +572,7 @@ internal static class Scanner
                     done = true;
                     break;
                 default:
-                    builder.Append(syntaxTree.Source[read]);
+                    builder.Append(span[0]);
                     read++;
                     break;
             }

@@ -365,7 +365,7 @@ public static class SyntaxFacts
         TokenKind.InvalidText => null,
 
         // EOF
-        TokenKind.EOF => null,
+        TokenKind.Eof => null,
         _ => throw new UnreachableException($"Unexpected syntax: '{kind}'"),
     };
 

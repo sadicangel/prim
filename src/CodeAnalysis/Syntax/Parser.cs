@@ -10,26 +10,26 @@ internal static class Parser
     {
         IReadOnlyList<Token> tokens = Scanner.Scan(syntaxTree).ToArray();
         if (tokens.Count == 0)
-            return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.EOF, Range: default, TokenTrivia.Empty, "\0"));
+            return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.Eof, Range: default, TokenTrivia.Empty, "\0"));
 
         var iterator = new TokenIterator(syntaxTree, tokens);
         return new CompilationUnit(
             iterator.SyntaxTree,
-            ParseMany(ref iterator, ParseGlobalExpression, static current => current.TokenKind is TokenKind.EOF),
-            iterator.Match(TokenKind.EOF));
+            ParseMany(ref iterator, ParseGlobalExpression, static current => current.TokenKind is TokenKind.Eof),
+            iterator.Match(TokenKind.Eof));
     }
 
     public static CompilationUnit ParseScript(SyntaxTree syntaxTree)
     {
         IReadOnlyList<Token> tokens = Scanner.Scan(syntaxTree).ToArray();
         if (tokens.Count == 0)
-            return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.EOF, Range: default, TokenTrivia.Empty, "\0"));
+            return new CompilationUnit(syntaxTree, [], new Token(syntaxTree, TokenKind.Eof, Range: default, TokenTrivia.Empty, "\0"));
 
         var iterator = new TokenIterator(syntaxTree, tokens);
         return new CompilationUnit(
             iterator.SyntaxTree,
-            ParseMany(ref iterator, ParseExpression, static current => current.TokenKind is TokenKind.EOF),
-            iterator.Match(TokenKind.EOF));
+            ParseMany(ref iterator, ParseExpression, static current => current.TokenKind is TokenKind.Eof),
+            iterator.Match(TokenKind.Eof));
     }
 
     private static List<T> ParseMany<T>(ref TokenIterator iterator, ParseNode<T> parse, Func<Token, bool> shouldStop)
@@ -109,7 +109,7 @@ internal static class Parser
         var nodes = new List<SyntaxNode>();
 
         var parseNext = true;
-        while (parseNext && iterator.Current.TokenKind is not TokenKind.ParenthesisClose and not TokenKind.EOF)
+        while (parseNext && iterator.Current.TokenKind is not TokenKind.ParenthesisClose and not TokenKind.Eof)
         {
             var node = parseNode(ref iterator);
             nodes.Add(node);
@@ -153,7 +153,7 @@ internal static class Parser
             var nodes = new List<object>();
 
             var parseNext = true;
-            while (parseNext && iterator.Current.TokenKind is not TokenKind.Equal and not TokenKind.EOF)
+            while (parseNext && iterator.Current.TokenKind is not TokenKind.Equal and not TokenKind.Eof)
             {
                 var node = parseNode(ref iterator);
                 nodes.Add(node);
@@ -220,7 +220,7 @@ internal static class Parser
     {
         // block: '{' [expression ';']* '}'
         var braceOpen = iterator.Match(TokenKind.BraceOpen);
-        var expressions = ParseMany(ref iterator, ParseTerminatedExpression, static current => current.TokenKind is TokenKind.EOF or TokenKind.BraceClose);
+        var expressions = ParseMany(ref iterator, ParseTerminatedExpression, static current => current.TokenKind is TokenKind.Eof or TokenKind.BraceClose);
         var braceClose = iterator.Match(TokenKind.BraceClose);
         return new BlockExpression(iterator.SyntaxTree, braceOpen, expressions, braceClose);
     }

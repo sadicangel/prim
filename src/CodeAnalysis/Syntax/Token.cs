@@ -161,5 +161,5 @@ public enum TokenKind
     InvalidText,
 
     // EOF
-    EOF,
+    Eof,
 }

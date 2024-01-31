@@ -16,7 +16,7 @@ public sealed class SyntaxTree_Scan_should
         untestedTokenKinds.Remove(TokenKind.Comment_SingleLine);
         untestedTokenKinds.Remove(TokenKind.InvalidText);
         untestedTokenKinds.Remove(TokenKind.Invalid);
-        untestedTokenKinds.Remove(TokenKind.EOF);
+        untestedTokenKinds.Remove(TokenKind.Eof);
 
         untestedTokenKinds.ExceptWith(testedTokenKinds);
 
@@ -41,7 +41,7 @@ public sealed class SyntaxTree_Scan_should
         var tokens = SyntaxTree.Scan(text);
 
         var token = Assert.Single(tokens);
-        Assert.Equal(TokenKind.EOF, token.TokenKind);
+        Assert.Equal(TokenKind.Eof, token.TokenKind);
         Assert.Equal(String.Empty, token.Text);
         var trivia = Assert.Single(token.Trivia.Leading);
         Assert.Equal(kind, trivia.TokenKind);
