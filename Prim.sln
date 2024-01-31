@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repl", "..\bfjit\src\Repl\Repl.csproj", "{25A76D3D-EAC8-4045-9575-806E02A2895C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repl", "src\Repl\Repl.csproj", "{F2C2AD54-9528-400D-92AC-B6C5790B863D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,10 @@ Global
 		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{510E6478-5BD0-4C37-83CE-89BD04B988E9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{25A76D3D-EAC8-4045-9575-806E02A2895C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25A76D3D-EAC8-4045-9575-806E02A2895C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25A76D3D-EAC8-4045-9575-806E02A2895C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25A76D3D-EAC8-4045-9575-806E02A2895C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C2AD54-9528-400D-92AC-B6C5790B863D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C2AD54-9528-400D-92AC-B6C5790B863D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C2AD54-9528-400D-92AC-B6C5790B863D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C2AD54-9528-400D-92AC-B6C5790B863D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
