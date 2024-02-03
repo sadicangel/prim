@@ -7,5 +7,9 @@ public sealed record class GlobalExpression(
 )
     : Expression(SyntaxNodeKind.GlobalExpression, SyntaxTree)
 {
-    public override IEnumerable<SyntaxNode> Children() => throw new NotImplementedException();
+    public override IEnumerable<SyntaxNode> Children()
+    {
+        yield return Declaration;
+        yield return Semicolon;
+    }
 }

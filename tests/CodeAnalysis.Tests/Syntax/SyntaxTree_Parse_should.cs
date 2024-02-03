@@ -98,7 +98,7 @@ public sealed class SyntaxTree_Parse_should
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal(":", expr.Colon.Text);
         Assert.Null(expr.Mutable);
-        Assert.Equal("i32", expr.Type.Text);
+        Assert.Equal("i32", expr.TypeNode.Text);
         Assert.Equal("=", expr.Equal.Text);
         Assert.Equal("2", expr.Expression.Text);
     }
@@ -114,7 +114,7 @@ public sealed class SyntaxTree_Parse_should
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal(":", expr.Colon.Text);
         Assert.Equal("mutable", expr.Mutable!.Text);
-        Assert.Equal("i32", expr.Type.Text);
+        Assert.Equal("i32", expr.TypeNode.Text);
         Assert.Equal("=", expr.Equal.Text);
         Assert.Equal("2", expr.Expression.Text);
     }

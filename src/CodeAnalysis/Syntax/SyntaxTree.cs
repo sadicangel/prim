@@ -60,13 +60,13 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
                 if (child is Token token)
                 {
                     foreach (var trivia in token.Trivia.Leading)
-                        treeNode.AddNode($"[grey66]L: {trivia.TokenKind}[/]");
+                        treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
                     if (token.Value is not null)
                         treeNode.AddNode($"[green3]{token.TokenKind}Token[/] {FormatLiteral(token)}");
                     else
                         treeNode.AddNode($"[green3]{token.TokenKind}Token[/]");
                     foreach (var trivia in token.Trivia.Trailing)
-                        treeNode.AddNode($"[grey66]T: {trivia.TokenKind}[/]");
+                        treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
                 }
                 else
                 {
@@ -105,6 +105,6 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
         return [.. new SyntaxTree(source, Parse).Root.Nodes.Cast<Token>()];
     }
 
-    public static SyntaxTree Parse(Source source) => new(source, Parser.ParseCompilationUnit);
+    public static SyntaxTree Parse(Source source) => new(source, Parser.Parse);
     public static SyntaxTree ParseScript(Source source) => new(source, Parser.ParseScript);
 }

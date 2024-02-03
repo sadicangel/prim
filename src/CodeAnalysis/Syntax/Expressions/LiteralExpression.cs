@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using CodeAnalysis.Types;
+
+namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class LiteralExpression(
     SyntaxTree SyntaxTree,
     Token Literal,

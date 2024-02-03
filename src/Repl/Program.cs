@@ -2,12 +2,11 @@
 using Spectre.Console;
 
 var syntaxTree = SyntaxTree.ParseScript("""
-    for (a : get_range()) {
-        print(a + 2);
-        print("done!");
-    }
+    a: i32 = 2;
+    b: i32 = a + 2;
     """);
-
-
-
 AnsiConsole.Write(syntaxTree.ToRenderable());
+
+var compilation = new Compilation([syntaxTree]);
+
+compilation.Evaluate();

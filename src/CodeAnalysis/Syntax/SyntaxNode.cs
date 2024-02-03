@@ -32,7 +32,7 @@ public enum SyntaxNodeKind
     GroupExpression,
     UnaryExpression,
     BinaryExpression,
-    ConvertExpression,
+    LambdaExpression,
 
     DeclarationExpression,
     AssignmentExpression,
@@ -54,8 +54,8 @@ public enum SyntaxNodeKind
 
     // Nodes
     Type,
+    Operator,
     Parameter,
     ArgumentList,
     CompilationUnit,
-    SubscriptExpression,
 }

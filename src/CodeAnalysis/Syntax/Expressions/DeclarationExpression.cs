@@ -1,16 +1,27 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using CodeAnalysis.Types;
+
+namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class DeclarationExpression(
     SyntaxTree SyntaxTree,
     Token Identifier,
     Token Colon,
     Token? Mutable,
-    TypeSyntax Type,
+    TypeSyntax TypeNode,
     Token Equal,
     Expression Expression
 )
     : IdentifierExpression(SyntaxNodeKind.DeclarationExpression, SyntaxTree, Identifier, Mutable is not null)
 {
+    public DeclarationKind DeclarationKind
+    {
+        get => TypeNode.Type switch
+        {
+            FunctionType => DeclarationKind.Function,
+            UserType => DeclarationKind.UserType,
+            _ => DeclarationKind.Variable
+        };
+    }
 
     public override IEnumerable<SyntaxNode> Children()
     {
@@ -18,8 +29,16 @@ public sealed record class DeclarationExpression(
         yield return Colon;
         if (Mutable is not null)
             yield return Mutable;
-        yield return Type;
+        yield return TypeNode;
         yield return Equal;
         yield return Expression;
     }
+}
+
+public enum DeclarationKind
+{
+    Variable,
+    Function,
+    Operator, // TODO: Support this
+    UserType,
 }

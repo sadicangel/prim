@@ -1,12 +1,12 @@
 ﻿using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Types;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeAnalysis.Syntax;
-
 internal static class Parser
 {
-    public static CompilationUnit ParseCompilationUnit(SyntaxTree syntaxTree)
+    public static CompilationUnit Parse(SyntaxTree syntaxTree)
     {
         IReadOnlyList<Token> tokens = Scanner.Scan(syntaxTree).ToArray();
         if (tokens.Count == 0)
@@ -123,6 +123,54 @@ internal static class Parser
         return new SeparatedNodeList<T>(nodes.ToArray());
     }
 
+    private static PrimType ParseType(ref TokenIterator iterator)
+    {
+        if (iterator.Current.TokenKind is TokenKind.ParenthesisOpen)
+        {
+            var parenthesisOpen = iterator.Match(TokenKind.ParenthesisOpen);
+            var parameters = ParseSeparatedList(ref iterator, ParseParameter);
+            var parenthesisClose = iterator.Match(TokenKind.ParenthesisClose);
+            var arrow = iterator.Match(TokenKind.Arrow);
+            var returnTypeSyntax = ParseTypeSyntax(ref iterator);
+
+            return new FunctionType(parameters, returnTypeSyntax.Type);
+        }
+        else
+        {
+            var typeName = iterator.Current.Text.ToString();
+            PrimType type = iterator.Current.TokenKind.IsPredefinedType()
+                ? PredefinedTypes.All.Single(t => t.Name == typeName)
+                : new UserType(typeName);
+            _ = iterator.Next();
+
+            // Check for option or array.
+            switch (iterator.Current.TokenKind)
+            {
+                case TokenKind.Hook:
+                    type = new OptionType(type);
+                    _ = iterator.Next();
+                    break;
+
+                case TokenKind.BracketOpen:
+                    _ = iterator.Next();
+                    _ = iterator.Match(TokenKind.BracketClose);
+                    type = new ArrayType(type);
+                    break;
+            }
+
+            return type;
+        }
+
+        static ParameterSyntax ParseParameter(ref TokenIterator iterator)
+        {
+            var identifier = iterator.Match(TokenKind.Identifier);
+            var colon = iterator.Match(TokenKind.Colon);
+            var type = ParseTypeSyntax(ref iterator);
+
+            return new ParameterSyntax(iterator.SyntaxTree, identifier, colon, type);
+        }
+    }
+
     private static TypeSyntax ParseTypeSyntax(ref TokenIterator iterator)
     {
         // type_syntax: types 
@@ -144,7 +192,7 @@ internal static class Parser
 
         static PrimType ReportInvalidTypeAndReturnNever(ref TokenIterator iterator)
         {
-            iterator.SyntaxTree.Diagnostics.ReportInvalidType(iterator.Current.Location);
+            iterator.SyntaxTree.Diagnostics.ReportExpectedTypeDefinition(iterator.Current.Location);
             return PredefinedTypes.Never;
         }
 
@@ -165,54 +213,6 @@ internal static class Parser
             }
 
             return new SeparatedNodeList<PrimType>(nodes.ToArray());
-        }
-
-        static PrimType ParseType(ref TokenIterator iterator)
-        {
-            if (iterator.Current.TokenKind is TokenKind.ParenthesisOpen)
-            {
-                var parenthesisOpen = iterator.Match(TokenKind.ParenthesisOpen);
-                var parameters = ParseSeparatedList(ref iterator, ParseParameter);
-                var parenthesisClose = iterator.Match(TokenKind.ParenthesisClose);
-                var arrow = iterator.Match(TokenKind.Arrow);
-                var returnTypeSyntax = ParseTypeSyntax(ref iterator);
-
-                return new FunctionType(parameters, returnTypeSyntax.Type);
-            }
-            else
-            {
-                var typeName = iterator.Current.Text.ToString();
-                PrimType type = iterator.Current.TokenKind.IsPredefinedType()
-                    ? PredefinedTypes.All.Single(t => t.Name == typeName)
-                    : new ReferencedType(typeName);
-                _ = iterator.Next();
-
-                // Check for option or array.
-                switch (iterator.Current.TokenKind)
-                {
-                    case TokenKind.Hook:
-                        type = new OptionType(type);
-                        _ = iterator.Next();
-                        break;
-
-                    case TokenKind.BracketOpen:
-                        _ = iterator.Next();
-                        _ = iterator.Match(TokenKind.BracketClose);
-                        type = new ArrayType(type);
-                        break;
-                }
-
-                return type;
-            }
-
-            static Parameter ParseParameter(ref TokenIterator iterator)
-            {
-                var identifier = iterator.Match(TokenKind.Identifier);
-                var colon = iterator.Match(TokenKind.Colon);
-                var type = ParseTypeSyntax(ref iterator);
-
-                return new Parameter(iterator.SyntaxTree, identifier, colon, type);
-            }
         }
     }
 
@@ -399,7 +399,7 @@ internal static class Parser
         return iterator.Peek(1).TokenKind switch
         {
             // declaration: identifier ':' type '=' expression
-            TokenKind.Colon => ParseDeclarationExpression(ref iterator),
+            TokenKind.Colon or TokenKind.Operator => ParseDeclarationExpression(ref iterator),
 
             // assign: identifier '=' expression
             TokenKind.Equal => ParseAssignmentExpression(ref iterator),
@@ -426,7 +426,11 @@ internal static class Parser
 
     private static DeclarationExpression ParseDeclarationExpression(ref TokenIterator iterator)
     {
-        // declaration: identifier ':' mutable? type '=' expression
+        // variable : identifier    ':' mutable? type  '=' expression
+        // function : identifier    ':' function_type  '=' expression
+        // user_type: identifier    ':'         'type' '=' expression
+        // TODO: operator : 'operator' op ':' function_type  '=' expression
+
         return new DeclarationExpression(
             iterator.SyntaxTree,
             iterator.Match(TokenKind.Identifier),
@@ -434,7 +438,7 @@ internal static class Parser
             iterator.MatchOrDefault(TokenKind.Mutable),
             ParseTypeSyntax(ref iterator),
             iterator.Match(TokenKind.Equal),
-            ParseExpression(ref iterator));
+            ParseTerminatedExpression(ref iterator));
     }
 
     private static AssignmentExpression ParseAssignmentExpression(ref TokenIterator iterator)

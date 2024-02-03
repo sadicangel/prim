@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Types;
+
+namespace CodeAnalysis.Syntax;
 
 public sealed record class TypeSyntax(
     SyntaxTree SyntaxTree,

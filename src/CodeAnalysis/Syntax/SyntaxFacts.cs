@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using CodeAnalysis.Operators;
+using System.Diagnostics;
 
 namespace CodeAnalysis.Syntax;
 
@@ -17,6 +18,60 @@ public static class SyntaxFacts
 
         _ => 0,
     };
+
+    public static UnaryOperatorKind GetUnaryOperatorKind(this TokenKind kind) => kind switch
+    {
+        TokenKind.Plus => UnaryOperatorKind.UnaryPlus,
+        TokenKind.Minus => UnaryOperatorKind.Negate,
+        TokenKind.PlusPlus => UnaryOperatorKind.Increment,
+        TokenKind.MinusMinus => UnaryOperatorKind.Decrement,
+        TokenKind.Bang => UnaryOperatorKind.Not,
+        TokenKind.Tilde => UnaryOperatorKind.OnesComplement,
+        _ => throw new InvalidOperationException($"Token {kind} is not a unary operator"),
+    };
+
+    public static BinaryOperatorKind GetBinaryOperatorKind(this TokenKind kind)
+    {
+        switch (kind)
+        {
+            case TokenKind.Ampersand:
+                return BinaryOperatorKind.And;
+            case TokenKind.AmpersandAmpersand:
+                return BinaryOperatorKind.AndAlso;
+            case TokenKind.BangEqual:
+                return BinaryOperatorKind.NotEqual;
+            case TokenKind.EqualEqual:
+                return BinaryOperatorKind.Equal;
+            case TokenKind.Greater:
+                return BinaryOperatorKind.GreaterThan;
+            case TokenKind.GreaterEqual:
+                return BinaryOperatorKind.GreaterThanOrEqual;
+            case TokenKind.Hat:
+                return BinaryOperatorKind.ExclusiveOr;
+            case TokenKind.Less:
+                return BinaryOperatorKind.LessThan;
+            case TokenKind.LessEqual:
+                return BinaryOperatorKind.LessThanOrEqual;
+            case TokenKind.Minus:
+                return BinaryOperatorKind.Subtract;
+            case TokenKind.Percent:
+                return BinaryOperatorKind.Modulo;
+            case TokenKind.Pipe:
+                return BinaryOperatorKind.Or;
+            case TokenKind.PipePipe:
+                return BinaryOperatorKind.OrElse;
+            case TokenKind.Plus:
+                return BinaryOperatorKind.Add;
+            case TokenKind.Slash:
+                return BinaryOperatorKind.Divide;
+            case TokenKind.Star:
+                return BinaryOperatorKind.Multiply;
+            case TokenKind.StarStar:
+                return BinaryOperatorKind.Exponent;
+            default:
+                throw new InvalidOperationException($"Token {kind} is not a binary operator");
+        }
+    }
 
     public static int GetBinaryOperatorPrecedence(this TokenKind type) => type switch
     {
@@ -61,6 +116,7 @@ public static class SyntaxFacts
     public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
     {
         "mutable" => TokenKind.Mutable,
+        "operator" => TokenKind.Operator,
         "sizeof" => TokenKind.SizeOf,
         "typeof" => TokenKind.TypeOf,
 
@@ -115,6 +171,7 @@ public static class SyntaxFacts
 
     public static bool IsKeyword(this TokenKind kind) => kind
         is TokenKind.Mutable
+        or TokenKind.Operator
         or TokenKind.SizeOf
         or TokenKind.TypeOf
         or TokenKind.If
@@ -218,7 +275,7 @@ public static class SyntaxFacts
     private readonly static Lazy<IReadOnlyList<TokenKind>> BinaryOperatorsLazy = new(() => [.. Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecedence(k) > 0)]);
     public static IEnumerable<TokenKind> BinaryOperators => BinaryOperatorsLazy.Value;
 
-    public static TokenKind GetBinaryOperatorOfAssignmentOperator(this TokenKind kind)
+    public static TokenKind GetBinaryOperatorOfAssignmentExpression(this TokenKind kind)
     {
         return kind switch
         {
@@ -323,6 +380,7 @@ public static class SyntaxFacts
 
         // Other Keywords
         TokenKind.Mutable => "mutable",
+        TokenKind.Operator => "operator",
 
         // Primitive Types
         TokenKind.Type_Any => "any",

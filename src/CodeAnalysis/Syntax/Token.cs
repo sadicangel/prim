@@ -89,7 +89,7 @@ public enum TokenKind
     Plus,
     PlusEqual,
     PlusPlus,
-    // SizeOf,
+    SizeOf,
     Slash,
     SlashEqual,
     Star,
@@ -98,7 +98,7 @@ public enum TokenKind
     StarStarEqual,
     // Subscript,
     Tilde,
-    // TypeOf,
+    TypeOf,
 
     // Control flow
     If,
@@ -121,8 +121,6 @@ public enum TokenKind
 
     // Other Keywords
     Mutable,
-    SizeOf,
-    TypeOf,
 
     // Primitive Types
     Type_Any,
@@ -149,6 +147,9 @@ public enum TokenKind
     Type_F64,
     Type_F80,
     Type_F128,
+
+    // Operator
+    Operator,
 
     // Identifier
     Identifier,

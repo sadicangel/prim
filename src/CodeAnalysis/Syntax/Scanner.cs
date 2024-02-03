@@ -1,8 +1,8 @@
 ﻿using CodeAnalysis.Text;
+using CodeAnalysis.Types;
 using System.Text;
 
 namespace CodeAnalysis.Syntax;
-
 internal static class Scanner
 {
     public static IEnumerable<Token> Scan(SyntaxTree syntaxTree)
@@ -369,6 +369,9 @@ internal static class Scanner
                 value = null;
                 return 1;
 
+            //case ['o', 'p', 'e', 'r', 'a', 't', 'o', 'r', var @operator, ..] when IsOperator(@operator):
+            //    return ScanOperator(syntaxTree, position, out kind, out range, out value);
+
             case ['"', ..]:
                 return ScanString(syntaxTree, position, out kind, out range, out value);
 
@@ -395,6 +398,10 @@ internal static class Scanner
                 return 1;
         }
     }
+    //private static bool IsOperator(char @operator)
+    //{
+
+    //}
 
     private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out List<Trivia> trivia)
     {
