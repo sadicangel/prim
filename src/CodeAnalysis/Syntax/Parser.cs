@@ -28,7 +28,7 @@ internal static class Parser
         var iterator = new TokenIterator(syntaxTree, tokens);
         return new CompilationUnit(
             iterator.SyntaxTree,
-            ParseMany(ref iterator, ParseExpression, static current => current.TokenKind is TokenKind.Eof),
+            ParseMany(ref iterator, ParseTerminatedExpression, static current => current.TokenKind is TokenKind.Eof),
             iterator.Match(TokenKind.Eof));
     }
 
@@ -67,14 +67,14 @@ internal static class Parser
             TokenKind.If => ParseIfElseExpression(ref iterator),
             TokenKind.For => ParseForExpression(ref iterator),
             TokenKind.While => ParseWhileExpression(ref iterator),
+            TokenKind.Break => ParseBreakExpression(ref iterator),
+            TokenKind.Continue => ParseContinueExpression(ref iterator),
+            TokenKind.Return => ParseReturnExpression(ref iterator),
+            TokenKind.Identifier when iterator.Peek(1).TokenKind == TokenKind.Colon => ParseDeclarationExpression(ref iterator),
             _ => new InlineExpression(
                 iterator.SyntaxTree,
                 iterator.Current.TokenKind switch
                 {
-                    TokenKind.Identifier when iterator.Peek(1).TokenKind == TokenKind.Colon => ParseDeclarationExpression(ref iterator),
-                    TokenKind.Break => ParseBreakExpression(ref iterator),
-                    TokenKind.Continue => ParseContinueExpression(ref iterator),
-                    TokenKind.Return => ParseReturnExpression(ref iterator),
                     _ => ParseBinaryExpression(ref iterator),
                 },
                 iterator.Match(TokenKind.Semicolon))

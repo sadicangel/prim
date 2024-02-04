@@ -4,7 +4,7 @@ public sealed record class ParameterSyntax(
     SyntaxTree SyntaxTree,
     Token Identifier,
     Token Colon,
-    TypeSyntax Type
+    TypeSyntax TypeNode
 )
     : SyntaxNode(SyntaxNodeKind.Parameter, SyntaxTree)
 {
@@ -12,6 +12,6 @@ public sealed record class ParameterSyntax(
     {
         yield return Identifier;
         yield return Colon;
-        yield return Type;
+        yield return TypeNode;
     }
 }

@@ -41,4 +41,6 @@ internal enum BoundNodeKind
 
     Symbol,
     Operator,
+
+    Program,
 }

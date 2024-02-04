@@ -57,20 +57,27 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
         {
             foreach (var child in syntaxNode.Children())
             {
-                if (child is Token token)
+                switch (child)
                 {
-                    foreach (var trivia in token.Trivia.Leading)
-                        treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
-                    if (token.Value is not null)
-                        treeNode.AddNode($"[green3]{token.TokenKind}Token[/] {FormatLiteral(token)}");
-                    else
-                        treeNode.AddNode($"[green3]{token.TokenKind}Token[/]");
-                    foreach (var trivia in token.Trivia.Trailing)
-                        treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
-                }
-                else
-                {
-                    WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/]"));
+                    case Token token:
+                        foreach (var trivia in token.Trivia.Leading)
+                            treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
+                        if (token.Value is not null)
+                            treeNode.AddNode($"[green3]{token.TokenKind}Token[/] {FormatLiteral(token)}");
+                        else
+                            treeNode.AddNode($"[green3]{token.TokenKind}Token[/] [darkseagreen2 i]{token.Text.ToString()}[/]");
+                        foreach (var trivia in token.Trivia.Trailing)
+                            treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
+                        break;
+
+                    case TypeSyntax type:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{type.Text}[/]"));
+                        // $"{base.Name}: {Type.Name}"
+                        break;
+
+                    default:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/]"));
+                        break;
                 }
             }
         }
