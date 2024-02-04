@@ -243,7 +243,6 @@ public static class SyntaxFacts
         or TokenKind.GreaterEqual
         or TokenKind.GreaterGreater
         or TokenKind.Hat
-        or TokenKind.HatEqual
         or TokenKind.HookHook
         or TokenKind.Less
         or TokenKind.LessEqual

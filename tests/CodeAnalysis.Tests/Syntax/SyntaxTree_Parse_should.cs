@@ -9,10 +9,11 @@ public sealed class SyntaxTree_Parse_should
     public void Parse_NameExpression()
     {
         var tree = SyntaxTree.ParseScript("""
-            a
+            a;
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<NameExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<NameExpression>(line.Expression);
         Assert.Equal("a", expr.Identifier.Text);
     }
 
@@ -23,7 +24,8 @@ public sealed class SyntaxTree_Parse_should
             a = 2
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<AssignmentExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<AssignmentExpression>(line.Expression);
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal("=", expr.Equal.Text);
         Assert.Equal("2", expr.Expression.Text);
@@ -36,7 +38,8 @@ public sealed class SyntaxTree_Parse_should
             a = {}
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<AssignmentExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<AssignmentExpression>(line.Expression);
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal("=", expr.Equal.Text);
         var block = Assert.IsType<BlockExpression>(expr.Expression);
@@ -50,7 +53,8 @@ public sealed class SyntaxTree_Parse_should
             a = if (a > b) 1 else 2;
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<AssignmentExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<AssignmentExpression>(line.Expression);
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal("=", expr.Equal.Text);
         var ifElse = Assert.IsType<IfElseExpression>(expr.Expression);
@@ -81,7 +85,8 @@ public sealed class SyntaxTree_Parse_should
             a {@operator} 2
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<AssignmentExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<AssignmentExpression>(line.Expression);
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal(@operator, expr.Equal.Text);
         Assert.Equal("2", expr.Expression.Text);
@@ -134,7 +139,8 @@ public sealed class SyntaxTree_Parse_should
             a({string.Join(", ", arguments)})
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<BinaryExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<BinaryExpression>(line.Expression);
         Assert.Equal("a", expr.Left.Text);
         Assert.Equal("(", expr.Operator.Text);
         var args = Assert.IsType<ArgumentListExpression>(expr.Right);
@@ -150,7 +156,8 @@ public sealed class SyntaxTree_Parse_should
     {
         var tree = SyntaxTree.ParseScript(text);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsAssignableFrom<LiteralExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsAssignableFrom<LiteralExpression>(line.Expression);
         Assert.Equal(text, expr.Literal.Text);
         Assert.Equal(value, expr.Literal.Value);
     }
@@ -162,7 +169,8 @@ public sealed class SyntaxTree_Parse_should
             (a)
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<GroupExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<GroupExpression>(line.Expression);
         Assert.Equal("(", expr.ParenthesisOpen.Text);
         Assert.IsAssignableFrom<Expression>(expr.Expression);
         Assert.Equal(")", expr.ParenthesisClose.Text);
@@ -182,7 +190,8 @@ public sealed class SyntaxTree_Parse_should
             {@operator}a
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<UnaryExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsType<UnaryExpression>(line.Expression);
         Assert.Equal(@operator, expr.Operator.Text);
         Assert.IsAssignableFrom<Expression>(expr.Operand);
     }
@@ -201,7 +210,8 @@ public sealed class SyntaxTree_Parse_should
             a {@operator} b
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsAssignableFrom<BinaryExpression>(node);
+        var line = Assert.IsType<InlineExpression>(node);
+        var expr = Assert.IsAssignableFrom<BinaryExpression>(line.Expression);
         Assert.IsAssignableFrom<Expression>(expr.Left);
         Assert.Equal(@operator, expr.Operator.Text);
         Assert.IsAssignableFrom<Expression>(expr.Right);
