@@ -1,4 +1,6 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Operators;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -29,24 +31,16 @@ internal record class BoundProgram(
             {
                 switch (child)
                 {
-                    //case Token token:
-                    //    foreach (var trivia in token.Trivia.Leading)
-                    //        treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
-                    //    if (token.Value is not null)
-                    //        treeNode.AddNode($"[green3]{token.TokenKind}Token[/] {FormatLiteral(token)}");
-                    //    else
-                    //        treeNode.AddNode($"[green3]{token.TokenKind}Token[/] [darkseagreen2 i]{token.Text.ToString()}[/]");
-                    //    foreach (var trivia in token.Trivia.Trailing)
-                    //        treeNode.AddNode($"[grey66 i]{trivia.TokenKind}[/]");
-                    //    break;
+                    case BoundOperator @operator:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{@operator.Operator.OperatorKind}[/]"));
+                        break;
 
-                    //case TypeSyntax type:
-                    //    WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{type.Text}[/]"));
-                    //    // $"{base.Name}: {Type.Name}"
-                    //    break;
+                    case BoundExpression expression:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{expression.Type.Name}[/]"));
+                        break;
 
                     default:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{child.SyntaxNode.Text}[/]"));
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/]"));
                         break;
                 }
             }

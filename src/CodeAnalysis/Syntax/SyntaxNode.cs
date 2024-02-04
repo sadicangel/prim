@@ -14,10 +14,11 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
     public virtual Range RangeWithWhiteSpace => Children().First().RangeWithWhiteSpace.Start..Children().Last().RangeWithWhiteSpace.End;
     public virtual ReadOnlySpan<char> Text => SyntaxTree.Source[Range];
     public SourceLocation Location => new(SyntaxTree.Source, Range);
-    public override string ToString() => Text.ToString();
 
     public abstract IEnumerable<SyntaxNode> Children();
     IEnumerable<INode> INode.Children() => Children();
+
+    public sealed override string ToString() => $"{NodeKind} {SyntaxTree.Source[Range]}";
 }
 
 public enum SyntaxNodeKind

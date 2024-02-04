@@ -1,9 +1,10 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
-public record class BinaryExpression(
+public sealed record class BinaryExpression(
     SyntaxTree SyntaxTree,
     Expression Left,
     Token Operator,
-    Expression Right
+    Expression Right,
+    Token? OperatorClose = null
 )
     : Expression(SyntaxNodeKind.BinaryExpression, SyntaxTree)
 {
@@ -12,5 +13,7 @@ public record class BinaryExpression(
         yield return Left;
         yield return Operator;
         yield return Right;
+        if (OperatorClose is not null)
+            yield return OperatorClose;
     }
 }

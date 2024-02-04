@@ -81,52 +81,52 @@ file static class PredefinedTypesHelper
 {
     public static PredefinedType AddMathOperators(this PredefinedType type)
     {
-        type.BinaryOperators.AddRange([
-            new BinaryOperator(BinaryOperatorKind.Add, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.Subtract, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.Multiply, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.Divide, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.Modulo, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.Exponent, type, type, type)
+        type.Operators.AddRange([
+            new BinaryOperator(OperatorKind.Add, type, type, type),
+            new BinaryOperator(OperatorKind.Subtract, type, type, type),
+            new BinaryOperator(OperatorKind.Multiply, type, type, type),
+            new BinaryOperator(OperatorKind.Divide, type, type, type),
+            new BinaryOperator(OperatorKind.Modulo, type, type, type),
+            new BinaryOperator(OperatorKind.Exponent, type, type, type)
         ]);
         return type;
     }
 
     public static PredefinedType AddShiftOperators(this PredefinedType type)
     {
-        type.BinaryOperators.AddRange([
-            new BinaryOperator(BinaryOperatorKind.LeftShift, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.RightShift, type, type, type)
+        type.Operators.AddRange([
+            new BinaryOperator(OperatorKind.LeftShift, type, type, type),
+            new BinaryOperator(OperatorKind.RightShift, type, type, type)
         ]);
         return type;
     }
 
     public static PredefinedType AddLogicalOperators(this PredefinedType type)
     {
-        type.BinaryOperators.AddRange([
-            new BinaryOperator(BinaryOperatorKind.And, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.Or, type, type, type),
-            new BinaryOperator(BinaryOperatorKind.ExclusiveOr, type, type, type),
+        type.Operators.AddRange([
+            new BinaryOperator(OperatorKind.And, type, type, type),
+            new BinaryOperator(OperatorKind.Or, type, type, type),
+            new BinaryOperator(OperatorKind.ExclusiveOr, type, type, type),
         ]);
         return type;
     }
 
     public static PredefinedType AddEqualityOperators(this PredefinedType type)
     {
-        type.BinaryOperators.AddRange([
-            new BinaryOperator(BinaryOperatorKind.Equal, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(BinaryOperatorKind.NotEqual, type, type, PredefinedTypes.Bool),
+        type.Operators.AddRange([
+            new BinaryOperator(OperatorKind.Equal, type, type, PredefinedTypes.Bool),
+            new BinaryOperator(OperatorKind.NotEqual, type, type, PredefinedTypes.Bool),
         ]);
         return type;
     }
 
     public static PredefinedType AddComparisonOperators(this PredefinedType type)
     {
-        type.BinaryOperators.AddRange([
-            new BinaryOperator(BinaryOperatorKind.LessThan, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(BinaryOperatorKind.LessThanOrEqual, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(BinaryOperatorKind.GreaterThan, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(BinaryOperatorKind.GreaterThanOrEqual, type, type, PredefinedTypes.Bool),
+        type.Operators.AddRange([
+            new BinaryOperator(OperatorKind.LessThan, type, type, PredefinedTypes.Bool),
+            new BinaryOperator(OperatorKind.LessThanOrEqual, type, type, PredefinedTypes.Bool),
+            new BinaryOperator(OperatorKind.GreaterThan, type, type, PredefinedTypes.Bool),
+            new BinaryOperator(OperatorKind.GreaterThanOrEqual, type, type, PredefinedTypes.Bool),
         ]);
         return type;
     }

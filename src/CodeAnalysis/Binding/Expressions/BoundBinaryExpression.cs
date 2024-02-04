@@ -5,7 +5,7 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundBinaryExpression(
     SyntaxNode SyntaxNode,
     BoundExpression Left,
-    BoundBinaryOperator Operator,
+    BoundOperator Operator,
     BoundExpression Right
 )
     : BoundExpression(BoundNodeKind.BinaryExpression, SyntaxNode, Operator.ResultType)
@@ -13,6 +13,7 @@ internal sealed record class BoundBinaryExpression(
     public override IEnumerable<BoundNode> Children()
     {
         yield return Left;
+        yield return Operator;
         yield return Right;
     }
 }

@@ -4,13 +4,14 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundUnaryExpression(
     SyntaxNode Syntax,
-    BoundUnaryOperator Operator,
+    BoundOperator Operator,
     BoundExpression Operand
 )
     : BoundExpression(BoundNodeKind.UnaryExpression, Syntax, Operator.ResultType)
 {
     public override IEnumerable<BoundNode> Children()
     {
+        yield return Operator;
         yield return Operand;
     }
 

@@ -104,9 +104,9 @@ internal static class Parser
 
     private delegate T ParseNode<T>(ref TokenIterator iterator);
 
-    private static SeparatedNodeList<T> ParseSeparatedList<T>(ref TokenIterator iterator, ParseNode<T> parseNode) where T : SyntaxNode
+    private static SeparatedNodeList<T> ParseSeparatedList<T>(ref TokenIterator iterator, ParseNode<T> parseNode) where T : notnull
     {
-        var nodes = new List<SyntaxNode>();
+        var nodes = new List<object>();
 
         var parseNext = true;
         while (parseNext && iterator.Current.TokenKind is not TokenKind.ParenthesisClose and not TokenKind.Eof)
@@ -161,13 +161,13 @@ internal static class Parser
             return type;
         }
 
-        static ParameterSyntax ParseParameter(ref TokenIterator iterator)
+        static Parameter ParseParameter(ref TokenIterator iterator)
         {
             var identifier = iterator.Match(TokenKind.Identifier);
             var colon = iterator.Match(TokenKind.Colon);
-            var type = ParseTypeSyntax(ref iterator);
+            var type = ParseType(ref iterator);
 
-            return new ParameterSyntax(iterator.SyntaxTree, identifier, colon, type);
+            return new Parameter(identifier.Text.ToString(), type);
         }
     }
 
@@ -320,22 +320,22 @@ internal static class Parser
             left = @operator.TokenKind switch
             {
                 // identifier '.' identifier
-                TokenKind.Dot => new BinaryExpressionReference(
+                TokenKind.Dot => new BinaryExpression(
                     iterator.SyntaxTree,
                     left,
                     @operator,
                     right),
 
-                // identifier '(' [args]* ')'
-                TokenKind.ParenthesisOpen => new BinaryExpressionCall(
+                // identifier '(' args ')'
+                TokenKind.ParenthesisOpen => new BinaryExpression(
                     iterator.SyntaxTree,
                     left,
                     @operator,
-                    (ArgumentListExpression)right,
+                    right,
                     iterator.Match(TokenKind.ParenthesisClose)),
 
                 // identifier '[' expression ']'
-                TokenKind.BracketOpen => new BinaryExpressionSubscript(
+                TokenKind.BracketOpen => new BinaryExpression(
                     iterator.SyntaxTree,
                     left,
                     @operator,

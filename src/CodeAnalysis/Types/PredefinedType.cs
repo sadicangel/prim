@@ -6,8 +6,11 @@ public sealed record class PredefinedType(string Name)
 {
     public override bool IsAssignableFrom(PrimType source)
     {
+        if (Name == Never) return false;
+
         if (this == source) return true;
 
+        // TODO: Consider using implicit conversion operator instead?
         return Name switch
         {
             Any => true,

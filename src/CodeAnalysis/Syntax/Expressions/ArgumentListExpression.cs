@@ -2,24 +2,6 @@
 
 namespace CodeAnalysis.Syntax.Expressions;
 
-public record class BinaryExpressionCall(
-    SyntaxTree SyntaxTree,
-    Expression Left,
-    Token ParenthesisOpen,
-    ArgumentListExpression ArgumentList,
-    Token ParenthesisClose
-)
-    : BinaryExpression(SyntaxTree, Left, ParenthesisOpen, ArgumentList)
-{
-    public override IEnumerable<SyntaxNode> Children()
-    {
-        yield return Left;
-        yield return ParenthesisOpen;
-        yield return Right;
-        yield return ParenthesisClose;
-    }
-}
-
 public sealed record class ArgumentListExpression(
     SyntaxTree SyntaxTree,
     SeparatedNodeList<Expression> Arguments

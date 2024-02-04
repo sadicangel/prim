@@ -32,6 +32,7 @@ internal static class Binder
             SyntaxNodeKind.LiteralExpression => BindLiteralExpression(ref context, (LiteralExpression)syntaxNode),
             SyntaxNodeKind.GroupExpression => BindGroupExpression(ref context, (GroupExpression)syntaxNode),
             SyntaxNodeKind.UnaryExpression => BindUnaryExpression(ref context, (UnaryExpression)syntaxNode),
+            SyntaxNodeKind.ArgumentList => BindArgumentListExpression(ref context, (ArgumentListExpression)syntaxNode),
             SyntaxNodeKind.BinaryExpression => BindBinaryExpression(ref context, (BinaryExpression)syntaxNode),
             SyntaxNodeKind.DeclarationExpression => BindDeclarationExpression(ref context, (DeclarationExpression)syntaxNode),
             SyntaxNodeKind.AssignmentExpression => BindAssignmentExpression(ref context, (AssignmentExpression)syntaxNode),
@@ -109,7 +110,7 @@ internal static class Binder
             return operand;
         }
 
-        var operators = operand.Type.UnaryOperators.FindAll(op => op.OperatorKind == syntaxNode.Operator.TokenKind.GetUnaryOperatorKind());
+        var operators = operand.Type.Operators.FindAll(op => op.OperatorKind == syntaxNode.Operator.TokenKind.GetUnaryOperatorKind());
 
         if (operators is not [var @operator])
         {
@@ -122,11 +123,30 @@ internal static class Binder
             throw new UnreachableException($"Unexpected number of unary operators. Expected 0 or 1, got {operators.Count}");
         }
 
-        return new BoundUnaryExpression(syntaxNode, new BoundUnaryOperator(syntaxNode.Operator, @operator), operand);
+        return new BoundUnaryExpression(syntaxNode, new BoundOperator(syntaxNode.Operator, @operator), operand);
+    }
+
+    private static BoundExpression BindArgumentListExpression(ref BindContext context, ArgumentListExpression syntaxNode)
+    {
+        var boundArguments = new List<BoundExpression>(syntaxNode.Arguments.Count);
+        foreach (var argument in syntaxNode.Arguments)
+        {
+            var boundArgument = BindExpression(ref context, argument);
+            if (boundArgument.Type == PredefinedTypes.Never)
+            {
+                // Diagnostic already reported as type is BoundNeverExpression.
+                return boundArgument;
+            }
+            boundArguments.Add(boundArgument);
+        }
+
+        return new BoundArgumentListExpression(syntaxNode, boundArguments);
     }
 
     private static BoundExpression BindBinaryExpression(ref BindContext context, BinaryExpression syntaxNode)
     {
+        var operatorKind = syntaxNode.Operator.TokenKind.GetBinaryOperatorKind();
+
         var left = BindExpression(ref context, syntaxNode.Left);
         if (left.Type == PredefinedTypes.Never)
         {
@@ -141,13 +161,40 @@ internal static class Binder
             return right;
         }
 
-        var operatorKind = syntaxNode.Operator.TokenKind.GetBinaryOperatorKind();
-        bool Match(BinaryOperator @operator) =>
-            @operator.OperatorKind == operatorKind && @operator.LeftType.IsAssignableFrom(left.Type) && @operator.RightType.IsAssignableFrom(right.Type);
+        if (right is BoundArgumentListExpression argumentList)
+        {
+            if (left.Type is not FunctionType functionType)
+            {
+                functionType = new FunctionType([.. argumentList.Arguments.Select((a, i) => new Parameter($"arg{i}", a.Type))], argumentList.Type);
+                context.Diagnostics.ReportInvalidSymbolType(syntaxNode.Left.Location, functionType, left.Type);
+                return new BoundNeverExpression(syntaxNode);
+            }
 
-        var operators = new List<BinaryOperator>(left.Type != right.Type
-            ? [.. left.Type.BinaryOperators, .. right.Type.BinaryOperators]
-            : [.. left.Type.BinaryOperators]).FindAll(Match);
+            if (argumentList.Arguments.Count != functionType.Parameters.Count)
+            {
+                context.Diagnostics.ReportInvalidNumberOfArguments(syntaxNode.Location, functionType, argumentList.Arguments.Count);
+                return new BoundNeverExpression(syntaxNode);
+            }
+
+            for (int i = 0; i < functionType.Parameters.Count; ++i)
+            {
+                var parameter = functionType.Parameters[i];
+                var argument = argumentList.Arguments[i];
+
+                if (!parameter.Type.IsAssignableFrom(argument.Type))
+                {
+                    context.Diagnostics.ReportInvalidArgumentType(argument.SyntaxNode.Location, parameter, argument.Type);
+                    return new BoundNeverExpression(syntaxNode);
+                }
+            }
+        }
+
+        var operators = left.Type.Operators
+            .Concat(left.Type != right.Type ? right.Type.Operators : Enumerable.Empty<Operator>())
+            .Where(op => op.OperatorKind == operatorKind)
+            .Cast<BinaryOperator>()
+            .Where(op => op.LeftType.IsAssignableFrom(left.Type) && op.RightType.IsAssignableFrom(right.Type))
+            .ToList();
 
         if (operators is not [var @operator])
         {
@@ -161,7 +208,7 @@ internal static class Binder
             return new BoundNeverExpression(syntaxNode);
         }
 
-        return new BoundBinaryExpression(syntaxNode, left, new BoundBinaryOperator(syntaxNode.Operator, @operator), right);
+        return new BoundBinaryExpression(syntaxNode, left, new BoundOperator(syntaxNode.Operator, @operator), right);
     }
 
     private static BoundExpression BindDeclarationExpression(ref BindContext context, DeclarationExpression syntaxNode)
@@ -179,7 +226,7 @@ internal static class Binder
             context.PushScope();
             foreach (var parameter in functionType.Parameters)
             {
-                var paramSymbol = new Symbol(parameter.Identifier.Text.ToString(), parameter.TypeNode.Type);
+                var paramSymbol = new Symbol(parameter.Name, parameter.Type);
                 if (!context.Scope.TryDeclare(paramSymbol))
                 {
                     context.Diagnostics.ReportSymbolRedeclaration(syntaxNode.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
@@ -195,6 +242,12 @@ internal static class Binder
             }
 
             context.PopScope();
+
+            functionType.Operators.Add(new BinaryOperator(
+                OperatorKind.Call,
+                functionType,
+                new TypeList([.. functionType.Parameters.Select(p => p.Type)]),
+                functionType.ReturnType));
         }
         else
         {

@@ -3,6 +3,7 @@ using Spectre.Console;
 
 var syntaxTree = SyntaxTree.ParseScript("""
     sum: (a: i32, b: i32) -> i32 = a + b;
+    c: i32 = sum(2, 5);
     """);
 
 if (syntaxTree.Diagnostics.Count > 0)

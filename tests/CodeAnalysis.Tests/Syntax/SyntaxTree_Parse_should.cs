@@ -134,12 +134,14 @@ public sealed class SyntaxTree_Parse_should
             a({string.Join(", ", arguments)})
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<BinaryExpressionCall>(node);
+        var expr = Assert.IsType<BinaryExpression>(node);
         Assert.Equal("a", expr.Left.Text);
-        Assert.Equal("(", expr.ParenthesisOpen.Text);
-        Assert.Equal(arguments.Length, expr.ArgumentList.Count);
-        Assert.All(expr.ArgumentList, arg => Assert.IsAssignableFrom<Expression>(arg));
-        Assert.Equal(")", expr.ParenthesisClose.Text);
+        Assert.Equal("(", expr.Operator.Text);
+        var args = Assert.IsType<ArgumentListExpression>(expr.Right);
+        Assert.Equal(arguments.Length, args.Count);
+        Assert.All(args, arg => Assert.IsAssignableFrom<Expression>(arg));
+        Assert.NotNull(expr.OperatorClose);
+        Assert.Equal(")", expr.OperatorClose.Text);
     }
 
     [Theory]

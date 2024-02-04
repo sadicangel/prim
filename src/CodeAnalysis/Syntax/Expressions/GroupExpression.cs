@@ -13,5 +13,4 @@ public sealed record class GroupExpression(
         yield return Expression;
         yield return ParenthesisClose;
     }
-    public override string ToString() => base.ToString();
 }

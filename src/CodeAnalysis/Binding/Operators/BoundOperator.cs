@@ -1,9 +1,15 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Operators;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Operators;
-internal abstract record class BoundOperator(
+internal sealed record class BoundOperator(
     SyntaxNode SyntaxNode,
-    PrimType ResultType
+    Operator Operator
 )
-    : BoundNode(BoundNodeKind.Operator, SyntaxNode);
+    : BoundNode(BoundNodeKind.Operator, SyntaxNode)
+{
+    public PrimType ResultType { get => Operator.ResultType; }
+
+    public override IEnumerable<BoundNode> Children() => Enumerable.Empty<BoundNode>();
+}

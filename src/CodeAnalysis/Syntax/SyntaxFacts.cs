@@ -19,59 +19,46 @@ public static class SyntaxFacts
         _ => 0,
     };
 
-    public static UnaryOperatorKind GetUnaryOperatorKind(this TokenKind kind) => kind switch
+    public static OperatorKind GetUnaryOperatorKind(this TokenKind kind) => kind switch
     {
-        TokenKind.Plus => UnaryOperatorKind.UnaryPlus,
-        TokenKind.Minus => UnaryOperatorKind.Negate,
-        TokenKind.PlusPlus => UnaryOperatorKind.Increment,
-        TokenKind.MinusMinus => UnaryOperatorKind.Decrement,
-        TokenKind.Bang => UnaryOperatorKind.Not,
-        TokenKind.Tilde => UnaryOperatorKind.OnesComplement,
+        TokenKind.Plus => OperatorKind.UnaryPlus,
+        TokenKind.Minus => OperatorKind.Negate,
+        TokenKind.PlusPlus => OperatorKind.Increment,
+        TokenKind.MinusMinus => OperatorKind.Decrement,
+        TokenKind.Bang => OperatorKind.Not,
+        TokenKind.Tilde => OperatorKind.OnesComplement,
         _ => throw new InvalidOperationException($"Token {kind} is not a unary operator"),
     };
 
-    public static BinaryOperatorKind GetBinaryOperatorKind(this TokenKind kind)
+    public static OperatorKind GetBinaryOperatorKind(this TokenKind kind) => kind switch
     {
-        switch (kind)
-        {
-            case TokenKind.Ampersand:
-                return BinaryOperatorKind.And;
-            case TokenKind.AmpersandAmpersand:
-                return BinaryOperatorKind.AndAlso;
-            case TokenKind.BangEqual:
-                return BinaryOperatorKind.NotEqual;
-            case TokenKind.EqualEqual:
-                return BinaryOperatorKind.Equal;
-            case TokenKind.Greater:
-                return BinaryOperatorKind.GreaterThan;
-            case TokenKind.GreaterEqual:
-                return BinaryOperatorKind.GreaterThanOrEqual;
-            case TokenKind.Hat:
-                return BinaryOperatorKind.ExclusiveOr;
-            case TokenKind.Less:
-                return BinaryOperatorKind.LessThan;
-            case TokenKind.LessEqual:
-                return BinaryOperatorKind.LessThanOrEqual;
-            case TokenKind.Minus:
-                return BinaryOperatorKind.Subtract;
-            case TokenKind.Percent:
-                return BinaryOperatorKind.Modulo;
-            case TokenKind.Pipe:
-                return BinaryOperatorKind.Or;
-            case TokenKind.PipePipe:
-                return BinaryOperatorKind.OrElse;
-            case TokenKind.Plus:
-                return BinaryOperatorKind.Add;
-            case TokenKind.Slash:
-                return BinaryOperatorKind.Divide;
-            case TokenKind.Star:
-                return BinaryOperatorKind.Multiply;
-            case TokenKind.StarStar:
-                return BinaryOperatorKind.Exponent;
-            default:
-                throw new InvalidOperationException($"Token {kind} is not a binary operator");
-        }
-    }
+        TokenKind.Ampersand => OperatorKind.And,
+        TokenKind.AmpersandAmpersand => OperatorKind.AndAlso,
+        TokenKind.BangEqual => OperatorKind.NotEqual,
+        TokenKind.BracketOpen => OperatorKind.Subscript,
+        TokenKind.Dot => OperatorKind.Reference,
+        TokenKind.EqualEqual => OperatorKind.Equal,
+        TokenKind.Greater => OperatorKind.GreaterThan,
+        TokenKind.GreaterEqual => OperatorKind.GreaterThanOrEqual,
+        TokenKind.GreaterGreater => OperatorKind.RightShift,
+        TokenKind.Hat => OperatorKind.ExclusiveOr,
+        TokenKind.HookHook => OperatorKind.NullCoalescence,
+        TokenKind.Less => OperatorKind.LessThan,
+        TokenKind.LessEqual => OperatorKind.LessThanOrEqual,
+        TokenKind.LessLess => OperatorKind.LeftShift,
+        TokenKind.Minus => OperatorKind.Subtract,
+        TokenKind.MinusMinus => OperatorKind.Decrement,
+        TokenKind.ParenthesisOpen => OperatorKind.Call,
+        TokenKind.Percent => OperatorKind.Modulo,
+        TokenKind.Pipe => OperatorKind.Or,
+        TokenKind.PipePipe => OperatorKind.OrElse,
+        TokenKind.Plus => OperatorKind.Add,
+        TokenKind.PlusPlus => OperatorKind.Increment,
+        TokenKind.Slash => OperatorKind.Divide,
+        TokenKind.Star => OperatorKind.Multiply,
+        TokenKind.StarStar => OperatorKind.Exponent,
+        _ => throw new InvalidOperationException($"Token {kind} is not a binary operator"),
+    };
 
     public static int GetBinaryOperatorPrecedence(this TokenKind type) => type switch
     {
@@ -255,6 +242,8 @@ public static class SyntaxFacts
         or TokenKind.Greater
         or TokenKind.GreaterEqual
         or TokenKind.GreaterGreater
+        or TokenKind.Hat
+        or TokenKind.HatEqual
         or TokenKind.HookHook
         or TokenKind.Less
         or TokenKind.LessEqual

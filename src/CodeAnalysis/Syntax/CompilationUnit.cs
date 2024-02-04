@@ -8,6 +8,4 @@ public sealed record class CompilationUnit(SyntaxTree SyntaxTree, IReadOnlyList<
             yield return node;
         yield return EofToken;
     }
-
-    public override string ToString() => Nodes.ToString()!;
 }

@@ -7,8 +7,7 @@ namespace CodeAnalysis.Types;
 [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 public abstract record class PrimType(string Name)
 {
-    public List<UnaryOperator> UnaryOperators { get; init; } = [];
-    public List<BinaryOperator> BinaryOperators { get; init; } = [];
+    public List<Operator> Operators { get; init; } = [];
 
     private string GetDebuggerDisplay() => $"{Name}: {PredefinedTypeNames.Type}";
 
