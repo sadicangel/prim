@@ -25,6 +25,6 @@ public sealed record class Compilation(IReadOnlyList<SyntaxTree> SyntaxTrees, Co
         AnsiConsole.Write(program.ToRenderable());
         AnsiConsole.WriteLine();
 
-        return Evaluator.Evaluate(Locals.CreateGlobalSymbols(), program);
+        return Interpreter.Interpret(Environment.CreateGlobal(), program);
     }
 }
