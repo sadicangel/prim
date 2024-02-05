@@ -39,8 +39,8 @@ internal sealed record class Scope : IEnumerable<Symbol>
     {
         var scope = new Scope();
 
-        foreach (var type in PredefinedTypes.All)
-            scope.Declare(new Symbol(type.Name, new TypeType(type)));
+        foreach (var symbol in PredefinedSymbols.All)
+            scope.Declare(symbol);
 
         return scope;
     }

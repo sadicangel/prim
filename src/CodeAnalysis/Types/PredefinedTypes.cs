@@ -4,36 +4,44 @@ using System.Reflection;
 namespace CodeAnalysis.Types;
 internal static class PredefinedTypes
 {
-    public static readonly PredefinedType Any = new(PredefinedTypeNames.Any);
-    public static readonly PredefinedType Unknown = new(PredefinedTypeNames.Unknown);
-    public static readonly PredefinedType Never = new(PredefinedTypeNames.Never);
-    public static readonly PredefinedType Unit = new(PredefinedTypeNames.Unit);
-    public static readonly PredefinedType Type = new(PredefinedTypeNames.Type);
-    public static readonly PredefinedType Str = new(PredefinedTypeNames.Str);
-    public static readonly PredefinedType Bool = new(PredefinedTypeNames.Bool);
-    public static readonly PredefinedType I8 = new(PredefinedTypeNames.I8);
-    public static readonly PredefinedType I16 = new(PredefinedTypeNames.I16);
-    public static readonly PredefinedType I32 = new(PredefinedTypeNames.I32);
-    public static readonly PredefinedType I64 = new(PredefinedTypeNames.I64);
-    public static readonly PredefinedType I128 = new(PredefinedTypeNames.I128);
-    public static readonly PredefinedType ISize = new(PredefinedTypeNames.ISize);
-    public static readonly PredefinedType U8 = new(PredefinedTypeNames.U8);
-    public static readonly PredefinedType U16 = new(PredefinedTypeNames.U16);
-    public static readonly PredefinedType U32 = new(PredefinedTypeNames.U32);
-    public static readonly PredefinedType U64 = new(PredefinedTypeNames.U64);
-    public static readonly PredefinedType U128 = new(PredefinedTypeNames.U128);
-    public static readonly PredefinedType USize = new(PredefinedTypeNames.USize);
-    public static readonly PredefinedType F16 = new(PredefinedTypeNames.F16);
-    public static readonly PredefinedType F32 = new(PredefinedTypeNames.F32);
-    public static readonly PredefinedType F64 = new(PredefinedTypeNames.F64);
-    public static readonly PredefinedType F80 = new(PredefinedTypeNames.F80);
-    public static readonly PredefinedType F128 = new(PredefinedTypeNames.F128);
+    public static readonly PredefinedType Any = new(PredefinedSymbolNames.Any);
+    public static readonly PredefinedType Unknown = new(PredefinedSymbolNames.Unknown);
+    public static readonly PredefinedType Never = new(PredefinedSymbolNames.Never);
+    public static readonly PredefinedType Unit = new(PredefinedSymbolNames.Unit);
+    public static readonly PredefinedType Type = new(PredefinedSymbolNames.Type);
+    public static readonly PredefinedType Str = new(PredefinedSymbolNames.Str);
+    public static readonly PredefinedType Bool = new(PredefinedSymbolNames.Bool);
+    public static readonly PredefinedType I8 = new(PredefinedSymbolNames.I8);
+    public static readonly PredefinedType I16 = new(PredefinedSymbolNames.I16);
+    public static readonly PredefinedType I32 = new(PredefinedSymbolNames.I32);
+    public static readonly PredefinedType I64 = new(PredefinedSymbolNames.I64);
+    public static readonly PredefinedType I128 = new(PredefinedSymbolNames.I128);
+    public static readonly PredefinedType ISize = new(PredefinedSymbolNames.ISize);
+    public static readonly PredefinedType U8 = new(PredefinedSymbolNames.U8);
+    public static readonly PredefinedType U16 = new(PredefinedSymbolNames.U16);
+    public static readonly PredefinedType U32 = new(PredefinedSymbolNames.U32);
+    public static readonly PredefinedType U64 = new(PredefinedSymbolNames.U64);
+    public static readonly PredefinedType U128 = new(PredefinedSymbolNames.U128);
+    public static readonly PredefinedType USize = new(PredefinedSymbolNames.USize);
+    public static readonly PredefinedType F16 = new(PredefinedSymbolNames.F16);
+    public static readonly PredefinedType F32 = new(PredefinedSymbolNames.F32);
+    public static readonly PredefinedType F64 = new(PredefinedSymbolNames.F64);
+    public static readonly PredefinedType F80 = new(PredefinedSymbolNames.F80);
+    public static readonly PredefinedType F128 = new(PredefinedSymbolNames.F128);
 
     static PredefinedTypes()
     {
+        Str.AddEqualityOperators();
+
+        Bool.AddEqualityOperators().AddLogicalOperators();
+
         PredefinedType[] integers = [I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize];
         foreach (var integer in integers)
-            integer.AddMathOperators().AddEqualityOperators().AddComparisonOperators().AddShiftOperators().AddLogicalOperators();
+            integer.AddMathOperators().AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators();
+
+        PredefinedType[] floats = [F16, F32, F64, F80, F128];
+        foreach (var @float in floats)
+            @float.AddMathOperators().AddEqualityOperators().AddComparisonOperators();
     }
 
     public static IReadOnlyList<PredefinedType> All { get; } = typeof(PredefinedTypes)
@@ -43,45 +51,15 @@ internal static class PredefinedTypes
         .ToArray();
 }
 
-internal static class PredefinedTypeNames
+internal static class PrimTypeExtensions
 {
-    public const string Any = "any";
-    public const string Unknown = "unknown";
-    public const string Never = "never";
-    public const string Unit = "unit";
-    public const string Type = "type";
-    public const string Str = "str";
-    public const string Bool = "bool";
-    public const string I8 = "i8";
-    public const string I16 = "i16";
-    public const string I32 = "i32";
-    public const string I64 = "i64";
-    public const string I128 = "i128";
-    public const string ISize = "isize";
-    public const string U8 = "u8";
-    public const string U16 = "u16";
-    public const string U32 = "u32";
-    public const string U64 = "u64";
-    public const string U128 = "u128";
-    public const string USize = "usize";
-    public const string F16 = "f16";
-    public const string F32 = "f32";
-    public const string F64 = "f64";
-    public const string F80 = "f80";
-    public const string F128 = "f128";
-
-    public static IReadOnlyList<string> All { get; } = typeof(PredefinedTypeNames)
-        .GetFields(BindingFlags.Public | BindingFlags.Static)
-        .Where(f => f.IsLiteral && f.IsInitOnly)
-        .Select(f => (string)f.GetValue(null)!)
-        .ToArray();
-}
-
-file static class PredefinedTypesHelper
-{
-    public static PredefinedType AddMathOperators(this PredefinedType type)
+    public static T AddMathOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
+            new UnaryOperator(OperatorKind.UnaryPlus, type, type),
+            new UnaryOperator(OperatorKind.Negate, type, type),
+            new UnaryOperator(OperatorKind.Increment, type, type),
+            new UnaryOperator(OperatorKind.Decrement, type, type),
             new BinaryOperator(OperatorKind.Add, type, type, type),
             new BinaryOperator(OperatorKind.Subtract, type, type, type),
             new BinaryOperator(OperatorKind.Multiply, type, type, type),
@@ -92,26 +70,20 @@ file static class PredefinedTypesHelper
         return type;
     }
 
-    public static PredefinedType AddShiftOperators(this PredefinedType type)
+    public static T AddBitwiseOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
+            new UnaryOperator(OperatorKind.OnesComplement, type, type),
+            new BinaryOperator(OperatorKind.And, type, type, type),
+            new BinaryOperator(OperatorKind.Or, type, type, type),
+            new BinaryOperator(OperatorKind.ExclusiveOr, type, type, type),
             new BinaryOperator(OperatorKind.LeftShift, type, type, type),
             new BinaryOperator(OperatorKind.RightShift, type, type, type)
         ]);
         return type;
     }
 
-    public static PredefinedType AddLogicalOperators(this PredefinedType type)
-    {
-        type.Operators.AddRange([
-            new BinaryOperator(OperatorKind.And, type, type, type),
-            new BinaryOperator(OperatorKind.Or, type, type, type),
-            new BinaryOperator(OperatorKind.ExclusiveOr, type, type, type),
-        ]);
-        return type;
-    }
-
-    public static PredefinedType AddEqualityOperators(this PredefinedType type)
+    public static T AddEqualityOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
             new BinaryOperator(OperatorKind.Equal, type, type, PredefinedTypes.Bool),
@@ -120,7 +92,7 @@ file static class PredefinedTypesHelper
         return type;
     }
 
-    public static PredefinedType AddComparisonOperators(this PredefinedType type)
+    public static T AddComparisonOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
             new BinaryOperator(OperatorKind.LessThan, type, type, PredefinedTypes.Bool),
@@ -128,6 +100,26 @@ file static class PredefinedTypesHelper
             new BinaryOperator(OperatorKind.GreaterThan, type, type, PredefinedTypes.Bool),
             new BinaryOperator(OperatorKind.GreaterThanOrEqual, type, type, PredefinedTypes.Bool),
         ]);
+        return type;
+    }
+
+    public static T AddLogicalOperators<T>(this T type) where T : PrimType
+    {
+        type.Operators.AddRange([
+            new UnaryOperator(OperatorKind.Not, type, PredefinedTypes.Bool),
+            new BinaryOperator(OperatorKind.AndAlso, type, type, PredefinedTypes.Bool),
+            new BinaryOperator(OperatorKind.OrElse, type, type, PredefinedTypes.Bool)
+        ]);
+        return type;
+    }
+
+    public static FunctionType AddCallOperator(this FunctionType type)
+    {
+        type.Operators.Add(new BinaryOperator(
+            OperatorKind.Call,
+            type,
+            new TypeList([.. type.Parameters.Select(p => p.Type)]),
+            type.ReturnType));
         return type;
     }
 }

@@ -18,7 +18,6 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
 
     internal SyntaxNode? GetParent(SyntaxNode node)
     {
-        Debug.WriteLine("enter");
         if (_nodeParents is null)
             Interlocked.CompareExchange(ref _nodeParents, CreateNodeParents(Root), null);
 

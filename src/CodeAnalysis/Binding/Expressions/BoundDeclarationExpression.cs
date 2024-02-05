@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Expressions;
 

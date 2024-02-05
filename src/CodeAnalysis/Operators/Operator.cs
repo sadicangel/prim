@@ -9,8 +9,8 @@ public enum OperatorKind
     Negate,
     Increment,
     Decrement,
-    Not,
     OnesComplement,
+    Not,
 
     Add,
     Subtract,
@@ -18,19 +18,24 @@ public enum OperatorKind
     Divide,
     Modulo,
     Exponent,
+
     And,
     Or,
     ExclusiveOr,
+    LeftShift,
+    RightShift,
+
     Equal,
     NotEqual,
+
     LessThan,
     LessThanOrEqual,
     GreaterThan,
     GreaterThanOrEqual,
-    LeftShift,
-    RightShift,
+
     AndAlso,
     OrElse,
+
     NullCoalescence,
     Call,
     Subscript,

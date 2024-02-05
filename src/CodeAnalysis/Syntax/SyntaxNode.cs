@@ -4,7 +4,7 @@ namespace CodeAnalysis.Syntax;
 
 public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree SyntaxTree) : INode
 {
-    //public SyntaxNode? Parent => SyntaxTree.GetParent(this);
+    public SyntaxNode? Parent => SyntaxTree.GetParent(this);
 
     public Token FirstToken => this is Token token ? token : Children().First().FirstToken;
     public Token LastToken => this is Token token ? token : Children().Last().LastToken;

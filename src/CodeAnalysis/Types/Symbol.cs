@@ -1,10 +1,9 @@
-﻿using CodeAnalysis.Types;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace CodeAnalysis.Binding;
+namespace CodeAnalysis.Types;
 
 [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-internal sealed record class Symbol(
+public sealed record class Symbol(
     string Name,
     PrimType Type,
     bool IsMutable = false

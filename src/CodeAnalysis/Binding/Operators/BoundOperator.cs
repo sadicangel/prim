@@ -9,6 +9,7 @@ internal sealed record class BoundOperator(
 )
     : BoundNode(BoundNodeKind.Operator, SyntaxNode)
 {
+    public OperatorKind OperatorKind { get => Operator.OperatorKind; }
     public PrimType ResultType { get => Operator.ResultType; }
 
     public override IEnumerable<BoundNode> Children() => Enumerable.Empty<BoundNode>();

@@ -1,9 +1,15 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis;
+using CodeAnalysis.Syntax;
 using Spectre.Console;
+using System.Text;
 
-var syntaxTree = SyntaxTree.ParseScript("""
+Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
+
+var syntaxTree = SyntaxTree.ParseScript(/*"""
     sum: (a: i32, b: i32) -> i32 = a + b;
-    c: i32 = sum(2, 5);
+    c: i32 = sum(2, 5);*/
+    """
+    println("Hello, world!");
     """);
 
 if (syntaxTree.Diagnostics.Count > 0)
@@ -13,7 +19,12 @@ if (syntaxTree.Diagnostics.Count > 0)
 }
 else
 {
+    AnsiConsole.Write(new Markup(syntaxTree.Source.Text, "grey66 i"));
+    AnsiConsole.WriteLine();
+    AnsiConsole.WriteLine();
+
     AnsiConsole.Write(syntaxTree.ToRenderable());
+    AnsiConsole.WriteLine();
 
     var compilation = new Compilation([syntaxTree]);
 
@@ -25,6 +36,7 @@ else
     }
     else
     {
-        AnsiConsole.WriteLine(result.Value?.ToString() ?? "null");
+        AnsiConsole.Write(new Markup(result.Value.ToString() ?? string.Empty, "plum4 i"));
+        AnsiConsole.WriteLine();
     }
 }

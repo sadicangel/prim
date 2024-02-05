@@ -243,11 +243,7 @@ internal static class Binder
 
             context.PopScope();
 
-            functionType.Operators.Add(new BinaryOperator(
-                OperatorKind.Call,
-                functionType,
-                new TypeList([.. functionType.Parameters.Select(p => p.Type)]),
-                functionType.ReturnType));
+            functionType.AddCallOperator();
         }
         else
         {

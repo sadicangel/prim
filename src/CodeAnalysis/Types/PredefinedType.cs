@@ -1,4 +1,4 @@
-﻿using static CodeAnalysis.Types.PredefinedTypeNames;
+﻿using static CodeAnalysis.Types.PredefinedSymbolNames;
 
 namespace CodeAnalysis.Types;
 public sealed record class PredefinedType(string Name)

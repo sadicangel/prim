@@ -9,7 +9,7 @@ public abstract record class PrimType(string Name)
 {
     public List<Operator> Operators { get; init; } = [];
 
-    private string GetDebuggerDisplay() => $"{Name}: {PredefinedTypeNames.Type}";
+    private string GetDebuggerDisplay() => $"{Name}: {PredefinedSymbolNames.Type}";
 
     public abstract bool IsAssignableFrom(PrimType source);
 
