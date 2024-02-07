@@ -213,7 +213,7 @@ internal static class Binder
 
     private static BoundExpression BindDeclarationExpression(ref BindContext context, DeclarationExpression syntaxNode)
     {
-        var symbol = new Symbol(syntaxNode.Identifier.Text.ToString(), syntaxNode.TypeNode.Type);
+        var symbol = new Symbol(syntaxNode.Identifier.Text.ToString(), syntaxNode.TypeNode.Type, syntaxNode.IsMutable);
         if (!context.Scope.TryDeclare(symbol))
         {
             context.Diagnostics.ReportSymbolRedeclaration(syntaxNode.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
@@ -272,7 +272,7 @@ internal static class Binder
         }
 
         var expression = !syntaxNode.IsCompound
-            ? BindExpression(ref context, syntaxNode)
+            ? BindExpression(ref context, syntaxNode.Expression)
             : BindBinaryExpression(ref context, FromCompoundAssignment(syntaxNode));
 
         if (expression.Type == PredefinedTypes.Never)
@@ -286,7 +286,7 @@ internal static class Binder
             return new BoundNeverExpression(syntaxNode);
         }
 
-        return new BoundAssignmentExpression(syntaxNode, expression);
+        return new BoundAssignmentExpression(syntaxNode, symbol, expression);
 
         static BinaryExpression FromCompoundAssignment(AssignmentExpression syntaxNode)
         {

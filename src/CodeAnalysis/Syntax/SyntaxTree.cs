@@ -2,11 +2,12 @@
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
+public sealed record class SyntaxTree(Source Source, CompilationUnit Root) : IEquatable<SyntaxTree>
 {
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
@@ -16,6 +17,10 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
     }
 
     public DiagnosticBag Diagnostics { get; init; } = [];
+
+    public bool Equals(SyntaxTree? other) => ReferenceEquals(this, other);
+
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 
     internal SyntaxNode? GetParent(SyntaxNode node)
     {

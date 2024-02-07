@@ -1,5 +1,6 @@
 ﻿using CodeAnalysis;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Types;
 using Spectre.Console;
 using System.Text;
 
@@ -7,8 +8,11 @@ Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
 
 var syntaxTree = SyntaxTree.ParseScript("""
     sum: (a: i32, b: i32) -> i32 = a + b;
-    c: i32 = sum(2, 5);
+    c: mutable i32 = sum(2, 5);
     println(c);
+    c *= 10;
+    println(c);
+    sum;
     """);
 
 if (syntaxTree.Diagnostics.Count > 0)
@@ -35,11 +39,12 @@ else
     }
     else
     {
-        AnsiConsole.Write(new Markup($"{result.Value switch
+        var value = result.Type switch
         {
-            Delegate @delegate => @delegate.Method.Name,
+            FunctionType function => function.Name,
             _ => result.Value
-        }} ", "grey66"));
+        };
+        AnsiConsole.Write(new Markup($"{value} ", "grey66"));
         AnsiConsole.Write(new Markup(result.Type.ToString(), "green i"));
         AnsiConsole.WriteLine();
     }

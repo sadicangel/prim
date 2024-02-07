@@ -18,8 +18,7 @@ public sealed record class Environment : IEnumerable<object?>
 
     public void Declare(Symbol symbol, object value)
     {
-        if (!(_symbols ??= []).TryAdd(symbol, value))
-            throw new UnreachableException($"{symbol.Name} redeclared");
+        (_symbols ??= [])[symbol] = value;
     }
 
     public object Lookup(Symbol symbol)

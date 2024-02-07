@@ -32,13 +32,13 @@ internal static class Evaluator
         return boundNode.NodeKind switch
         {
             //BoundNodeKind.GlobalExpression => EvaluateGlobalExpression(context, (BoundGlobalExpression)boundNode),
-            //BoundNodeKind.BlockExpression => EvaluateBlockExpression(context, (BoundBlockExpression)boundNode),
+            BoundNodeKind.BlockExpression => EvaluateBlockExpression(context, (BoundBlockExpression)boundNode),
             BoundNodeKind.LiteralExpression => EvaluateLiteralExpression(context, (BoundLiteralExpression)boundNode),
-            //BoundNodeKind.UnaryExpression => EvaluateUnaryExpression(context, (BoundUnaryExpression)boundNode),
+            BoundNodeKind.UnaryExpression => EvaluateUnaryExpression(context, (BoundUnaryExpression)boundNode),
             BoundNodeKind.ArgumentList => EvaluateArgumentListExpression(context, (BoundArgumentListExpression)boundNode),
             BoundNodeKind.BinaryExpression => EvaluateBinaryExpression(context, (BoundBinaryExpression)boundNode),
             BoundNodeKind.DeclarationExpression => EvaluateDeclarationExpression(context, (BoundDeclarationExpression)boundNode),
-            //BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression(context, (BoundAssignmentExpression)boundNode),
+            BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression(context, (BoundAssignmentExpression)boundNode),
             BoundNodeKind.NameExpression => EvaluateNameExpression(context, (BoundNameExpression)boundNode),
             //BoundNodeKind.ForExpression => EvaluateForExpression(context, (BoundForExpression)boundNode),
             //BoundNodeKind.IfElseExpression => EvaluateIfElseExpression(context, (BoundIfElseExpression)boundNode),
@@ -48,15 +48,39 @@ internal static class Evaluator
             //BoundNodeKind.ReturnExpression => EvaluateReturnExpression(context, (BoundReturnExpression)boundNode),
             //BoundNodeKind.ConvertExpression => throw new NotImplementedException(),
             //BoundNodeKind.NeverExpression => throw new NotImplementedException(),
-            BoundNodeKind.Symbol => throw new NotImplementedException(),
-            BoundNodeKind.Operator => throw new NotImplementedException(),
+            //BoundNodeKind.Symbol => throw new NotImplementedException(),
+            //BoundNodeKind.Operator => throw new NotImplementedException(),
             _ => throw new UnreachableException($"Unexpected {nameof(BoundNodeKind)} '{boundNode.NodeKind}'"),
         };
+    }
+
+    private static object EvaluateBlockExpression(EvaluateContext context, BoundBlockExpression boundNode)
+    {
+        object result = Unit.Value;
+        foreach (var expression in boundNode.Expressions)
+            result = EvaluateBoundNode(context, expression);
+        return result;
     }
 
     private static object EvaluateLiteralExpression(EvaluateContext context, BoundLiteralExpression boundNode)
     {
         return boundNode.Value ?? throw new UnreachableException("Value should not be null");
+    }
+
+    private static object EvaluateUnaryExpression(EvaluateContext context, BoundUnaryExpression boundNode)
+    {
+        dynamic operand = EvaluateBoundNode(context, boundNode.Operand);
+
+        return boundNode.Operator.OperatorKind switch
+        {
+            OperatorKind.UnaryPlus => +operand,
+            OperatorKind.Negate => -operand,
+            OperatorKind.Increment => ++operand,
+            OperatorKind.Decrement => --operand,
+            OperatorKind.OnesComplement => ~operand,
+            OperatorKind.Not => !operand,
+            _ => throw new UnreachableException($"Unexpected {nameof(OperatorKind)} '{boundNode.Operator.OperatorKind}'"),
+        };
     }
 
     private static object[] EvaluateArgumentListExpression(EvaluateContext context, BoundArgumentListExpression boundNode)
@@ -99,7 +123,7 @@ internal static class Evaluator
         };
     }
 
-    private static object EvaluateDeclarationExpression(EvaluateContext context, BoundDeclarationExpression boundNode)
+    private static Symbol EvaluateDeclarationExpression(EvaluateContext context, BoundDeclarationExpression boundNode)
     {
         switch (boundNode.DeclarationKind)
         {
@@ -114,38 +138,53 @@ internal static class Evaluator
             default:
                 throw new UnreachableException($"Unexpected {nameof(DeclarationKind)} '{boundNode.DeclarationKind}'");
         }
+    }
 
-        static Delegate CreateFunc(EvaluateContext context, FunctionType function, BoundExpression expression)
+    private static Symbol EvaluateAssignmentExpression(EvaluateContext context, BoundAssignmentExpression boundNode)
+    {
+        switch (boundNode.Symbol.Type)
         {
-            System.Linq.Expressions.Expression<Action<EvaluateContext, Symbol, object>> DeclareSymbol =
-                (context, symbol, value) => context.Environment.Declare(symbol, value);
+            case FunctionType function:
+                context.Environment.Declare(boundNode.Symbol, CreateFunc(context, function, boundNode.Expression));
+                return boundNode.Symbol;
 
-            var pushEnv = typeof(EvaluateContext).GetMethod(nameof(EvaluateContext.PushEnvironment))!;
-            var popEnv = typeof(EvaluateContext).GetMethod(nameof(EvaluateContext.PopEnvironment))!;
-            var environment = typeof(EvaluateContext).GetProperty(nameof(EvaluateContext.Environment))!;
-            var declare = typeof(Environment).GetMethod(nameof(Environment.Declare))!;
-            var symbol = typeof(Symbol).GetConstructor([typeof(string), typeof(PrimType), typeof(bool)])!;
-            var interpret = typeof(Evaluator).GetMethod(nameof(EvaluateBoundNode), BindingFlags.NonPublic | BindingFlags.Static)!;
-
-            var parameters = function.Parameters.Select(p => Expr.Parameter(typeof(object), p.Name)).ToArray();
-
-            var result = Expr.Variable(typeof(object), "result");
-            var ctx = Expr.Constant(context, typeof(EvaluateContext));
-            var node = Expr.Constant(expression, typeof(BoundExpression));
-            var env = Expr.Property(ctx, environment);
-
-            var body = Expr.Block(
-                [result],
-                Expr.Call(ctx, pushEnv),
-                Expr.Block(function.Parameters.Select((p, i) => Expr.Call(env, declare, Expr.New(symbol, Expr.Constant(p.Name), Expr.Constant(p.Type), Expr.Constant(false)), parameters[i]))),
-                Expr.Assign(result, Expr.Call(interpret, ctx, node)),
-                Expr.Call(ctx, popEnv),
-                result
-            );
-            var lambda = Expr.Lambda(body, parameters);
-            var func = lambda.Compile();
-            return func;
+            default:
+                context.Environment.Declare(boundNode.Symbol, EvaluateBoundNode(context, boundNode.Expression));
+                return boundNode.Symbol;
         }
+    }
+
+
+    private static Delegate CreateFunc(EvaluateContext context, FunctionType function, BoundExpression expression)
+    {
+        System.Linq.Expressions.Expression<Action<EvaluateContext, Symbol, object>> DeclareSymbol =
+            (context, symbol, value) => context.Environment.Declare(symbol, value);
+
+        var pushEnv = typeof(EvaluateContext).GetMethod(nameof(EvaluateContext.PushEnvironment))!;
+        var popEnv = typeof(EvaluateContext).GetMethod(nameof(EvaluateContext.PopEnvironment))!;
+        var environment = typeof(EvaluateContext).GetProperty(nameof(EvaluateContext.Environment))!;
+        var declare = typeof(Environment).GetMethod(nameof(Environment.Declare))!;
+        var symbol = typeof(Symbol).GetConstructor([typeof(string), typeof(PrimType), typeof(bool)])!;
+        var interpret = typeof(Evaluator).GetMethod(nameof(EvaluateBoundNode), BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        var parameters = function.Parameters.Select(p => Expr.Parameter(typeof(object), p.Name)).ToArray();
+
+        var result = Expr.Variable(typeof(object), "result");
+        var ctx = Expr.Constant(context, typeof(EvaluateContext));
+        var node = Expr.Constant(expression, typeof(BoundExpression));
+        var env = Expr.Property(ctx, environment);
+
+        var body = Expr.Block(
+            [result],
+            Expr.Call(ctx, pushEnv),
+            Expr.Block(function.Parameters.Select((p, i) => Expr.Call(env, declare, Expr.New(symbol, Expr.Constant(p.Name), Expr.Constant(p.Type), Expr.Constant(false)), parameters[i]))),
+            Expr.Assign(result, Expr.Call(interpret, ctx, node)),
+            Expr.Call(ctx, popEnv),
+            result
+        );
+        var lambda = Expr.Lambda(body, parameters);
+        var func = lambda.Compile();
+        return func;
     }
 
     private static object EvaluateNameExpression(EvaluateContext context, BoundNameExpression boundNode)
