@@ -33,7 +33,7 @@ public sealed record class Source(string Text, string FilePath)
         return lower - 1;
     }
 
-    public override string ToString() => Text.ToString();
+    public override string ToString() => Text;
 
     private List<SourceLine> ParseLines(ReadOnlySpan<char> text)
     {

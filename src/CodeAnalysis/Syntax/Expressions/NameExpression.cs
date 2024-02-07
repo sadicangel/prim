@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class NameExpression(
     SyntaxTree SyntaxTree,
     Token Identifier
@@ -8,5 +10,10 @@ public sealed record class NameExpression(
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Identifier;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder.Identifier(Identifier);
     }
 }

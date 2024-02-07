@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class BlockExpression(
     SyntaxTree SyntaxTree,
@@ -14,5 +16,13 @@ public sealed record class BlockExpression(
         foreach (var expression in Expressions)
             yield return expression;
         yield return BraceClose;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder.Token(BraceOpen);
+        foreach (var expression in Expressions)
+            builder.Node(expression);
+        builder.Token(BraceClose);
     }
 }

@@ -11,6 +11,8 @@ public abstract record class PrimType(string Name)
 
     private string GetDebuggerDisplay() => $"{Name}: {PredefinedSymbolNames.Type}";
 
+    public sealed override string ToString() => Name;
+
     public abstract bool IsAssignableFrom(PrimType source);
 
     // TODO: Override this with actual conversions.

@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax;
 
 public sealed record class ParameterSyntax(
     SyntaxTree SyntaxTree,
@@ -13,5 +15,13 @@ public sealed record class ParameterSyntax(
         yield return Identifier;
         yield return Colon;
         yield return TypeNode;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Token(Identifier)
+            .Token(Colon)
+            .Node(TypeNode);
     }
 }

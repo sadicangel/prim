@@ -196,6 +196,15 @@ public static class SyntaxFacts
         or TokenKind.Type_F80
         or TokenKind.Type_F128;
 
+    public static bool IsControlFlow(this TokenKind kind) => kind
+        is TokenKind.If
+        or TokenKind.Else
+        or TokenKind.While
+        or TokenKind.For
+        or TokenKind.Break
+        or TokenKind.Continue
+        or TokenKind.Return;
+
     public static bool IsPredefinedType(this TokenKind kind) => kind
         is TokenKind.Type_Any
         or TokenKind.Type_Unknown

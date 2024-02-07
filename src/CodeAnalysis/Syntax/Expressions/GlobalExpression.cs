@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class GlobalExpression(
     SyntaxTree SyntaxTree,
@@ -11,5 +13,12 @@ public sealed record class GlobalExpression(
     {
         yield return Declaration;
         yield return Semicolon;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Node(Declaration)
+            .Token(Semicolon);
     }
 }

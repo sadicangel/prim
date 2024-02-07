@@ -45,11 +45,3 @@ internal sealed record class Scope : IEnumerable<Symbol>
         return scope;
     }
 }
-
-// TODO: Use ReadOnlyMemory<char> instead os strings?
-file sealed class SymbolDictionaryComparer : IEqualityComparer<ReadOnlyMemory<char>>
-{
-    public static readonly SymbolDictionaryComparer Default = new();
-    public bool Equals(ReadOnlyMemory<char> x, ReadOnlyMemory<char> y) => x.Span.Equals(y.Span, StringComparison.Ordinal);
-    public int GetHashCode([DisallowNull] ReadOnlyMemory<char> obj) => string.GetHashCode(obj.Span, StringComparison.Ordinal);
-}

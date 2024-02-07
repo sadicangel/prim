@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class BreakExpression(
     SyntaxTree SyntaxTree,
@@ -11,5 +13,12 @@ public sealed record class BreakExpression(
     {
         yield return Break;
         yield return Result;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .ControlFlow(Break)
+            .Node(Result);
     }
 }

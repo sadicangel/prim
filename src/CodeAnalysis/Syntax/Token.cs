@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
@@ -29,6 +30,11 @@ public sealed record class Token(
     public override IEnumerable<SyntaxNode> Children() => Enumerable.Empty<SyntaxNode>();
 
     private string GetDebuggerDisplay() => $"{TokenKind} {{ \"{Value ?? Text.ToString()}\" }}";
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder.Literal(this);
+    }
 }
 
 public readonly record struct TokenTrivia(List<Trivia> Leading, List<Trivia> Trailing)

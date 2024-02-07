@@ -36,7 +36,7 @@ internal record class BoundProgram(
                         break;
 
                     case BoundExpression expression:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{expression.Type.Name}[/]"));
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.NodeKind}[/] [darkseagreen2 i]{expression.Type}[/]"));
                         break;
 
                     default:
@@ -45,19 +45,5 @@ internal record class BoundProgram(
                 }
             }
         }
-
-        //static string FormatLiteral(Token token)
-        //{
-        //    return token.TokenKind switch
-        //    {
-        //        TokenKind.I32 => $"[gold3]{token.Value}[/]",
-        //        TokenKind.F32 => $"[gold3]{token.Value}[/]",
-        //        TokenKind.Str => $"[darkorange3]\"{token.Value}\"[/]",
-        //        TokenKind.True => $"[blue3_1]{token.Value}[/]",
-        //        TokenKind.False => $"[blue3_1]{token.Value}[/]",
-        //        TokenKind.Null => $"[blue3_1]{token.Value}[/]",
-        //        _ => throw new UnreachableException($"Unexpected {nameof(TokenKind)} '{token.TokenKind}'"),
-        //    };
-        //}
     }
 }

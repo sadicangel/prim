@@ -2,6 +2,7 @@
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using System.Diagnostics;
+using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
@@ -94,6 +95,13 @@ public sealed record class SyntaxTree(Source Source, CompilationUnit Root)
                 _ => throw new UnreachableException($"Unexpected {nameof(TokenKind)} '{token.TokenKind}'"),
             };
         }
+    }
+
+    public IRenderable ToMarkup()
+    {
+        var builder = new StringBuilder();
+        Root.WriteMarkupTo(builder);
+        return new Markup(builder.ToString());
     }
 
     public static IReadOnlyList<Token> Scan(Source source)

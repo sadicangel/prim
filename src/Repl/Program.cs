@@ -8,6 +8,7 @@ Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
 var syntaxTree = SyntaxTree.ParseScript("""
     sum: (a: i32, b: i32) -> i32 = a + b;
     c: i32 = sum(2, 5);
+    println(c);
     """);
 
 if (syntaxTree.Diagnostics.Count > 0)
@@ -17,7 +18,7 @@ if (syntaxTree.Diagnostics.Count > 0)
 }
 else
 {
-    AnsiConsole.Write(new Markup(syntaxTree.Source.Text, "grey66 i"));
+    AnsiConsole.Write(syntaxTree.Root.Text.ToString());
     AnsiConsole.WriteLine();
     AnsiConsole.WriteLine();
 
@@ -34,7 +35,12 @@ else
     }
     else
     {
-        AnsiConsole.Write(new Markup(result.Value.ToString() ?? string.Empty, "plum4 i"));
+        AnsiConsole.Write(new Markup($"{result.Value switch
+        {
+            Delegate @delegate => @delegate.Method.Name,
+            _ => result.Value
+        }} ", "grey66"));
+        AnsiConsole.Write(new Markup(result.Type.ToString(), "green i"));
         AnsiConsole.WriteLine();
     }
 }

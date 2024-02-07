@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class InlineExpression(
@@ -12,5 +14,12 @@ public sealed record class InlineExpression(
     {
         yield return Expression;
         yield return Semicolon;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Node(Expression)
+            .Token(Semicolon);
     }
 }

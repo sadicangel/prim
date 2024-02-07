@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Text;
+using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
@@ -19,6 +20,8 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
     IEnumerable<INode> INode.Children() => Children();
 
     public sealed override string ToString() => $"{NodeKind} {SyntaxTree.Source[Range]}";
+
+    public abstract void WriteMarkupTo(StringBuilder builder);
 }
 
 public enum SyntaxNodeKind

@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Types;
+using System.Text;
 
 namespace CodeAnalysis.Syntax.Expressions;
 
@@ -32,6 +33,17 @@ public sealed record class DeclarationExpression(
         yield return TypeNode;
         yield return Equal;
         yield return Expression;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Identifier(Identifier)
+            .Token(Colon)
+            .Token(Mutable)
+            .Node(TypeNode)
+            .Token(Equal)
+            .Node(Expression);
     }
 }
 

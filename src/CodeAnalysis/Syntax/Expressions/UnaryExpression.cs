@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class UnaryExpression(
     SyntaxTree SyntaxTree,
     Token Operator,
@@ -10,5 +12,12 @@ public sealed record class UnaryExpression(
     {
         yield return Operator;
         yield return Operand;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Token(Operator)
+            .Node(Operand);
     }
 }

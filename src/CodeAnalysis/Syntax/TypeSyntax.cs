@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Types;
+using System.Text;
 
 namespace CodeAnalysis.Syntax;
 
@@ -12,4 +13,10 @@ public sealed record class TypeSyntax(
     public TypeSyntax(SyntaxTree syntaxTree) : this(syntaxTree, [], PredefinedTypes.Unit) { }
 
     public override IEnumerable<SyntaxNode> Children() => Tokens;
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        foreach (var token in Tokens)
+            builder.Token(token);
+    }
 }

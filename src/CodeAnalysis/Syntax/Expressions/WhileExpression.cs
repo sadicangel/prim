@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class WhileExpression(
     SyntaxTree SyntaxTree,
@@ -17,5 +19,15 @@ public sealed record class WhileExpression(
         yield return Condition;
         yield return ParenthesisClose;
         yield return Body;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .ControlFlow(While)
+            .Token(ParenthesisOpen)
+            .Node(Condition)
+            .Append(ParenthesisClose)
+            .Node(Body);
     }
 }

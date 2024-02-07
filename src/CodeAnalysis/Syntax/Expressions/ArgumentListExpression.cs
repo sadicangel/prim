@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 
 namespace CodeAnalysis.Syntax.Expressions;
 
@@ -15,4 +16,10 @@ public sealed record class ArgumentListExpression(
     public override IEnumerable<SyntaxNode> Children() => Arguments;
     public IEnumerator<Expression> GetEnumerator() => Arguments.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        foreach (var node in Arguments.Nodes.Cast<SyntaxNode>())
+            builder.Node(node);
+    }
 }

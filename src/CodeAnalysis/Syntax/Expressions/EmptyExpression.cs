@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class EmptyExpression(
     SyntaxTree SyntaxTree,
@@ -9,5 +11,10 @@ public sealed record class EmptyExpression(
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Semicolon;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder.Token(Semicolon);
     }
 }

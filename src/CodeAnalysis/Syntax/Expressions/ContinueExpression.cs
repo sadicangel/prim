@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class ContinueExpression(
     SyntaxTree SyntaxTree,
     Token Continue,
@@ -10,5 +12,12 @@ public sealed record class ContinueExpression(
     {
         yield return Continue;
         yield return Result;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .ControlFlow(Continue)
+            .Node(Result);
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class AssignmentExpression(
     SyntaxTree SyntaxTree,
@@ -15,5 +17,13 @@ public sealed record class AssignmentExpression(
         yield return Identifier;
         yield return Equal;
         yield return Expression;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Identifier(Identifier)
+            .Token(Equal)
+            .Node(Expression);
     }
 }

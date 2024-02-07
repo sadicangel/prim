@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class BinaryExpression(
     SyntaxTree SyntaxTree,
     Expression Left,
@@ -15,5 +17,14 @@ public sealed record class BinaryExpression(
         yield return Right;
         if (OperatorClose is not null)
             yield return OperatorClose;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .Node(Left)
+            .Token(Operator)
+            .Node(Right)
+            .Token(OperatorClose);
     }
 }

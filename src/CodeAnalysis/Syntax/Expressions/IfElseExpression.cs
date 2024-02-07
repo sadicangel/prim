@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class IfElseExpression(
     SyntaxTree SyntaxTree,
@@ -21,5 +23,17 @@ public sealed record class IfElseExpression(
         yield return Then;
         yield return ElseToken;
         yield return Else;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder
+            .ControlFlow(If)
+            .Token(ParenthesisOpen)
+            .Node(Condition)
+            .Token(ParenthesisClose)
+            .Node(Then)
+            .Token(ElseToken)
+            .Node(Else);
     }
 }
