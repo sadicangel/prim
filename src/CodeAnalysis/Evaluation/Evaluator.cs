@@ -75,8 +75,8 @@ internal static class Evaluator
         {
             OperatorKind.UnaryPlus => +operand,
             OperatorKind.Negate => -operand,
-            OperatorKind.Increment => ++operand,
-            OperatorKind.Decrement => --operand,
+            OperatorKind.PrefixIncrement => ++operand,
+            OperatorKind.PrefixDecrement => --operand,
             OperatorKind.OnesComplement => ~operand,
             OperatorKind.Not => !operand,
             _ => throw new UnreachableException($"Unexpected {nameof(OperatorKind)} '{boundNode.Operator.OperatorKind}'"),

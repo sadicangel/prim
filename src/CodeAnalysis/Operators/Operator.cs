@@ -7,8 +7,8 @@ public enum OperatorKind
 {
     UnaryPlus,
     Negate,
-    Increment,
-    Decrement,
+    PrefixIncrement,
+    PrefixDecrement,
     OnesComplement,
     Not,
 
@@ -36,10 +36,11 @@ public enum OperatorKind
     AndAlso,
     OrElse,
 
+    ExplicitConversion,
+    ImplicitConversion,
+
     NullCoalescence,
     Call,
     Subscript,
     Reference,
-    ExplicitCast,
-    ImplicitCast,
 }
