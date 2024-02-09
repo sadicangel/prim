@@ -19,6 +19,7 @@ internal static class DiagnosticMessage
     public static string AmbiguousBinaryOperator(Token @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftType.Name}' and '{rightType.Name}'";
     public static string InvalidArgumentType(Parameter parameter, PrimType actualType) => $"Invalid expression of type '{actualType.Name}' provided for parameter '{parameter.Name}' of type '{parameter.Type.Name}'";
     public static string InvalidExpressionType(PrimType expectedType, PrimType actualType) => $"Invalid expression of type '{actualType.Name}'. Expected '{expectedType.Name}'";
+    public static string InvalidImplicitConversion(PrimType sourceType, PrimType destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
     public static string InvalidNumberOfArguments(FunctionType functionType, int actualNumberOfArguments) => $"Function '{functionType.Name}' requires {functionType.Parameters.Count} arguments but was given {actualNumberOfArguments}";
     public static string InvalidSymbolType(PrimType expectedType, PrimType actualType) => $"Invalid symbol of type '{actualType.Name}'. Expected '{expectedType.Name}'";
     public static string InvalidTypeConversion(PrimType sourceType, PrimType targetType) => $"Invalid conversion from type '{sourceType.Name}' to '{targetType.Name}'";
@@ -31,7 +32,6 @@ internal static class DiagnosticMessage
 
 
 
-    public static string InvalidImplicitConversion(PrimType sourceType, PrimType destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
 
     public static string RedundantConversion() => "Conversion is redundant";
 

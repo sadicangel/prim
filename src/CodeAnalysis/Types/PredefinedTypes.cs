@@ -236,5 +236,4 @@ internal static class PrimTypeExtensions
             type.ReturnType));
         return type;
     }
-
 }

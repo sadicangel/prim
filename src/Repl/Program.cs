@@ -7,12 +7,8 @@ using System.Text;
 Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
 
 var syntaxTree = SyntaxTree.ParseScript("""
-    sum: (a: i32, b: i32) -> i32 = a + b;
-    c: mutable i32 = sum(2, 5);
-    println(c);
-    c *= 10;
-    println(c);
-    sum;
+    a: f32 = 10;
+    println(a);
     """);
 
 if (syntaxTree.Diagnostics.Count > 0)

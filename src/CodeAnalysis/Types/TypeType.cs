@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Types;
 
-public sealed record class TypeType(PrimType Type)
-    : PrimType(PredefinedSymbolNames.Type)
+public sealed record class TypeType(PrimType Type) : PrimType(PredefinedSymbolNames.Type)
 {
-    public override bool IsAssignableFrom(PrimType source) => this == source;
+    public bool Equals(TypeType? other) => base.Equals(other);
+    public override int GetHashCode() => base.GetHashCode();
 }

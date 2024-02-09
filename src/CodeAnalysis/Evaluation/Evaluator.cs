@@ -41,7 +41,7 @@ internal static class Evaluator
             BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression(context, (BoundAssignmentExpression)boundNode),
             BoundNodeKind.NameExpression => EvaluateNameExpression(context, (BoundNameExpression)boundNode),
             //BoundNodeKind.ForExpression => EvaluateForExpression(context, (BoundForExpression)boundNode),
-            //BoundNodeKind.IfElseExpression => EvaluateIfElseExpression(context, (BoundIfElseExpression)boundNode),
+            BoundNodeKind.IfElseExpression => EvaluateIfElseExpression(context, (BoundIfElseExpression)boundNode),
             //BoundNodeKind.WhileExpression => EvaluateWhileExpression(context, (BoundWhileExpression)boundNode),
             //BoundNodeKind.BreakExpression => EvaluateBreakExpression(context, (BoundBreakExpression)boundNode),
             //BoundNodeKind.ContinueExpression => EvaluateContinueExpression(context, (BoundContinueExpression)boundNode),
@@ -54,6 +54,12 @@ internal static class Evaluator
         };
     }
 
+    private static object EvaluateIfElseExpression(EvaluateContext context, BoundIfElseExpression boundNode)
+    {
+        var result = (bool)EvaluateBoundNode(context, boundNode.Condition);
+        return EvaluateBoundNode(context, result ? boundNode.Then : boundNode.Else);
+    }
+
     private static object EvaluateBlockExpression(EvaluateContext context, BoundBlockExpression boundNode)
     {
         object result = Unit.Value;
@@ -62,7 +68,7 @@ internal static class Evaluator
         return result;
     }
 
-    private static object EvaluateLiteralExpression(EvaluateContext context, BoundLiteralExpression boundNode)
+    private static object EvaluateLiteralExpression(EvaluateContext _, BoundLiteralExpression boundNode)
     {
         return boundNode.Value ?? throw new UnreachableException("Value should not be null");
     }
@@ -79,6 +85,8 @@ internal static class Evaluator
             OperatorKind.PrefixDecrement => --operand,
             OperatorKind.OnesComplement => ~operand,
             OperatorKind.Not => !operand,
+            OperatorKind.ImplicitConversion or OperatorKind.ExplicitConversion when boundNode.Type == PredefinedTypes.Any => operand,
+            OperatorKind.ImplicitConversion or OperatorKind.ExplicitConversion => Convert.ChangeType(operand, boundNode.Type.GetCrlType()),
             _ => throw new UnreachableException($"Unexpected {nameof(OperatorKind)} '{boundNode.Operator.OperatorKind}'"),
         };
     }
@@ -198,4 +206,59 @@ internal sealed record class EvaluateContext(Environment Environment, Diagnostic
     public Environment Environment { get; set; } = Environment;
     public void PushEnvironment() => Environment = Environment.CreateChildScope();
     public void PopEnvironment() => Environment = Environment.Parent ?? throw new InvalidOperationException("Invalid environment stack");
+}
+
+file static class Extensions
+{
+    public static Type GetCrlType(this PrimType type)
+    {
+        return type switch
+        {
+            ArrayType array =>
+                array.ElementType.GetCrlType().MakeArrayType(),
+            FunctionType function =>
+                Type.GetType($"{nameof(System)}.{nameof(Func<object>)}`{function.Parameters.Count}", throwOnError: true)!.MakeGenericType([.. function.Parameters.Select(p => p.Type.GetCrlType()), function.ReturnType.GetCrlType()]),
+            OptionType option =>
+                typeof(object),
+            PredefinedType predefined =>
+                predefined.Name switch
+                {
+                    PredefinedSymbolNames.Any => typeof(object),
+                    PredefinedSymbolNames.Bool => typeof(bool),
+                    PredefinedSymbolNames.I8 => typeof(sbyte),
+                    PredefinedSymbolNames.I16 => typeof(short),
+                    PredefinedSymbolNames.I32 => typeof(int),
+                    PredefinedSymbolNames.I64 => typeof(long),
+                    PredefinedSymbolNames.I128 => typeof(long),
+                    PredefinedSymbolNames.ISize => typeof(nint),
+                    PredefinedSymbolNames.U8 => typeof(byte),
+                    PredefinedSymbolNames.U16 => typeof(ushort),
+                    PredefinedSymbolNames.U32 => typeof(uint),
+                    PredefinedSymbolNames.U64 => typeof(ulong),
+                    PredefinedSymbolNames.U128 => typeof(ulong),
+                    PredefinedSymbolNames.USize => typeof(nuint),
+                    PredefinedSymbolNames.F16 => typeof(Half),
+                    PredefinedSymbolNames.F32 => typeof(float),
+                    PredefinedSymbolNames.F64 => typeof(double),
+                    PredefinedSymbolNames.F80 => typeof(double),
+                    PredefinedSymbolNames.F128 => typeof(double),
+                    PredefinedSymbolNames.Never => typeof(void),
+                    PredefinedSymbolNames.Str => typeof(string),
+                    PredefinedSymbolNames.Type => typeof(Type),
+                    PredefinedSymbolNames.Unit => typeof(void),
+                    PredefinedSymbolNames.Unknown => typeof(object),
+                    _ => throw new NotSupportedException($"Type {type} is not supported by the .NET CRL"),
+                },
+            TypeList typeList =>
+                Type.GetType($"{nameof(System)}.{nameof(ValueType)}`{typeList.Types.Count}", throwOnError: true)!.MakeGenericType([.. typeList.Types.Select(GetCrlType)]),
+            TypeType typeType =>
+                typeof(Type),
+            UnionType union =>
+                typeof(object),
+            UserType userType =>
+                throw new NotSupportedException($"Type {type} is not supported by the .NET CRL"),
+            _ =>
+                throw new NotSupportedException($"Type {type} is not supported by the .NET CRL"),
+        };
+    }
 }
