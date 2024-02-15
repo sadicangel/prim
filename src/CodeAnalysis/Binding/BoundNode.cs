@@ -14,7 +14,7 @@ internal abstract record class BoundNode(
 
 internal enum BoundNodeKind
 {
-    GlobalExpression,
+    DeclarationExpression,
 
     BlockExpression,
     EmptyExpression,
@@ -25,7 +25,6 @@ internal enum BoundNodeKind
     BinaryExpression,
     ConvertExpression,
 
-    DeclarationExpression,
     AssignmentExpression,
     NameExpression,
 

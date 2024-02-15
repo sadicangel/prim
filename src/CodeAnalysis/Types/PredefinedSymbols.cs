@@ -28,8 +28,8 @@ internal static class PredefinedSymbols
     public static readonly Symbol F80 = FromPredefinedType(PredefinedTypes.F80);
     public static readonly Symbol F128 = FromPredefinedType(PredefinedTypes.F128);
 
-    public static readonly Symbol PrintLn = new(PredefinedSymbolNames.PrintLn, new FunctionType([new Parameter("obj", PredefinedTypes.Any)], PredefinedTypes.Unit).AddCallOperator());
-    public static readonly Symbol ScanLn = new(PredefinedSymbolNames.ScanLn, new FunctionType([], PredefinedTypes.Str).AddCallOperator());
+    public static readonly Symbol PrintLn = new(PredefinedSymbolNames.PrintLn, new FunctionType([new Parameter("obj", PredefinedTypes.Any)], PredefinedTypes.Unit));
+    public static readonly Symbol ScanLn = new(PredefinedSymbolNames.ScanLn, new FunctionType([], PredefinedTypes.Str));
 
     public static IReadOnlyList<Symbol> All { get; } = typeof(PredefinedSymbols)
         .GetFields(BindingFlags.Public | BindingFlags.Static)

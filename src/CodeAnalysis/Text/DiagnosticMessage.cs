@@ -13,6 +13,7 @@ internal static class DiagnosticMessage
 
     // Parsing error messages.
     public static string ExpectedTypeDefinition() => $"Expected type definition";
+    public static string InvalidLocationForTypeDefinition() => $"Invalid location for type definition";
     public static string UnexpectedToken(TokenKind expected, TokenKind actual) => $"Unexpected token '{actual.GetDiagnosticDisplay()}'. Expected '{expected.GetDiagnosticDisplay()}'";
 
     // Binding error messages.

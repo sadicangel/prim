@@ -31,13 +31,12 @@ internal static class Evaluator
     {
         return boundNode.NodeKind switch
         {
-            //BoundNodeKind.GlobalExpression => EvaluateGlobalExpression(context, (BoundGlobalExpression)boundNode),
+            BoundNodeKind.DeclarationExpression => EvaluateDeclarationExpression(context, (BoundDeclarationExpression)boundNode),
             BoundNodeKind.BlockExpression => EvaluateBlockExpression(context, (BoundBlockExpression)boundNode),
             BoundNodeKind.LiteralExpression => EvaluateLiteralExpression(context, (BoundLiteralExpression)boundNode),
             BoundNodeKind.UnaryExpression => EvaluateUnaryExpression(context, (BoundUnaryExpression)boundNode),
             BoundNodeKind.ArgumentList => EvaluateArgumentListExpression(context, (BoundArgumentListExpression)boundNode),
             BoundNodeKind.BinaryExpression => EvaluateBinaryExpression(context, (BoundBinaryExpression)boundNode),
-            BoundNodeKind.DeclarationExpression => EvaluateDeclarationExpression(context, (BoundDeclarationExpression)boundNode),
             BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression(context, (BoundAssignmentExpression)boundNode),
             BoundNodeKind.NameExpression => EvaluateNameExpression(context, (BoundNameExpression)boundNode),
             //BoundNodeKind.ForExpression => EvaluateForExpression(context, (BoundForExpression)boundNode),

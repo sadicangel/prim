@@ -75,6 +75,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 
     // Parsing Errors.
     internal void ReportExpectedTypeDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.ExpectedTypeDefinition());
+    internal void ReportInvalidLocationForTypeDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidLocationForTypeDefinition());
     internal void ReportUnexpectedToken(TokenKind expected, Token actual) => ReportError(actual.Location, DiagnosticMessage.UnexpectedToken(expected, actual.TokenKind));
 
     // Binder Errors.

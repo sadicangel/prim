@@ -16,18 +16,21 @@ public readonly record struct EvaluationResult(object Value, PrimType Type, Diag
 
 public sealed record class Compilation(IReadOnlyList<SyntaxTree> SyntaxTrees, Compilation? Previous = null)
 {
+    internal Scope Scope { get; init; } = Previous?.Scope ?? Scope.CreateGlobalScope();
+    internal Environment Environment { get; init; } = Previous?.Environment ?? Environment.CreateGlobalScope();
+
     public EvaluationResult Evaluate()
     {
         if (SyntaxTrees.Any(st => st.Diagnostics.HasErrors))
             return new EvaluationResult(new DiagnosticBag(SyntaxTrees.SelectMany(tree => tree.Diagnostics)));
 
-        var program = Binder.Bind(Scope.CreateGlobalScope(), SyntaxTrees[0].Root);
+        var program = Binder.Bind(Scope, SyntaxTrees[0].Root);
         if (program.Diagnostics.HasErrors)
             return new EvaluationResult(program.Diagnostics);
 
         AnsiConsole.Write(program.ToRenderable());
         AnsiConsole.WriteLine();
 
-        return Evaluator.Evaluate(Environment.CreateGlobalScope(), program);
+        return Evaluator.Evaluate(Environment, program);
     }
 }

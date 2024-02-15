@@ -2,7 +2,6 @@
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Binding.Expressions;
-
 internal sealed record class BoundDeclarationExpression(
     SyntaxNode SyntaxNode,
     Symbol Symbol,

@@ -15,26 +15,43 @@ internal static class Binder
         var boundNodes = new List<BoundNode>();
         var context = new BindContext(globalScope, []);
 
-        foreach (var syntaxNode in compilation.Nodes)
-            boundNodes.Add(BindExpression(context, syntaxNode));
+        if (Declare(context, compilation.Nodes.OfType<GlobalDeclarationExpression>()))
+        {
+            foreach (var syntaxNode in compilation.Nodes)
+                boundNodes.Add(BindExpression(context, syntaxNode));
+        }
 
         return new BoundProgram(compilation, boundNodes, context.Diagnostics);
+    }
+
+    private static bool Declare(BindContext context, IEnumerable<GlobalDeclarationExpression> declarations)
+    {
+        foreach (var declaration in declarations)
+        {
+            var symbol = new Symbol(declaration.Identifier.Text.ToString(), declaration.TypeNode.Type, declaration.IsMutable);
+            if (!context.Scope.TryDeclare(symbol))
+            {
+                context.Diagnostics.ReportSymbolRedeclaration(declaration.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
+                return false;
+            }
+        }
+        return true;
     }
 
     private static BoundExpression BindExpression(BindContext context, SyntaxNode syntaxNode)
     {
         return syntaxNode.NodeKind switch
         {
-            SyntaxNodeKind.GlobalExpression => BindGlobalExpression(context, (GlobalExpression)syntaxNode),
+            SyntaxNodeKind.GlobalDeclarationExpression => BindGlobalDeclarationExpression(context, (GlobalDeclarationExpression)syntaxNode),
             SyntaxNodeKind.BlockExpression => BindBlockExpression(context, (BlockExpression)syntaxNode),
             SyntaxNodeKind.InlineExpression => BindInlineExpression(context, (InlineExpression)syntaxNode),
             SyntaxNodeKind.EmptyExpression => BindEmptyExpression(context, (EmptyExpression)syntaxNode),
+            SyntaxNodeKind.LocalDeclarationExpression => BindLocalDeclarationExpression(context, (LocalDeclarationExpression)syntaxNode),
             SyntaxNodeKind.LiteralExpression => BindLiteralExpression(context, (LiteralExpression)syntaxNode),
             SyntaxNodeKind.GroupExpression => BindGroupExpression(context, (GroupExpression)syntaxNode),
             SyntaxNodeKind.UnaryExpression => BindUnaryExpression(context, (UnaryExpression)syntaxNode),
             SyntaxNodeKind.ArgumentList => BindArgumentListExpression(context, (ArgumentListExpression)syntaxNode),
             SyntaxNodeKind.BinaryExpression => BindBinaryExpression(context, (BinaryExpression)syntaxNode),
-            SyntaxNodeKind.DeclarationExpression => BindDeclarationExpression(context, (DeclarationExpression)syntaxNode),
             SyntaxNodeKind.AssignmentExpression => BindAssignmentExpression(context, (AssignmentExpression)syntaxNode),
             SyntaxNodeKind.NameExpression => BindNameExpression(context, (NameExpression)syntaxNode),
             SyntaxNodeKind.ForExpression => BindForExpression(context, (ForExpression)syntaxNode),
@@ -45,11 +62,6 @@ internal static class Binder
             SyntaxNodeKind.ReturnExpression => BindReturnExpression(context, (ReturnExpression)syntaxNode),
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxNodeKind)} '{syntaxNode.NodeKind}'"),
         };
-    }
-
-    private static BoundGlobalExpression BindGlobalExpression(BindContext context, GlobalExpression syntaxNode)
-    {
-        return new BoundGlobalExpression(syntaxNode, BindDeclarationExpression(context, syntaxNode.Declaration));
     }
 
     private static BoundBlockExpression BindBlockExpression(BindContext context, BlockExpression syntaxNode)
@@ -221,7 +233,61 @@ internal static class Binder
         return new BoundBinaryExpression(syntaxNode, left, new BoundOperator(syntaxNode.Operator, @operator), right);
     }
 
-    private static BoundExpression BindDeclarationExpression(BindContext context, DeclarationExpression syntaxNode)
+    private static BoundExpression BindGlobalDeclarationExpression(BindContext context, GlobalDeclarationExpression syntaxNode)
+    {
+        Debug.Assert(context.Scope.IsGlobal);
+        var symbol = context.Scope.Lookup(syntaxNode.Identifier.Text.ToString()) ?? throw new UnreachableException($"Symbol '{syntaxNode.Identifier.Text}' not declared in first pass");
+
+        BoundExpression expression;
+        switch (symbol.Type)
+        {
+            case FunctionType functionType:
+                {
+                    context.PushScope();
+                    foreach (var parameter in functionType.Parameters)
+                    {
+                        var paramSymbol = new Symbol(parameter.Name, parameter.Type);
+                        if (!context.Scope.TryDeclare(paramSymbol))
+                        {
+                            context.Diagnostics.ReportSymbolRedeclaration(syntaxNode.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
+                            return new BoundNeverExpression(syntaxNode);
+                        }
+                    }
+
+                    expression = BindConversion(
+                        context,
+                        BindExpression(context, syntaxNode.Expression),
+                        functionType.ReturnType,
+                        isExplicit: false);
+
+                    context.PopScope();
+                    break;
+                }
+            case TypeType type:
+                {
+                    throw new NotImplementedException();
+                }
+
+            default:
+                expression = BindConversion(
+                            context,
+                            BindExpression(context, syntaxNode.Expression),
+                            symbol.Type,
+                            isExplicit: false);
+                break;
+        }
+
+        if (expression.Type == PredefinedTypes.Never)
+        {
+            // Diagnostic already reported as type is BoundNeverExpression.
+            return expression;
+        }
+
+        return new BoundDeclarationExpression(syntaxNode, symbol, expression);
+    }
+
+
+    private static BoundExpression BindLocalDeclarationExpression(BindContext context, LocalDeclarationExpression syntaxNode)
     {
         var symbol = new Symbol(syntaxNode.Identifier.Text.ToString(), syntaxNode.TypeNode.Type, syntaxNode.IsMutable);
         if (!context.Scope.TryDeclare(symbol))
@@ -251,8 +317,6 @@ internal static class Binder
                 isExplicit: false);
 
             context.PopScope();
-
-            functionType.AddCallOperator();
         }
         else
         {

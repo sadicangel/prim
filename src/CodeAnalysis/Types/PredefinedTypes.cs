@@ -226,14 +226,4 @@ internal static class PrimTypeExtensions
         type.Operators.AddRange(types.Select(other => new UnaryOperator(OperatorKind.ImplicitConversion, type, other)));
         return type;
     }
-
-    public static FunctionType AddCallOperator(this FunctionType type)
-    {
-        type.Operators.Add(new BinaryOperator(
-            OperatorKind.Call,
-            type,
-            new TypeList([.. type.Parameters.Select(p => p.Type)]),
-            type.ReturnType));
-        return type;
-    }
 }

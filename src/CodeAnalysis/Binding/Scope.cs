@@ -28,9 +28,12 @@ internal sealed record class Scope : IEnumerable<Symbol>
     public Symbol? Lookup(string name) =>
         _symbols?.GetValueOrDefault(name) ?? Parent?.Lookup(name);
 
-    public bool TryLookup(string name, [MaybeNullWhen(false)] out Symbol symbol) =>
-        _symbols?.TryGetValue(name, out symbol) ?? Parent?.TryLookup(name, out symbol) ?? (symbol = null) is not null;
-
+    public bool TryLookup(string name, [MaybeNullWhen(false)] out Symbol symbol)
+    {
+        symbol = null;
+        return _symbols?.TryGetValue(name, out symbol) is true
+            || Parent?.TryLookup(name, out symbol) is true;
+    }
     public IEnumerator<Symbol> GetEnumerator() => _symbols?.Values.GetEnumerator() ?? Enumerable.Empty<Symbol>().GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

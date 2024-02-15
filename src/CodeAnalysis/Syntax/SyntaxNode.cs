@@ -26,11 +26,12 @@ public abstract record class SyntaxNode(SyntaxNodeKind NodeKind, SyntaxTree Synt
 
 public enum SyntaxNodeKind
 {
-    GlobalExpression,
+    GlobalDeclarationExpression,
 
     BlockExpression,
     InlineExpression,
     EmptyExpression,
+    LocalDeclarationExpression,
 
     LiteralExpression,
     GroupExpression,
@@ -38,7 +39,6 @@ public enum SyntaxNodeKind
     BinaryExpression,
     LambdaExpression,
 
-    DeclarationExpression,
     AssignmentExpression,
     NameExpression,
 

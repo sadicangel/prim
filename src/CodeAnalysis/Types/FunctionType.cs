@@ -1,7 +1,25 @@
-﻿namespace CodeAnalysis.Types;
+﻿using CodeAnalysis.Operators;
 
-public sealed record class FunctionType(IReadOnlyList<Parameter> Parameters, PrimType ReturnType)
-    : PrimType($"({String.Join(", ", Parameters.Select(p => p.ToString()))}) -> {ReturnType.Name}");
+namespace CodeAnalysis.Types;
+
+public sealed record class FunctionType : PrimType
+{
+    public FunctionType(IReadOnlyList<Parameter> parameters, PrimType returnType)
+        : base($"({String.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}")
+    {
+        Parameters = parameters;
+        ReturnType = returnType;
+        Operators.Add(
+            new BinaryOperator(
+                OperatorKind.Call,
+                this,
+                new TypeList([.. Parameters.Select(p => p.Type)]),
+                ReturnType));
+    }
+
+    public IReadOnlyList<Parameter> Parameters { get; init; }
+    public PrimType ReturnType { get; init; }
+}
 
 public sealed record class Parameter(string Name, PrimType Type)
 {
