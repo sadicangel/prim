@@ -8,5 +8,5 @@ internal sealed record class BoundArgumentListExpression(
 )
     : BoundExpression(BoundNodeKind.ArgumentList, SyntaxNode, new TypeList([.. Arguments.Select(a => a.Type)]))
 {
-    public override IEnumerable<BoundNode> Children() => Enumerable.Empty<BoundNode>();
+    public override IEnumerable<BoundNode> Children() => Arguments;
 }

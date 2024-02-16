@@ -16,7 +16,7 @@ internal static class Parser
         var iterator = new TokenIterator(syntaxTree, tokens);
         return new CompilationUnit(
             iterator.SyntaxTree,
-            ParseMany(ref iterator, ParseGlobalDeclarationExpression, static current => current.TokenKind is TokenKind.Eof),
+            ParseMany(ref iterator, ParseGlobalExpression, static current => current.TokenKind is TokenKind.Eof),
             iterator.Match(TokenKind.Eof));
     }
 
@@ -417,60 +417,108 @@ internal static class Parser
         };
     }
 
-    private static GlobalDeclarationExpression ParseGlobalDeclarationExpression(ref TokenIterator iterator)
+    private static GlobalDeclarationExpression ParseGlobalExpression(ref TokenIterator iterator)
     {
-        // variable : identifier ':'          type  '=' expression
-        // function : identifier ':' function_type  '=' expression
-        // user_type: identifier ':'         'type' '=' expression
+        var declaration = ParseDeclarationExpression(ref iterator);
 
-        var identifier = iterator.Match(TokenKind.Identifier);
-        var colon = iterator.Match(TokenKind.Colon);
-        switch (iterator.Current.TokenKind)
-        {
-            case TokenKind.Type_Type:
-                _ = iterator.Match(TokenKind.Type_Type);
-                var equal = iterator.Match(TokenKind.Equal);
-                var members = ParseMany(ref iterator, ParseMemberExpression, static t => t.TokenKind is TokenKind.BraceClose);
-                throw new NotImplementedException();
-
-            default:
-                return new GlobalDeclarationExpression(
-                    iterator.SyntaxTree,
-                    identifier,
-                    colon,
-                    ParseTypeSyntax(ref iterator),
-                    iterator.Match(TokenKind.Equal),
-                    ParseTerminatedExpression(ref iterator));
-        }
-
-        static Expression ParseMemberExpression(ref TokenIterator iterator) =>
-            throw new NotImplementedException(nameof(ParseMemberExpression));
+        return new GlobalDeclarationExpression(iterator.SyntaxTree, declaration);
     }
 
     private static LocalDeclarationExpression ParseLocalDeclarationExpression(ref TokenIterator iterator)
     {
-        // variable : identifier ':' mutable? type  '=' expression
-        // function : identifier ':' function_type  '=' expression
+        var declaration = ParseDeclarationExpression(ref iterator);
+        if (declaration.TypeNode.Type is TypeType)
+            iterator.SyntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
+                new SourceLocation(iterator.SyntaxTree.Source, new Range(declaration.Identifier.Range.Start, declaration.TypeNode.Range.End)));
 
+        return new LocalDeclarationExpression(iterator.SyntaxTree, declaration);
+    }
+
+    private static DeclarationExpression ParseDeclarationExpression(ref TokenIterator iterator)
+    {
+        return iterator.Peek(2).TokenKind switch
+        {
+            // user_type: identifier ':'         'type' '=' expression
+            TokenKind.Type_Type => ParseTypeDeclarationExpression(ref iterator),
+            // variable : identifier ':'          type  '=' expression
+            // function : identifier ':' function_type  '=' expression
+            _ => ParseFuncOrVarDeclarationExpression(ref iterator),
+        };
+    }
+
+    private static DeclarationExpression ParseFuncOrVarDeclarationExpression(ref TokenIterator iterator)
+    {
         var identifier = iterator.Match(TokenKind.Identifier);
         var colon = iterator.Match(TokenKind.Colon);
-        var mutable = iterator.MatchOrDefault(TokenKind.Mutable);
-        var typeNode = ParseTypeSyntax(ref iterator);
+        var type = ParseTypeSyntax(ref iterator);
         var equal = iterator.Match(TokenKind.Equal);
         var expression = ParseTerminatedExpression(ref iterator);
-
-        if (typeNode.Type is TypeType)
-            iterator.SyntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
-                new SourceLocation(iterator.SyntaxTree.Source, new Range(identifier.Range.Start, typeNode.Range.End)));
-
-        return new LocalDeclarationExpression(
+        return new DeclarationExpression(
             iterator.SyntaxTree,
             identifier,
             colon,
-            mutable,
-            typeNode,
+            type,
             equal,
             expression);
+    }
+
+    private static DeclarationExpression ParseTypeDeclarationExpression(ref TokenIterator iterator)
+    {
+        var identifier = iterator.Match(TokenKind.Identifier);
+        var colon = iterator.Match(TokenKind.Colon);
+        var type = new TypeSyntax(iterator.SyntaxTree, [iterator.Match(TokenKind.Type_Type)], new UserType(identifier.Text.ToString()));
+        var equal = iterator.Match(TokenKind.Equal);
+        var memberList = ParseMemberListExpression(ref iterator);
+        return new DeclarationExpression(
+            iterator.SyntaxTree,
+            identifier,
+            colon,
+            type,
+            equal,
+            memberList);
+    }
+
+    private static MemberListExpression ParseMemberListExpression(ref TokenIterator iterator)
+    {
+        var braceOpen = iterator.Match(TokenKind.BraceOpen);
+        var members = ParseMany(ref iterator, ParseMemberExpression, static t => t.TokenKind is TokenKind.Eof or TokenKind.BraceClose);
+        var braceClose = iterator.Match(TokenKind.BraceClose);
+
+        return new MemberListExpression(iterator.SyntaxTree, braceOpen, members, braceClose);
+
+        static MemberExpression ParseMemberExpression(ref TokenIterator iterator)
+        {
+            // variable: identifier ':' mutable? type '=' expression
+            // method  : identifier ':' function_type '=' expression
+
+            var declaration = iterator.Peek(2).TokenKind switch
+            {
+                // user_type: identifier ':'         'type' '=' expression
+                TokenKind.Type_Type => ParseTypeDeclarationExpression(ref iterator),
+                // property: identifier ':'          type  '=' expression
+                // method  : identifier ':' function_type  '=' expression
+                _ => ParseFuncOrVarDeclarationExpression(ref iterator),
+            };
+
+            var memberType = (MemberType)0;
+            switch (declaration.TypeNode.Type)
+            {
+                case TypeType:
+                    iterator.SyntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
+                        new SourceLocation(iterator.SyntaxTree.Source, new Range(declaration.Identifier.Range.Start, declaration.TypeNode.Range.End)));
+                    break;
+
+                case FunctionType:
+                    memberType = MemberType.Method;
+                    break;
+
+                default:
+                    memberType = MemberType.Property;
+                    break;
+            }
+
+            return new MemberExpression(iterator.SyntaxTree, memberType, declaration);
+        }
     }
 
     private static AssignmentExpression ParseAssignmentExpression(ref TokenIterator iterator)
@@ -497,7 +545,7 @@ internal record struct TokenIterator(SyntaxTree SyntaxTree, IReadOnlyList<Token>
 
     public int Index { get; private set; }
 
-    public readonly Token Current { get => Tokens[Index]; }
+    public readonly Token Current { get => Tokens[int.Clamp(Index, 0, Tokens.Count - 1)]; }
 
     public readonly Token Peek(int offset = 0)
     {

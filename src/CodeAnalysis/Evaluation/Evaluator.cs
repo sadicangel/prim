@@ -134,12 +134,16 @@ internal static class Evaluator
     {
         switch (boundNode.DeclarationKind)
         {
-            case DeclarationKind.Variable:
-                context.Environment.Declare(boundNode.Symbol, EvaluateBoundNode(context, boundNode.Expression));
-                return boundNode.Symbol;
-
             case DeclarationKind.Function:
                 context.Environment.Declare(boundNode.Symbol, CreateFunc(context, (FunctionType)boundNode.Symbol.Type, boundNode.Expression));
+                return boundNode.Symbol;
+
+            case DeclarationKind.UserType:
+                context.Environment.Declare(boundNode.Symbol, boundNode.Expression);
+                return boundNode.Symbol;
+
+            case DeclarationKind.Variable:
+                context.Environment.Declare(boundNode.Symbol, EvaluateBoundNode(context, boundNode.Expression));
                 return boundNode.Symbol;
 
             default:
@@ -161,12 +165,8 @@ internal static class Evaluator
         }
     }
 
-
     private static Delegate CreateFunc(EvaluateContext context, FunctionType function, BoundExpression expression)
     {
-        System.Linq.Expressions.Expression<Action<EvaluateContext, Symbol, object>> DeclareSymbol =
-            (context, symbol, value) => context.Environment.Declare(symbol, value);
-
         var pushEnv = typeof(EvaluateContext).GetMethod(nameof(EvaluateContext.PushEnvironment))!;
         var popEnv = typeof(EvaluateContext).GetMethod(nameof(EvaluateContext.PopEnvironment))!;
         var environment = typeof(EvaluateContext).GetProperty(nameof(EvaluateContext.Environment))!;

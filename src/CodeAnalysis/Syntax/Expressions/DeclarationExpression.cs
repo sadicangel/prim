@@ -3,8 +3,7 @@ using System.Text;
 
 namespace CodeAnalysis.Syntax.Expressions;
 
-public abstract record class DeclarationExpression(
-    SyntaxNodeKind NodeKind,
+public sealed record class DeclarationExpression(
     SyntaxTree SyntaxTree,
     Token Identifier,
     Token Colon,
@@ -13,13 +12,26 @@ public abstract record class DeclarationExpression(
     Token Equal,
     Expression Expression
 )
-    : IdentifierExpression(NodeKind, SyntaxTree, Identifier, Mutable is not null)
+    : IdentifierExpression(SyntaxNodeKind.DeclarationExpression, SyntaxTree, Identifier, Mutable is not null)
 {
+    public DeclarationExpression(
+        SyntaxTree syntaxTree,
+        Token identifier,
+        Token colon,
+        TypeSyntax typeNode,
+        Token equal,
+        Expression expression
+    )
+        : this(syntaxTree, identifier, colon, Mutable: null, typeNode, equal, expression)
+    {
+    }
+
     public DeclarationKind DeclarationKind
     {
         get => TypeNode.Type switch
         {
             FunctionType => DeclarationKind.Function,
+            UserType => DeclarationKind.UserType,
             _ => DeclarationKind.Variable
         };
     }

@@ -43,4 +43,5 @@ internal enum BoundNodeKind
     ArgumentList,
 
     Program,
+    MemberList,
 }

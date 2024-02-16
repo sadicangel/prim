@@ -22,8 +22,7 @@ while (true)
     }
     else
     {
-        AnsiConsole.Write(syntaxTree.Root.Text.ToString());
-        AnsiConsole.WriteLine();
+        AnsiConsole.WriteLine(syntaxTree.Root.Text.ToString());
         AnsiConsole.WriteLine();
 
         AnsiConsole.Write(syntaxTree.ToRenderable());
@@ -42,6 +41,7 @@ while (true)
             var value = result.Type switch
             {
                 FunctionType function => function.Name,
+                UserType userType => userType.Name,
                 _ => result.Value
             };
             AnsiConsole.Write(new Markup($"{value} ", "grey66"));

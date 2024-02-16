@@ -26,7 +26,8 @@ internal static class TokenColours
             _ => null,
         }) is not null;
     }
-    public static StringBuilder Node(this StringBuilder builder, SyntaxNode node) { node.WriteMarkupTo(builder); return builder; }
+    public static StringBuilder Node(this StringBuilder builder, SyntaxNode? node) { node?.WriteMarkupTo(builder); return builder; }
+    public static StringBuilder Nodes(this StringBuilder builder, IEnumerable<SyntaxNode> nodes) { foreach (var node in nodes) node?.WriteMarkupTo(builder); return builder; }
     public static StringBuilder Comment(this StringBuilder builder, Token? token) => builder.Token(token, CommentColour);
     public static StringBuilder ControlFlow(this StringBuilder builder, Token? token) => builder.Token(token, ControlFlowColour);
     public static StringBuilder Keyword(this StringBuilder builder, Token? token) => builder.Token(token, KeywordColour);

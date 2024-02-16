@@ -1,13 +1,15 @@
 ﻿using System.Text;
 
 namespace CodeAnalysis.Syntax.Expressions;
-
-public sealed record class GlobalDeclarationExpression(
+public sealed record class MemberExpression(
     SyntaxTree SyntaxTree,
+    MemberType MemberType,
     DeclarationExpression Declaration
 )
-    : IdentifierExpression(SyntaxNodeKind.GlobalDeclarationExpression, SyntaxTree, Declaration.Identifier, Declaration.IsMutable)
+    : Expression(SyntaxNodeKind.MemberExpression, SyntaxTree)
 {
+    public bool IsMutable { get => Declaration.IsMutable; }
+
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Declaration;
@@ -17,4 +19,11 @@ public sealed record class GlobalDeclarationExpression(
     {
         builder.Node(Declaration);
     }
+}
+
+public enum MemberType
+{
+    Property,
+    Method,
+    Operator
 }

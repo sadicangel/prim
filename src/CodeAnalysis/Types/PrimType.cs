@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Operators;
+using CodeAnalysis.Types.Members;
 using System.Diagnostics;
 
 namespace CodeAnalysis.Types;
@@ -6,6 +7,7 @@ namespace CodeAnalysis.Types;
 [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 public abstract record class PrimType(string Name)
 {
+    public List<Property> Properties { get; init; } = [];
     public List<Operator> Operators { get; init; } = [];
 
     private string GetDebuggerDisplay() => $"{Name}: {PredefinedSymbolNames.Type}";

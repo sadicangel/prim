@@ -41,6 +41,8 @@ public enum SyntaxNodeKind
 
     AssignmentExpression,
     NameExpression,
+    DeclarationExpression,
+    MemberExpression,
 
     ForExpression,
     IfElseExpression,
@@ -60,6 +62,7 @@ public enum SyntaxNodeKind
     Type,
     Operator,
     Parameter,
+    MemberList,
     ArgumentList,
     CompilationUnit,
 }

@@ -99,7 +99,7 @@ public sealed class SyntaxTree_Parse_should
             a: i32 = 2
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<LocalDeclarationExpression>(node);
+        var expr = Assert.IsType<LocalDeclarationExpression>(node).Declaration;
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal(":", expr.Colon.Text);
         Assert.Equal("i32", expr.TypeNode.Text);
@@ -114,7 +114,7 @@ public sealed class SyntaxTree_Parse_should
             a: mutable i32 = 2
             """);
         var node = Assert.Single(tree.Root.Nodes);
-        var expr = Assert.IsType<LocalDeclarationExpression>(node);
+        var expr = Assert.IsType<LocalDeclarationExpression>(node).Declaration;
         Assert.Equal("a", expr.Identifier.Text);
         Assert.Equal(":", expr.Colon.Text);
         Assert.Equal("mutable", expr.Mutable!.Text);

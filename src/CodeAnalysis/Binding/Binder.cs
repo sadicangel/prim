@@ -5,6 +5,7 @@ using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Text;
 using CodeAnalysis.Types;
+using CodeAnalysis.Types.Members;
 using System.Diagnostics;
 
 namespace CodeAnalysis.Binding;
@@ -24,9 +25,9 @@ internal static class Binder
         return new BoundProgram(compilation, boundNodes, context.Diagnostics);
     }
 
-    private static bool Declare(BindContext context, IEnumerable<GlobalDeclarationExpression> declarations)
+    private static bool Declare(BindContext context, IEnumerable<GlobalDeclarationExpression> globalDeclarations)
     {
-        foreach (var declaration in declarations)
+        foreach (var declaration in globalDeclarations.Select(g => g.Declaration))
         {
             var symbol = new Symbol(declaration.Identifier.Text.ToString(), declaration.TypeNode.Type, declaration.IsMutable);
             if (!context.Scope.TryDeclare(symbol))
@@ -233,10 +234,22 @@ internal static class Binder
         return new BoundBinaryExpression(syntaxNode, left, new BoundOperator(syntaxNode.Operator, @operator), right);
     }
 
-    private static BoundExpression BindGlobalDeclarationExpression(BindContext context, GlobalDeclarationExpression syntaxNode)
+    private static BoundExpression BindDeclarationExpression(BindContext context, DeclarationExpression syntaxNode, bool isGlobal = false)
     {
-        Debug.Assert(context.Scope.IsGlobal);
-        var symbol = context.Scope.Lookup(syntaxNode.Identifier.Text.ToString()) ?? throw new UnreachableException($"Symbol '{syntaxNode.Identifier.Text}' not declared in first pass");
+        Symbol symbol;
+        if (isGlobal)
+        {
+            symbol = context.Scope.Lookup(syntaxNode.Identifier.Text.ToString()) ?? throw new UnreachableException($"Symbol '{syntaxNode.Identifier.Text}' not declared in first pass");
+        }
+        else
+        {
+            symbol = new Symbol(syntaxNode.Identifier.Text.ToString(), syntaxNode.TypeNode.Type, syntaxNode.IsMutable);
+            if (!context.Scope.TryDeclare(symbol))
+            {
+                context.Diagnostics.ReportSymbolRedeclaration(syntaxNode.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
+                return new BoundNeverExpression(syntaxNode);
+            }
+        }
 
         BoundExpression expression;
         switch (symbol.Type)
@@ -261,12 +274,12 @@ internal static class Binder
                         isExplicit: false);
 
                     context.PopScope();
-                    break;
                 }
-            case TypeType type:
-                {
-                    throw new NotImplementedException();
-                }
+                break;
+
+            case UserType userType:
+                expression = BindMemberListExpression(context, userType, (MemberListExpression)syntaxNode.Expression);
+                break;
 
             default:
                 expression = BindConversion(
@@ -286,54 +299,50 @@ internal static class Binder
         return new BoundDeclarationExpression(syntaxNode, symbol, expression);
     }
 
+    private static BoundExpression BindMemberListExpression(BindContext context, PrimType type, MemberListExpression syntaxNode)
+    {
+        context.PushScope();
+        var boundMembers = new List<BoundDeclarationExpression>();
+        foreach (var member in syntaxNode.Members)
+        {
+            var boundMember = BindDeclarationExpression(context, member.Declaration);
+            if (boundMember is not BoundDeclarationExpression boundDeclaration)
+            {
+                // Diagnostic already reported as type is BoundNeverExpression.
+                return boundMember;
+            }
+            boundMembers.Add(boundDeclaration);
+
+            switch (member.MemberType)
+            {
+                case MemberType.Property:
+                    type.Properties.Add(new Property(
+                        Name: member.Declaration.Identifier.Text.ToString(),
+                        Type: boundMember.Type,
+                        member.IsMutable));
+                    break;
+                case MemberType.Method:
+                    break;
+                case MemberType.Operator:
+                    break;
+                default:
+                    throw new UnreachableException($"Unexpected {nameof(MemberType)} '{member.MemberType}'");
+            }
+        }
+        context.PopScope();
+        return new BoundMemberListExpression(syntaxNode, boundMembers, type);
+    }
+
+    private static BoundExpression BindGlobalDeclarationExpression(BindContext context, GlobalDeclarationExpression syntaxNode)
+    {
+        Debug.Assert(context.Scope.IsGlobal);
+        return BindDeclarationExpression(context, syntaxNode.Declaration, isGlobal: true);
+    }
+
 
     private static BoundExpression BindLocalDeclarationExpression(BindContext context, LocalDeclarationExpression syntaxNode)
     {
-        var symbol = new Symbol(syntaxNode.Identifier.Text.ToString(), syntaxNode.TypeNode.Type, syntaxNode.IsMutable);
-        if (!context.Scope.TryDeclare(symbol))
-        {
-            context.Diagnostics.ReportSymbolRedeclaration(syntaxNode.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
-            return new BoundNeverExpression(syntaxNode);
-        }
-
-        BoundExpression expression;
-        if (symbol.Type is FunctionType functionType)
-        {
-            context.PushScope();
-            foreach (var parameter in functionType.Parameters)
-            {
-                var paramSymbol = new Symbol(parameter.Name, parameter.Type);
-                if (!context.Scope.TryDeclare(paramSymbol))
-                {
-                    context.Diagnostics.ReportSymbolRedeclaration(syntaxNode.Identifier.Location, context.Scope.Lookup(symbol.Name)!);
-                    return new BoundNeverExpression(syntaxNode);
-                }
-            }
-
-            expression = BindConversion(
-                context,
-                BindExpression(context, syntaxNode.Expression),
-                functionType.ReturnType,
-                isExplicit: false);
-
-            context.PopScope();
-        }
-        else
-        {
-            expression = BindConversion(
-                context,
-                BindExpression(context, syntaxNode.Expression),
-                symbol.Type,
-                isExplicit: false);
-        }
-
-        if (expression.Type == PredefinedTypes.Never)
-        {
-            // Diagnostic already reported as type is BoundNeverExpression.
-            return expression;
-        }
-
-        return new BoundDeclarationExpression(syntaxNode, symbol, expression);
+        return BindDeclarationExpression(context, syntaxNode.Declaration);
     }
 
     private static BoundExpression BindAssignmentExpression(BindContext context, AssignmentExpression syntaxNode)

@@ -1,12 +1,20 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using System.Text;
+
+namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class LocalDeclarationExpression(
     SyntaxTree SyntaxTree,
-    Token Identifier,
-    Token Colon,
-    Token? Mutable,
-    TypeSyntax TypeNode,
-    Token Equal,
-    Expression Expression
+    DeclarationExpression Declaration
 )
-    : DeclarationExpression(SyntaxNodeKind.LocalDeclarationExpression, SyntaxTree, Identifier, Colon, Mutable, TypeNode, Equal, Expression);
+    : IdentifierExpression(SyntaxNodeKind.LocalDeclarationExpression, SyntaxTree, Declaration.Identifier, Declaration.IsMutable)
+{
+    public override IEnumerable<SyntaxNode> Children()
+    {
+        yield return Declaration;
+    }
+
+    public override void WriteMarkupTo(StringBuilder builder)
+    {
+        builder.Node(Declaration);
+    }
+}
