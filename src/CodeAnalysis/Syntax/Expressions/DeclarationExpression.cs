@@ -14,18 +14,6 @@ public sealed record class DeclarationExpression(
 )
     : IdentifierExpression(SyntaxNodeKind.DeclarationExpression, SyntaxTree, Identifier, Mutable is not null)
 {
-    public DeclarationExpression(
-        SyntaxTree syntaxTree,
-        Token identifier,
-        Token colon,
-        TypeSyntax typeNode,
-        Token equal,
-        Expression expression
-    )
-        : this(syntaxTree, identifier, colon, Mutable: null, typeNode, equal, expression)
-    {
-    }
-
     public DeclarationKind DeclarationKind
     {
         get => TypeNode.Type switch

@@ -450,6 +450,7 @@ internal static class Parser
     {
         var identifier = iterator.Match(TokenKind.Identifier);
         var colon = iterator.Match(TokenKind.Colon);
+        var mutable = iterator.MatchOrDefault(TokenKind.Mutable);
         var type = ParseTypeSyntax(ref iterator);
         var equal = iterator.Match(TokenKind.Equal);
         var expression = ParseTerminatedExpression(ref iterator);
@@ -457,6 +458,7 @@ internal static class Parser
             iterator.SyntaxTree,
             identifier,
             colon,
+            mutable,
             type,
             equal,
             expression);
@@ -473,6 +475,7 @@ internal static class Parser
             iterator.SyntaxTree,
             identifier,
             colon,
+            Mutable: null,
             type,
             equal,
             memberList);
