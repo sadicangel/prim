@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Text;
 
-public readonly record struct SourceLine(Source Source, Range Range, Range RangeWithLineBreak)
+public readonly record struct SourceLine(SourceText Source, Range Range, Range RangeWithLineBreak)
 {
     public char this[Index index] => Text[index];
     public ReadOnlySpan<char> this[Range range] => Text[Range];

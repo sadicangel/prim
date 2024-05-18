@@ -1,4 +1,6 @@
-﻿namespace CodeAnalysis.Types;
+﻿using CodeAnalysis.Text;
+
+namespace CodeAnalysis.Types;
 
 public sealed record class UnionType(IReadOnlyList<PrimType> Types)
     : PrimType(String.Join(" | ", Types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)))

@@ -158,16 +158,16 @@ internal static class PrimTypeExtensions
     public static T AddMathOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
-            new UnaryOperator(OperatorKind.UnaryPlus, type, type),
-            new UnaryOperator(OperatorKind.Negate, type, type),
-            new UnaryOperator(OperatorKind.PrefixIncrement, type, type),
-            new UnaryOperator(OperatorKind.PrefixDecrement, type, type),
-            new BinaryOperator(OperatorKind.Add, type, type, type),
-            new BinaryOperator(OperatorKind.Subtract, type, type, type),
-            new BinaryOperator(OperatorKind.Multiply, type, type, type),
-            new BinaryOperator(OperatorKind.Divide, type, type, type),
-            new BinaryOperator(OperatorKind.Modulo, type, type, type),
-            new BinaryOperator(OperatorKind.Exponent, type, type, type)
+            new UnaryOperatorInfo(OperatorKind.UnaryPlus, type, type),
+            new UnaryOperatorInfo(OperatorKind.Negate, type, type),
+            new UnaryOperatorInfo(OperatorKind.PrefixIncrement, type, type),
+            new UnaryOperatorInfo(OperatorKind.PrefixDecrement, type, type),
+            new BinaryOperatorInfo(OperatorKind.Add, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.Subtract, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.Multiply, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.Divide, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.Modulo, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.Exponent, type, type, type)
         ]);
         return type;
     }
@@ -175,12 +175,12 @@ internal static class PrimTypeExtensions
     public static T AddBitwiseOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
-            new UnaryOperator(OperatorKind.OnesComplement, type, type),
-            new BinaryOperator(OperatorKind.And, type, type, type),
-            new BinaryOperator(OperatorKind.Or, type, type, type),
-            new BinaryOperator(OperatorKind.ExclusiveOr, type, type, type),
-            new BinaryOperator(OperatorKind.LeftShift, type, type, type),
-            new BinaryOperator(OperatorKind.RightShift, type, type, type)
+            new UnaryOperatorInfo(OperatorKind.OnesComplement, type, type),
+            new BinaryOperatorInfo(OperatorKind.And, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.Or, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.ExclusiveOr, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.LeftShift, type, type, type),
+            new BinaryOperatorInfo(OperatorKind.RightShift, type, type, type)
         ]);
         return type;
     }
@@ -188,8 +188,8 @@ internal static class PrimTypeExtensions
     public static T AddEqualityOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
-            new BinaryOperator(OperatorKind.Equal, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(OperatorKind.NotEqual, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.Equal, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.NotEqual, type, type, PredefinedTypes.Bool),
         ]);
         return type;
     }
@@ -197,10 +197,10 @@ internal static class PrimTypeExtensions
     public static T AddComparisonOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
-            new BinaryOperator(OperatorKind.LessThan, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(OperatorKind.LessThanOrEqual, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(OperatorKind.GreaterThan, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(OperatorKind.GreaterThanOrEqual, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.LessThan, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.LessThanOrEqual, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.GreaterThan, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.GreaterThanOrEqual, type, type, PredefinedTypes.Bool),
         ]);
         return type;
     }
@@ -208,22 +208,22 @@ internal static class PrimTypeExtensions
     public static T AddLogicalOperators<T>(this T type) where T : PrimType
     {
         type.Operators.AddRange([
-            new UnaryOperator(OperatorKind.Not, type, PredefinedTypes.Bool),
-            new BinaryOperator(OperatorKind.AndAlso, type, type, PredefinedTypes.Bool),
-            new BinaryOperator(OperatorKind.OrElse, type, type, PredefinedTypes.Bool)
+            new UnaryOperatorInfo(OperatorKind.Not, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.AndAlso, type, type, PredefinedTypes.Bool),
+            new BinaryOperatorInfo(OperatorKind.OrElse, type, type, PredefinedTypes.Bool)
         ]);
         return type;
     }
 
     public static T AddExplicitConversionOperators<T>(this T type, params PrimType[] types) where T : PrimType
     {
-        type.Operators.AddRange(types.Select(other => new UnaryOperator(OperatorKind.ExplicitConversion, type, other)));
+        type.Operators.AddRange(types.Select(other => new UnaryOperatorInfo(OperatorKind.ExplicitConversion, type, other)));
         return type;
     }
 
     public static T AddImplicitConversionOperators<T>(this T type, params PrimType[] types) where T : PrimType
     {
-        type.Operators.AddRange(types.Select(other => new UnaryOperator(OperatorKind.ImplicitConversion, type, other)));
+        type.Operators.AddRange(types.Select(other => new UnaryOperatorInfo(OperatorKind.ImplicitConversion, type, other)));
         return type;
     }
 }

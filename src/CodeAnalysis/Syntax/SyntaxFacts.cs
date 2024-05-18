@@ -1,428 +1,162 @@
-﻿using CodeAnalysis.Operators;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace CodeAnalysis.Syntax;
-
 public static class SyntaxFacts
 {
-    public static int GetUnaryOperatorPrecedence(this TokenKind type) => type switch
-    {
-        TokenKind.Bang or
-        TokenKind.Minus or
-        TokenKind.Plus or
-        TokenKind.Tilde or
-        TokenKind.PlusPlus or
-        TokenKind.MinusMinus or
-        TokenKind.SizeOf or
-        TokenKind.TypeOf => 8,
-
-        _ => 0,
-    };
-
-    public static OperatorKind GetUnaryOperatorKind(this TokenKind kind) => kind switch
-    {
-        TokenKind.Plus => OperatorKind.UnaryPlus,
-        TokenKind.Minus => OperatorKind.Negate,
-        TokenKind.PlusPlus => OperatorKind.PrefixIncrement,
-        TokenKind.MinusMinus => OperatorKind.PrefixDecrement,
-        TokenKind.Bang => OperatorKind.Not,
-        TokenKind.Tilde => OperatorKind.OnesComplement,
-        _ => throw new InvalidOperationException($"Token {kind} is not a unary operator"),
-    };
-
-    public static OperatorKind GetBinaryOperatorKind(this TokenKind kind) => kind switch
-    {
-        TokenKind.Ampersand => OperatorKind.And,
-        TokenKind.AmpersandAmpersand => OperatorKind.AndAlso,
-        TokenKind.BangEqual => OperatorKind.NotEqual,
-        TokenKind.BracketOpen => OperatorKind.Subscript,
-        TokenKind.Dot => OperatorKind.Reference,
-        TokenKind.EqualEqual => OperatorKind.Equal,
-        TokenKind.Greater => OperatorKind.GreaterThan,
-        TokenKind.GreaterEqual => OperatorKind.GreaterThanOrEqual,
-        TokenKind.GreaterGreater => OperatorKind.RightShift,
-        TokenKind.Hat => OperatorKind.ExclusiveOr,
-        TokenKind.HookHook => OperatorKind.NullCoalescence,
-        TokenKind.Less => OperatorKind.LessThan,
-        TokenKind.LessEqual => OperatorKind.LessThanOrEqual,
-        TokenKind.LessLess => OperatorKind.LeftShift,
-        TokenKind.Minus => OperatorKind.Subtract,
-        TokenKind.MinusMinus => OperatorKind.PrefixDecrement,
-        TokenKind.ParenthesisOpen => OperatorKind.Call,
-        TokenKind.Percent => OperatorKind.Modulo,
-        TokenKind.Pipe => OperatorKind.Or,
-        TokenKind.PipePipe => OperatorKind.OrElse,
-        TokenKind.Plus => OperatorKind.Add,
-        TokenKind.PlusPlus => OperatorKind.PrefixIncrement,
-        TokenKind.Slash => OperatorKind.Divide,
-        TokenKind.Star => OperatorKind.Multiply,
-        TokenKind.StarStar => OperatorKind.Exponent,
-        _ => throw new InvalidOperationException($"Token {kind} is not a binary operator"),
-    };
-
-    public static int GetBinaryOperatorPrecedence(this TokenKind type) => type switch
-    {
-        TokenKind.BracketOpen or
-        TokenKind.ParenthesisOpen => 10,
-
-        TokenKind.Dot => 9,
-
-        TokenKind.DotDot => 8,
-
-        TokenKind.StarStar => 7,
-
-        TokenKind.Percent or
-        TokenKind.Star or
-        TokenKind.Slash => 6,
-
-        TokenKind.Plus or
-        TokenKind.Minus => 5,
-
-        TokenKind.LessLess or
-        TokenKind.GreaterGreater => 4,
-
-        TokenKind.EqualEqual or
-        TokenKind.BangEqual or
-        TokenKind.Less or
-        TokenKind.LessEqual or
-        TokenKind.Greater or
-        TokenKind.GreaterEqual => 3,
-
-        TokenKind.Ampersand or
-        TokenKind.AmpersandAmpersand => 2,
-
-        TokenKind.Arrow or
-        TokenKind.Pipe or
-        TokenKind.PipePipe or
-        TokenKind.Hat or
-        TokenKind.HookHook => 1,
-
-        _ => 0,
-    };
-
-    public static TokenKind GetKeywordKind(this ReadOnlySpan<char> text) => text switch
-    {
-        "mutable" => TokenKind.Mutable,
-        "operator" => TokenKind.Operator,
-        "sizeof" => TokenKind.SizeOf,
-        "typeof" => TokenKind.TypeOf,
-
-        "if" => TokenKind.If,
-        "else" => TokenKind.Else,
-        "while" => TokenKind.While,
-        "for" => TokenKind.For,
-        "break" => TokenKind.Break,
-        "continue" => TokenKind.Continue,
-        "return" => TokenKind.Return,
-
-        "any" => TokenKind.Type_Any,
-        "unknown" => TokenKind.Type_Unknown,
-        "bool" => TokenKind.Type_Bool,
-        "false" => TokenKind.False,
-        "true" => TokenKind.True,
-        "never" => TokenKind.Type_Never,
-        "unit" => TokenKind.Type_Unit,
-        "null" => TokenKind.Null,
-        "str" => TokenKind.Type_Str,
-        "type" => TokenKind.Type_Type,
-        "i8" => TokenKind.Type_I8,
-        "i16" => TokenKind.Type_I16,
-        "i32" => TokenKind.Type_I32,
-        "i64" => TokenKind.Type_I64,
-        "i128" => TokenKind.Type_I128,
-        "isize" => TokenKind.Type_ISize,
-        "u8" => TokenKind.Type_U8,
-        "u16" => TokenKind.Type_U16,
-        "u32" => TokenKind.Type_U32,
-        "u64" => TokenKind.Type_U64,
-        "u128" => TokenKind.Type_U128,
-        "usize" => TokenKind.Type_USize,
-        "f16" => TokenKind.Type_F16,
-        "f32" => TokenKind.Type_F32,
-        "f64" => TokenKind.Type_F64,
-        "f80" => TokenKind.Type_F80,
-        "f128" => TokenKind.Type_F128,
-
-        _ => TokenKind.Identifier,
-    };
-
-    public static bool IsNumber(this TokenKind kind) => kind is >= TokenKind.I32 and <= TokenKind.F32;
-
-    public static bool IsBoolean(this TokenKind kind) => kind is TokenKind.True or TokenKind.False;
-
-    public static bool IsLiteral(this TokenKind kind) => kind.IsNumber() || kind.IsBoolean() || kind is TokenKind.Str || kind is TokenKind.Null;
-
-    public static bool IsComment(this TokenKind kind) => kind is TokenKind.Comment_SingleLine or TokenKind.Comment_MultiLine;
-
-    public static bool IsTrivia(this TokenKind kind) => kind is TokenKind.Invalid or TokenKind.WhiteSpace or TokenKind.LineBreak || kind.IsComment();
-
-    public static bool IsKeyword(this TokenKind kind) => kind
-        is TokenKind.Mutable
-        or TokenKind.Operator
-        or TokenKind.SizeOf
-        or TokenKind.TypeOf
-        or TokenKind.If
-        or TokenKind.Else
-        or TokenKind.While
-        or TokenKind.For
-        or TokenKind.Break
-        or TokenKind.Continue
-        or TokenKind.Return
-        or TokenKind.Type_Any
-        or TokenKind.Type_Unknown
-        or TokenKind.Type_Bool
-        or TokenKind.False
-        or TokenKind.True
-        or TokenKind.Type_Never
-        or TokenKind.Type_Unit
-        or TokenKind.Null
-        or TokenKind.Type_Str
-        or TokenKind.Type_Type
-        or TokenKind.Type_I8
-        or TokenKind.Type_I16
-        or TokenKind.Type_I32
-        or TokenKind.Type_I64
-        or TokenKind.Type_I128
-        or TokenKind.Type_ISize
-        or TokenKind.Type_U8
-        or TokenKind.Type_U16
-        or TokenKind.Type_U32
-        or TokenKind.Type_U64
-        or TokenKind.Type_U128
-        or TokenKind.Type_USize
-        or TokenKind.Type_F16
-        or TokenKind.Type_F32
-        or TokenKind.Type_F64
-        or TokenKind.Type_F80
-        or TokenKind.Type_F128;
-
-    public static bool IsControlFlow(this TokenKind kind) => kind
-        is TokenKind.If
-        or TokenKind.Else
-        or TokenKind.While
-        or TokenKind.For
-        or TokenKind.Break
-        or TokenKind.Continue
-        or TokenKind.Return;
-
-    public static bool IsPredefinedType(this TokenKind kind) => kind
-        is TokenKind.Type_Any
-        or TokenKind.Type_Unknown
-        or TokenKind.Type_Never
-        or TokenKind.Type_Unit
-        or TokenKind.Type_Type
-        or TokenKind.Type_Str
-        or TokenKind.Type_Bool
-        or TokenKind.Type_I8
-        or TokenKind.Type_I16
-        or TokenKind.Type_I32
-        or TokenKind.Type_I64
-        or TokenKind.Type_I128
-        or TokenKind.Type_ISize
-        or TokenKind.Type_U8
-        or TokenKind.Type_U16
-        or TokenKind.Type_U32
-        or TokenKind.Type_U64
-        or TokenKind.Type_U128
-        or TokenKind.Type_USize
-        or TokenKind.Type_F16
-        or TokenKind.Type_F32
-        or TokenKind.Type_F64
-        or TokenKind.Type_F80
-        or TokenKind.Type_F128;
-
-    public static bool IsOperator(this TokenKind kind) => kind.IsUnaryOperator() || kind.IsBinaryOperator();
-
-    public static bool IsUnaryOperator(this TokenKind kind) => kind
-        is TokenKind.Bang
-        or TokenKind.Minus
-        or TokenKind.Plus
-        or TokenKind.Tilde;
-
-    public static bool IsBinaryOperator(this TokenKind kind) => kind
-        is TokenKind.Ampersand
-        or TokenKind.AmpersandAmpersand
-        or TokenKind.Arrow
-        or TokenKind.BangEqual
-        or TokenKind.BracketOpen
-        or TokenKind.EqualEqual
-        or TokenKind.Dot
-        or TokenKind.DotDot
-        or TokenKind.Greater
-        or TokenKind.GreaterEqual
-        or TokenKind.GreaterGreater
-        or TokenKind.Hat
-        or TokenKind.HookHook
-        or TokenKind.Less
-        or TokenKind.LessEqual
-        or TokenKind.LessLess
-        or TokenKind.Minus
-        or TokenKind.ParenthesisOpen
-        or TokenKind.Percent
-        or TokenKind.Pipe
-        or TokenKind.PipePipe
-        or TokenKind.Plus
-        or TokenKind.Slash
-        or TokenKind.Star
-        or TokenKind.StarStar;
-
-    private readonly static Lazy<IReadOnlyList<TokenKind>> UnaryOperatorsLazy = new(() => [.. Enum.GetValues<TokenKind>().Where(k => GetUnaryOperatorPrecedence(k) > 0)]);
-    public static IEnumerable<TokenKind> UnaryOperators => UnaryOperatorsLazy.Value;
-
-    private readonly static Lazy<IReadOnlyList<TokenKind>> BinaryOperatorsLazy = new(() => [.. Enum.GetValues<TokenKind>().Where(k => GetBinaryOperatorPrecedence(k) > 0)]);
-    public static IEnumerable<TokenKind> BinaryOperators => BinaryOperatorsLazy.Value;
-
-    public static TokenKind GetBinaryOperatorOfAssignmentExpression(this TokenKind kind)
+    public static string? GetText(SyntaxKind kind)
     {
         return kind switch
         {
-            TokenKind.AmpersandEqual => TokenKind.Ampersand,
-            TokenKind.GreaterGreaterEqual => TokenKind.GreaterGreater,
-            TokenKind.HatEqual => TokenKind.Hat,
-            TokenKind.HookHookEqual => TokenKind.HookHook,
-            TokenKind.LessLessEqual => TokenKind.LessLess,
-            TokenKind.MinusEqual => TokenKind.Minus,
-            TokenKind.PercentEqual => TokenKind.Percent,
-            TokenKind.PipeEqual => TokenKind.Pipe,
-            TokenKind.PlusEqual => TokenKind.Plus,
-            TokenKind.StarStarEqual => TokenKind.StarStar,
-            TokenKind.SlashEqual => TokenKind.Slash,
-            TokenKind.StarEqual => TokenKind.Star,
-            _ => throw new UnreachableException($"Unexpected syntax: '{kind}'"),
+            SyntaxKind.InvalidSyntax => null,
+            SyntaxKind.EofToken => null,
+            SyntaxKind.IdentifierToken => null,
+
+            SyntaxKind.AmpersandToken => "&",
+            SyntaxKind.AmpersandAmpersandToken => "&&",
+            SyntaxKind.AmpersandEqualToken => "&=",
+            SyntaxKind.ArrowToken => "->",
+            SyntaxKind.BangToken => "!",
+            SyntaxKind.BangEqualToken => "!=",
+            SyntaxKind.BraceOpenToken => "{",
+            SyntaxKind.BraceCloseToken => "}",
+            SyntaxKind.BracketOpenToken => "[",
+            SyntaxKind.BracketCloseToken => "]",
+            SyntaxKind.ColonToken => ":",
+            SyntaxKind.CommaToken => ",",
+            SyntaxKind.DotToken => ".",
+            SyntaxKind.DotDotToken => "..",
+            SyntaxKind.EqualToken => "=",
+            SyntaxKind.EqualEqualToken => "==",
+            SyntaxKind.GreaterToken => ">",
+            SyntaxKind.GreaterEqualToken => ">=",
+            SyntaxKind.GreaterGreaterToken => ">>",
+            SyntaxKind.GreaterGreaterEqualToken => ">>=",
+            SyntaxKind.HatToken => "^",
+            SyntaxKind.HatEqualToken => "^=",
+            SyntaxKind.HookToken => "?",
+            SyntaxKind.HookHookToken => "??",
+            SyntaxKind.HookHookEqualToken => "??=",
+            SyntaxKind.LambdaToken => "=>",
+            SyntaxKind.LessToken => "<",
+            SyntaxKind.LessEqualToken => "<=",
+            SyntaxKind.LessLessToken => "<<",
+            SyntaxKind.LessLessEqualToken => "<<=",
+            SyntaxKind.MinusToken => "-",
+            SyntaxKind.MinusEqualToken => "-=",
+            SyntaxKind.MinusMinusToken => "--",
+            SyntaxKind.ParenthesisOpenToken => "(",
+            SyntaxKind.ParenthesisCloseToken => ")",
+            SyntaxKind.PercentToken => "%",
+            SyntaxKind.PercentEqualToken => "%=",
+            SyntaxKind.PipeToken => "|",
+            SyntaxKind.PipeEqualToken => "|=",
+            SyntaxKind.PipePipeToken => "||",
+            SyntaxKind.PlusToken => "+",
+            SyntaxKind.PlusEqualToken => "+=",
+            SyntaxKind.PlusPlusToken => "++",
+            SyntaxKind.SemicolonToken => ";",
+            SyntaxKind.SlashToken => "/",
+            SyntaxKind.SlashEqualToken => "/=",
+            SyntaxKind.StarToken => "*",
+            SyntaxKind.StarEqualToken => "*=",
+            SyntaxKind.StarStarToken => "**",
+            SyntaxKind.StarStarEqualToken => "**=",
+            SyntaxKind.TildeToken => "~",
+
+            SyntaxKind.I32LiteralToken => null,
+            SyntaxKind.I64LiteralToken => null,
+            SyntaxKind.F32LiteralToken => null,
+            SyntaxKind.F64LiteralToken => null,
+            SyntaxKind.StrLiteralToken => null,
+            SyntaxKind.TrueLiteralToken => null,
+            SyntaxKind.FalseLiteralToken => null,
+            SyntaxKind.NullLiteralToken => null,
+
+            SyntaxKind.IfKeyword => "if",
+            SyntaxKind.ElseKeyword => "else",
+            SyntaxKind.WhileKeyword => "while",
+            SyntaxKind.ForKeyword => "for",
+            SyntaxKind.ContinueKeyword => "continue",
+            SyntaxKind.BreakKeyword => "break",
+            SyntaxKind.ReturnKeyword => "return",
+
+            SyntaxKind.AnyKeyword => "any",
+            SyntaxKind.UnknownKeyword => "unknown",
+            SyntaxKind.NeverKeyword => "never",
+            SyntaxKind.UnitKeyword => "unit",
+            SyntaxKind.TypeKeyword => "type",
+            SyntaxKind.StrKeyword => "str",
+            SyntaxKind.BoolKeyword => "bool",
+            SyntaxKind.I8Keyword => "i8",
+            SyntaxKind.I16Keyword => "i16",
+            SyntaxKind.I32Keyword => "i32",
+            SyntaxKind.I64Keyword => "i64",
+            SyntaxKind.I128Keyword => "i128",
+            SyntaxKind.ISizeKeyword => "isize",
+            SyntaxKind.U8Keyword => "u8",
+            SyntaxKind.U16Keyword => "u16",
+            SyntaxKind.U32Keyword => "u32",
+            SyntaxKind.U64Keyword => "u64",
+            SyntaxKind.U128Keyword => "u128",
+            SyntaxKind.USizeKeyword => "usize",
+            SyntaxKind.F16Keyword => "f16",
+            SyntaxKind.F32Keyword => "f32",
+            SyntaxKind.F64Keyword => "f64",
+            SyntaxKind.F80Keyword => "f80",
+            SyntaxKind.F128Keyword => "f128",
+
+            SyntaxKind.LineBreakTrivia => null,
+            SyntaxKind.WhiteSpaceTrivia => null,
+            SyntaxKind.SingleLineCommentTrivia => null,
+            SyntaxKind.MultiLineCommentTrivia => null,
+            SyntaxKind.InvalidTextTrivia => null,
+
+            SyntaxKind.CompilationUnit => null,
+
+            _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{kind}'")
         };
     }
 
-    public static string? GetText(this TokenKind kind) => kind switch
+    public static string? GetDisplayText(SyntaxKind kind) => GetText(kind) ?? kind.ToString();
+
+    public static SyntaxKind GetKeywordKind(ReadOnlySpan<char> text)
     {
-        // Invalid
-        TokenKind.Invalid => null,
+        return text switch
+        {
+            "if" => SyntaxKind.IfKeyword,
+            "else" => SyntaxKind.ElseKeyword,
+            "while" => SyntaxKind.WhileKeyword,
+            "for" => SyntaxKind.ForKeyword,
+            "continue" => SyntaxKind.ContinueKeyword,
+            "break" => SyntaxKind.BreakKeyword,
+            "return" => SyntaxKind.ReturnKeyword,
 
-        // Punctuation
-        TokenKind.BraceOpen => "{",
-        TokenKind.BraceClose => "}",
-        TokenKind.ParenthesisOpen => "(",
-        TokenKind.ParenthesisClose => ")",
-        TokenKind.BracketOpen => "[",
-        TokenKind.BracketClose => "]",
-        TokenKind.Colon => ":",
-        TokenKind.Semicolon => ";",
-        TokenKind.Comma => ",",
+            "any" => SyntaxKind.AnyKeyword,
+            "unknown" => SyntaxKind.UnknownKeyword,
+            "never" => SyntaxKind.NeverKeyword,
+            "unit" => SyntaxKind.UnitKeyword,
+            "type" => SyntaxKind.TypeKeyword,
+            "str" => SyntaxKind.StrKeyword,
+            "bool" => SyntaxKind.BoolKeyword,
+            "i8" => SyntaxKind.I8Keyword,
+            "i16" => SyntaxKind.I16Keyword,
+            "i32" => SyntaxKind.I32Keyword,
+            "i64" => SyntaxKind.I64Keyword,
+            "i128" => SyntaxKind.I128Keyword,
+            "isize" => SyntaxKind.ISizeKeyword,
+            "u8" => SyntaxKind.U8Keyword,
+            "u16" => SyntaxKind.U16Keyword,
+            "u32" => SyntaxKind.U32Keyword,
+            "u64" => SyntaxKind.U64Keyword,
+            "u128" => SyntaxKind.U128Keyword,
+            "usize" => SyntaxKind.USizeKeyword,
+            "f16" => SyntaxKind.F16Keyword,
+            "f32" => SyntaxKind.F32Keyword,
+            "f64" => SyntaxKind.F64Keyword,
+            "f80" => SyntaxKind.F80Keyword,
+            "f128" => SyntaxKind.F128Keyword,
 
-        // Operator
-        TokenKind.Ampersand => "&",
-        TokenKind.AmpersandAmpersand => "&&",
-        TokenKind.AmpersandEqual => "&=",
-        TokenKind.Bang => "!",
-        TokenKind.BangEqual => "!=",
-        // TokenKind.Call => null,
-        TokenKind.Arrow => "->",
-        TokenKind.Dot => ".",
-        TokenKind.DotDot => "..",
-        TokenKind.Equal => "=",
-        TokenKind.EqualEqual => "==",
-        TokenKind.Greater => ">",
-        TokenKind.GreaterEqual => ">=",
-        TokenKind.GreaterGreater => ">>",
-        TokenKind.GreaterGreaterEqual => ">>=",
-        TokenKind.Hat => "^",
-        TokenKind.HatEqual => "^=",
-        TokenKind.Hook => "?",
-        TokenKind.HookHook => "??",
-        TokenKind.HookHookEqual => "??=",
-        TokenKind.Lambda => "=>",
-        TokenKind.Less => "<",
-        TokenKind.LessEqual => "<=",
-        TokenKind.LessLess => "<<",
-        TokenKind.LessLessEqual => "<<=",
-        TokenKind.Minus => "-",
-        TokenKind.MinusEqual => "-=",
-        TokenKind.MinusMinus => "--",
-        TokenKind.Percent => "%",
-        TokenKind.PercentEqual => "%=",
-        TokenKind.Pipe => "|",
-        TokenKind.PipeEqual => "|=",
-        TokenKind.PipePipe => "||",
-        TokenKind.Plus => "+",
-        TokenKind.PlusEqual => "+=",
-        TokenKind.PlusPlus => "++",
-        TokenKind.SizeOf => "sizeof",
-        TokenKind.Slash => "/",
-        TokenKind.SlashEqual => "/=",
-        TokenKind.Star => "*",
-        TokenKind.StarEqual => "*=",
-        TokenKind.StarStar => "**",
-        TokenKind.StarStarEqual => "**=",
-        // TokenKind.Subscript => null,
-        TokenKind.Tilde => "~",
-        TokenKind.TypeOf => "typeof",
-
-        // Control flow
-        TokenKind.If => "if",
-        TokenKind.Else => "else",
-        TokenKind.While => "while",
-        TokenKind.For => "for",
-        TokenKind.Continue => "continue",
-        TokenKind.Break => "break",
-        TokenKind.Return => "return",
-
-        // Literals
-        TokenKind.I32 => null,
-        //TokenKind.I64 => null,
-        TokenKind.F32 => null,
-        //TokenKind.F64 => null,
-        TokenKind.Str => null,
-        TokenKind.True => "true",
-        TokenKind.False => "false",
-        TokenKind.Null => "null",
-
-        // Other Keywords
-        TokenKind.Mutable => "mutable",
-        TokenKind.Operator => "operator",
-
-        // Primitive Types
-        TokenKind.Type_Any => "any",
-        TokenKind.Type_Unknown => "unknown",
-        TokenKind.Type_Never => "never",
-        TokenKind.Type_Unit => "unit",
-        TokenKind.Type_Type => "type",
-        // TokenKind.Type_Option => null,
-        // TokenKind.Type_Union => null,
-        // TokenKind.Type_Array => null,
-        TokenKind.Type_Str => "str",
-        // TokenKind.Type_Func => null,
-        TokenKind.Type_Bool => "bool",
-        TokenKind.Type_I8 => "i8",
-        TokenKind.Type_I16 => "i16",
-        TokenKind.Type_I32 => "i32",
-        TokenKind.Type_I64 => "i64",
-        TokenKind.Type_I128 => "i128",
-        TokenKind.Type_ISize => "isize",
-        TokenKind.Type_U8 => "u8",
-        TokenKind.Type_U16 => "u16",
-        TokenKind.Type_U32 => "u32",
-        TokenKind.Type_U64 => "u64",
-        TokenKind.Type_U128 => "u128",
-        TokenKind.Type_USize => "usize",
-        TokenKind.Type_F16 => "f16",
-        TokenKind.Type_F32 => "f32",
-        TokenKind.Type_F64 => "f64",
-        TokenKind.Type_F80 => "f80",
-        TokenKind.Type_F128 => "f128",
-
-        // Identifier
-        TokenKind.Identifier => null,
-
-        // Trivia
-        TokenKind.LineBreak => null,
-        TokenKind.WhiteSpace => null,
-        TokenKind.Comment_SingleLine => null,
-        TokenKind.Comment_MultiLine => null,
-        TokenKind.InvalidText => null,
-
-        // EOF
-        TokenKind.Eof => null,
-        _ => throw new UnreachableException($"Unexpected syntax: '{kind}'"),
-    };
-
-    public static string GetDiagnosticDisplay(this TokenKind kind) => kind.GetText() ?? $"<{kind}>";
+            _ => SyntaxKind.IdentifierToken,
+        };
+    }
 }

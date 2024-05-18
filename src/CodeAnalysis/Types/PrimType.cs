@@ -27,9 +27,9 @@ public abstract record class PrimType(string Name)
             return Conversion.Identity();
 
         if (target == PredefinedTypes.Any)
-            return Conversion.Implicit(new UnaryOperator(OperatorKind.ImplicitConversion, this, target));
+            return Conversion.Implicit(new UnaryOperatorInfo(OperatorKind.ImplicitConversion, this, target));
 
-        var @operator = (UnaryOperator?)Operators
+        var @operator = (UnaryOperatorInfo?)Operators
             .Find(op => op.OperatorKind is OperatorKind.ImplicitConversion or OperatorKind.ExplicitConversion && op.ResultType == target);
 
         if (@operator is not null)
@@ -49,14 +49,14 @@ public readonly record struct Conversion
     private static readonly Conversion Identity_ = new() { Type = ConversionType.Identity };
 
     public ConversionType Type { get; init; }
-    public UnaryOperator? Operator { get; init; }
+    public UnaryOperatorInfo? Operator { get; init; }
 
     public static Conversion None() => None_;
     public static Conversion Identity() => Identity_;
-    public static Conversion Implicit(UnaryOperator @operator) => new() { Type = ConversionType.Implicit, Operator = @operator };
-    public static Conversion Explicit(UnaryOperator @operator) => new() { Type = ConversionType.Explicit, Operator = @operator };
+    public static Conversion Implicit(UnaryOperatorInfo @operator) => new() { Type = ConversionType.Implicit, Operator = @operator };
+    public static Conversion Explicit(UnaryOperatorInfo @operator) => new() { Type = ConversionType.Explicit, Operator = @operator };
 
-    public T Match<T>(Func<T> None, Func<T> Identity, Func<UnaryOperator, T> Implicit, Func<UnaryOperator, T> Explicit)
+    public T Match<T>(Func<T> None, Func<T> Identity, Func<UnaryOperatorInfo, T> Implicit, Func<UnaryOperatorInfo, T> Explicit)
     {
         return Type switch
         {

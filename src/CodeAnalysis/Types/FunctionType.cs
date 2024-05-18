@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Operators;
+using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Types;
 
@@ -10,7 +11,7 @@ public sealed record class FunctionType : PrimType
         Parameters = parameters;
         ReturnType = returnType;
         Operators.Add(
-            new BinaryOperator(
+            new BinaryOperatorInfo(
                 OperatorKind.Call,
                 this,
                 new TypeList([.. Parameters.Select(p => p.Type)]),
@@ -19,11 +20,6 @@ public sealed record class FunctionType : PrimType
 
     public IReadOnlyList<Parameter> Parameters { get; init; }
     public PrimType ReturnType { get; init; }
-}
-
-public sealed record class Parameter(string Name, PrimType Type)
-{
     public bool Equals(FunctionType? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
-    public override string ToString() => $"{Name}: {Type.Name}";
 }

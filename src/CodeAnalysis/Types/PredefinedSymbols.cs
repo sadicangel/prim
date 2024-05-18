@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using CodeAnalysis.Types.Metadata;
+
+using BindingFlags = System.Reflection.BindingFlags;
 
 namespace CodeAnalysis.Types;
 internal static class PredefinedSymbols
