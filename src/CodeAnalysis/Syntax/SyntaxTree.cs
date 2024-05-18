@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Syntax.Parsing;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
@@ -41,5 +42,20 @@ public sealed class SyntaxTree
                 }
             }
         }
+    }
+
+    public static IReadOnlyList<SyntaxToken> Scan(SourceText sourceText)
+    {
+        static CompilationUnitSyntax Parse(SyntaxTree syntaxTree)
+        {
+            var tokens = new List<SyntaxToken>(Scanner.Scan(syntaxTree));
+            var eof = tokens is [.., var last and { SyntaxKind: SyntaxKind.EofToken }]
+                ? last
+                : SyntaxFactory.GetEofToken(syntaxTree);
+
+            return new CompilationUnitSyntax(syntaxTree, tokens, eof);
+        }
+
+        return [.. new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>()];
     }
 }

@@ -5,9 +5,5 @@ public sealed record class CompilationUnitSyntax(
     SyntaxToken EofToken
     ) : SyntaxNode(SyntaxKind.CompilationUnit, SyntaxTree)
 {
-    public override IEnumerable<SyntaxNode> Children()
-    {
-        foreach (var syntaxNode in SyntaxNodes)
-            yield return syntaxNode;
-    }
+    public override IEnumerable<SyntaxNode> Children() => SyntaxNodes;
 }

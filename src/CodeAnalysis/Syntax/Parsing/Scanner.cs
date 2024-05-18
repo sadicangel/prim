@@ -21,21 +21,23 @@ internal static class Scanner
 
             if (badTokens.Count > 0)
             {
-                for (int i = badTokens.Count - 1; i >= 0; --i)
+                token = token with
                 {
-                    var badToken = badTokens[i];
-                    token = token with
-                    {
-                        LeadingTrivia = [
-                            ..badToken.LeadingTrivia,
-                            new SyntaxTrivia(SyntaxKind.InvalidTextTrivia, syntaxTree, badToken.Range),
-                            ..badToken.TrailingTrivia,
-                            ..token.LeadingTrivia
-                        ]
-                    };
-                }
-
+                    LeadingTrivia = [
+                        ..badTokens.SelectMany(ToInvalidTextTrivia),
+                        ..token.LeadingTrivia
+                    ]
+                };
                 badTokens.Clear();
+
+                static IEnumerable<SyntaxTrivia> ToInvalidTextTrivia(SyntaxToken token)
+                {
+                    foreach (var trivia in token.LeadingTrivia)
+                        yield return trivia;
+                    yield return new SyntaxTrivia(SyntaxKind.InvalidTextTrivia, token.SyntaxTree, token.Range);
+                    foreach (var trivia in token.TrailingTrivia)
+                        yield return trivia;
+                }
             }
             yield return token;
         }
@@ -46,12 +48,11 @@ internal static class Scanner
     {
         var read = 0;
         read += ScanTrivia(syntaxTree, position + read, leading: true, out var leadingTrivia);
-        read += ScanTokenOnly(syntaxTree, position + read, out var kind, out var range, out var value);
+        read += ScanTokenOnly(syntaxTree, position + read, out var syntaxKind, out var range, out var value);
         read += ScanTrivia(syntaxTree, position + read, leading: false, out var trailingTrivia);
 
-        token = new SyntaxToken(syntaxTree, kind, range, leadingTrivia, trailingTrivia, value);
+        token = new SyntaxToken(syntaxKind, syntaxTree, range, leadingTrivia, trailingTrivia, value);
         return read;
-
     }
 
     private static int ScanTokenOnly(SyntaxTree syntaxTree, int position, out SyntaxKind kind, out Range range, out object? value)
@@ -396,10 +397,6 @@ internal static class Scanner
                 return 1;
         }
     }
-    //private static bool IsOperator(char @operator)
-    //{
-
-    //}
 
     private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out List<SyntaxTrivia> trivia)
     {
@@ -519,7 +516,7 @@ internal static class Scanner
         if (isInteger && syntaxTree.SourceText[(position + read)..] is ['.', '0' or '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9', ..])
         {
             isInteger = false;
-            // We stop when there is not dot after a number. This way we grab all dots in a number (which we report as incorrect).
+            // We stop when there is no dot after a number. This way we grab all dots in a number (which we report as incorrect).
             while (true)
             {
                 do

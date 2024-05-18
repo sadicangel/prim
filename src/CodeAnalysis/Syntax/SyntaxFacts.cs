@@ -8,6 +8,8 @@ public static class SyntaxFacts
         return kind switch
         {
             SyntaxKind.InvalidSyntax => null,
+            SyntaxKind.EofToken => null,
+            SyntaxKind.IdentifierToken => null,
 
             SyntaxKind.AmpersandToken => "&",
             SyntaxKind.AmpersandAmpersandToken => "&&",
@@ -109,9 +111,7 @@ public static class SyntaxFacts
             SyntaxKind.MultiLineCommentTrivia => null,
             SyntaxKind.InvalidTextTrivia => null,
 
-            SyntaxKind.IdentifierToken => null,
-
-            SyntaxKind.EofToken => null,
+            SyntaxKind.CompilationUnit => null,
 
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{kind}'")
         };

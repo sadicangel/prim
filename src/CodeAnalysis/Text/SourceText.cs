@@ -7,6 +7,8 @@ public sealed record class SourceText(string Text, string FilePath)
 
     public string FileName { get; } = String.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetFileName(FilePath);
 
+    public int Length { get => Text.Length; }
+
     public IReadOnlyList<SourceLine> Lines { get => _lines ??= ParseLines(Text); }
 
     public char this[Index index] => index.GetOffset(Text.Length) < 0 || index.GetOffset(Text.Length) >= Text.Length ? '\0' : Text[index];
