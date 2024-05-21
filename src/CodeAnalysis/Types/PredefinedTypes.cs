@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Operators;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace CodeAnalysis.Types;
@@ -151,6 +152,15 @@ internal static class PredefinedTypes
         .Where(f => f.FieldType == typeof(PredefinedType))
         .Select(f => (PredefinedType)f.GetValue(null)!)
         .ToArray();
+
+    public static PredefinedType GetByName(ReadOnlySpan<char> typeName)
+    {
+        foreach (var type in All)
+            if (typeName.Equals(type.Name, StringComparison.Ordinal))
+                return type;
+
+        throw new UnreachableException($"Unknown predefined type '{typeName}'");
+    }
 }
 
 internal static class PrimTypeExtensions

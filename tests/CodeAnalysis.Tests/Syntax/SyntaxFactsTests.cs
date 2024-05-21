@@ -18,5 +18,26 @@ public sealed class SyntaxFactsTests
         Assert.Equal(text, token.Text);
     }
 
+    [Theory]
+    [MemberData(nameof(GetAssignmentOperatorData))]
+    public void IsAssignmentOperator_returns_true_for_assignment_operator(SyntaxKind syntaxKind) =>
+        Assert.True(SyntaxFacts.IsAssignmentOperator(syntaxKind));
+
     public static TheoryData<SyntaxKind> GetSyntaxKindData() => new(Enum.GetValues<SyntaxKind>());
+
+    public static TheoryData<SyntaxKind> GetAssignmentOperatorData() => new([
+        SyntaxKind.EqualsToken,
+        SyntaxKind.PlusEqualsToken,
+        SyntaxKind.MinusEqualsToken,
+        SyntaxKind.StarEqualsToken,
+        SyntaxKind.SlashEqualsToken,
+        SyntaxKind.PercentEqualsToken,
+        SyntaxKind.StarStarEqualsToken,
+        SyntaxKind.LessLessEqualsToken,
+        SyntaxKind.GreaterGreaterEqualsToken,
+        SyntaxKind.AmpersandEqualsToken,
+        SyntaxKind.PipeEqualsToken,
+        SyntaxKind.HatEqualsToken,
+        SyntaxKind.HookHookEqualsToken,
+    ]);
 }

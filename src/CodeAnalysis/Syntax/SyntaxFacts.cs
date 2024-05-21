@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 
 namespace CodeAnalysis.Syntax;
+
 public static class SyntaxFacts
 {
-    public static string? GetText(SyntaxKind kind)
+    public static string? GetText(SyntaxKind syntaxKind)
     {
-        return kind switch
+        return syntaxKind switch
         {
             SyntaxKind.InvalidSyntax => null,
             SyntaxKind.EofToken => null,
@@ -13,10 +14,10 @@ public static class SyntaxFacts
 
             SyntaxKind.AmpersandToken => "&",
             SyntaxKind.AmpersandAmpersandToken => "&&",
-            SyntaxKind.AmpersandEqualToken => "&=",
+            SyntaxKind.AmpersandEqualsToken => "&=",
             SyntaxKind.ArrowToken => "->",
             SyntaxKind.BangToken => "!",
-            SyntaxKind.BangEqualToken => "!=",
+            SyntaxKind.BangEqualsToken => "!=",
             SyntaxKind.BraceOpenToken => "{",
             SyntaxKind.BraceCloseToken => "}",
             SyntaxKind.BracketOpenToken => "[",
@@ -25,42 +26,42 @@ public static class SyntaxFacts
             SyntaxKind.CommaToken => ",",
             SyntaxKind.DotToken => ".",
             SyntaxKind.DotDotToken => "..",
-            SyntaxKind.EqualToken => "=",
-            SyntaxKind.EqualEqualToken => "==",
+            SyntaxKind.EqualsToken => "=",
+            SyntaxKind.EqualsEqualsToken => "==",
             SyntaxKind.GreaterToken => ">",
-            SyntaxKind.GreaterEqualToken => ">=",
+            SyntaxKind.GreaterEqualsToken => ">=",
             SyntaxKind.GreaterGreaterToken => ">>",
-            SyntaxKind.GreaterGreaterEqualToken => ">>=",
+            SyntaxKind.GreaterGreaterEqualsToken => ">>=",
             SyntaxKind.HatToken => "^",
-            SyntaxKind.HatEqualToken => "^=",
+            SyntaxKind.HatEqualsToken => "^=",
             SyntaxKind.HookToken => "?",
             SyntaxKind.HookHookToken => "??",
-            SyntaxKind.HookHookEqualToken => "??=",
+            SyntaxKind.HookHookEqualsToken => "??=",
             SyntaxKind.LambdaToken => "=>",
             SyntaxKind.LessToken => "<",
-            SyntaxKind.LessEqualToken => "<=",
+            SyntaxKind.LessEqualsToken => "<=",
             SyntaxKind.LessLessToken => "<<",
-            SyntaxKind.LessLessEqualToken => "<<=",
+            SyntaxKind.LessLessEqualsToken => "<<=",
             SyntaxKind.MinusToken => "-",
-            SyntaxKind.MinusEqualToken => "-=",
+            SyntaxKind.MinusEqualsToken => "-=",
             SyntaxKind.MinusMinusToken => "--",
             SyntaxKind.ParenthesisOpenToken => "(",
             SyntaxKind.ParenthesisCloseToken => ")",
             SyntaxKind.PercentToken => "%",
-            SyntaxKind.PercentEqualToken => "%=",
+            SyntaxKind.PercentEqualsToken => "%=",
             SyntaxKind.PipeToken => "|",
-            SyntaxKind.PipeEqualToken => "|=",
+            SyntaxKind.PipeEqualsToken => "|=",
             SyntaxKind.PipePipeToken => "||",
             SyntaxKind.PlusToken => "+",
-            SyntaxKind.PlusEqualToken => "+=",
+            SyntaxKind.PlusEqualsToken => "+=",
             SyntaxKind.PlusPlusToken => "++",
             SyntaxKind.SemicolonToken => ";",
             SyntaxKind.SlashToken => "/",
-            SyntaxKind.SlashEqualToken => "/=",
+            SyntaxKind.SlashEqualsToken => "/=",
             SyntaxKind.StarToken => "*",
-            SyntaxKind.StarEqualToken => "*=",
+            SyntaxKind.StarEqualsToken => "*=",
             SyntaxKind.StarStarToken => "**",
-            SyntaxKind.StarStarEqualToken => "**=",
+            SyntaxKind.StarStarEqualsToken => "**=",
             SyntaxKind.TildeToken => "~",
 
             SyntaxKind.I32LiteralToken => null,
@@ -113,15 +114,15 @@ public static class SyntaxFacts
 
             SyntaxKind.CompilationUnit => null,
 
-            _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{kind}'")
+            _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };
     }
 
-    public static string? GetDisplayText(SyntaxKind kind) => GetText(kind) ?? kind.ToString();
+    public static string? GetDisplayText(SyntaxKind syntaxKind) => GetText(syntaxKind) ?? syntaxKind.ToString();
 
-    public static SyntaxKind GetKeywordKind(ReadOnlySpan<char> text)
+    public static SyntaxKind GetKeywordKind(ReadOnlySpan<char> syntaxText)
     {
-        return text switch
+        return syntaxText switch
         {
             "if" => SyntaxKind.IfKeyword,
             "else" => SyntaxKind.ElseKeyword,
@@ -159,4 +160,75 @@ public static class SyntaxFacts
             _ => SyntaxKind.IdentifierToken,
         };
     }
+
+    public static bool IsAssignmentOperator(SyntaxKind syntaxKind) => syntaxKind
+        is SyntaxKind.EqualsToken
+        or SyntaxKind.PlusEqualsToken
+        or SyntaxKind.MinusEqualsToken
+        or SyntaxKind.StarEqualsToken
+        or SyntaxKind.SlashEqualsToken
+        or SyntaxKind.PercentEqualsToken
+        or SyntaxKind.StarStarEqualsToken
+        or SyntaxKind.LessLessEqualsToken
+        or SyntaxKind.GreaterGreaterEqualsToken
+        or SyntaxKind.AmpersandEqualsToken
+        or SyntaxKind.PipeEqualsToken
+        or SyntaxKind.HatEqualsToken
+        or SyntaxKind.HookHookEqualsToken;
+
+    public static bool IsPredefinedType(SyntaxKind syntaxKind) =>
+        syntaxKind is >= SyntaxKind.UnknownKeyword and <= SyntaxKind.F128Keyword;
+
+    public static bool IsLiteral(SyntaxKind syntaxKind) =>
+        syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.NullLiteralToken;
+
+    public static (SyntaxKind Expression, int Precedence) GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
+    {
+        SyntaxKind.BangToken => (SyntaxKind.NotExpression, 8),
+        SyntaxKind.MinusToken => (SyntaxKind.UnaryMinusExpression, 8),
+        SyntaxKind.PlusToken => (SyntaxKind.UnaryPlusExpression, 8),
+        SyntaxKind.TildeToken => (SyntaxKind.OnesComplementExpression, 8),
+        SyntaxKind.PlusPlusToken => (SyntaxKind.PrefixIncrementExpression, 8),
+        SyntaxKind.MinusMinusToken => (SyntaxKind.PrefixDecrementExpression, 8),
+        _ => (0, 0),
+    };
+
+    public static (SyntaxKind Expression, int Precedence) GetBinaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
+    {
+        //SyntaxKind.BracketOpenToken or
+        //SyntaxKind.ParenthesisOpenToken => 10,
+
+        //SyntaxKind.DotToken => 9,
+
+        //SyntaxKind.DotDotToken => 8,
+
+        SyntaxKind.StarStarToken => (SyntaxKind.PowerExpression, 7),
+
+        SyntaxKind.PercentToken => (SyntaxKind.ModuloExpression, 6),
+        SyntaxKind.StarToken => (SyntaxKind.MultiplyExpression, 6),
+        SyntaxKind.SlashToken => (SyntaxKind.DivideExpression, 6),
+
+        SyntaxKind.PlusToken => (SyntaxKind.AddExpression, 5),
+        SyntaxKind.MinusToken => (SyntaxKind.SubtractExpression, 5),
+
+        SyntaxKind.LessLessToken => (SyntaxKind.LeftShiftExpression, 4),
+        SyntaxKind.GreaterGreaterToken => (SyntaxKind.RightShiftExpression, 4),
+
+        SyntaxKind.EqualsEqualsToken => (SyntaxKind.EqualsExpression, 3),
+        SyntaxKind.BangEqualsToken => (SyntaxKind.NotEqualsExpression, 3),
+        SyntaxKind.LessToken => (SyntaxKind.LessThanExpression, 3),
+        SyntaxKind.LessEqualsToken => (SyntaxKind.LessThanOrEqualExpression, 3),
+        SyntaxKind.GreaterToken => (SyntaxKind.GreaterThanExpression, 3),
+        SyntaxKind.GreaterEqualsToken => (SyntaxKind.GreaterThanOrEqualExpression, 3),
+
+        SyntaxKind.AmpersandToken => (SyntaxKind.BitwiseAndExpression, 2),
+        SyntaxKind.AmpersandAmpersandToken => (SyntaxKind.LogicalAndExpression, 2),
+
+        //SyntaxKind.ArrowToken or
+        SyntaxKind.PipeToken => (SyntaxKind.BitwiseOrExpression, 1),
+        SyntaxKind.PipePipeToken => (SyntaxKind.LogicalOrExpression, 1),
+        SyntaxKind.HatToken => (SyntaxKind.ExclusiveOrExpression, 1),
+        SyntaxKind.HookHookToken => (SyntaxKind.CoalesceExpression, 1),
+        _ => (0, 0),
+    };
 }

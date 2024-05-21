@@ -122,7 +122,7 @@ internal static class Scanner
                 return 2;
 
             case ['&', '=', ..]:
-                kind = SyntaxKind.AmpersandEqualToken;
+                kind = SyntaxKind.AmpersandEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -134,7 +134,7 @@ internal static class Scanner
                 return 1;
 
             case ['!', '=', ..]:
-                kind = SyntaxKind.BangEqualToken;
+                kind = SyntaxKind.BangEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -165,19 +165,19 @@ internal static class Scanner
                 return 1;
 
             case ['=', '=', ..]:
-                kind = SyntaxKind.EqualEqualToken;
+                kind = SyntaxKind.EqualsEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
 
             case ['=', ..]:
-                kind = SyntaxKind.EqualToken;
+                kind = SyntaxKind.EqualsToken;
                 range = position..(position + 1);
                 value = null;
                 return 1;
 
             case ['>', '>', '=', ..]:
-                kind = SyntaxKind.GreaterGreaterEqualToken;
+                kind = SyntaxKind.GreaterGreaterEqualsToken;
                 range = position..(position + 3);
                 value = null;
                 return 3;
@@ -189,7 +189,7 @@ internal static class Scanner
                 return 2;
 
             case ['>', '=', ..]:
-                kind = SyntaxKind.GreaterEqualToken;
+                kind = SyntaxKind.GreaterEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -201,7 +201,7 @@ internal static class Scanner
                 return 1;
 
             case ['^', '=', ..]:
-                kind = SyntaxKind.HatEqualToken;
+                kind = SyntaxKind.HatEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -213,7 +213,7 @@ internal static class Scanner
                 return 1;
 
             case ['?', '?', '=', ..]:
-                kind = SyntaxKind.HookHookEqualToken;
+                kind = SyntaxKind.HookHookEqualsToken;
                 range = position..(position + 3);
                 value = null;
                 return 3;
@@ -231,7 +231,7 @@ internal static class Scanner
                 return 1;
 
             case ['<', '<', '=', ..]:
-                kind = SyntaxKind.LessLessEqualToken;
+                kind = SyntaxKind.LessLessEqualsToken;
                 range = position..(position + 3);
                 value = null;
                 return 3;
@@ -243,7 +243,7 @@ internal static class Scanner
                 return 2;
 
             case ['<', '=', ..]:
-                kind = SyntaxKind.LessEqualToken;
+                kind = SyntaxKind.LessEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -267,7 +267,7 @@ internal static class Scanner
                 return 2;
 
             case ['-', '=', ..]:
-                kind = SyntaxKind.MinusEqualToken;
+                kind = SyntaxKind.MinusEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -279,7 +279,7 @@ internal static class Scanner
                 return 1;
 
             case ['%', '=', ..]:
-                kind = SyntaxKind.PercentEqualToken;
+                kind = SyntaxKind.PercentEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -297,7 +297,7 @@ internal static class Scanner
                 return 2;
 
             case ['|', '=', ..]:
-                kind = SyntaxKind.PipeEqualToken;
+                kind = SyntaxKind.PipeEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -315,7 +315,7 @@ internal static class Scanner
                 return 2;
 
             case ['+', '=', ..]:
-                kind = SyntaxKind.PlusEqualToken;
+                kind = SyntaxKind.PlusEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -327,7 +327,7 @@ internal static class Scanner
                 return 1;
 
             case ['/', '=', ..]:
-                kind = SyntaxKind.SlashEqualToken;
+                kind = SyntaxKind.SlashEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -339,7 +339,7 @@ internal static class Scanner
                 return 1;
 
             case ['*', '*', '=', ..]:
-                kind = SyntaxKind.StarStarEqualToken;
+                kind = SyntaxKind.StarStarEqualsToken;
                 range = position..(position + 3);
                 value = null;
                 return 3;
@@ -351,7 +351,7 @@ internal static class Scanner
                 return 2;
 
             case ['*', '=', ..]:
-                kind = SyntaxKind.StarEqualToken;
+                kind = SyntaxKind.StarEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;

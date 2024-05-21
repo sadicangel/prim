@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Parsing;
 using CodeAnalysis.Syntax.Parsing;
 using CodeAnalysis.Text;
 
@@ -51,11 +52,14 @@ public sealed class SyntaxTree
             var tokens = new List<SyntaxToken>(Scanner.Scan(syntaxTree));
             var eof = tokens is [.., var last and { SyntaxKind: SyntaxKind.EofToken }]
                 ? last
-                : SyntaxFactory.GetEofToken(syntaxTree);
+                : SyntaxFactory.EofToken(syntaxTree);
 
             return new CompilationUnitSyntax(syntaxTree, tokens, eof);
         }
 
         return [.. new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>()];
     }
+
+    public static SyntaxTree Parse(SourceText sourceText, bool isScript = false) =>
+        new(sourceText, syntaxTree => Parser.Parse(syntaxTree, isScript));
 }

@@ -1,8 +1,8 @@
 ﻿namespace CodeAnalysis.Syntax;
 public static class SyntaxFactory
 {
-    private static readonly IReadOnlyList<SyntaxTrivia> EmptySyntaxTrivia = [];
+    private static readonly IReadOnlyList<SyntaxTrivia> s_emptySyntaxTrivia = [];
 
-    public static IReadOnlyList<SyntaxTrivia> GetEmptySyntaxTrivia() => EmptySyntaxTrivia;
-    public static SyntaxToken GetEofToken(SyntaxTree syntaxTree) => new(SyntaxKind.EofToken, syntaxTree, new Range(syntaxTree.SourceText.Length, syntaxTree.SourceText.Length), EmptySyntaxTrivia, EmptySyntaxTrivia, "\0");
+    public static IReadOnlyList<SyntaxTrivia> EmptyTrivia() => s_emptySyntaxTrivia;
+    public static SyntaxToken EofToken(SyntaxTree syntaxTree) => new(SyntaxKind.EofToken, syntaxTree, new Range(syntaxTree.SourceText.Length, syntaxTree.SourceText.Length), s_emptySyntaxTrivia, s_emptySyntaxTrivia, "\0");
 }

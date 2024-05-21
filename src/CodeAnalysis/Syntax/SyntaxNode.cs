@@ -13,7 +13,8 @@ public abstract record class SyntaxNode(SyntaxKind SyntaxKind, SyntaxTree Syntax
     public virtual ReadOnlySpan<char> Text => SyntaxTree.SourceText[Range];
     public SourceLocation Location => new(SyntaxTree.SourceText, Range);
 
-    public sealed override string ToString() => $"{SyntaxKind} {SyntaxTree.SourceText[Range]}";
+    public sealed override string ToString() =>
+        SyntaxTree.SourceText[Range] is var sourceText and { Length: > 0 } ? $"{SyntaxKind} {sourceText}" : SyntaxKind.ToString();
 
     public abstract IEnumerable<SyntaxNode> Children();
 }
