@@ -184,7 +184,5 @@ public enum SyntaxKind
     LessThanOrEqualExpression,
     GreaterThanExpression,
     GreaterThanOrEqualExpression,
-    //IsExpression,
-    //AsExpression,
     CoalesceExpression,
 }

@@ -114,6 +114,78 @@ public static class SyntaxFacts
 
             SyntaxKind.CompilationUnit => null,
 
+            SyntaxKind.PredefinedType => null,
+            SyntaxKind.NamedType => null,
+            SyntaxKind.OptionType => null,
+            SyntaxKind.ArrayType => null,
+            SyntaxKind.FunctionType => null,
+            SyntaxKind.UnionType => null,
+            SyntaxKind.Parameter => null,
+            SyntaxKind.ParameterList => null,
+            SyntaxKind.TypeList => null,
+
+            SyntaxKind.IdentifierNameExpression => null,
+
+            SyntaxKind.I32LiteralExpression => null,
+            SyntaxKind.I64LiteralExpression => null,
+            SyntaxKind.F32LiteralExpression => null,
+            SyntaxKind.F64LiteralExpression => null,
+            SyntaxKind.StrLiteralExpression => null,
+            SyntaxKind.TrueLiteralExpression => null,
+            SyntaxKind.FalseLiteralExpression => null,
+            SyntaxKind.NullLiteralExpression => null,
+
+            SyntaxKind.GroupExpression => null,
+            SyntaxKind.SimpleAssignmentExpression => null,
+            SyntaxKind.AddAssignmentExpression => null,
+            SyntaxKind.SubtractAssignmentExpression => null,
+            SyntaxKind.MultiplyAssignmentExpression => null,
+            SyntaxKind.DivideAssignmentExpression => null,
+            SyntaxKind.ModuloAssignmentExpression => null,
+            SyntaxKind.PowerAssignmentExpression => null,
+            SyntaxKind.AndAssignmentExpression => null,
+            SyntaxKind.ExclusiveOrAssignmentExpression => null,
+            SyntaxKind.OrAssignmentExpression => null,
+            SyntaxKind.LeftShiftAssignmentExpression => null,
+            SyntaxKind.RightShiftAssignmentExpression => null,
+            SyntaxKind.CoalesceAssignmentExpression => null,
+
+            SyntaxKind.VariableDeclaration => null,
+            SyntaxKind.FunctionDeclaration => null,
+            SyntaxKind.StructDeclaration => null,
+            SyntaxKind.LocalDeclaration => null,
+
+            SyntaxKind.EmptyExpression => null,
+            SyntaxKind.StatementExpression => null,
+
+            SyntaxKind.UnaryPlusExpression => null,
+            SyntaxKind.UnaryMinusExpression => null,
+            SyntaxKind.PrefixIncrementExpression => null,
+            SyntaxKind.PrefixDecrementExpression => null,
+            SyntaxKind.OnesComplementExpression => null,
+            SyntaxKind.NotExpression => null,
+
+            SyntaxKind.AddExpression => null,
+            SyntaxKind.SubtractExpression => null,
+            SyntaxKind.MultiplyExpression => null,
+            SyntaxKind.DivideExpression => null,
+            SyntaxKind.ModuloExpression => null,
+            SyntaxKind.PowerExpression => null,
+            SyntaxKind.LeftShiftExpression => null,
+            SyntaxKind.RightShiftExpression => null,
+            SyntaxKind.LogicalOrExpression => null,
+            SyntaxKind.LogicalAndExpression => null,
+            SyntaxKind.BitwiseOrExpression => null,
+            SyntaxKind.BitwiseAndExpression => null,
+            SyntaxKind.ExclusiveOrExpression => null,
+            SyntaxKind.EqualsExpression => null,
+            SyntaxKind.NotEqualsExpression => null,
+            SyntaxKind.LessThanExpression => null,
+            SyntaxKind.LessThanOrEqualExpression => null,
+            SyntaxKind.GreaterThanExpression => null,
+            SyntaxKind.GreaterThanOrEqualExpression => null,
+            SyntaxKind.CoalesceExpression => null,
+
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };
     }
@@ -175,6 +247,9 @@ public static class SyntaxFacts
         or SyntaxKind.PipeEqualsToken
         or SyntaxKind.HatEqualsToken
         or SyntaxKind.HookHookEqualsToken;
+
+    public static bool IsKeyword(SyntaxKind syntaxKind) =>
+        syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.F128Keyword;
 
     public static bool IsPredefinedType(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.UnknownKeyword and <= SyntaxKind.F128Keyword;
