@@ -7,7 +7,7 @@ internal static partial class Parser
 {
     private delegate T ParseNode<T>(SyntaxTree syntaxTree, SyntaxTokenIterator iterator);
 
-    public static CompilationUnitSyntax Parse(SyntaxTree syntaxTree, bool isScript)
+    internal static CompilationUnitSyntax Parse(SyntaxTree syntaxTree, bool isScript)
     {
         var tokens = Scanner.Scan(syntaxTree).ToArray();
         if (tokens.Length == 0)

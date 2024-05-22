@@ -13,9 +13,6 @@ public enum SyntaxKind
     F32LiteralToken,
     F64LiteralToken,
     StrLiteralToken,
-    TrueLiteralToken,
-    FalseLiteralToken,
-    NullLiteralToken,
 
     AmpersandToken,
     AmpersandAmpersandToken,
@@ -101,6 +98,10 @@ public enum SyntaxKind
     F64Keyword,
     F80Keyword,
     F128Keyword,
+
+    TrueKeyword,
+    FalseKeyword,
+    NullKeyword,
 
     LineBreakTrivia,
     WhiteSpaceTrivia,

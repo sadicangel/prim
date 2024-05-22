@@ -69,9 +69,6 @@ public static class SyntaxFacts
             SyntaxKind.F32LiteralToken => null,
             SyntaxKind.F64LiteralToken => null,
             SyntaxKind.StrLiteralToken => null,
-            SyntaxKind.TrueLiteralToken => null,
-            SyntaxKind.FalseLiteralToken => null,
-            SyntaxKind.NullLiteralToken => null,
 
             SyntaxKind.IfKeyword => "if",
             SyntaxKind.ElseKeyword => "else",
@@ -105,6 +102,10 @@ public static class SyntaxFacts
             SyntaxKind.F64Keyword => "f64",
             SyntaxKind.F80Keyword => "f80",
             SyntaxKind.F128Keyword => "f128",
+
+            SyntaxKind.TrueKeyword => "true",
+            SyntaxKind.FalseKeyword => "false",
+            SyntaxKind.NullKeyword => "null",
 
             SyntaxKind.LineBreakTrivia => null,
             SyntaxKind.WhiteSpaceTrivia => null,
@@ -229,6 +230,10 @@ public static class SyntaxFacts
             "f80" => SyntaxKind.F80Keyword,
             "f128" => SyntaxKind.F128Keyword,
 
+            "true" => SyntaxKind.TrueKeyword,
+            "false" => SyntaxKind.FalseKeyword,
+            "null" => SyntaxKind.NullKeyword,
+
             _ => SyntaxKind.IdentifierToken,
         };
     }
@@ -253,9 +258,6 @@ public static class SyntaxFacts
 
     public static bool IsPredefinedType(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.UnknownKeyword and <= SyntaxKind.F128Keyword;
-
-    public static bool IsLiteral(SyntaxKind syntaxKind) =>
-        syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.NullLiteralToken;
 
     public static (SyntaxKind Expression, int Precedence) GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
     {

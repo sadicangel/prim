@@ -5,7 +5,7 @@ namespace CodeAnalysis.Syntax.Parsing;
 
 internal static class Scanner
 {
-    public static IEnumerable<SyntaxToken> Scan(SyntaxTree syntaxTree)
+    internal static IEnumerable<SyntaxToken> Scan(SyntaxTree syntaxTree)
     {
         var badTokens = new List<SyntaxToken>();
         var position = 0;
@@ -600,8 +600,8 @@ internal static class Scanner
         kind = SyntaxFacts.GetKeywordKind(text);
         value = kind switch
         {
-            SyntaxKind.TrueLiteralToken => true,
-            SyntaxKind.FalseLiteralToken => false,
+            SyntaxKind.TrueKeyword => true,
+            SyntaxKind.FalseKeyword => false,
             _ => null,
         };
         return read;
