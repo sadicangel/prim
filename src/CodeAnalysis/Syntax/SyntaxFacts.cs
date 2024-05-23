@@ -258,10 +258,13 @@ public static class SyntaxFacts
         or SyntaxKind.HookHookEqualsToken;
 
     public static bool IsKeyword(SyntaxKind syntaxKind) =>
-        syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.F128Keyword;
+        syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.NullKeyword;
 
     public static bool IsPredefinedType(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.UnknownKeyword and <= SyntaxKind.F128Keyword;
+
+    public static bool IsNumberLiteralToken(SyntaxKind syntaxKind) =>
+        syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.F64LiteralToken;
 
     public static (SyntaxKind Expression, int Precedence) GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
     {

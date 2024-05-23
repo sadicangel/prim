@@ -1,7 +1,6 @@
 ﻿namespace CodeAnalysis.Tests.Parsing;
 public partial class ScannerTests
 {
-    public readonly record struct TokenData(SyntaxKind SyntaxKind, string Text);
     private static readonly TokenData[] s_literal_tokens = [
         new(SyntaxKind.IdentifierToken, "a"),
         new(SyntaxKind.IdentifierToken, "_a"),
@@ -60,6 +59,12 @@ public partial class ScannerTests
         new(SyntaxKind.StrLiteralToken, "\"test\""),
         new(SyntaxKind.StrLiteralToken, "\"te\\\"st\""),
     ];
+    private static readonly TokenData[] s_all_tokens = Enum.GetValues<SyntaxKind>()
+        .Select(sk => new TokenData(sk, SyntaxFacts.GetText(sk)!))
+        .Where(td => td.Text is not null).Concat(s_literal_tokens)
+        .ToArray();
+
+    public static TheoryData<TokenData> GetAllTokenInfo() => new(s_all_tokens);
 
     [Theory]
     [MemberData(nameof(GetAllTokenInfo))]
@@ -68,9 +73,4 @@ public partial class ScannerTests
         var token = SyntaxTree.Scan(new SourceText(data.Text))[0];
         Assert.Equal(data.SyntaxKind, token.SyntaxKind);
     }
-
-    public static TheoryData<TokenData> GetAllTokenInfo() => new(Enum.GetValues<SyntaxKind>()
-        .Select(sk => new TokenData(sk, SyntaxFacts.GetText(sk)!))
-        .Where(td => td.Text is not null)
-        .Concat(s_literal_tokens));
 }
