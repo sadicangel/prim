@@ -9,7 +9,9 @@ public enum SyntaxKind
     IdentifierToken,
 
     I32LiteralToken,
+    U32LiteralToken,
     I64LiteralToken,
+    U64LiteralToken,
     F32LiteralToken,
     F64LiteralToken,
     StrLiteralToken,
@@ -118,7 +120,9 @@ public enum SyntaxKind
     IdentifierNameExpression,
 
     I32LiteralExpression,
+    U32LiteralExpression,
     I64LiteralExpression,
+    U64LiteralExpression,
     F32LiteralExpression,
     F64LiteralExpression,
     StrLiteralExpression,

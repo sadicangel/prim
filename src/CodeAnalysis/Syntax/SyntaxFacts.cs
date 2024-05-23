@@ -65,7 +65,9 @@ public static class SyntaxFacts
             SyntaxKind.TildeToken => "~",
 
             SyntaxKind.I32LiteralToken => null,
+            SyntaxKind.U32LiteralToken => null,
             SyntaxKind.I64LiteralToken => null,
+            SyntaxKind.U64LiteralToken => null,
             SyntaxKind.F32LiteralToken => null,
             SyntaxKind.F64LiteralToken => null,
             SyntaxKind.StrLiteralToken => null,
@@ -128,7 +130,9 @@ public static class SyntaxFacts
             SyntaxKind.IdentifierNameExpression => null,
 
             SyntaxKind.I32LiteralExpression => null,
+            SyntaxKind.U32LiteralExpression => null,
             SyntaxKind.I64LiteralExpression => null,
+            SyntaxKind.U64LiteralExpression => null,
             SyntaxKind.F32LiteralExpression => null,
             SyntaxKind.F64LiteralExpression => null,
             SyntaxKind.StrLiteralExpression => null,

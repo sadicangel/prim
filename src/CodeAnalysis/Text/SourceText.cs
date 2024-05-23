@@ -11,7 +11,16 @@ public sealed record class SourceText(string Text, string FilePath)
 
     public IReadOnlyList<SourceLine> Lines { get => _lines ??= ParseLines(Text); }
 
-    public char this[Index index] => index.GetOffset(Text.Length) < 0 || index.GetOffset(Text.Length) >= Text.Length ? '\0' : Text[index];
+    public char this[Index index]
+    {
+        get
+        {
+            var offset = index.GetOffset(Length);
+            if (offset < 0 || offset >= Length)
+                return '\0';
+            return Text[offset];
+        }
+    }
 
     public ReadOnlySpan<char> this[Range range] => Text.AsSpan(range);
 

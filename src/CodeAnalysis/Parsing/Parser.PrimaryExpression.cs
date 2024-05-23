@@ -19,8 +19,12 @@ partial class Parser
                 new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, current, PredefinedTypes.Unit, null),
             SyntaxKind.I32LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.I32LiteralExpression, syntaxTree, current, PredefinedTypes.I32, current.Value),
+            SyntaxKind.U32LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.U32LiteralExpression, syntaxTree, current, PredefinedTypes.U32, current.Value),
             SyntaxKind.I64LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.I64LiteralExpression, syntaxTree, current, PredefinedTypes.I64, current.Value),
+            SyntaxKind.U64LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.U64LiteralExpression, syntaxTree, current, PredefinedTypes.U64, current.Value),
             SyntaxKind.F32LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.F32LiteralExpression, syntaxTree, current, PredefinedTypes.F32, current.Value),
             SyntaxKind.F64LiteralToken =>

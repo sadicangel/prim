@@ -50,7 +50,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 
     // Scanning Errors.
     internal void ReportInvalidCharacter(SourceLocation location, char character) => ReportError(location, DiagnosticMessage.InvalidCharacter(character));
-    internal void ReportInvalidSyntaxValue(SourceLocation location, string text, SyntaxKind kind) => ReportError(location, DiagnosticMessage.InvalidSyntaxValue(text, kind));
+    internal void ReportInvalidSyntaxValue(SourceLocation location, SyntaxKind kind) => ReportError(location, DiagnosticMessage.InvalidSyntaxValue(location.Text.ToString(), kind));
     internal void ReportUnterminatedComment(SourceLocation location) => ReportError(location, DiagnosticMessage.UnterminatedComment());
     internal void ReportUnterminatedString(SourceLocation location) => ReportError(location, DiagnosticMessage.UnterminatedString());
 
