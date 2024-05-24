@@ -12,25 +12,25 @@ partial class Parser
         return current.SyntaxKind switch
         {
             SyntaxKind.TrueKeyword =>
-                new LiteralExpressionSyntax(SyntaxKind.TrueLiteralExpression, syntaxTree, current, PredefinedTypes.Bool, true),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.TrueLiteralExpression, PredefinedTypes.Bool, true),
             SyntaxKind.FalseKeyword =>
-                new LiteralExpressionSyntax(SyntaxKind.FalseLiteralExpression, syntaxTree, current, PredefinedTypes.Bool, false),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.FalseLiteralExpression, PredefinedTypes.Bool, false),
             SyntaxKind.NullKeyword =>
-                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, current, PredefinedTypes.Unit, null),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.NullLiteralExpression, PredefinedTypes.Unit, null),
             SyntaxKind.I32LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.I32LiteralExpression, syntaxTree, current, PredefinedTypes.I32, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.I32LiteralExpression, PredefinedTypes.I32, current.Value),
             SyntaxKind.U32LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.U32LiteralExpression, syntaxTree, current, PredefinedTypes.U32, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.U32LiteralExpression, PredefinedTypes.U32, current.Value),
             SyntaxKind.I64LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.I64LiteralExpression, syntaxTree, current, PredefinedTypes.I64, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.I64LiteralExpression, PredefinedTypes.I64, current.Value),
             SyntaxKind.U64LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.U64LiteralExpression, syntaxTree, current, PredefinedTypes.U64, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.U64LiteralExpression, PredefinedTypes.U64, current.Value),
             SyntaxKind.F32LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.F32LiteralExpression, syntaxTree, current, PredefinedTypes.F32, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.F32LiteralExpression, PredefinedTypes.F32, current.Value),
             SyntaxKind.F64LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.F64LiteralExpression, syntaxTree, current, PredefinedTypes.F64, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.F64LiteralExpression, PredefinedTypes.F64, current.Value),
             SyntaxKind.StrLiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.StrLiteralExpression, syntaxTree, current, PredefinedTypes.Str, current.Value),
+                ParseLiteralExpression(syntaxTree, iterator, SyntaxKind.StrLiteralExpression, PredefinedTypes.Str, current.Value),
             SyntaxKind.ParenthesisOpenToken =>
                 ParseGroupExpression(syntaxTree, iterator),
             _ => next switch

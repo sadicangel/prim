@@ -1,4 +1,6 @@
 ﻿namespace CodeAnalysis.Tests.Parsing;
+
+#if !DEBUG
 public partial class ScannerTests
 {
     public static TheoryData<TokenData, TokenData, TokenData> GetSeparatedTokenPairs()
@@ -30,3 +32,4 @@ public partial class ScannerTests
         }
     }
 }
+#endif

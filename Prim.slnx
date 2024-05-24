@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/SolutionItems/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src\CodeAnalysis\CodeAnalysis.csproj" />
+  <Project Path="src\Repl\Repl.csproj" />
+  <Project Path="tests\CodeAnalysis.Tests\CodeAnalysis.Tests.csproj" />
+</Solution>

@@ -8,7 +8,7 @@ partial class Parser
     {
         return iterator.Peek(2).SyntaxKind switch
         {
-            SyntaxKind.TypeKeyword => ParseStructDeclaration(syntaxTree, iterator),
+            SyntaxKind.TypeKeyword => ParseTypeDeclaration(syntaxTree, iterator),
             SyntaxKind.ParenthesisOpenToken => ParseFunctionDeclaration(syntaxTree, iterator),
             _ => ParseVariableDeclaration(syntaxTree, iterator),
         };

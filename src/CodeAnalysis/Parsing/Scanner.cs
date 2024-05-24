@@ -614,7 +614,7 @@ internal static class Scanner
                     break;
 
                 case ['u' or 'U', 'l' or 'L', ..]:
-                    read++;
+                    read += 2;
                     kind = SyntaxKind.U64LiteralToken;
                     isInvalid = !ulong.TryParse(syntaxTree.SourceText[position..(position + read - 1)], numberStyles, CultureInfo.InvariantCulture, out var u64);
                     value = u64;

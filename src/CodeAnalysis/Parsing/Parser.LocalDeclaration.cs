@@ -8,7 +8,7 @@ partial class Parser
     private static LocalDeclarationSyntax ParseLocalDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
         var declaration = ParseDeclaration(syntaxTree, iterator);
-        if (declaration is StructDeclarationSyntax structDeclaration)
+        if (declaration is TypeDeclarationSyntax structDeclaration)
         {
             syntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
                 new SourceLocation(

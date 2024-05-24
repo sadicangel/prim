@@ -14,7 +14,7 @@ internal static partial class Parser
             return new CompilationUnitSyntax(syntaxTree, [], SyntaxFactory.EofToken(syntaxTree));
 
         ParseNode<ExpressionSyntax> parseExpression = isScript
-            ? static (syntaxTree, iterator) => ParseExpression(syntaxTree, iterator, isTerminated: true)
+            ? static (syntaxTree, iterator) => ParseExpression(syntaxTree, iterator, isTerminated: false)
             : ParseDeclaration;
 
         var iterator = new SyntaxTokenIterator(tokens);

@@ -1,5 +1,5 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class StructDeclarationSyntax(
+public sealed record class TypeDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken,
     SyntaxToken ColonToken,
