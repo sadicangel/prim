@@ -5,7 +5,7 @@ namespace CodeAnalysis.Types;
 
 public sealed record class FunctionType : PrimType
 {
-    public FunctionType(IReadOnlyList<Parameter> parameters, PrimType returnType)
+    public FunctionType(ReadOnlyList<Parameter> parameters, PrimType returnType)
         : base($"({String.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}")
     {
         Parameters = parameters;

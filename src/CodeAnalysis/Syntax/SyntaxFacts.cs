@@ -15,7 +15,6 @@ public static class SyntaxFacts
             SyntaxKind.AmpersandToken => "&",
             SyntaxKind.AmpersandAmpersandToken => "&&",
             SyntaxKind.AmpersandEqualsToken => "&=",
-            SyntaxKind.ArrowToken => "->",
             SyntaxKind.BangToken => "!",
             SyntaxKind.BangEqualsToken => "!=",
             SyntaxKind.BraceOpenToken => "{",
@@ -28,20 +27,20 @@ public static class SyntaxFacts
             SyntaxKind.DotDotToken => "..",
             SyntaxKind.EqualsToken => "=",
             SyntaxKind.EqualsEqualsToken => "==",
-            SyntaxKind.GreaterToken => ">",
-            SyntaxKind.GreaterEqualsToken => ">=",
-            SyntaxKind.GreaterGreaterToken => ">>",
-            SyntaxKind.GreaterGreaterEqualsToken => ">>=",
+            SyntaxKind.MinusGreaterThanToken => "->",
+            SyntaxKind.GreaterThanToken => ">",
+            SyntaxKind.GreaterThanEqualsToken => ">=",
+            SyntaxKind.GreaterThanGreaterThanToken => ">>",
+            SyntaxKind.GreaterThanGreaterThanEqualsToken => ">>=",
             SyntaxKind.HatToken => "^",
             SyntaxKind.HatEqualsToken => "^=",
             SyntaxKind.HookToken => "?",
             SyntaxKind.HookHookToken => "??",
             SyntaxKind.HookHookEqualsToken => "??=",
-            SyntaxKind.LambdaToken => "=>",
-            SyntaxKind.LessToken => "<",
-            SyntaxKind.LessEqualsToken => "<=",
-            SyntaxKind.LessLessToken => "<<",
-            SyntaxKind.LessLessEqualsToken => "<<=",
+            SyntaxKind.LessThanToken => "<",
+            SyntaxKind.LessThanEqualsToken => "<=",
+            SyntaxKind.LessThanLessThanToken => "<<",
+            SyntaxKind.LessThanLessThanEqualsToken => "<<=",
             SyntaxKind.MinusToken => "-",
             SyntaxKind.MinusEqualsToken => "-=",
             SyntaxKind.MinusMinusToken => "--",
@@ -162,6 +161,7 @@ public static class SyntaxFacts
 
             SyntaxKind.EmptyExpression => null,
             SyntaxKind.StatementExpression => null,
+            SyntaxKind.BlockExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,
             SyntaxKind.UnaryMinusExpression => null,
@@ -250,8 +250,8 @@ public static class SyntaxFacts
         or SyntaxKind.SlashEqualsToken
         or SyntaxKind.PercentEqualsToken
         or SyntaxKind.StarStarEqualsToken
-        or SyntaxKind.LessLessEqualsToken
-        or SyntaxKind.GreaterGreaterEqualsToken
+        or SyntaxKind.LessThanLessThanEqualsToken
+        or SyntaxKind.GreaterThanGreaterThanEqualsToken
         or SyntaxKind.AmpersandEqualsToken
         or SyntaxKind.PipeEqualsToken
         or SyntaxKind.HatEqualsToken
@@ -295,15 +295,15 @@ public static class SyntaxFacts
         SyntaxKind.PlusToken => (SyntaxKind.AddExpression, 5),
         SyntaxKind.MinusToken => (SyntaxKind.SubtractExpression, 5),
 
-        SyntaxKind.LessLessToken => (SyntaxKind.LeftShiftExpression, 4),
-        SyntaxKind.GreaterGreaterToken => (SyntaxKind.RightShiftExpression, 4),
+        SyntaxKind.LessThanLessThanToken => (SyntaxKind.LeftShiftExpression, 4),
+        SyntaxKind.GreaterThanGreaterThanToken => (SyntaxKind.RightShiftExpression, 4),
 
         SyntaxKind.EqualsEqualsToken => (SyntaxKind.EqualsExpression, 3),
         SyntaxKind.BangEqualsToken => (SyntaxKind.NotEqualsExpression, 3),
-        SyntaxKind.LessToken => (SyntaxKind.LessThanExpression, 3),
-        SyntaxKind.LessEqualsToken => (SyntaxKind.LessThanOrEqualExpression, 3),
-        SyntaxKind.GreaterToken => (SyntaxKind.GreaterThanExpression, 3),
-        SyntaxKind.GreaterEqualsToken => (SyntaxKind.GreaterThanOrEqualExpression, 3),
+        SyntaxKind.LessThanToken => (SyntaxKind.LessThanExpression, 3),
+        SyntaxKind.LessThanEqualsToken => (SyntaxKind.LessThanOrEqualExpression, 3),
+        SyntaxKind.GreaterThanToken => (SyntaxKind.GreaterThanExpression, 3),
+        SyntaxKind.GreaterThanEqualsToken => (SyntaxKind.GreaterThanOrEqualExpression, 3),
 
         SyntaxKind.AmpersandToken => (SyntaxKind.BitwiseAndExpression, 2),
         SyntaxKind.AmpersandAmpersandToken => (SyntaxKind.LogicalAndExpression, 2),

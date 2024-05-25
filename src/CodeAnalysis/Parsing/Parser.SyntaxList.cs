@@ -3,29 +3,23 @@
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ReadOnlyList<SyntaxNode> ParseSeparatedSyntaxList<TNode>(
+    private static ReadOnlyList<TNode> ParseSyntaxList<TNode>(
         SyntaxTree syntaxTree,
         SyntaxTokenIterator iterator,
-        SyntaxKind separatorKind,
         ReadOnlySpan<SyntaxKind> endingKinds,
         ParseNode<TNode> parseNode)
         where TNode : SyntaxNode
     {
-        var nodes = new ReadOnlyList<SyntaxNode>();
+        var nodes = new ReadOnlyList<TNode>();
 
         var parseNext = true;
         while (parseNext && !endingKinds.Contains(iterator.Current.SyntaxKind))
         {
             var node = parseNode(syntaxTree, iterator);
             nodes.Add(node);
-
-            if (iterator.TryMatch(separatorKind, out var separatorToken))
-                nodes.Add(separatorToken);
-            else
-                parseNext = false;
         }
 
-        return nodes;
+        return new(nodes);
     }
 }
 

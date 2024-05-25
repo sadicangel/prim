@@ -41,7 +41,7 @@ partial class Parser
         {
             return iterator.Current.SyntaxKind switch
             {
-                SyntaxKind.IdentifierToken when SyntaxFacts.IsPredefinedType(iterator.Current.SyntaxKind) =>
+                >= SyntaxKind.UnknownKeyword and <= SyntaxKind.F128Keyword =>
                     ParsePredefinedType(syntaxTree, iterator),
                 SyntaxKind.IdentifierToken =>
                     ParseNamedType(syntaxTree, iterator),
@@ -57,8 +57,8 @@ partial class Parser
 
             static PredefinedTypeSyntax ParsePredefinedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
             {
-                var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
-                return new PredefinedTypeSyntax(syntaxTree, identifierToken);
+                var predefinedType = iterator.Next();
+                return new PredefinedTypeSyntax(syntaxTree, predefinedType);
             }
 
             static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
@@ -102,7 +102,7 @@ partial class Parser
                             return new ParameterSyntax(syntaxTree, identifierToken, colonToken, type);
                         }));
                 var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-                var arrowToken = iterator.Match(SyntaxKind.ArrowToken);
+                var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
                 var returnType = ParseTypeSingle(syntaxTree, iterator);
                 return new FunctionTypeSyntax(syntaxTree, parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
             }

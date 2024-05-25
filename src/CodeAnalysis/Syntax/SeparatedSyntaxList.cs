@@ -2,7 +2,7 @@
 public abstract record class SeparatedSyntaxList<T>(
     SyntaxKind SyntaxKind,
     SyntaxTree SyntaxTree,
-    IReadOnlyList<SyntaxNode> SyntaxNodes)
+    ReadOnlyList<SyntaxNode> SyntaxNodes)
     : SyntaxNode(SyntaxKind, SyntaxTree), IReadOnlyList<T> where T : SyntaxNode
 {
     public int Count { get => (SyntaxNodes.Count + 1) / 2; }

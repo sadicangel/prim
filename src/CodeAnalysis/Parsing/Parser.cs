@@ -19,7 +19,7 @@ internal static partial class Parser
 
         var iterator = new SyntaxTokenIterator(tokens);
 
-        var expressions = new List<ExpressionSyntax>();
+        var expressions = new ReadOnlyList<SyntaxNode>();
 
         while (iterator.Current.SyntaxKind is not SyntaxKind.EofToken)
         {

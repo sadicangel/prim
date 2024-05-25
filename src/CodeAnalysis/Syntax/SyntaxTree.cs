@@ -45,7 +45,7 @@ public sealed class SyntaxTree
         }
     }
 
-    public static IReadOnlyList<SyntaxToken> Scan(SourceText sourceText)
+    public static ReadOnlyList<SyntaxToken> Scan(SourceText sourceText)
     {
         static CompilationUnitSyntax Parse(SyntaxTree syntaxTree)
         {
@@ -54,10 +54,10 @@ public sealed class SyntaxTree
                 ? last
                 : SyntaxFactory.EofToken(syntaxTree);
 
-            return new CompilationUnitSyntax(syntaxTree, tokens, eof);
+            return new CompilationUnitSyntax(syntaxTree, new(tokens), eof);
         }
 
-        return [.. new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>()];
+        return new(new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>());
     }
 
     public static SyntaxTree ParseScript(SourceText sourceText) =>

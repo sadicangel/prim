@@ -33,11 +33,11 @@ internal static class PredefinedSymbols
     public static readonly Symbol PrintLn = new(PredefinedSymbolNames.PrintLn, new FunctionType([new Parameter("obj", PredefinedTypes.Any)], PredefinedTypes.Unit));
     public static readonly Symbol ScanLn = new(PredefinedSymbolNames.ScanLn, new FunctionType([], PredefinedTypes.Str));
 
-    public static IReadOnlyList<Symbol> All { get; } = typeof(PredefinedSymbols)
+    public static ReadOnlyList<Symbol> All { get; } = new(typeof(PredefinedSymbols)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
         .Where(f => f.FieldType == typeof(Symbol))
         .Select(f => (Symbol)f.GetValue(null)!)
-        .ToArray();
+        .ToArray());
 
     private static Symbol FromPredefinedType(PredefinedType type) => new(type.Name, new TypeType(type));
 }
@@ -72,9 +72,9 @@ internal static class PredefinedSymbolNames
     public const string PrintLn = "println";
     public const string ScanLn = "scanln";
 
-    public static IReadOnlyList<string> All { get; } = typeof(PredefinedSymbolNames)
+    public static ReadOnlyList<string> All { get; } = new(typeof(PredefinedSymbolNames)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
         .Where(f => f.IsLiteral && f.IsInitOnly)
         .Select(f => (string)f.GetValue(null)!)
-        .ToArray();
+        .ToArray());
 }

@@ -8,7 +8,7 @@ partial class Parser
     {
         return iterator.Current.SyntaxKind switch
         {
-            //SyntaxKind.BraceOpenToken => ParseBlockExpression(syntaxTree, iterator),
+            SyntaxKind.BraceOpenToken => ParseBlockExpression(syntaxTree, iterator),
             //SyntaxKind.IfKeyword => ParseIfElseExpression(syntaxTree, iterator),
             //SyntaxKind.ForKeyword => ParseForExpression(syntaxTree, iterator),
             //SyntaxKind.WhileKeyword => ParseWhileExpression(syntaxTree, iterator),

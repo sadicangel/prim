@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Text;
 public sealed record class SourceText(string Text, string FilePath)
 {
-    private IReadOnlyList<SourceLine>? _lines;
+    private ReadOnlyList<SourceLine>? _lines;
 
     public SourceText(string text) : this(text, string.Empty) { }
 
@@ -9,7 +9,7 @@ public sealed record class SourceText(string Text, string FilePath)
 
     public int Length { get => Text.Length; }
 
-    public IReadOnlyList<SourceLine> Lines { get => _lines ??= ParseLines(Text); }
+    public ReadOnlyList<SourceLine> Lines { get => _lines ??= ParseLines(Text); }
 
     public char this[Index index]
     {
@@ -48,7 +48,7 @@ public sealed record class SourceText(string Text, string FilePath)
 
     public override string ToString() => Text;
 
-    private List<SourceLine> ParseLines(ReadOnlySpan<char> text)
+    private ReadOnlyList<SourceLine> ParseLines(ReadOnlySpan<char> text)
     {
         var lines = new List<SourceLine>();
 
@@ -78,6 +78,6 @@ public sealed record class SourceText(string Text, string FilePath)
         if (position >= lineStart)
             lines.Add(new SourceLine(this, lineStart..position, lineStart..position));
 
-        return lines;
+        return new(lines);
     }
 }

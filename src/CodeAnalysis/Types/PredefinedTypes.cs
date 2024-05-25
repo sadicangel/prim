@@ -1,6 +1,6 @@
-﻿using CodeAnalysis.Operators;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
+using CodeAnalysis.Operators;
 
 namespace CodeAnalysis.Types;
 internal static class PredefinedTypes
@@ -147,11 +147,11 @@ internal static class PredefinedTypes
         U128.AddImplicitConversionOperators(USize);
     }
 
-    public static IReadOnlyList<PredefinedType> All { get; } = typeof(PredefinedTypes)
+    public static ReadOnlyList<PredefinedType> All { get; } = new(typeof(PredefinedTypes)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
         .Where(f => f.FieldType == typeof(PredefinedType))
         .Select(f => (PredefinedType)f.GetValue(null)!)
-        .ToArray();
+        .ToArray());
 
     public static PredefinedType GetByName(ReadOnlySpan<char> typeName)
     {

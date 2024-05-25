@@ -1,15 +1,16 @@
-﻿using CodeAnalysis.Syntax;
+﻿using System.Diagnostics;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using System.Diagnostics;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
     private static AssignmentExpressionSyntax ParseAssignmentExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
-        var left = ParseExpression(syntaxTree, iterator, isTerminated: false);
+        // TODO: Allow more expressions here.
+        var left = ParseIdentifierNameExpression(syntaxTree, iterator);
         var operatorToken = iterator.Next();
-        var syntaxKind = iterator.Current.SyntaxKind switch
+        var syntaxKind = operatorToken.SyntaxKind switch
         {
             SyntaxKind.EqualsToken => SyntaxKind.SimpleAssignmentExpression,
             SyntaxKind.PlusEqualsToken => SyntaxKind.AddAssignmentExpression,
@@ -18,8 +19,8 @@ partial class Parser
             SyntaxKind.SlashEqualsToken => SyntaxKind.DivideAssignmentExpression,
             SyntaxKind.PercentEqualsToken => SyntaxKind.ModuloAssignmentExpression,
             SyntaxKind.StarStarEqualsToken => SyntaxKind.PowerAssignmentExpression,
-            SyntaxKind.LessLessEqualsToken => SyntaxKind.LeftShiftAssignmentExpression,
-            SyntaxKind.GreaterGreaterEqualsToken => SyntaxKind.RightShiftAssignmentExpression,
+            SyntaxKind.LessThanLessThanEqualsToken => SyntaxKind.LeftShiftAssignmentExpression,
+            SyntaxKind.GreaterThanGreaterThanEqualsToken => SyntaxKind.RightShiftAssignmentExpression,
             SyntaxKind.AmpersandEqualsToken => SyntaxKind.AndAssignmentExpression,
             SyntaxKind.PipeEqualsToken => SyntaxKind.OrAssignmentExpression,
             SyntaxKind.HatEqualsToken => SyntaxKind.ExclusiveOrAssignmentExpression,

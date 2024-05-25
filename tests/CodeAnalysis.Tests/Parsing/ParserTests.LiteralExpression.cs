@@ -7,6 +7,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("true"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.TrueLiteralExpression, node.SyntaxKind);
     }
 
@@ -15,6 +16,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("false"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.FalseLiteralExpression, node.SyntaxKind);
     }
 
@@ -23,6 +25,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("null"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.NullLiteralExpression, node.SyntaxKind);
     }
 
@@ -31,6 +34,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("42"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.I32LiteralExpression, node.SyntaxKind);
     }
 
@@ -39,6 +43,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("42U"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.U32LiteralExpression, node.SyntaxKind);
     }
 
@@ -47,6 +52,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("42L"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.I64LiteralExpression, node.SyntaxKind);
     }
 
@@ -55,6 +61,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("42UL"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.U64LiteralExpression, node.SyntaxKind);
     }
 
@@ -63,6 +70,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("4.2f"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.F32LiteralExpression, node.SyntaxKind);
     }
 
@@ -71,6 +79,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("4.2"));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.F64LiteralExpression, node.SyntaxKind);
     }
 
@@ -79,6 +88,7 @@ public partial class ParserTests
     {
         var unit = SyntaxTree.ParseScript(new SourceText("\"str\""));
         var node = Assert.Single(unit.Root.SyntaxNodes);
+        Assert.Empty(unit.Diagnostics);
         Assert.Equal(SyntaxKind.StrLiteralExpression, node.SyntaxKind);
     }
 

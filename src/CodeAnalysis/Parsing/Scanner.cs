@@ -1,6 +1,6 @@
-﻿using CodeAnalysis.Text;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
+using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax.Parsing;
 
@@ -146,12 +146,6 @@ internal static class Scanner
                 value = null;
                 return 1;
 
-            case ['=', '>', ..]:
-                kind = SyntaxKind.LambdaToken;
-                range = position..(position + 2);
-                value = null;
-                return 2;
-
             case ['.', '.', ..]:
                 kind = SyntaxKind.DotDotToken;
                 range = position..(position + 2);
@@ -178,25 +172,25 @@ internal static class Scanner
                 return 1;
 
             case ['>', '>', '=', ..]:
-                kind = SyntaxKind.GreaterGreaterEqualsToken;
+                kind = SyntaxKind.GreaterThanGreaterThanEqualsToken;
                 range = position..(position + 3);
                 value = null;
                 return 3;
 
             case ['>', '>', ..]:
-                kind = SyntaxKind.GreaterGreaterToken;
+                kind = SyntaxKind.GreaterThanGreaterThanToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
 
             case ['>', '=', ..]:
-                kind = SyntaxKind.GreaterEqualsToken;
+                kind = SyntaxKind.GreaterThanEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
 
             case ['>', ..]:
-                kind = SyntaxKind.GreaterToken;
+                kind = SyntaxKind.GreaterThanToken;
                 range = position..(position + 1);
                 value = null;
                 return 1;
@@ -232,31 +226,31 @@ internal static class Scanner
                 return 1;
 
             case ['<', '<', '=', ..]:
-                kind = SyntaxKind.LessLessEqualsToken;
+                kind = SyntaxKind.LessThanLessThanEqualsToken;
                 range = position..(position + 3);
                 value = null;
                 return 3;
 
             case ['<', '<', ..]:
-                kind = SyntaxKind.LessLessToken;
+                kind = SyntaxKind.LessThanLessThanToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
 
             case ['<', '=', ..]:
-                kind = SyntaxKind.LessEqualsToken;
+                kind = SyntaxKind.LessThanEqualsToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
 
             case ['<', ..]:
-                kind = SyntaxKind.LessToken;
+                kind = SyntaxKind.LessThanToken;
                 range = position..(position + 1);
                 value = null;
                 return 1;
 
             case ['-', '>', ..]:
-                kind = SyntaxKind.ArrowToken;
+                kind = SyntaxKind.MinusGreaterThanToken;
                 range = position..(position + 2);
                 value = null;
                 return 2;
@@ -399,7 +393,7 @@ internal static class Scanner
         }
     }
 
-    private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out List<SyntaxTrivia> trivia)
+    private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out ReadOnlyList<SyntaxTrivia> trivia)
     {
         trivia = [];
         var totalScan = 0;
@@ -616,7 +610,7 @@ internal static class Scanner
                 case ['u' or 'U', 'l' or 'L', ..]:
                     read += 2;
                     kind = SyntaxKind.U64LiteralToken;
-                    isInvalid = !ulong.TryParse(syntaxTree.SourceText[position..(position + read - 1)], numberStyles, CultureInfo.InvariantCulture, out var u64);
+                    isInvalid = !ulong.TryParse(syntaxTree.SourceText[position..(position + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var u64);
                     value = u64;
                     break;
 
