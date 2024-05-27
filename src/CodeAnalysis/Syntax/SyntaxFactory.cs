@@ -1,9 +1,9 @@
 ﻿namespace CodeAnalysis.Syntax;
 public static class SyntaxFactory
 {
-    private static readonly ReadOnlyList<SyntaxTrivia> s_emptySyntaxTrivia = [];
+    private static readonly SyntaxList<SyntaxTrivia> s_emptySyntaxTrivia = [];
 
-    public static ReadOnlyList<SyntaxTrivia> EmptyTrivia() =>
+    public static SyntaxList<SyntaxTrivia> EmptyTrivia() =>
         s_emptySyntaxTrivia;
 
     public static SyntaxToken EofToken(SyntaxTree syntaxTree) =>

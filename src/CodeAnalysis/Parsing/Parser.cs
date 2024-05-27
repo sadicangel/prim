@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Parsing;
 namespace CodeAnalysis.Parsing;
 internal static partial class Parser
 {
-    private delegate T ParseNode<T>(SyntaxTree syntaxTree, SyntaxTokenIterator iterator);
+    private delegate T ParseNode<out T>(SyntaxTree syntaxTree, SyntaxTokenIterator iterator) where T : SyntaxNode;
 
     internal static CompilationUnitSyntax Parse(SyntaxTree syntaxTree, bool isScript)
     {
@@ -19,19 +19,7 @@ internal static partial class Parser
 
         var iterator = new SyntaxTokenIterator(tokens);
 
-        var expressions = new ReadOnlyList<SyntaxNode>();
-
-        while (iterator.Current.SyntaxKind is not SyntaxKind.EofToken)
-        {
-            var start = iterator.Current;
-
-            expressions.Add(parseExpression(syntaxTree, iterator));
-
-            // No tokens consumed. Skip the current token to avoid infinite loop.
-            // No need to report any extra error as parse methods already failed.
-            if (iterator.Current == start)
-                _ = iterator.Next();
-        }
+        var expressions = ParseSyntaxList<SyntaxNode>(syntaxTree, iterator, [SyntaxKind.EofToken], parseExpression);
 
         var eofToken = iterator.Match(SyntaxKind.EofToken);
 

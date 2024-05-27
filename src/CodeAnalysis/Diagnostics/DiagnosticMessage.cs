@@ -14,6 +14,7 @@ internal static class DiagnosticMessage
 
     // Parsing error messages.
     public static string ExpectedTypeDefinition() => $"Expected type definition";
+    public static string InvalidLocationForFunctionDefinition() => $"Invalid location for function definition";
     public static string InvalidLocationForTypeDefinition() => $"Invalid location for type definition";
     public static string UnexpectedToken(SyntaxKind expected, SyntaxKind actual) => $"Unexpected token '{SyntaxFacts.GetDisplayText(actual)}'. Expected '{SyntaxFacts.GetDisplayText(expected)}'";
 

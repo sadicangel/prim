@@ -45,19 +45,20 @@ public sealed class SyntaxTree
         }
     }
 
-    public static ReadOnlyList<SyntaxToken> Scan(SourceText sourceText)
+    public static SyntaxList<SyntaxToken> Scan(SourceText sourceText)
     {
         static CompilationUnitSyntax Parse(SyntaxTree syntaxTree)
         {
-            var tokens = new List<SyntaxToken>(Scanner.Scan(syntaxTree));
-            var eof = tokens is [.., var last and { SyntaxKind: SyntaxKind.EofToken }]
+            var tokens = new SyntaxList<SyntaxNode>.Builder();
+            tokens.AddRange(Scanner.Scan(syntaxTree));
+            var eof = tokens is [.., SyntaxToken last and { SyntaxKind: SyntaxKind.EofToken }]
                 ? last
                 : SyntaxFactory.EofToken(syntaxTree);
 
-            return new CompilationUnitSyntax(syntaxTree, new(tokens), eof);
+            return new CompilationUnitSyntax(syntaxTree, tokens.ToSyntaxList(), eof);
         }
 
-        return new(new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>());
+        return new SyntaxList<SyntaxToken>([.. new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>()]);
     }
 
     public static SyntaxTree ParseScript(SourceText sourceText) =>

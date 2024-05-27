@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax;
 public sealed record class CompilationUnitSyntax(
     SyntaxTree SyntaxTree,
-    ReadOnlyList<SyntaxNode> SyntaxNodes,
+    SyntaxList<SyntaxNode> SyntaxNodes,
     SyntaxToken EofToken
     ) : SyntaxNode(SyntaxKind.CompilationUnit, SyntaxTree)
 {

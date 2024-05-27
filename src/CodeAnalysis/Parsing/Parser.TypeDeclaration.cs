@@ -10,7 +10,13 @@ partial class Parser
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var typeToken = iterator.Match(SyntaxKind.TypeKeyword);
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
-        var expression = ParseExpression(syntaxTree, iterator, isTerminated: true);
+        var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
+        var members = ParseSyntaxList(
+            syntaxTree,
+            iterator,
+            [SyntaxKind.BraceCloseToken, SyntaxKind.EofToken],
+            ParseMemberDeclaration);
+        var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
         return new TypeDeclarationSyntax(
             syntaxTree,
@@ -18,6 +24,8 @@ partial class Parser
             colonToken,
             typeToken,
             operatorToken,
-            expression);
+            braceOpenToken,
+            members,
+            braceCloseToken);
     }
 }

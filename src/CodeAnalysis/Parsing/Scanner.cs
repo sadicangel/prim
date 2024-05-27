@@ -24,10 +24,10 @@ internal static class Scanner
             {
                 token = token with
                 {
-                    LeadingTrivia = [
+                    LeadingTrivia = new([
                         ..badTokens.SelectMany(ToInvalidTextTrivia),
                         ..token.LeadingTrivia
-                    ]
+                    ])
                 };
                 badTokens.Clear();
 
@@ -393,9 +393,9 @@ internal static class Scanner
         }
     }
 
-    private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out ReadOnlyList<SyntaxTrivia> trivia)
+    private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out SyntaxList<SyntaxTrivia> trivia)
     {
-        trivia = [];
+        var builder = new SyntaxList<SyntaxTrivia>.Builder();
         var totalScan = 0;
         while (true)
         {
@@ -416,11 +416,12 @@ internal static class Scanner
             totalScan += read;
 
             if (read > 0)
-                trivia.Add(item);
+                builder.Add(item);
 
             if (item.SyntaxKind == SyntaxKind.LineBreakTrivia && !leading)
                 break;
         }
+        trivia = builder.IsDefault ? SyntaxFactory.EmptyTrivia() : builder.ToSyntaxList();
         return totalScan;
     }
 

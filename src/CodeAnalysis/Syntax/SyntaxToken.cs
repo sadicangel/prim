@@ -3,8 +3,8 @@ public sealed record class SyntaxToken(
     SyntaxKind SyntaxKind,
     SyntaxTree SyntaxTree,
     Range Range,
-    ReadOnlyList<SyntaxTrivia> LeadingTrivia,
-    ReadOnlyList<SyntaxTrivia> TrailingTrivia,
+    SyntaxList<SyntaxTrivia> LeadingTrivia,
+    SyntaxList<SyntaxTrivia> TrailingTrivia,
     object? Value)
     : SyntaxNode(SyntaxKind, SyntaxTree)
 {

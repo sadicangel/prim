@@ -3,23 +3,28 @@
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ReadOnlyList<TNode> ParseSyntaxList<TNode>(
+    private static SyntaxList<TNode> ParseSyntaxList<TNode>(
         SyntaxTree syntaxTree,
         SyntaxTokenIterator iterator,
         ReadOnlySpan<SyntaxKind> endingKinds,
         ParseNode<TNode> parseNode)
         where TNode : SyntaxNode
     {
-        var nodes = new ReadOnlyList<TNode>();
+        var nodes = new SyntaxList<TNode>.Builder();
 
-        var parseNext = true;
-        while (parseNext && !endingKinds.Contains(iterator.Current.SyntaxKind))
+        while (!endingKinds.Contains(iterator.Current.SyntaxKind))
         {
-            var node = parseNode(syntaxTree, iterator);
-            nodes.Add(node);
+            var start = iterator.Current;
+
+            nodes.Add(parseNode(syntaxTree, iterator));
+
+            // No tokens consumed. Skip the current token to avoid infinite loop.
+            // No need to report any extra error as parse methods already failed.
+            if (iterator.Current == start)
+                _ = iterator.Next();
         }
 
-        return new(nodes);
+        return nodes.ToSyntaxList();
     }
 }
 

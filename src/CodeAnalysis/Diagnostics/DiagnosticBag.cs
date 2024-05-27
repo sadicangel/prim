@@ -1,8 +1,8 @@
-﻿using CodeAnalysis.Syntax;
+﻿using System.Collections;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using CodeAnalysis.Types;
 using CodeAnalysis.Types.Metadata;
-using System.Collections;
 
 namespace CodeAnalysis.Diagnostics;
 
@@ -56,6 +56,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 
     // Parsing Errors.
     internal void ReportExpectedTypeDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.ExpectedTypeDefinition());
+    internal void ReportInvalidLocationForFunctionDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidLocationForFunctionDefinition());
     internal void ReportInvalidLocationForTypeDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidLocationForTypeDefinition());
     internal void ReportUnexpectedToken(SyntaxKind expected, SyntaxToken actual) => ReportError(actual.Location, DiagnosticMessage.UnexpectedToken(expected, actual.SyntaxKind));
 

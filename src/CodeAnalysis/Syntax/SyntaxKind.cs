@@ -157,6 +157,7 @@ public enum SyntaxKind
     VariableDeclaration,
     FunctionDeclaration,
     StructDeclaration,
+    MemberDeclaration,
     LocalDeclaration,
 
     EmptyExpression,

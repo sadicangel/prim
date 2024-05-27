@@ -1,7 +1,10 @@
 ﻿using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace CodeAnalysis;
-public sealed class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>, IEquatable<ReadOnlyList<T>>
+
+[CollectionBuilder(typeof(ReadOnlyListBuilder), nameof(ReadOnlyListBuilder.Create))]
+public sealed class ReadOnlyList<T> : IReadOnlyList<T>, IEquatable<ReadOnlyList<T>>
 {
     private readonly List<T> _values;
 
@@ -9,23 +12,17 @@ public sealed class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>, IEquatable<Rea
 
     public ReadOnlyList(int capacity) => _values = new(capacity);
 
+    public ReadOnlyList(List<T> values) => _values = values;
+
     public ReadOnlyList(IEnumerable<T> collection) => _values = new(collection);
 
-    public T this[int index] { get => _values[index]; set => _values[index] = value; }
+    public T this[int index] { get => _values[index]; }
 
     public int Count => _values.Count;
 
-    bool ICollection<T>.IsReadOnly => ((ICollection<T>)_values).IsReadOnly;
-
-    public void Add(T item) => _values.Add(item);
-
-    public void Clear() => _values.Clear();
-
     public bool Contains(T item) => _values.Contains(item);
 
-    public void CopyTo(T[] array, int arrayIndex) => _values.CopyTo(array, arrayIndex);
-
-    public bool Equals(ReadOnlyList<T>? other) => other is not null && this.SequenceEqual(other);
+    public bool Equals(ReadOnlyList<T>? other) => other is not null && (ReferenceEquals(this, other) || this.SequenceEqual(other));
 
     public override bool Equals(object? obj) => Equals(obj as ReadOnlyList<T>);
 
@@ -35,11 +32,15 @@ public sealed class ReadOnlyList<T> : IList<T>, IReadOnlyList<T>, IEquatable<Rea
 
     public int IndexOf(T item) => _values.IndexOf(item);
 
-    public void Insert(int index, T item) => _values.Insert(index, item);
-
-    public bool Remove(T item) => _values.Remove(item);
-
-    public void RemoveAt(int index) => _values.RemoveAt(index);
-
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_values).GetEnumerator();
+}
+
+public static class ReadOnlyListBuilder
+{
+    public static ReadOnlyList<T> Create<T>(ReadOnlySpan<T> values)
+    {
+        var list = new List<T>(values.Length);
+        list.AddRange(values);
+        return new ReadOnlyList<T>([.. list]);
+    }
 }

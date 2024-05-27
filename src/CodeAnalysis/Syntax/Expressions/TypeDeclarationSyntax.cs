@@ -5,7 +5,9 @@ public sealed record class TypeDeclarationSyntax(
     SyntaxToken ColonToken,
     SyntaxToken TypeToken,
     SyntaxToken OperatorToken,
-    ExpressionSyntax Expression)
+    SyntaxToken BraceOpenToken,
+    SyntaxList<MemberDeclarationSyntax> Members,
+    SyntaxToken BraceCloseToken)
     : DeclarationSyntax(SyntaxKind.StructDeclaration, SyntaxTree)
 {
     public bool IsMutable { get => OperatorToken.SyntaxKind is SyntaxKind.EqualsToken; }
@@ -16,6 +18,9 @@ public sealed record class TypeDeclarationSyntax(
         yield return ColonToken;
         yield return TypeToken;
         yield return OperatorToken;
-        yield return Expression;
+        yield return BraceOpenToken;
+        foreach (var member in Members)
+            yield return member;
+        yield return BraceCloseToken;
     }
 }

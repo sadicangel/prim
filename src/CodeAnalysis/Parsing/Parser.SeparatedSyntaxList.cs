@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ReadOnlyList<SyntaxNode> ParseSeparatedSyntaxList<TNode>(
+    private static SyntaxList<SyntaxNode> ParseSeparatedSyntaxList<TNode>(
         SyntaxTree syntaxTree,
         SyntaxTokenIterator iterator,
         SyntaxKind separatorKind,
@@ -11,11 +11,13 @@ partial class Parser
         ParseNode<TNode> parseNode)
         where TNode : SyntaxNode
     {
-        var nodes = new ReadOnlyList<SyntaxNode>();
+        var nodes = new SyntaxList<SyntaxNode>.Builder();
 
         var parseNext = true;
         while (parseNext && !endingKinds.Contains(iterator.Current.SyntaxKind))
         {
+            var start = iterator.Current;
+
             var node = parseNode(syntaxTree, iterator);
             nodes.Add(node);
 
@@ -23,9 +25,14 @@ partial class Parser
                 nodes.Add(separatorToken);
             else
                 parseNext = false;
+
+            // No tokens consumed. Skip the current token to avoid infinite loop.
+            // No need to report any extra error as parse methods already failed.
+            if (iterator.Current == start)
+                _ = iterator.Next();
         }
 
-        return nodes;
+        return nodes.ToSyntaxList();
     }
 }
 

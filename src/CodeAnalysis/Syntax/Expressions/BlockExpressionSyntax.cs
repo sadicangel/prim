@@ -1,9 +1,8 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class BlockExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken BraceOpenToken,
-    ReadOnlyList<ExpressionSyntax> Expressions,
+    SyntaxList<ExpressionSyntax> Expressions,
     SyntaxToken BraceCloseToken)
     : ExpressionSyntax(SyntaxKind.BlockExpression, SyntaxTree)
 {
