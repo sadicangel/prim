@@ -165,6 +165,7 @@ public static class SyntaxFacts
             SyntaxKind.EmptyExpression => null,
             SyntaxKind.StatementExpression => null,
             SyntaxKind.BlockExpression => null,
+            SyntaxKind.ArrayExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,
             SyntaxKind.UnaryMinusExpression => null,

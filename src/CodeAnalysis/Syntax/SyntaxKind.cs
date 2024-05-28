@@ -165,6 +165,7 @@ public enum SyntaxKind
     EmptyExpression,
     StatementExpression,
     BlockExpression,
+    ArrayExpression,
 
     UnaryPlusExpression,
     UnaryMinusExpression,
