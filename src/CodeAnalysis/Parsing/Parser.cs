@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Syntax.Parsing;
 
 namespace CodeAnalysis.Parsing;
@@ -7,19 +6,21 @@ internal static partial class Parser
 {
     private delegate T ParseNode<out T>(SyntaxTree syntaxTree, SyntaxTokenIterator iterator) where T : SyntaxNode;
 
-    internal static CompilationUnitSyntax Parse(SyntaxTree syntaxTree, bool isScript)
+    internal static CompilationUnitSyntax Parse(SyntaxTree syntaxTree) =>
+        ParseCompilationUnit(syntaxTree, ParseDeclaration);
+
+    internal static CompilationUnitSyntax ParseScript(SyntaxTree syntaxTree) =>
+        ParseCompilationUnit(syntaxTree, static (syntaxTree, iterator) => ParseExpression(syntaxTree, iterator, isTerminated: false));
+
+    private static CompilationUnitSyntax ParseCompilationUnit(SyntaxTree syntaxTree, ParseNode<SyntaxNode> parseNode)
     {
         var tokens = Scanner.Scan(syntaxTree).ToArray();
         if (tokens.Length == 0)
             return new CompilationUnitSyntax(syntaxTree, [], SyntaxFactory.EofToken(syntaxTree));
 
-        ParseNode<ExpressionSyntax> parseExpression = isScript
-            ? static (syntaxTree, iterator) => ParseExpression(syntaxTree, iterator, isTerminated: false)
-            : ParseDeclaration;
-
         var iterator = new SyntaxTokenIterator(tokens);
 
-        var expressions = ParseSyntaxList<SyntaxNode>(syntaxTree, iterator, [SyntaxKind.EofToken], parseExpression);
+        var expressions = ParseSyntaxList(syntaxTree, iterator, [SyntaxKind.EofToken], parseNode);
 
         var eofToken = iterator.Match(SyntaxKind.EofToken);
 

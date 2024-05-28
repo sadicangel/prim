@@ -74,8 +74,8 @@ public enum SyntaxKind
     ContinueKeyword,
     BreakKeyword,
     ReturnKeyword,
-    AnyKeyword,
 
+    AnyKeyword,
     UnknownKeyword,
     NeverKeyword,
     UnitKeyword,
@@ -99,6 +99,8 @@ public enum SyntaxKind
     F64Keyword,
     F80Keyword,
     F128Keyword,
+
+    StructKeyword,
 
     TrueKeyword,
     FalseKeyword,

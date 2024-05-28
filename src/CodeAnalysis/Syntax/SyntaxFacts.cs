@@ -104,6 +104,8 @@ public static class SyntaxFacts
             SyntaxKind.F80Keyword => "f80",
             SyntaxKind.F128Keyword => "f128",
 
+            SyntaxKind.StructKeyword => "struct",
+
             SyntaxKind.TrueKeyword => "true",
             SyntaxKind.FalseKeyword => "false",
             SyntaxKind.NullKeyword => "null",
@@ -235,6 +237,8 @@ public static class SyntaxFacts
             "f80" => SyntaxKind.F80Keyword,
             "f128" => SyntaxKind.F128Keyword,
 
+            "struct" => SyntaxKind.StructKeyword,
+
             "true" => SyntaxKind.TrueKeyword,
             "false" => SyntaxKind.FalseKeyword,
             "null" => SyntaxKind.NullKeyword,
@@ -262,7 +266,7 @@ public static class SyntaxFacts
         syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.NullKeyword;
 
     public static bool IsPredefinedType(SyntaxKind syntaxKind) =>
-        syntaxKind is >= SyntaxKind.UnknownKeyword and <= SyntaxKind.F128Keyword;
+        syntaxKind is >= SyntaxKind.AnyKeyword and <= SyntaxKind.F128Keyword;
 
     public static bool IsNumberLiteralToken(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.F64LiteralToken;

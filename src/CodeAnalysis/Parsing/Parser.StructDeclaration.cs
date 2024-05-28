@@ -4,11 +4,11 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static TypeDeclarationSyntax ParseTypeDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static StructDeclarationSyntax ParseStructDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
-        var typeToken = iterator.Match(SyntaxKind.TypeKeyword);
+        var structToken = iterator.Match(SyntaxKind.StructKeyword);
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
         var members = ParseSyntaxList(
@@ -18,11 +18,11 @@ partial class Parser
             ParseMemberDeclaration);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
-        return new TypeDeclarationSyntax(
+        return new StructDeclarationSyntax(
             syntaxTree,
             identifierToken,
             colonToken,
-            typeToken,
+            structToken,
             operatorToken,
             braceOpenToken,
             members,

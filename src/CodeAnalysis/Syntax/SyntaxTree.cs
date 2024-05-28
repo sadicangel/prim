@@ -61,6 +61,7 @@ public sealed class SyntaxTree
         return new SyntaxList<SyntaxToken>([.. new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>()]);
     }
 
-    public static SyntaxTree ParseScript(SourceText sourceText) =>
-        new(sourceText, syntaxTree => Parser.Parse(syntaxTree, isScript: true));
+    public static SyntaxTree Parse(SourceText sourceText) => new(sourceText, Parser.Parse);
+
+    public static SyntaxTree ParseScript(SourceText sourceText) => new(sourceText, Parser.ParseScript);
 }

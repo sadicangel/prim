@@ -8,19 +8,15 @@ partial class Parser
     private static MemberDeclarationSyntax ParseMemberDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
         var declaration = ParseDeclaration(syntaxTree, iterator);
-        if (declaration is TypeDeclarationSyntax structDeclaration)
+        if (declaration is StructDeclarationSyntax structDeclaration)
         {
             syntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
-                new SourceLocation(
-                    syntaxTree.SourceText,
-                    new Range(structDeclaration.IdentifierToken.Range.Start, structDeclaration.TypeToken.Range.End)));
+                new SourceLocation(syntaxTree.SourceText, structDeclaration.IdentifierToken.Range));
         }
         if (declaration is FunctionDeclarationSyntax funcDeclaration)
         {
             syntaxTree.Diagnostics.ReportInvalidLocationForFunctionDefinition(
-                new SourceLocation(
-                    syntaxTree.SourceText,
-                    new Range(funcDeclaration.IdentifierToken.Range.Start, funcDeclaration.Type.Range.End)));
+                new SourceLocation(syntaxTree.SourceText, funcDeclaration.IdentifierToken.Range));
         }
         return new MemberDeclarationSyntax(syntaxTree, declaration);
     }

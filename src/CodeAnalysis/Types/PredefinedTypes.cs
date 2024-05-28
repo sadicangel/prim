@@ -5,30 +5,30 @@ using CodeAnalysis.Operators;
 namespace CodeAnalysis.Types;
 internal static class PredefinedTypes
 {
-    public static readonly PredefinedType Any = new(PredefinedSymbolNames.Any);
-    public static readonly PredefinedType Unknown = new(PredefinedSymbolNames.Unknown);
-    public static readonly PredefinedType Never = new(PredefinedSymbolNames.Never);
-    public static readonly PredefinedType Unit = new(PredefinedSymbolNames.Unit);
-    public static readonly PredefinedType Type = new(PredefinedSymbolNames.Type);
-    public static readonly PredefinedType Str = new(PredefinedSymbolNames.Str);
-    public static readonly PredefinedType Bool = new(PredefinedSymbolNames.Bool);
-    public static readonly PredefinedType I8 = new(PredefinedSymbolNames.I8);
-    public static readonly PredefinedType I16 = new(PredefinedSymbolNames.I16);
-    public static readonly PredefinedType I32 = new(PredefinedSymbolNames.I32);
-    public static readonly PredefinedType I64 = new(PredefinedSymbolNames.I64);
-    public static readonly PredefinedType I128 = new(PredefinedSymbolNames.I128);
-    public static readonly PredefinedType ISize = new(PredefinedSymbolNames.ISize);
-    public static readonly PredefinedType U8 = new(PredefinedSymbolNames.U8);
-    public static readonly PredefinedType U16 = new(PredefinedSymbolNames.U16);
-    public static readonly PredefinedType U32 = new(PredefinedSymbolNames.U32);
-    public static readonly PredefinedType U64 = new(PredefinedSymbolNames.U64);
-    public static readonly PredefinedType U128 = new(PredefinedSymbolNames.U128);
-    public static readonly PredefinedType USize = new(PredefinedSymbolNames.USize);
-    public static readonly PredefinedType F16 = new(PredefinedSymbolNames.F16);
-    public static readonly PredefinedType F32 = new(PredefinedSymbolNames.F32);
-    public static readonly PredefinedType F64 = new(PredefinedSymbolNames.F64);
-    public static readonly PredefinedType F80 = new(PredefinedSymbolNames.F80);
-    public static readonly PredefinedType F128 = new(PredefinedSymbolNames.F128);
+    public static readonly PredefinedType Any = new(PredefinedTypeNames.Any);
+    public static readonly PredefinedType Unknown = new(PredefinedTypeNames.Unknown);
+    public static readonly PredefinedType Never = new(PredefinedTypeNames.Never);
+    public static readonly PredefinedType Unit = new(PredefinedTypeNames.Unit);
+    public static readonly PredefinedType Type = new(PredefinedTypeNames.Type);
+    public static readonly PredefinedType Str = new(PredefinedTypeNames.Str);
+    public static readonly PredefinedType Bool = new(PredefinedTypeNames.Bool);
+    public static readonly PredefinedType I8 = new(PredefinedTypeNames.I8);
+    public static readonly PredefinedType I16 = new(PredefinedTypeNames.I16);
+    public static readonly PredefinedType I32 = new(PredefinedTypeNames.I32);
+    public static readonly PredefinedType I64 = new(PredefinedTypeNames.I64);
+    public static readonly PredefinedType I128 = new(PredefinedTypeNames.I128);
+    public static readonly PredefinedType ISize = new(PredefinedTypeNames.ISize);
+    public static readonly PredefinedType U8 = new(PredefinedTypeNames.U8);
+    public static readonly PredefinedType U16 = new(PredefinedTypeNames.U16);
+    public static readonly PredefinedType U32 = new(PredefinedTypeNames.U32);
+    public static readonly PredefinedType U64 = new(PredefinedTypeNames.U64);
+    public static readonly PredefinedType U128 = new(PredefinedTypeNames.U128);
+    public static readonly PredefinedType USize = new(PredefinedTypeNames.USize);
+    public static readonly PredefinedType F16 = new(PredefinedTypeNames.F16);
+    public static readonly PredefinedType F32 = new(PredefinedTypeNames.F32);
+    public static readonly PredefinedType F64 = new(PredefinedTypeNames.F64);
+    public static readonly PredefinedType F80 = new(PredefinedTypeNames.F80);
+    public static readonly PredefinedType F128 = new(PredefinedTypeNames.F128);
 
     static PredefinedTypes()
     {

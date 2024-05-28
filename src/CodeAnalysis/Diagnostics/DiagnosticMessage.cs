@@ -1,6 +1,4 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
-using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Text;
 
@@ -19,19 +17,19 @@ internal static class DiagnosticMessage
     public static string UnexpectedToken(SyntaxKind expected, SyntaxKind actual) => $"Unexpected token '{SyntaxFacts.GetDisplayText(actual)}'. Expected '{SyntaxFacts.GetDisplayText(expected)}'";
 
     // Binding error messages.
-    public static string AmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftType.Name}' and '{rightType.Name}'";
-    public static string InvalidArgumentType(Parameter parameter, PrimType actualType) => $"Invalid expression of type '{actualType.Name}' provided for parameter '{parameter.Name}' of type '{parameter.Type.Name}'";
-    public static string InvalidExpressionType(PrimType expectedType, PrimType actualType) => $"Invalid expression of type '{actualType.Name}'. Expected '{expectedType.Name}'";
-    public static string InvalidImplicitConversion(PrimType sourceType, PrimType destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
-    public static string InvalidNumberOfArguments(FunctionType functionType, int actualNumberOfArguments) => $"Function '{functionType.Name}' requires {functionType.Parameters.Count} arguments but was given {actualNumberOfArguments}";
-    public static string InvalidSymbolType(PrimType expectedType, PrimType actualType) => $"Invalid symbol of type '{actualType.Name}'. Expected '{expectedType.Name}'";
-    public static string InvalidTypeConversion(PrimType sourceType, PrimType targetType) => $"Invalid conversion from type '{sourceType.Name}' to '{targetType.Name}'";
-    public static string SymbolReassignment(Symbol symbol) => $"Reassignment of read-only symbol '{symbol.Name}'";
-    public static string SymbolRedeclaration(Symbol symbol) => $"Redeclaration of symbol '{symbol.Name}'";
-    public static string UndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is not defined for types '{leftType.Name}' and '{rightType.Name}'";
-    public static string UndefinedType(PrimType type) => $"Undefined type '{type.Name}'";
-    public static string ReportUndefinedSymbol(Symbol symbol) => $"Undefined symbol '{symbol.Name}'";
-    public static string UndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => $"Unary operator '{@operator.Text}' is not defined for type '{operandType.Name}'";
+    //public static string AmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftType.Name}' and '{rightType.Name}'";
+    //public static string InvalidArgumentType(Parameter parameter, PrimType actualType) => $"Invalid expression of type '{actualType.Name}' provided for parameter '{parameter.Name}' of type '{parameter.Type.Name}'";
+    //public static string InvalidExpressionType(PrimType expectedType, PrimType actualType) => $"Invalid expression of type '{actualType.Name}'. Expected '{expectedType.Name}'";
+    //public static string InvalidImplicitConversion(PrimType sourceType, PrimType destinationType) => $"Invalid implicit conversion from type '{sourceType}' to '{destinationType}'. An explicit conversion exists (are you missing a cast?)";
+    //public static string InvalidNumberOfArguments(FunctionType functionType, int actualNumberOfArguments) => $"Function '{functionType.Name}' requires {functionType.Parameters.Count} arguments but was given {actualNumberOfArguments}";
+    //public static string InvalidSymbolType(PrimType expectedType, PrimType actualType) => $"Invalid symbol of type '{actualType.Name}'. Expected '{expectedType.Name}'";
+    //public static string InvalidTypeConversion(PrimType sourceType, PrimType targetType) => $"Invalid conversion from type '{sourceType.Name}' to '{targetType.Name}'";
+    //public static string SymbolReassignment(Symbol symbol) => $"Reassignment of read-only symbol '{symbol.Name}'";
+    //public static string SymbolRedeclaration(Symbol symbol) => $"Redeclaration of symbol '{symbol.Name}'";
+    //public static string UndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is not defined for types '{leftType.Name}' and '{rightType.Name}'";
+    //public static string UndefinedType(PrimType type) => $"Undefined type '{type.Name}'";
+    //public static string ReportUndefinedSymbol(Symbol symbol) => $"Undefined symbol '{symbol.Name}'";
+    //public static string UndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => $"Unary operator '{@operator.Text}' is not defined for type '{operandType.Name}'";
 
     //public static string RedundantConversion() => "Conversion is redundant";
     //public static string InvalidExpressionType(PrimType actualType) => $"Invalid expression of type '{actualType}'";

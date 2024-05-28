@@ -10,7 +10,7 @@ public abstract record class PrimType(string Name)
     public List<Property> Properties { get; init; } = [];
     public List<Operator> Operators { get; init; } = [];
 
-    private string GetDebuggerDisplay() => $"{Name}: {PredefinedSymbolNames.Type}";
+    private string GetDebuggerDisplay() => $"{Name}: {PredefinedTypeNames.Type}";
 
     public virtual bool Equals(PrimType? other) => other is not null && Name == other.Name;
 

@@ -1,9 +1,9 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class TypeDeclarationSyntax(
+public sealed record class StructDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken,
     SyntaxToken ColonToken,
-    SyntaxToken TypeToken,
+    SyntaxToken StructToken,
     SyntaxToken OperatorToken,
     SyntaxToken BraceOpenToken,
     SyntaxList<MemberDeclarationSyntax> Members,
@@ -16,7 +16,7 @@ public sealed record class TypeDeclarationSyntax(
     {
         yield return IdentifierToken;
         yield return ColonToken;
-        yield return TypeToken;
+        yield return StructToken;
         yield return OperatorToken;
         yield return BraceOpenToken;
         foreach (var member in Members)

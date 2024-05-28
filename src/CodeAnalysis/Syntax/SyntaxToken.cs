@@ -12,12 +12,12 @@ public sealed record class SyntaxToken(
 
     public override Range Range { get; } = Range;
 
-    public override Range RangeWithWhiteSpace
+    public override Range RangeWithTrivia
     {
         get
         {
-            var start = LeadingTrivia is [var first, ..] ? first.RangeWithWhiteSpace.Start : Range.Start;
-            var end = TrailingTrivia is [.., var last] ? last.RangeWithWhiteSpace.End : Range.End;
+            var start = LeadingTrivia is [var first, ..] ? first.RangeWithTrivia.Start : Range.Start;
+            var end = TrailingTrivia is [.., var last] ? last.RangeWithTrivia.End : Range.End;
             return start..end;
         }
     }

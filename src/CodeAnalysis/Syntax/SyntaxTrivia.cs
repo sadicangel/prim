@@ -8,7 +8,7 @@ public sealed record class SyntaxTrivia(
 {
     public override Range Range { get; } = Range;
 
-    public override Range RangeWithWhiteSpace { get => Range; }
+    public override Range RangeWithTrivia { get => Range; }
 
     public override IEnumerable<SyntaxNode> Children() => [];
 }

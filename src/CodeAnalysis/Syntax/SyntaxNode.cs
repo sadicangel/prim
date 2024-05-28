@@ -9,8 +9,9 @@ public abstract record class SyntaxNode(SyntaxKind SyntaxKind, SyntaxTree Syntax
     public SyntaxToken LastToken => this is SyntaxToken token ? token : Children().Last().LastToken;
 
     public virtual Range Range => Children().First().Range.Start..Children().Last().Range.End;
-    public virtual Range RangeWithWhiteSpace => Children().First().RangeWithWhiteSpace.Start..Children().Last().RangeWithWhiteSpace.End;
+    public virtual Range RangeWithTrivia => Children().First().RangeWithTrivia.Start..Children().Last().RangeWithTrivia.End;
     public virtual ReadOnlySpan<char> Text => SyntaxTree.SourceText[Range];
+    public virtual ReadOnlySpan<char> TextWithTrivia => SyntaxTree.SourceText[RangeWithTrivia];
     public SourceLocation Location => new(SyntaxTree.SourceText, Range);
 
     public sealed override string ToString() =>
