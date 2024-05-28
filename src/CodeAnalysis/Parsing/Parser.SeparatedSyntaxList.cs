@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static SyntaxList<SyntaxNode> ParseSeparatedSyntaxList<TNode>(
+    private static SeparatedSyntaxList<TNode> ParseSeparatedSyntaxList<TNode>(
         SyntaxTree syntaxTree,
         SyntaxTokenIterator iterator,
         SyntaxKind separatorKind,
@@ -32,7 +32,7 @@ partial class Parser
                 _ = iterator.Next();
         }
 
-        return nodes.ToSyntaxList();
+        return new SeparatedSyntaxList<TNode>(nodes.ToSyntaxList());
     }
 }
 

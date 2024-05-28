@@ -26,7 +26,7 @@ partial class Parser
 
         return types switch
         {
-            { Count: > 1 } => new UnionTypeSyntax(syntaxTree, new TypeSyntaxList(syntaxTree, types)),
+            { Count: > 1 } => new UnionTypeSyntax(syntaxTree, types),
             [TypeSyntax type] => type,
             _ => ReportInvalidType(syntaxTree, iterator)
         };
