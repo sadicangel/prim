@@ -26,6 +26,7 @@ partial class Parser
             //SyntaxKind.BreakKeyword => ParseBreakExpression(syntaxTree, iterator),
             //SyntaxKind.ContinueKeyword => ParseContinueExpression(syntaxTree, iterator),
             //SyntaxKind.ReturnKeyword => ParseReturnExpression(syntaxTree, iterator),
+            SyntaxKind.BraceOpenToken when iterator.Peek(1).SyntaxKind is SyntaxKind.DotToken => ParseStructExpression(syntaxTree, iterator),
             SyntaxKind.BraceOpenToken => ParseBlockExpression(syntaxTree, iterator),
             SyntaxKind.BracketOpenToken => ParseArrayExpression(syntaxTree, iterator),
             SyntaxKind.SemicolonToken => ParseEmptyExpression(syntaxTree, iterator),
