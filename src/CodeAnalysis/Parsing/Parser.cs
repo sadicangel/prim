@@ -10,7 +10,7 @@ internal static partial class Parser
         ParseCompilationUnit(syntaxTree, ParseDeclaration);
 
     internal static CompilationUnitSyntax ParseScript(SyntaxTree syntaxTree) =>
-        ParseCompilationUnit(syntaxTree, static (syntaxTree, iterator) => ParseExpression(syntaxTree, iterator, isTerminated: false));
+        ParseCompilationUnit(syntaxTree, static (syntaxTree, iterator) => ParseExpression(syntaxTree, iterator));
 
     private static CompilationUnitSyntax ParseCompilationUnit(SyntaxTree syntaxTree, ParseNode<SyntaxNode> parseNode)
     {

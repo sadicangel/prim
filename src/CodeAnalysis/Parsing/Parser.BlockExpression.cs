@@ -11,7 +11,7 @@ partial class Parser
             syntaxTree,
             iterator,
             [SyntaxKind.BraceCloseToken, SyntaxKind.EofToken],
-            static (st, it) => ParseExpression(st, it, isTerminated: true));
+            ParseTerminatedExpression);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
         return new BlockExpressionSyntax(syntaxTree, braceOpenToken, expressions, braceCloseToken);
     }

@@ -8,7 +8,7 @@ partial class Parser
     {
         // '(' expr ')'
         var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
-        var expression = ParseExpression(syntaxTree, iterator, isTerminated: false);
+        var expression = ParseExpression(syntaxTree, iterator);
         var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
         return new GroupExpressionSyntax(
             syntaxTree,

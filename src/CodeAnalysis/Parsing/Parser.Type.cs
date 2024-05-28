@@ -79,7 +79,7 @@ partial class Parser
                 var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
                 var elementType = ParseTypeSingle(syntaxTree, iterator);
                 var colonToken = iterator.Match(SyntaxKind.ColonToken);
-                var length = ParseExpression(syntaxTree, iterator, isTerminated: false);
+                var length = ParseExpression(syntaxTree, iterator);
                 var bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
                 return new ArrayTypeSyntax(syntaxTree, bracketOpenToken, elementType, colonToken, length, bracketCloseToken);
             }

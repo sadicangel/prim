@@ -27,7 +27,7 @@ partial class Parser
             SyntaxKind.HookHookEqualsToken => SyntaxKind.CoalesceAssignmentExpression,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{iterator.Current.SyntaxKind}' for assignment")
         };
-        var right = ParseExpression(syntaxTree, iterator, isTerminated: false);
+        var right = ParseExpression(syntaxTree, iterator);
 
         return new AssignmentExpressionSyntax(syntaxKind, syntaxTree, left, operatorToken, right);
     }

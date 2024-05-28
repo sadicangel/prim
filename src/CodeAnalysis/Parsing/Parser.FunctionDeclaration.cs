@@ -13,7 +13,7 @@ partial class Parser
         if (type is not FunctionTypeSyntax functionType)
             throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(FunctionTypeSyntax)}'");
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
-        var expression = ParseExpression(syntaxTree, iterator, isTerminated: true);
+        var expression = ParseTerminatedExpression(syntaxTree, iterator);
 
         return new FunctionDeclarationSyntax(
             syntaxTree,

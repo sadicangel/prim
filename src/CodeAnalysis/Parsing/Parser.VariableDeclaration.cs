@@ -10,7 +10,7 @@ partial class Parser
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var type = ParseType(syntaxTree, iterator);
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
-        var expression = ParseExpression(syntaxTree, iterator, isTerminated: true);
+        var expression = ParseTerminatedExpression(syntaxTree, iterator);
 
         return new VariableDeclarationSyntax(
             syntaxTree,
