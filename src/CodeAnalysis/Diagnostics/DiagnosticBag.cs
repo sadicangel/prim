@@ -67,7 +67,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     //internal void ReportInvalidSymbolType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidSymbolType(expectedType, actualType));
     //internal void ReportInvalidTypeConversion(SourceLocation location, PrimType sourceType, PrimType targetType) => ReportError(location, DiagnosticMessage.InvalidTypeConversion(sourceType, targetType));
     //internal void ReportSymbolReassignment(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.SymbolReassignment(symbol));
-    //internal void ReportSymbolRedeclaration(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbol));
+    internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     //internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftType, rightType));
     //internal void ReportUndefinedType(SourceLocation location, PrimType type) => ReportError(location, DiagnosticMessage.UndefinedType(type));
     //internal void ReportUndefinedSymbol(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.ReportUndefinedSymbol(symbol));

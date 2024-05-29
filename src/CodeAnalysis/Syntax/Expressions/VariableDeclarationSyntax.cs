@@ -10,7 +10,7 @@ public sealed record class VariableDeclarationSyntax(
     ExpressionSyntax Expression)
     : DeclarationSyntax(SyntaxKind.VariableDeclaration, SyntaxTree)
 {
-    public bool IsMutable { get => OperatorToken.SyntaxKind is SyntaxKind.EqualsToken; }
+    public bool IsReadOnly { get => OperatorToken.SyntaxKind is SyntaxKind.ColonToken; }
 
     public override IEnumerable<SyntaxNode> Children()
     {

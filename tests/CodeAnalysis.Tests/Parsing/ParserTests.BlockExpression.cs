@@ -7,9 +7,9 @@ partial class ParserTests
     [MemberData(nameof(GetBlockExpressions))]
     public void Parser_BlockExpression(int expressionCount, string source)
     {
-        var unit = SyntaxTree.ParseScript(new SourceText(source));
-        var node = Assert.Single(unit.Root.SyntaxNodes);
-        Assert.Empty(unit.Diagnostics);
+        var tree = SyntaxTree.ParseScript(new SourceText(source));
+        var node = Assert.Single(tree.Root.SyntaxNodes);
+        Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.BlockExpression, node.SyntaxKind);
         var block = Assert.IsType<BlockExpressionSyntax>(node);
         Assert.Equal(expressionCount, block.Expressions.Count);

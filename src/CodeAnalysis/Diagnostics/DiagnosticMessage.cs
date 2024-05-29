@@ -25,7 +25,7 @@ internal static class DiagnosticMessage
     //public static string InvalidSymbolType(PrimType expectedType, PrimType actualType) => $"Invalid symbol of type '{actualType.Name}'. Expected '{expectedType.Name}'";
     //public static string InvalidTypeConversion(PrimType sourceType, PrimType targetType) => $"Invalid conversion from type '{sourceType.Name}' to '{targetType.Name}'";
     //public static string SymbolReassignment(Symbol symbol) => $"Reassignment of read-only symbol '{symbol.Name}'";
-    //public static string SymbolRedeclaration(Symbol symbol) => $"Redeclaration of symbol '{symbol.Name}'";
+    public static string SymbolRedeclaration(string symbolName) => $"Redeclaration of symbol '{symbolName}'";
     //public static string UndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is not defined for types '{leftType.Name}' and '{rightType.Name}'";
     //public static string UndefinedType(PrimType type) => $"Undefined type '{type.Name}'";
     //public static string ReportUndefinedSymbol(Symbol symbol) => $"Undefined symbol '{symbol.Name}'";

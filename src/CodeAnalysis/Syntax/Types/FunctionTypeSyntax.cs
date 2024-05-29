@@ -2,7 +2,7 @@
 public sealed record class FunctionTypeSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken ParenthesisOpenToken,
-    ParameterSyntaxList Parameters,
+    SeparatedSyntaxList<ParameterSyntax> Parameters,
     SyntaxToken ParenthesisCloseToken,
     SyntaxToken ArrowToken,
     TypeSyntax ReturnType)
@@ -11,7 +11,8 @@ public sealed record class FunctionTypeSyntax(
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return ParenthesisOpenToken;
-        yield return Parameters;
+        foreach (var parameter in Parameters.SyntaxNodes)
+            yield return parameter;
         yield return ParenthesisCloseToken;
         yield return ArrowToken;
         yield return ReturnType;

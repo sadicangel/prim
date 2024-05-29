@@ -87,20 +87,18 @@ partial class Parser
             static FunctionTypeSyntax ParseFunctionType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
             {
                 var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
-                var parameters = new ParameterSyntaxList(
+                var parameters = ParseSeparatedSyntaxList(
                     syntaxTree,
-                    ParseSeparatedSyntaxList(
-                        syntaxTree,
-                        iterator,
-                        SyntaxKind.CommaToken,
-                        [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
-                        static (syntaxTree, iterator) =>
-                        {
-                            var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
-                            var colonToken = iterator.Match(SyntaxKind.ColonToken);
-                            var type = ParseTypeSingle(syntaxTree, iterator);
-                            return new ParameterSyntax(syntaxTree, identifierToken, colonToken, type);
-                        }));
+                    iterator,
+                    SyntaxKind.CommaToken,
+                    [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
+                    static (syntaxTree, iterator) =>
+                    {
+                        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+                        var colonToken = iterator.Match(SyntaxKind.ColonToken);
+                        var type = ParseTypeSingle(syntaxTree, iterator);
+                        return new ParameterSyntax(syntaxTree, identifierToken, colonToken, type);
+                    });
                 var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
                 var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
                 var returnType = ParseTypeSingle(syntaxTree, iterator);

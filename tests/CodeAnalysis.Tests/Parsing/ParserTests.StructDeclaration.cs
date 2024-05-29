@@ -5,14 +5,14 @@ public partial class ParserTests
     [Fact]
     public void Parse_StructDeclaration()
     {
-        var unit = SyntaxTree.Parse(new SourceText("""
+        var tree = SyntaxTree.Parse(new SourceText("""
             Point2d: struct : {
                 x: i32 = 0;
                 y: i32 = 0;
             }
             """));
-        var node = Assert.Single(unit.Root.SyntaxNodes);
-        Assert.Empty(unit.Diagnostics);
+        var node = Assert.Single(tree.Root.SyntaxNodes);
+        Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.StructDeclaration, node.SyntaxKind);
     }
 }

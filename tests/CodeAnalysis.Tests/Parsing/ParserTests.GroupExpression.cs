@@ -4,9 +4,9 @@ public partial class ParserTests
     [Fact]
     public void Parse_GroupExpression()
     {
-        var unit = SyntaxTree.ParseScript(new SourceText("(true)"));
-        var node = Assert.Single(unit.Root.SyntaxNodes);
-        Assert.Empty(unit.Diagnostics);
+        var tree = SyntaxTree.ParseScript(new SourceText("(true)"));
+        var node = Assert.Single(tree.Root.SyntaxNodes);
+        Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.GroupExpression, node.SyntaxKind);
     }
 }
