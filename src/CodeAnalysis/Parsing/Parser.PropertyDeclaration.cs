@@ -5,7 +5,7 @@ using CodeAnalysis.Text;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static MemberDeclarationSyntax ParseMemberDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
         var declaration = ParseDeclaration(syntaxTree, iterator);
         if (declaration is StructDeclarationSyntax structDeclaration)
@@ -18,6 +18,6 @@ partial class Parser
             syntaxTree.Diagnostics.ReportInvalidLocationForFunctionDefinition(
                 new SourceLocation(syntaxTree.SourceText, funcDeclaration.IdentifierToken.Range));
         }
-        return new MemberDeclarationSyntax(syntaxTree, declaration);
+        return new PropertyDeclarationSyntax(syntaxTree, declaration);
     }
 }

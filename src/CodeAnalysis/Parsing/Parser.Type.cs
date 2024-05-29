@@ -57,8 +57,8 @@ partial class Parser
 
             static PredefinedTypeSyntax ParsePredefinedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
             {
-                var predefinedType = iterator.Next();
-                return new PredefinedTypeSyntax(syntaxTree, predefinedType);
+                var predefinedTypeToken = iterator.Next();
+                return new PredefinedTypeSyntax(syntaxTree, predefinedTypeToken);
             }
 
             static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)

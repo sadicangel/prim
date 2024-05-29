@@ -159,7 +159,7 @@ public enum SyntaxKind
     VariableDeclaration,
     FunctionDeclaration,
     StructDeclaration,
-    MemberDeclaration,
+    PropertyDeclaration,
     LocalDeclaration,
 
     EmptyExpression,
@@ -167,7 +167,7 @@ public enum SyntaxKind
     BlockExpression,
     ArrayExpression,
     StructExpression,
-    MemberExpression,
+    PropertyExpression,
 
     UnaryPlusExpression,
     UnaryMinusExpression,

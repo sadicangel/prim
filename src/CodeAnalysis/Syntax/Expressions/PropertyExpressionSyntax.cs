@@ -1,13 +1,13 @@
 ﻿
 namespace CodeAnalysis.Syntax.Expressions;
 
-public sealed record class MemberExpressionSyntax(
+public sealed record class PropertyExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken DotToken,
     SyntaxToken IdentifierToken,
     SyntaxToken EqualsToken,
     ExpressionSyntax Expression)
-    : SyntaxNode(SyntaxKind.MemberExpression, SyntaxTree)
+    : SyntaxNode(SyntaxKind.PropertyExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

@@ -159,7 +159,7 @@ public static class SyntaxFacts
             SyntaxKind.VariableDeclaration => null,
             SyntaxKind.FunctionDeclaration => null,
             SyntaxKind.StructDeclaration => null,
-            SyntaxKind.MemberDeclaration => null,
+            SyntaxKind.PropertyDeclaration => null,
             SyntaxKind.LocalDeclaration => null,
 
             SyntaxKind.EmptyExpression => null,
@@ -167,7 +167,7 @@ public static class SyntaxFacts
             SyntaxKind.BlockExpression => null,
             SyntaxKind.ArrayExpression => null,
             SyntaxKind.StructExpression => null,
-            SyntaxKind.MemberExpression => null,
+            SyntaxKind.PropertyExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,
             SyntaxKind.UnaryMinusExpression => null,
