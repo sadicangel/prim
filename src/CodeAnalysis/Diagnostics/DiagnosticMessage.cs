@@ -28,7 +28,7 @@ internal static class DiagnosticMessage
     public static string SymbolRedeclaration(string symbolName) => $"Redeclaration of symbol '{symbolName}'";
     //public static string UndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is not defined for types '{leftType.Name}' and '{rightType.Name}'";
     //public static string UndefinedType(PrimType type) => $"Undefined type '{type.Name}'";
-    //public static string ReportUndefinedSymbol(Symbol symbol) => $"Undefined symbol '{symbol.Name}'";
+    public static string ReportUndefinedSymbol(string symbolName) => $"Undefined symbol '{symbolName}'";
     //public static string UndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => $"Unary operator '{@operator.Text}' is not defined for type '{operandType.Name}'";
 
     //public static string RedundantConversion() => "Conversion is redundant";

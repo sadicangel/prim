@@ -114,6 +114,16 @@ public enum SyntaxKind
 
     // Other nodes
 
+    PredefinedType,
+    NamedType,
+    OptionType,
+    ArrayType,
+    FunctionType,
+    UnionType,
+    Parameter,
+    ParameterList,
+    TypeList,
+
     CompilationUnit,
 
     // Expressions
@@ -130,16 +140,6 @@ public enum SyntaxKind
     TrueLiteralExpression,
     FalseLiteralExpression,
     NullLiteralExpression,
-
-    PredefinedType,
-    NamedType,
-    OptionType,
-    ArrayType,
-    FunctionType,
-    UnionType,
-    Parameter,
-    ParameterList,
-    TypeList,
 
     GroupExpression,
     SimpleAssignmentExpression,

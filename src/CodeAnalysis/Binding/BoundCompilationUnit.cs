@@ -4,7 +4,7 @@ namespace CodeAnalysis.Binding;
 
 internal sealed record class BoundCompilationUnit(
     SyntaxNode SyntaxNode,
-    ReadOnlyList<BoundNode> BoundNodes)
+    BoundList<BoundNode> BoundNodes)
     : BoundNode(BoundKind.CompilationUnit, SyntaxNode)
 {
     public override IEnumerable<BoundNode> Children()

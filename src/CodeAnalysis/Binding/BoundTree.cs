@@ -16,6 +16,6 @@ internal sealed class BoundTree
 
     public override string ToString() => $"BoundTree {{ Root = {Root} }}";
 
-    public static BoundTree BindSymbols(SyntaxTree syntaxTree, BoundScope boundScope) =>
+    public static BoundTree Bind(SyntaxTree syntaxTree, BoundScope boundScope) =>
         new BoundTree(syntaxTree, (boundTree) => Binder.Bind(boundTree, boundScope));
 }

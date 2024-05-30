@@ -7,8 +7,7 @@ public partial class BinderTests
     [Fact]
     public void Bind_VariableDeclaration()
     {
-        var scope = BoundScope.Global();
-        _ = BoundTree.BindSymbols(SyntaxTree.Parse(new SourceText($"a: i32 = 2;")), scope);
-        _ = Assert.IsType<VariableSymbol>(scope.Lookup("a"));
+        _ = BoundTree.Bind(SyntaxTree.Parse(new SourceText($"a: i32 = 2;")), _scope);
+        _ = Assert.IsType<VariableSymbol>(_scope.Lookup("a"));
     }
 }

@@ -19,7 +19,7 @@ public sealed record class Compilation(ReadOnlyList<SyntaxTree> SyntaxTrees, Dia
                 continue;
             }
 
-            var boundTree = BoundTree.BindSymbols(syntaxTree, _scope);
+            var boundTree = BoundTree.Bind(syntaxTree, _scope);
             diagnostics.AddRange(boundTree.Diagnostics);
             boundTrees.Add(boundTree);
         }
