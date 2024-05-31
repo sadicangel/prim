@@ -23,45 +23,33 @@ partial class Binder
             SyntaxKind.NullLiteralExpression =>
                 BindLiteralExpression((LiteralExpressionSyntax)syntax, context),
             SyntaxKind.GroupExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.SimpleAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.AddAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.SubtractAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.MultiplyAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.DivideAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.ModuloAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.PowerAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.AndAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.ExclusiveOrAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.OrAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.LeftShiftAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.RightShiftAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindGroupExpression((GroupExpressionSyntax)syntax, context),
+            SyntaxKind.SimpleAssignmentExpression or
+            SyntaxKind.AddAssignmentExpression or
+            SyntaxKind.SubtractAssignmentExpression or
+            SyntaxKind.MultiplyAssignmentExpression or
+            SyntaxKind.DivideAssignmentExpression or
+            SyntaxKind.ModuloAssignmentExpression or
+            SyntaxKind.PowerAssignmentExpression or
+            SyntaxKind.AndAssignmentExpression or
+            SyntaxKind.ExclusiveOrAssignmentExpression or
+            SyntaxKind.OrAssignmentExpression or
+            SyntaxKind.LeftShiftAssignmentExpression or
+            SyntaxKind.RightShiftAssignmentExpression or
             SyntaxKind.CoalesceAssignmentExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindAssignmentExpression((AssignmentExpressionSyntax)syntax, context),
             SyntaxKind.VariableDeclaration =>
                 BindVariableDeclaration((VariableDeclarationSyntax)syntax, context),
             SyntaxKind.FunctionDeclaration =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindFunctionDeclaration((FunctionDeclarationSyntax)syntax, context),
             SyntaxKind.StructDeclaration =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindStructDeclaration((StructDeclarationSyntax)syntax, context),
             SyntaxKind.PropertyDeclaration =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             SyntaxKind.LocalDeclaration =>
                 BindLocalDeclaration((LocalDeclarationSyntax)syntax, context),
             SyntaxKind.EmptyExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindEmptyExpression((EmptyExpressionSyntax)syntax, context),
             SyntaxKind.StatementExpression =>
                 BindStatementExpression((StatementExpressionSyntax)syntax, context),
             SyntaxKind.BlockExpression =>

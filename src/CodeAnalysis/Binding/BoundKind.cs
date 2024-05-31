@@ -2,6 +2,8 @@
 
 internal enum BoundKind
 {
+    Unbound,
+
     CompilationUnit,
 
     NeverExpression,
