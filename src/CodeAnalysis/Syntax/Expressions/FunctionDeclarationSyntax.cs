@@ -7,7 +7,7 @@ public sealed record class FunctionDeclarationSyntax(
     SyntaxToken ColonToken,
     FunctionTypeSyntax Type,
     SyntaxToken OperatorToken,
-    ExpressionSyntax Expression)
+    ExpressionSyntax Body)
     : DeclarationSyntax(SyntaxKind.FunctionDeclaration, SyntaxTree)
 {
     public bool IsMutable { get => OperatorToken.SyntaxKind is SyntaxKind.EqualsToken; }
@@ -18,6 +18,6 @@ public sealed record class FunctionDeclarationSyntax(
         yield return ColonToken;
         yield return Type;
         yield return OperatorToken;
-        yield return Expression;
+        yield return Body;
     }
 }

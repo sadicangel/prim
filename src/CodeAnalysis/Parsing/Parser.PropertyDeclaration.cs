@@ -1,23 +1,23 @@
 ﻿using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
     private static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
-        var declaration = ParseDeclaration(syntaxTree, iterator);
-        if (declaration is StructDeclarationSyntax structDeclaration)
-        {
-            syntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
-                new SourceLocation(syntaxTree.SourceText, structDeclaration.IdentifierToken.Range));
-        }
-        if (declaration is FunctionDeclarationSyntax funcDeclaration)
-        {
-            syntaxTree.Diagnostics.ReportInvalidLocationForFunctionDefinition(
-                new SourceLocation(syntaxTree.SourceText, funcDeclaration.IdentifierToken.Range));
-        }
-        return new PropertyDeclarationSyntax(syntaxTree, declaration);
+        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var colonToken = iterator.Match(SyntaxKind.ColonToken);
+        var type = ParseType(syntaxTree, iterator);
+        var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+        var expression = ParseTerminatedExpression(syntaxTree, iterator);
+
+        return new PropertyDeclarationSyntax(
+            syntaxTree,
+            identifierToken,
+            colonToken,
+            type,
+            operatorToken,
+            expression);
     }
 }

@@ -103,28 +103,20 @@ partial class Binder
 
             var parameters = new List<Parameter>(syntax.Parameters.Count);
 
-            using (context.PushScope())
+            var seenParameterNames = new HashSet<string>();
+            foreach (var parameterSyntax in syntax.Parameters)
             {
-                foreach (var parameterSyntax in syntax.Parameters)
-                {
-                    var parameter = BindParameter(parameterSyntax, context);
-                    if (parameter.Type.IsNever)
-                        return parameter.Type;
-                    parameters.Add(parameter);
-                }
+                var parameterName = parameterSyntax.IdentifierToken.Text.ToString();
+                var parameterType = BindType(parameterSyntax.Type, context);
+                if (parameterType.IsNever)
+                    return parameterType;
+                if (!seenParameterNames.Add(parameterName))
+                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, parameterName);
+                var parameter = new Parameter(parameterName, parameterType);
+                parameters.Add(parameter);
             }
 
             return new FunctionType(new(parameters), returnType);
-
-            static Parameter BindParameter(ParameterSyntax syntax, BindingContext context)
-            {
-                var parameterName = syntax.IdentifierToken.Text.ToString();
-                var parameterType = BindType(syntax.Type, context);
-                var parameterSymbol = new ParameterSymbol(syntax, parameterName, parameterType);
-                if (!context.BoundScope.Declare(parameterSymbol))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, parameterName);
-                return new Parameter(parameterName, parameterType);
-            }
         }
 
         static PrimType BindUnionType(UnionTypeSyntax syntax, BindingContext context)

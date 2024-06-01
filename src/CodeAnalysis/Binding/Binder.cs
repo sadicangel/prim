@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Binding.Types;
+using CodeAnalysis.Binding.Types.Metadata;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -59,10 +60,28 @@ internal static partial class Binder
     private static void DeclareStructMembers(StructDeclarationSyntax syntax, BindingContext context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
-        var structSymbol = context.BoundScope.Lookup(structName)
-            ?? throw new UnreachableException($"Type '{structName}' was not declared");
+        if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
+            throw new UnreachableException($"Type '{structName}' was not declared");
 
-        // TODO: Bind type members
+        var properties = new List<Property>(syntax.Properties.Count);
+        var declaredPropertyNames = new HashSet<string>();
+        {
+            foreach (var propertySyntax in syntax.Properties)
+            {
+                var propertyName = propertySyntax.IdentifierToken.Text.ToString();
+                var propertyType = BindType(propertySyntax.Type, context);
+                if (!declaredPropertyNames.Add(propertyName))
+                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, propertyName);
+                var property = new Property(propertyName, propertyType, propertySyntax.IsReadOnly);
+                properties.Add(property);
+            }
+        }
+
+        structSymbol = new StructSymbol(syntax, structName, new NamedType(structName)
+        {
+            Properties = [.. properties]
+        });
+
         context.BoundScope.Replace(structSymbol);
     }
 
