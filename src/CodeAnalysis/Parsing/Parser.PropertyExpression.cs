@@ -9,7 +9,7 @@ partial class Parser
         var dotToken = iterator.Match(SyntaxKind.DotToken);
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
         var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
-        var expression = ParseExpression(syntaxTree, iterator);
-        return new PropertyExpressionSyntax(syntaxTree, dotToken, identifierToken, equalsToken, expression);
+        var init = ParseExpression(syntaxTree, iterator);
+        return new PropertyExpressionSyntax(syntaxTree, dotToken, identifierToken, equalsToken, init);
     }
 }

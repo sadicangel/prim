@@ -53,11 +53,9 @@ partial class Binder
             SyntaxKind.BlockExpression =>
                 BindBlockExpression((BlockExpressionSyntax)syntax, context),
             SyntaxKind.ArrayExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindArrayExpression((ArrayExpressionSyntax)syntax, context),
             SyntaxKind.StructExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.PropertyExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindStructExpression((StructExpressionSyntax)syntax, context),
             SyntaxKind.UnaryPlusExpression or
             SyntaxKind.UnaryMinusExpression or
             SyntaxKind.PrefixIncrementExpression or

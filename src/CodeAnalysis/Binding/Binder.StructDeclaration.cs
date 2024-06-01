@@ -22,7 +22,7 @@ partial class Binder
                 var syntaxProperty = syntax.Properties[i];
                 var structProperty = symbol.Type.Properties[i];
 
-                var propertySymbol = new PropertySymbol(syntaxProperty, structProperty.Name, structProperty.Type, structProperty.IsReadOnly);
+                var propertySymbol = new PropertySymbol(syntaxProperty, structProperty);
                 if (!context.BoundScope.Declare(propertySymbol))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, propertySymbol.Name);
 

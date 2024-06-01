@@ -6,7 +6,7 @@ public sealed record class PropertyExpressionSyntax(
     SyntaxToken DotToken,
     SyntaxToken IdentifierToken,
     SyntaxToken EqualsToken,
-    ExpressionSyntax Expression)
+    ExpressionSyntax Init)
     : SyntaxNode(SyntaxKind.PropertyExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
@@ -14,6 +14,6 @@ public sealed record class PropertyExpressionSyntax(
         yield return DotToken;
         yield return IdentifierToken;
         yield return EqualsToken;
-        yield return Expression;
+        yield return Init;
     }
 }

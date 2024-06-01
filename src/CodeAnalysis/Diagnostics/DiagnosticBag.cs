@@ -70,6 +70,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     //internal void ReportSymbolReassignment(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.SymbolReassignment(symbol));
     internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     //internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftType, rightType));
+    internal void ReportUndefinedMember(SourceLocation location, string typeName, string memberName) => ReportError(location, DiagnosticMessage.UndefinedMember(typeName, memberName));
     internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     internal void ReportUndefinedSymbol(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.ReportUndefinedSymbol(symbolName));
     //internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandType));

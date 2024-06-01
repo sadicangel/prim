@@ -5,7 +5,7 @@ public partial class ParserTests
     public void Parse_StructExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("""
-            {
+            Point2d {
                 .x = 2,
                 .y = 4,
             }

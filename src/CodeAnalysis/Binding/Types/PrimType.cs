@@ -17,4 +17,15 @@ public abstract record class PrimType(string Name)
     public override int GetHashCode() => Name.GetHashCode();
 
     public sealed override string ToString() => Name;
+
+    public Property? GetProperty(ReadOnlySpan<char> name)
+    {
+        for (var i = 0; i < Properties.Count; ++i)
+        {
+            var property = Properties[i];
+            if (name.Equals(property.Name, StringComparison.Ordinal))
+                return property;
+        }
+        return null;
+    }
 }
