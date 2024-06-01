@@ -61,6 +61,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     // Binder Errors.
     //internal void ReportAmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftType, rightType));
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
+    internal void ReportInvalidArrayLength(SourceLocation location) => ReportError(location, DiagnosticMessage.ReportInvalidArrayLength());
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     //internal void ReportInvalidImplicitConversion(SourceLocation location, PrimType sourceType, PrimType destinationType) => ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceType, destinationType));
     //internal void ReportInvalidNumberOfArguments(SourceLocation location, FunctionType functionType, int actualNumberOfArguments) => ReportError(location, DiagnosticMessage.InvalidNumberOfArguments(functionType, actualNumberOfArguments));
@@ -69,7 +70,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     //internal void ReportSymbolReassignment(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.SymbolReassignment(symbol));
     internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     //internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftType, rightType));
-    //internal void ReportUndefinedType(SourceLocation location, PrimType type) => ReportError(location, DiagnosticMessage.UndefinedType(type));
+    internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     internal void ReportUndefinedSymbol(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.ReportUndefinedSymbol(symbolName));
     //internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandType));
 

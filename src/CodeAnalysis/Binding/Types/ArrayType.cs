@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Types;
+﻿namespace CodeAnalysis.Binding.Types;
 
 public sealed record class ArrayType(PrimType ElementType, int Length) : PrimType($"[{ElementType.Name}: {Length}]")
 {

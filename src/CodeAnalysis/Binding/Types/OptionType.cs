@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Types;
+﻿namespace CodeAnalysis.Binding.Types;
 
 public sealed record class OptionType(PrimType UnderlyingType) : PrimType($"{UnderlyingType.Name}?")
 {

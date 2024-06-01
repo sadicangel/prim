@@ -1,5 +1,5 @@
 ﻿
-using CodeAnalysis.Types;
+using CodeAnalysis.Binding.Types;
 
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class LiteralExpressionSyntax(

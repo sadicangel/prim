@@ -1,5 +1,5 @@
-﻿using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Types;
+using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Tests.Parsing;
 partial class ParserTests

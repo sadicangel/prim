@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Binding.Types;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -7,6 +8,8 @@ namespace CodeAnalysis.Binding;
 
 internal static partial class Binder
 {
+    private static readonly List<DeclarationSyntax> s_emptyDeclarationList = [];
+
     public static BoundCompilationUnit Bind(BoundTree boundTree, BoundScope boundScope)
     {
         var context = new BindingContext(boundTree, boundScope);
@@ -18,14 +21,17 @@ internal static partial class Binder
             .GroupBy(d => d.SyntaxKind)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, []))
+        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, s_emptyDeclarationList))
             DeclareStruct((StructDeclarationSyntax)declaration, context);
 
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.FunctionDeclaration, []))
+        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.FunctionDeclaration, s_emptyDeclarationList))
             DeclareFunction((FunctionDeclarationSyntax)declaration, context);
 
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.VariableDeclaration, []))
+        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.VariableDeclaration, s_emptyDeclarationList))
             DeclareVariable((VariableDeclarationSyntax)declaration, context);
+
+        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, s_emptyDeclarationList))
+            DeclareStructMembers((StructDeclarationSyntax)declaration, context);
 
         return BindCompilationUnit(compilationUnit, context);
     }
@@ -41,30 +47,42 @@ internal static partial class Binder
         };
     }
 
-    private static NamedTypeSymbol DeclareStruct(StructDeclarationSyntax syntax, BindingContext context)
+    private static StructSymbol DeclareStruct(StructDeclarationSyntax syntax, BindingContext context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
-        var namedTypeSymbol = new NamedTypeSymbol(new StructSymbol(structName));
-        if (!context.BoundScope.Declare(namedTypeSymbol))
+        var structSymbol = new StructSymbol(syntax, structName, new NamedType(structName));
+        if (!context.BoundScope.Declare(structSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
-        return namedTypeSymbol;
+        return structSymbol;
     }
 
-    private static FunctionTypeSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BindingContext context)
+    private static void DeclareStructMembers(StructDeclarationSyntax syntax, BindingContext context)
+    {
+        var structName = syntax.IdentifierToken.Text.ToString();
+        var structSymbol = context.BoundScope.Lookup(structName)
+            ?? throw new UnreachableException($"Type '{structName}' was not declared");
+
+        // TODO: Bind type members
+        context.BoundScope.Replace(structSymbol);
+    }
+
+    private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BindingContext context)
     {
         var functionName = syntax.IdentifierToken.Text.ToString();
-        var functionType = new FunctionTypeSymbol(new FunctionSymbol(functionName));
-        if (!context.BoundScope.Declare(functionType))
+        var functionType = (FunctionType)BindType(syntax.Type, context);
+        var functionSymbol = new FunctionSymbol(syntax, functionName, functionType);
+        if (!context.BoundScope.Declare(functionSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, functionName);
-        return functionType;
+        return functionSymbol;
     }
 
     private static VariableSymbol DeclareVariable(VariableDeclarationSyntax syntax, BindingContext context)
     {
         var variableName = syntax.IdentifierToken.Text.ToString();
-        var variableType = new VariableSymbol(variableName, syntax.IsReadOnly);
-        if (!context.BoundScope.Declare(variableType))
+        var variableType = BindType(syntax.Type, context);
+        var variableSymbol = new VariableSymbol(syntax, variableName, variableType, syntax.IsReadOnly);
+        if (!context.BoundScope.Declare(variableSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);
-        return variableType;
+        return variableSymbol;
     }
 }

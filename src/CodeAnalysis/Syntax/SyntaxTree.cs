@@ -1,6 +1,5 @@
 ﻿using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Parsing;
-using CodeAnalysis.Syntax.Parsing;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;

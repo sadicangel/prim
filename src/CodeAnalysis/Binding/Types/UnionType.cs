@@ -1,9 +1,9 @@
 ﻿using CodeAnalysis.Text;
 
-namespace CodeAnalysis.Types;
+namespace CodeAnalysis.Binding.Types;
 
 public sealed record class UnionType(ReadOnlyList<PrimType> Types)
-    : PrimType(String.Join(" | ", Types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)))
+    : PrimType(string.Join(" | ", Types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)))
 {
     public bool Equals(UnionType? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();

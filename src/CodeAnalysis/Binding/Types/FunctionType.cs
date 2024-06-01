@@ -1,21 +1,14 @@
-﻿using CodeAnalysis.Operators;
-using CodeAnalysis.Types.Metadata;
+﻿using CodeAnalysis.Binding.Types.Metadata;
 
-namespace CodeAnalysis.Types;
+namespace CodeAnalysis.Binding.Types;
 
 public sealed record class FunctionType : PrimType
 {
     public FunctionType(ReadOnlyList<Parameter> parameters, PrimType returnType)
-        : base($"({String.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}")
+        : base($"({string.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}")
     {
         Parameters = parameters;
         ReturnType = returnType;
-        Operators.Add(
-            new BinaryOperatorInfo(
-                OperatorKind.Call,
-                this,
-                new TypeList([.. Parameters.Select(p => p.Type)]),
-                ReturnType));
     }
 
     public IReadOnlyList<Parameter> Parameters { get; init; }

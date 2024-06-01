@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Parsing;
 
 namespace CodeAnalysis.Parsing;
 internal static partial class Parser

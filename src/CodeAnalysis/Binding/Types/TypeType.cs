@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Types;
+﻿namespace CodeAnalysis.Binding.Types;
 
 public sealed record class TypeType(PrimType Type) : PrimType(PredefinedTypeNames.Type)
 {

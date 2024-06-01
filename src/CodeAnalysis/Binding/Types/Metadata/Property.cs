@@ -1,11 +1,9 @@
-﻿using CodeAnalysis.Types.Metadata;
-
-namespace CodeAnalysis.Types.Members;
+﻿namespace CodeAnalysis.Binding.Types.Metadata;
 
 public sealed record class Property(
     string Name,
     PrimType Type,
-    bool IsMutable
+    bool IsReadOnly
 )
     : Member(Name)
 {

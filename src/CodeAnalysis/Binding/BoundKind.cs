@@ -76,4 +76,10 @@ internal enum BoundKind
     GreaterThanExpression,
     GreaterThanOrEqualExpression,
     CoalesceExpression,
+
+    Function,
+    Parameter,
+    Struct,
+    Property,
+    Variable,
 }

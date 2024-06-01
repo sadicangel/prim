@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Types.Metadata;
+﻿namespace CodeAnalysis.Binding.Types.Metadata;
 
 public sealed record class Parameter(string Name, PrimType Type)
 {

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
+using CodeAnalysis.Binding.Types;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser

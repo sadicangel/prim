@@ -1,3 +1,10 @@
-﻿namespace CodeAnalysis.Binding.Symbols;
+﻿using CodeAnalysis.Binding.Types;
+using CodeAnalysis.Syntax;
 
-internal sealed record class FunctionSymbol(string Name) : Symbol(SymbolKind.Function, Name);
+namespace CodeAnalysis.Binding.Symbols;
+
+internal sealed record class FunctionSymbol(SyntaxNode SyntaxNode, string Name, FunctionType Type)
+    : Symbol(BoundKind.Function, SyntaxNode, Name)
+{
+    public override FunctionType Type { get; } = Type;
+}

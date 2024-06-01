@@ -1,8 +1,9 @@
 ﻿using System.Globalization;
 using System.Text;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
-namespace CodeAnalysis.Syntax.Parsing;
+namespace CodeAnalysis.Parsing;
 
 internal static class Scanner
 {
@@ -369,12 +370,12 @@ internal static class Scanner
             case ['"', ..]:
                 return ScanString(syntaxTree, position, out kind, out range, out value);
 
-            case [var d1, ..] when Char.IsAsciiDigit(d1):
-            case ['.', var d2, ..] when Char.IsAsciiDigit(d2):
+            case [var d1, ..] when char.IsAsciiDigit(d1):
+            case ['.', var d2, ..] when char.IsAsciiDigit(d2):
                 return ScanNumber(syntaxTree, position, out kind, out range, out value);
 
             case ['_', ..]:
-            case [var l, ..] when Char.IsAsciiLetter(l):
+            case [var l, ..] when char.IsAsciiLetter(l):
                 return ScanIdentifier(syntaxTree, position, out kind, out range, out value);
 
             // Control
@@ -406,7 +407,7 @@ internal static class Scanner
             ['/', '/', ..] => ScanSingleLineComment(syntaxTree, position, out item),
             ['\n' or '\r', ..] => ScanLineBreak(syntaxTree, position, out item),
             [' ' or '\t', ..] => ScanWhiteSpace(syntaxTree, position, out item),
-            [var whitespace, ..] when Char.IsWhiteSpace(whitespace) => ScanWhiteSpace(syntaxTree, position, out item),
+            [var whitespace, ..] when char.IsWhiteSpace(whitespace) => ScanWhiteSpace(syntaxTree, position, out item),
                 _ => 0
             };
 
@@ -446,7 +447,7 @@ internal static class Scanner
             {
                 case []:
                 case ['\0' or '\r' or '\n', ..]:
-                case [var c, ..] when !Char.IsWhiteSpace(c):
+                case [var c, ..] when !char.IsWhiteSpace(c):
                     done = true;
                     break;
                 default:
@@ -525,7 +526,7 @@ internal static class Scanner
             case ['0', 'x' or 'X', ..]:
                 {
                     read += 2;
-                    while (Char.IsAsciiHexDigit(syntaxTree.SourceText[position + read]))
+                    while (char.IsAsciiHexDigit(syntaxTree.SourceText[position + read]))
                     {
                         ++read;
                     }
@@ -534,7 +535,7 @@ internal static class Scanner
                 break;
             default:
                 {
-                    while (Char.IsAsciiDigit(syntaxTree.SourceText[position + read]))
+                    while (char.IsAsciiDigit(syntaxTree.SourceText[position + read]))
                     {
                         ++read;
                     }
@@ -543,7 +544,7 @@ internal static class Scanner
                     {
                         isFloat = true;
                         ++read;
-                        while (Char.IsAsciiDigit(syntaxTree.SourceText[position + read]))
+                        while (char.IsAsciiDigit(syntaxTree.SourceText[position + read]))
                         {
                             ++read;
                         }
@@ -552,12 +553,12 @@ internal static class Scanner
                     if (syntaxTree.SourceText[position + read] is 'e' or 'E')
                     {
                         isFloat = true;
-                        if (!Char.IsAsciiDigit(syntaxTree.SourceText[position + read - 1]))
+                        if (!char.IsAsciiDigit(syntaxTree.SourceText[position + read - 1]))
                         {
                             isInvalid = true;
                         }
                         ++read;
-                        while (Char.IsAsciiDigit(syntaxTree.SourceText[position + read]))
+                        while (char.IsAsciiDigit(syntaxTree.SourceText[position + read]))
                         {
                             ++read;
                         }
@@ -728,6 +729,6 @@ internal static class Scanner
         };
         return read;
 
-        static bool IsValid(char c) => c is '_' || Char.IsAsciiLetterOrDigit(c);
+        static bool IsValid(char c) => c is '_' || char.IsAsciiLetterOrDigit(c);
     }
 }
