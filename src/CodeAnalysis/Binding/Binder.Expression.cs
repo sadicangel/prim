@@ -44,8 +44,6 @@ partial class Binder
                 BindFunctionDeclaration((FunctionDeclarationSyntax)syntax, context),
             SyntaxKind.StructDeclaration =>
                 BindStructDeclaration((StructDeclarationSyntax)syntax, context),
-            SyntaxKind.PropertyDeclaration =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             SyntaxKind.LocalDeclaration =>
                 BindLocalDeclaration((LocalDeclarationSyntax)syntax, context),
             SyntaxKind.EmptyExpression =>
@@ -53,63 +51,39 @@ partial class Binder
             SyntaxKind.StatementExpression =>
                 BindStatementExpression((StatementExpressionSyntax)syntax, context),
             SyntaxKind.BlockExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindBlockExpression((BlockExpressionSyntax)syntax, context),
             SyntaxKind.ArrayExpression =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             SyntaxKind.StructExpression =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             SyntaxKind.PropertyExpression =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.UnaryPlusExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.UnaryMinusExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.PrefixIncrementExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.PrefixDecrementExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.OnesComplementExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+            SyntaxKind.UnaryPlusExpression or
+            SyntaxKind.UnaryMinusExpression or
+            SyntaxKind.PrefixIncrementExpression or
+            SyntaxKind.PrefixDecrementExpression or
+            SyntaxKind.OnesComplementExpression or
             SyntaxKind.NotExpression =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.AddExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.SubtractExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.MultiplyExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.DivideExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.ModuloExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.PowerExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.LeftShiftExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.RightShiftExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.LogicalOrExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.LogicalAndExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.BitwiseOrExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.BitwiseAndExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.ExclusiveOrExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.EqualsExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.NotEqualsExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.LessThanExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.LessThanOrEqualExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.GreaterThanExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
-            SyntaxKind.GreaterThanOrEqualExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+            SyntaxKind.AddExpression or
+            SyntaxKind.SubtractExpression or
+            SyntaxKind.MultiplyExpression or
+            SyntaxKind.DivideExpression or
+            SyntaxKind.ModuloExpression or
+            SyntaxKind.PowerExpression or
+            SyntaxKind.LeftShiftExpression or
+            SyntaxKind.RightShiftExpression or
+            SyntaxKind.LogicalOrExpression or
+            SyntaxKind.LogicalAndExpression or
+            SyntaxKind.BitwiseOrExpression or
+            SyntaxKind.BitwiseAndExpression or
+            SyntaxKind.ExclusiveOrExpression or
+            SyntaxKind.EqualsExpression or
+            SyntaxKind.NotEqualsExpression or
+            SyntaxKind.LessThanExpression or
+            SyntaxKind.LessThanOrEqualExpression or
+            SyntaxKind.GreaterThanExpression or
+            SyntaxKind.GreaterThanOrEqualExpression or
             SyntaxKind.CoalesceExpression =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             _ =>
