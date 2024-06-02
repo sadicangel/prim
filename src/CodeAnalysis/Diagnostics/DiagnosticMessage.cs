@@ -11,11 +11,11 @@ internal static class DiagnosticMessage
     public static string InvalidCharacter(char character) =>
         $"Invalid character input: '{character}'";
     public static string InvalidSyntaxValue(string value, SyntaxKind kind) =>
-        $"The value '{value}' is not a valid '{GetDisplayText(kind)}'";
+        $"'{value}' is not a valid '{GetDisplayText(kind)}'";
     public static string UnterminatedComment() =>
-        "Unterminated comment";
+        $"Unterminated comment";
     public static string UnterminatedString() =>
-        "Unterminated string literal";
+        $"Unterminated string literal";
 
     // Parsing error messages.
     public static string ExpectedTypeDefinition() =>
@@ -28,16 +28,17 @@ internal static class DiagnosticMessage
         $"Unexpected token '{GetDisplayText(actual)}'. Expected '{GetDisplayText(expected)}'";
 
     // Binding error messages.
-    public static string ReportInvalidArrayLength() =>
-        $"Invalid array length expression. Must be a constant i32 value";
+    public static string InvalidArrayLength() =>
+        $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
     public static string SymbolRedeclaration(string symbolName) =>
         $"Redeclaration of symbol '{symbolName}'";
     public static string UndefinedType(string typeName) =>
         $"Undefined type '{typeName}'";
     public static string UndefinedTypeMember(string typeName, string memberName) =>
         $"'{typeName}' does not contain a definition for '{memberName}'";
-    public static string ReportUndefinedSymbol(string symbolName) =>
+    public static string UndefinedSymbol(string symbolName) =>
         $"Undefined symbol '{symbolName}'";
+
     //public static string AmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftType.Name}' and '{rightType.Name}'";
     //public static string InvalidArgumentType(Parameter parameter, PrimType actualType) => $"Invalid expression of type '{actualType.Name}' provided for parameter '{parameter.Name}' of type '{parameter.Type.Name}'";
     //public static string UndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => $"Binary operator '{@operator.Text}' is not defined for types '{leftType.Name}' and '{rightType.Name}'";

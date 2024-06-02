@@ -71,14 +71,14 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 
     // Binding Errors.
     internal void ReportInvalidArrayLength(SourceLocation location) =>
-        ReportError(location, DiagnosticMessage.ReportInvalidArrayLength());
+        ReportError(location, DiagnosticMessage.InvalidArrayLength());
     internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) =>
         ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     internal void ReportUndefinedTypeMember(SourceLocation location, string typeName, string memberName) =>
         ReportError(location, DiagnosticMessage.UndefinedTypeMember(typeName, memberName));
     internal void ReportUndefinedSymbol(SourceLocation location, string symbolName) =>
-        ReportError(location, DiagnosticMessage.ReportUndefinedSymbol(symbolName));
+        ReportError(location, DiagnosticMessage.UndefinedSymbol(symbolName));
 
     //internal void ReportAmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftType, rightType));
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
