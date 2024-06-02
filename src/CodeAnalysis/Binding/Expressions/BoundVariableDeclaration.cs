@@ -4,13 +4,13 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundVariableDeclaration(
     SyntaxNode SyntaxNode,
-    VariableSymbol Symbol,
+    VariableSymbol VariableSymbol,
     BoundExpression Expression)
-    : BoundDeclaration(BoundKind.VariableDeclaration, SyntaxNode, Symbol.Type)
+    : BoundDeclaration(BoundKind.VariableDeclaration, SyntaxNode, VariableSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return Symbol;
+        yield return VariableSymbol;
         yield return Expression;
     }
 }

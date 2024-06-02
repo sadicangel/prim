@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding.Types;
 
-public sealed record class UnionType(ReadOnlyList<PrimType> Types)
+internal sealed record class UnionType(ReadOnlyList<PrimType> Types)
     : PrimType(string.Join(" | ", Types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)))
 {
     public bool Equals(UnionType? other) => base.Equals(other);

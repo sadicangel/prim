@@ -70,17 +70,23 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(actual.Location, DiagnosticMessage.UnexpectedToken(expected, actual.SyntaxKind));
 
     // Binding Errors.
+    internal void ReportAmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
+        ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftTypeName, rightTypeName));
     internal void ReportInvalidArrayLength(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidArrayLength());
     internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) =>
         ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
+    internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
+        ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftTypeName, rightTypeName));
     internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     internal void ReportUndefinedTypeMember(SourceLocation location, string typeName, string memberName) =>
         ReportError(location, DiagnosticMessage.UndefinedTypeMember(typeName, memberName));
     internal void ReportUndefinedSymbol(SourceLocation location, string symbolName) =>
         ReportError(location, DiagnosticMessage.UndefinedSymbol(symbolName));
+    internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
+        ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandTypeName));
 
-    //internal void ReportAmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftType, rightType));
+
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     //internal void ReportInvalidImplicitConversion(SourceLocation location, PrimType sourceType, PrimType destinationType) => ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceType, destinationType));
@@ -88,8 +94,6 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     //internal void ReportInvalidSymbolType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidSymbolType(expectedType, actualType));
     //internal void ReportInvalidTypeConversion(SourceLocation location, PrimType sourceType, PrimType targetType) => ReportError(location, DiagnosticMessage.InvalidTypeConversion(sourceType, targetType));
     //internal void ReportSymbolReassignment(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.SymbolReassignment(symbol));
-    //internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftType, rightType));
-    //internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandType));
     //internal void ReportRedundantConversion(SourceLocation location) => ReportWarning(location, DiagnosticMessage.RedundantConversion());
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(actualType));
     //internal void ReportInvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Location, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));

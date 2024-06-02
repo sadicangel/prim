@@ -1,6 +1,5 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Binding.Types;
 using CodeAnalysis.Binding.Types.Metadata;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -29,6 +28,6 @@ partial class Binder
             var propExpr = new BoundPropertyExpression(propertySyntax, propertySymbol, init);
             properties.Add(propExpr);
         }
-        return new BoundStructExpression(syntax, PredefinedTypes.Unknown, properties.ToBoundList());
+        return new BoundStructExpression(syntax, structSymbol, properties.ToBoundList());
     }
 }

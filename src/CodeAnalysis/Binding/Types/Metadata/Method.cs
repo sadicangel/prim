@@ -1,2 +1,2 @@
 ﻿namespace CodeAnalysis.Binding.Types.Metadata;
-public abstract record class Method(string Name, PrimType Type) : Member(Name);
+internal sealed record class Method(string Name, FunctionType Type) : Member(Name);

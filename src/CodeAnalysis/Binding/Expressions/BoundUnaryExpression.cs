@@ -3,18 +3,16 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 
-internal sealed record class BoundBinaryExpression(
+internal sealed record class BoundUnaryExpression(
     BoundKind BoundKind,
     SyntaxNode SyntaxNode,
-    BoundExpression Left,
     OperatorSymbol OperatorSymbol,
-    BoundExpression Right)
+    BoundExpression Operand)
     : BoundExpression(BoundKind, SyntaxNode, OperatorSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return Left;
         yield return OperatorSymbol;
-        yield return Right;
+        yield return Operand;
     }
 }
