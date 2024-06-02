@@ -21,7 +21,7 @@ partial class Binder
         {
             if (structSymbol.Type.GetProperty(propertySyntax.IdentifierToken.Text) is not Property property)
             {
-                context.Diagnostics.ReportUndefinedMember(propertySyntax.Location, structName, propertySyntax.IdentifierToken.Text.ToString());
+                context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.IdentifierToken.Text.ToString());
                 continue;
             }
             var propertySymbol = new PropertySymbol(propertySyntax, property);

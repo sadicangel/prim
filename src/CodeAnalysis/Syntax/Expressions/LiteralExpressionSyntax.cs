@@ -1,12 +1,8 @@
-﻿
-using CodeAnalysis.Binding.Types;
-
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class LiteralExpressionSyntax(
     SyntaxKind SyntaxKind,
     SyntaxTree SyntaxTree,
     SyntaxToken LiteralToken,
-    PrimType LiteralType,
     object? LiteralValue)
     : ExpressionSyntax(SyntaxKind, SyntaxTree)
 {

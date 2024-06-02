@@ -201,8 +201,6 @@ public static class SyntaxFacts
         };
     }
 
-    public static string? GetDisplayText(SyntaxKind syntaxKind) => GetText(syntaxKind) ?? syntaxKind.ToString();
-
     public static SyntaxKind GetKeywordKind(ReadOnlySpan<char> syntaxText)
     {
         return syntaxText switch

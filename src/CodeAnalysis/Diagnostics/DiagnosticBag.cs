@@ -42,39 +42,54 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         _diagnostics.Add(new Diagnostic(Id: "", location, severity, message));
     }
 
-    public void ReportError(SourceLocation location, string message) => Report(location, DiagnosticSeverity.Error, message);
-    public void ReportWarning(SourceLocation location, string message) => Report(location, DiagnosticSeverity.Warning, message);
-    public void ReportInformation(SourceLocation location, string message) => Report(location, DiagnosticSeverity.Warning, message);
+    public void ReportError(SourceLocation location, string message) =>
+        Report(location, DiagnosticSeverity.Error, message);
+    public void ReportWarning(SourceLocation location, string message) =>
+        Report(location, DiagnosticSeverity.Warning, message);
+    public void ReportInformation(SourceLocation location, string message) =>
+        Report(location, DiagnosticSeverity.Warning, message);
 
     // Scanning Errors.
-    internal void ReportInvalidCharacter(SourceLocation location, char character) => ReportError(location, DiagnosticMessage.InvalidCharacter(character));
-    internal void ReportInvalidSyntaxValue(SourceLocation location, SyntaxKind kind) => ReportError(location, DiagnosticMessage.InvalidSyntaxValue(location.Text.ToString(), kind));
-    internal void ReportUnterminatedComment(SourceLocation location) => ReportError(location, DiagnosticMessage.UnterminatedComment());
-    internal void ReportUnterminatedString(SourceLocation location) => ReportError(location, DiagnosticMessage.UnterminatedString());
+    internal void ReportInvalidCharacter(SourceLocation location, char character) =>
+        ReportError(location, DiagnosticMessage.InvalidCharacter(character));
+    internal void ReportInvalidSyntaxValue(SourceLocation location, SyntaxKind kind) =>
+        ReportError(location, DiagnosticMessage.InvalidSyntaxValue(location.Text.ToString(), kind));
+    internal void ReportUnterminatedComment(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.UnterminatedComment());
+    internal void ReportUnterminatedString(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.UnterminatedString());
 
     // Parsing Errors.
-    internal void ReportExpectedTypeDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.ExpectedTypeDefinition());
-    internal void ReportInvalidLocationForFunctionDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidLocationForFunctionDefinition());
-    internal void ReportInvalidLocationForTypeDefinition(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidLocationForTypeDefinition());
-    internal void ReportUnexpectedToken(SyntaxKind expected, SyntaxToken actual) => ReportError(actual.Location, DiagnosticMessage.UnexpectedToken(expected, actual.SyntaxKind));
+    internal void ReportExpectedTypeDefinition(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.ExpectedTypeDefinition());
+    internal void ReportInvalidLocationForFunctionDefinition(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidLocationForFunctionDefinition());
+    internal void ReportInvalidLocationForTypeDefinition(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidLocationForTypeDefinition());
+    internal void ReportUnexpectedToken(SyntaxKind expected, SyntaxToken actual) =>
+        ReportError(actual.Location, DiagnosticMessage.UnexpectedToken(expected, actual.SyntaxKind));
 
-    // Binder Errors.
+    // Binding Errors.
+    internal void ReportInvalidArrayLength(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.ReportInvalidArrayLength());
+    internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) =>
+        ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
+    internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
+    internal void ReportUndefinedTypeMember(SourceLocation location, string typeName, string memberName) =>
+        ReportError(location, DiagnosticMessage.UndefinedTypeMember(typeName, memberName));
+    internal void ReportUndefinedSymbol(SourceLocation location, string symbolName) =>
+        ReportError(location, DiagnosticMessage.ReportUndefinedSymbol(symbolName));
+
     //internal void ReportAmbiguousBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftType, rightType));
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
-    internal void ReportInvalidArrayLength(SourceLocation location) => ReportError(location, DiagnosticMessage.ReportInvalidArrayLength());
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     //internal void ReportInvalidImplicitConversion(SourceLocation location, PrimType sourceType, PrimType destinationType) => ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceType, destinationType));
     //internal void ReportInvalidNumberOfArguments(SourceLocation location, FunctionType functionType, int actualNumberOfArguments) => ReportError(location, DiagnosticMessage.InvalidNumberOfArguments(functionType, actualNumberOfArguments));
     //internal void ReportInvalidSymbolType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidSymbolType(expectedType, actualType));
     //internal void ReportInvalidTypeConversion(SourceLocation location, PrimType sourceType, PrimType targetType) => ReportError(location, DiagnosticMessage.InvalidTypeConversion(sourceType, targetType));
     //internal void ReportSymbolReassignment(SourceLocation location, Symbol symbol) => ReportError(location, DiagnosticMessage.SymbolReassignment(symbol));
-    internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     //internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, PrimType leftType, PrimType rightType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftType, rightType));
-    internal void ReportUndefinedMember(SourceLocation location, string typeName, string memberName) => ReportError(location, DiagnosticMessage.UndefinedMember(typeName, memberName));
-    internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
-    internal void ReportUndefinedSymbol(SourceLocation location, string symbolName) => ReportError(location, DiagnosticMessage.ReportUndefinedSymbol(symbolName));
     //internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, PrimType operandType) => ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandType));
-
     //internal void ReportRedundantConversion(SourceLocation location) => ReportWarning(location, DiagnosticMessage.RedundantConversion());
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(actualType));
     //internal void ReportInvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Location, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));
