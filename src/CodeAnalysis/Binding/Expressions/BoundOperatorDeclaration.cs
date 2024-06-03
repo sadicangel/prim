@@ -2,15 +2,16 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
-internal sealed record class BoundPropertyDeclaration(
+
+internal sealed record class BoundOperatorDeclaration(
     SyntaxNode SyntaxNode,
-    PropertySymbol PropertySymbol,
+    OperatorSymbol OperatorSymbol,
     BoundExpression Expression)
-    : BoundMemberDeclaration(BoundKind.PropertyDeclaration, SyntaxNode, PropertySymbol.Type)
+    : BoundMemberDeclaration(BoundKind.OperatorDeclaration, SyntaxNode, OperatorSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return PropertySymbol;
+        yield return OperatorSymbol;
         yield return Expression;
     }
 }

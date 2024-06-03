@@ -1,5 +1,5 @@
-﻿using CodeAnalysis.Syntax;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
 
@@ -47,9 +47,8 @@ internal record class SyntaxTokenIterator(IReadOnlyList<SyntaxToken> Tokens)
         return token;
     }
 
-    public bool TryMatch(SyntaxKind syntaxKind, [MaybeNullWhen(false)] out SyntaxToken token) => (token = MatchOrDefault(syntaxKind)) is not null;
-
-    public SyntaxToken? MatchOrDefault(SyntaxKind syntaxKind) => Current.SyntaxKind == syntaxKind ? Next() : null;
+    public bool TryMatch(SyntaxKind syntaxKind, [MaybeNullWhen(false)] out SyntaxToken token) =>
+        (token = Current.SyntaxKind == syntaxKind ? Next() : null) is not null;
 
     public SyntaxToken Match(params ReadOnlySpan<SyntaxKind> syntaxKinds)
     {

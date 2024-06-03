@@ -11,11 +11,11 @@ partial class Parser
         var structToken = iterator.Match(SyntaxKind.StructKeyword);
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
-        var properties = ParseSyntaxList(
+        var members = ParseSyntaxList(
             syntaxTree,
             iterator,
             [SyntaxKind.BraceCloseToken, SyntaxKind.EofToken],
-            ParsePropertyDeclaration);
+            ParseMemberDeclaration);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
         return new StructDeclarationSyntax(
@@ -25,7 +25,7 @@ partial class Parser
             structToken,
             operatorToken,
             braceOpenToken,
-            properties,
+            members,
             braceCloseToken);
     }
 }

@@ -15,7 +15,7 @@ internal static partial class Parser
     {
         var tokens = Scanner.Scan(syntaxTree).ToArray();
         if (tokens.Length == 0)
-            return new CompilationUnitSyntax(syntaxTree, [], SyntaxFactory.EofToken(syntaxTree));
+            return new CompilationUnitSyntax(syntaxTree, [], SyntaxFactory.Token(SyntaxKind.EofToken, syntaxTree));
 
         var iterator = new SyntaxTokenIterator(tokens);
 

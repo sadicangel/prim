@@ -13,47 +13,45 @@ partial class Binder
         var left = BindExpression(syntax.Left, context);
         var right = BindExpression(syntax.Right, context);
 
-        var (expressionKind, operatorKind) = syntax.SyntaxKind switch
+        var expressionKind = syntax.SyntaxKind switch
         {
-            SyntaxKind.AddExpression => (BoundKind.AddExpression, BoundKind.AddOperator),
-            SyntaxKind.SubtractExpression => (BoundKind.SubtractExpression, BoundKind.SubtractOperator),
-            SyntaxKind.MultiplyExpression => (BoundKind.MultiplyExpression, BoundKind.MultiplyOperator),
-            SyntaxKind.DivideExpression => (BoundKind.DivideExpression, BoundKind.DivideOperator),
-            SyntaxKind.ModuloExpression => (BoundKind.ModuloExpression, BoundKind.ModuloOperator),
-            SyntaxKind.PowerExpression => (BoundKind.PowerExpression, BoundKind.PowerOperator),
-            SyntaxKind.LeftShiftExpression => (BoundKind.LeftShiftExpression, BoundKind.LeftShiftOperator),
-            SyntaxKind.RightShiftExpression => (BoundKind.RightShiftExpression, BoundKind.RightShiftOperator),
-            SyntaxKind.LogicalOrExpression => (BoundKind.LogicalOrExpression, BoundKind.LogicalOrOperator),
-            SyntaxKind.LogicalAndExpression => (BoundKind.LogicalAndExpression, BoundKind.LogicalAndOperator),
-            SyntaxKind.BitwiseOrExpression => (BoundKind.BitwiseOrExpression, BoundKind.BitwiseOrOperator),
-            SyntaxKind.BitwiseAndExpression => (BoundKind.BitwiseAndExpression, BoundKind.BitwiseAndOperator),
-            SyntaxKind.ExclusiveOrExpression => (BoundKind.ExclusiveOrExpression, BoundKind.ExclusiveOrOperator),
-            SyntaxKind.EqualsExpression => (BoundKind.EqualsExpression, BoundKind.EqualsOperator),
-            SyntaxKind.NotEqualsExpression => (BoundKind.NotEqualsExpression, BoundKind.NotEqualsOperator),
-            SyntaxKind.LessThanExpression => (BoundKind.LessThanExpression, BoundKind.LessThanOperator),
-            SyntaxKind.LessThanOrEqualExpression => (BoundKind.LessThanOrEqualExpression, BoundKind.LessThanOrEqualOperator),
-            SyntaxKind.GreaterThanExpression => (BoundKind.GreaterThanExpression, BoundKind.GreaterThanOperator),
-            SyntaxKind.GreaterThanOrEqualExpression => (BoundKind.GreaterThanOrEqualExpression, BoundKind.GreaterThanOrEqualOperator),
-            SyntaxKind.CoalesceExpression => (BoundKind.CoalesceExpression, BoundKind.CoalesceOperator),
+            SyntaxKind.AddExpression => BoundKind.AddExpression,
+            SyntaxKind.SubtractExpression => BoundKind.SubtractExpression,
+            SyntaxKind.MultiplyExpression => BoundKind.MultiplyExpression,
+            SyntaxKind.DivideExpression => BoundKind.DivideExpression,
+            SyntaxKind.ModuloExpression => BoundKind.ModuloExpression,
+            SyntaxKind.PowerExpression => BoundKind.PowerExpression,
+            SyntaxKind.LeftShiftExpression => BoundKind.LeftShiftExpression,
+            SyntaxKind.RightShiftExpression => BoundKind.RightShiftExpression,
+            SyntaxKind.LogicalOrExpression => BoundKind.LogicalOrExpression,
+            SyntaxKind.LogicalAndExpression => BoundKind.LogicalAndExpression,
+            SyntaxKind.BitwiseOrExpression => BoundKind.BitwiseOrExpression,
+            SyntaxKind.BitwiseAndExpression => BoundKind.BitwiseAndExpression,
+            SyntaxKind.ExclusiveOrExpression => BoundKind.ExclusiveOrExpression,
+            SyntaxKind.EqualsExpression => BoundKind.EqualsExpression,
+            SyntaxKind.NotEqualsExpression => BoundKind.NotEqualsExpression,
+            SyntaxKind.LessThanExpression => BoundKind.LessThanExpression,
+            SyntaxKind.LessThanOrEqualExpression => BoundKind.LessThanOrEqualExpression,
+            SyntaxKind.GreaterThanExpression => BoundKind.GreaterThanExpression,
+            SyntaxKind.GreaterThanOrEqualExpression => BoundKind.GreaterThanOrEqualExpression,
+            SyntaxKind.CoalesceExpression => BoundKind.CoalesceExpression,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 
-        var operatorName = SyntaxFacts.GetText(syntax.Operator.SyntaxKind)
-            ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.Operator.SyntaxKind}'");
-        var operators = left.Type.GetBinaryOperators(operatorName, left.Type, right.Type, PredefinedTypes.Any);
+        var operators = left.Type.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
         if (operators is [])
         {
-            context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator, left.Type.Name, right.Type.Name);
+            context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
             return new BoundNeverExpression(syntax);
         }
         if (operators.Count > 1)
         {
-            context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.Operator, left.Type.Name, right.Type.Name);
+            context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
             return new BoundNeverExpression(syntax);
         }
 
         var @operator = operators[0];
-        var operatorSymbol = new OperatorSymbol(operatorKind, syntax.Operator, @operator);
+        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
 
         return new BoundBinaryExpression(expressionKind, syntax, left, operatorSymbol, right);
     }

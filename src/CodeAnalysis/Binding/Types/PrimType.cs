@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Types.Metadata;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Types;
 
@@ -10,9 +11,7 @@ internal abstract record class PrimType(string Name)
     public bool IsNever { get => this == PredefinedTypes.Never; }
     public bool IsUnknown { get => this == PredefinedTypes.Unknown; }
 
-    public ReadOnlyList<Property> Properties { get; init; } = [];
-    public ReadOnlyList<Method> Methods { get; init; } = [];
-    public ReadOnlyList<Operator> Operators { get; init; } = [];
+    public List<Member> Members { get; init; } = [];
 
     private string GetDebuggerDisplay() => $"{Name}: {PredefinedTypeNames.Type}";
 
@@ -24,29 +23,48 @@ internal abstract record class PrimType(string Name)
 
     public Property? GetProperty(ReadOnlySpan<char> name)
     {
-        for (var i = 0; i < Properties.Count; ++i)
+        foreach (var property in Members.OfType<Property>())
         {
-            var property = Properties[i];
             if (name.Equals(property.Name, StringComparison.Ordinal))
                 return property;
         }
         return null;
     }
 
-    public List<Operator> GetUnaryOperators(string name, PrimType operandType, PrimType resultType)
+    public Method? GetMethod(ReadOnlySpan<char> name, FunctionType type)
     {
-        return Operators
-            .Where(o => o.Name == name)
+        foreach (var method in Members.OfType<Method>())
+        {
+            if (name.Equals(method.Name, StringComparison.Ordinal) && method.Type == type)
+                return method;
+        }
+        return null;
+    }
+
+    public Operator? GetOperator(SyntaxKind operatorKind, FunctionType type)
+    {
+        foreach (var @operator in Members.OfType<Operator>())
+        {
+            if (@operator.OperatorKind == operatorKind && @operator.Type == type)
+                return @operator;
+        }
+        return null;
+    }
+
+    public List<Operator> GetUnaryOperators(SyntaxKind operatorKind, PrimType operandType, PrimType resultType)
+    {
+        return Members.OfType<Operator>()
+            .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 1)
             .Where(o => o.Type.Parameters[0].Type == operandType)
             .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
             .ToList();
     }
 
-    public List<Operator> GetBinaryOperators(string name, PrimType leftType, PrimType rightType, PrimType resultType)
+    public List<Operator> GetBinaryOperators(SyntaxKind operatorKind, PrimType leftType, PrimType rightType, PrimType resultType)
     {
-        return Operators
-            .Where(o => o.Name == name)
+        return Members.OfType<Operator>()
+            .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 2)
             .Where(o => o.Type.Parameters[0].Type == leftType)
             .Where(o => o.Type.Parameters[1].Type == rightType)

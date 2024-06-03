@@ -6,7 +6,7 @@ public sealed record class StructDeclarationSyntax(
     SyntaxToken StructToken,
     SyntaxToken OperatorToken,
     SyntaxToken BraceOpenToken,
-    SyntaxList<PropertyDeclarationSyntax> Properties,
+    SyntaxList<MemberDeclarationSyntax> Members,
     SyntaxToken BraceCloseToken)
     : DeclarationSyntax(SyntaxKind.StructDeclaration, SyntaxTree)
 {
@@ -19,8 +19,8 @@ public sealed record class StructDeclarationSyntax(
         yield return StructToken;
         yield return OperatorToken;
         yield return BraceOpenToken;
-        foreach (var property in Properties)
-            yield return property;
+        foreach (var member in Members)
+            yield return member;
         yield return BraceCloseToken;
     }
 }

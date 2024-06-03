@@ -15,7 +15,7 @@ public partial class ParserTests
         var node = Assert.Single(tree.Root.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<StructDeclarationSyntax>(node);
-        var member = Assert.Single(decl.Properties);
+        var member = Assert.Single(decl.Members);
         Assert.Equal(SyntaxKind.PropertyDeclaration, member.SyntaxKind);
     }
 }

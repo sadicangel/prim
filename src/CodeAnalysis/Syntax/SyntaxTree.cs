@@ -52,7 +52,7 @@ public sealed class SyntaxTree
             tokens.AddRange(Scanner.Scan(syntaxTree));
             var eof = tokens is [.., SyntaxToken last and { SyntaxKind: SyntaxKind.EofToken }]
                 ? last
-                : SyntaxFactory.EofToken(syntaxTree);
+                : SyntaxFactory.Token(SyntaxKind.EofToken, syntaxTree);
 
             return new CompilationUnitSyntax(syntaxTree, tokens.ToSyntaxList(), eof);
         }

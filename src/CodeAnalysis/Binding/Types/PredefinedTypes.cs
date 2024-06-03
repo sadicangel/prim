@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using CodeAnalysis.Binding.Types.Metadata;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Types;
 internal static class PredefinedTypes
@@ -32,29 +32,29 @@ internal static class PredefinedTypes
 
     static PredefinedTypes()
     {
-        Str.SetOperators(GetEqualityOperators(Str));
+        Str.Members.AddRange(GetEqualityOperators(Str));
 
-        Bool.SetOperators(GetEqualityOperators(Bool), GetLogicalOperators(Bool));
+        Bool.Members.AddRange(GetEqualityOperators(Bool).Concat(GetLogicalOperators(Bool)));
 
-        I8.SetOperators(GetEqualityOperators(I8), GetComparisonOperators(I8), GetBitwiseOperators(I8), GetMathOperators(I8));
-        I16.SetOperators(GetEqualityOperators(I16), GetComparisonOperators(I16), GetBitwiseOperators(I16), GetMathOperators(I16));
-        I32.SetOperators(GetEqualityOperators(I32), GetComparisonOperators(I32), GetBitwiseOperators(I32), GetMathOperators(I32));
-        I64.SetOperators(GetEqualityOperators(I64), GetComparisonOperators(I64), GetBitwiseOperators(I64), GetMathOperators(I64));
-        I128.SetOperators(GetEqualityOperators(I128), GetComparisonOperators(I128), GetBitwiseOperators(I128), GetMathOperators(I128));
-        ISize.SetOperators(GetEqualityOperators(ISize), GetComparisonOperators(ISize), GetBitwiseOperators(ISize), GetMathOperators(ISize));
+        I8.Members.AddRange(GetEqualityOperators(I8).Concat(GetComparisonOperators(I8)).Concat(GetBitwiseOperators(I8)).Concat(GetMathOperators(I8)));
+        I16.Members.AddRange(GetEqualityOperators(I16).Concat(GetComparisonOperators(I16)).Concat(GetBitwiseOperators(I16)).Concat(GetMathOperators(I16)));
+        I32.Members.AddRange(GetEqualityOperators(I32).Concat(GetComparisonOperators(I32)).Concat(GetBitwiseOperators(I32)).Concat(GetMathOperators(I32)));
+        I64.Members.AddRange(GetEqualityOperators(I64).Concat(GetComparisonOperators(I64)).Concat(GetBitwiseOperators(I64)).Concat(GetMathOperators(I64)));
+        I128.Members.AddRange(GetEqualityOperators(I128).Concat(GetComparisonOperators(I128)).Concat(GetBitwiseOperators(I128)).Concat(GetMathOperators(I128)));
+        ISize.Members.AddRange(GetEqualityOperators(ISize).Concat(GetComparisonOperators(ISize)).Concat(GetBitwiseOperators(ISize)).Concat(GetMathOperators(ISize)));
 
-        U8.SetOperators(GetEqualityOperators(U8), GetComparisonOperators(U8), GetBitwiseOperators(U8), GetMathOperators(U8));
-        U16.SetOperators(GetEqualityOperators(U16), GetComparisonOperators(U16), GetBitwiseOperators(U16), GetMathOperators(U16));
-        U32.SetOperators(GetEqualityOperators(U32), GetComparisonOperators(U32), GetBitwiseOperators(U32), GetMathOperators(U32));
-        U64.SetOperators(GetEqualityOperators(U64), GetComparisonOperators(U64), GetBitwiseOperators(U64), GetMathOperators(U64));
-        U128.SetOperators(GetEqualityOperators(U128), GetComparisonOperators(U128), GetBitwiseOperators(U128), GetMathOperators(U128));
-        USize.SetOperators(GetEqualityOperators(USize), GetComparisonOperators(USize), GetBitwiseOperators(USize), GetMathOperators(USize));
+        U8.Members.AddRange(GetEqualityOperators(U8).Concat(GetComparisonOperators(U8)).Concat(GetBitwiseOperators(U8)).Concat(GetMathOperators(U8)));
+        U16.Members.AddRange(GetEqualityOperators(U16).Concat(GetComparisonOperators(U16)).Concat(GetBitwiseOperators(U16)).Concat(GetMathOperators(U16)));
+        U32.Members.AddRange(GetEqualityOperators(U32).Concat(GetComparisonOperators(U32)).Concat(GetBitwiseOperators(U32)).Concat(GetMathOperators(U32)));
+        U64.Members.AddRange(GetEqualityOperators(U64).Concat(GetComparisonOperators(U64)).Concat(GetBitwiseOperators(U64)).Concat(GetMathOperators(U64)));
+        U128.Members.AddRange(GetEqualityOperators(U128).Concat(GetComparisonOperators(U128)).Concat(GetBitwiseOperators(U128)).Concat(GetMathOperators(U128)));
+        USize.Members.AddRange(GetEqualityOperators(USize).Concat(GetComparisonOperators(USize)).Concat(GetBitwiseOperators(USize)).Concat(GetMathOperators(USize)));
 
-        F16.SetOperators(GetEqualityOperators(F16), GetComparisonOperators(F16), GetMathOperators(F16));
-        F32.SetOperators(GetEqualityOperators(F32), GetComparisonOperators(F32), GetMathOperators(F32));
-        F64.SetOperators(GetEqualityOperators(F64), GetComparisonOperators(F64), GetMathOperators(F64));
-        F80.SetOperators(GetEqualityOperators(F80), GetComparisonOperators(F80), GetMathOperators(F80));
-        F128.SetOperators(GetEqualityOperators(F128), GetComparisonOperators(F128), GetMathOperators(F128));
+        F16.Members.AddRange(GetEqualityOperators(F16).Concat(GetComparisonOperators(F16)).Concat(GetMathOperators(F16)));
+        F32.Members.AddRange(GetEqualityOperators(F32).Concat(GetComparisonOperators(F32)).Concat(GetMathOperators(F32)));
+        F64.Members.AddRange(GetEqualityOperators(F64).Concat(GetComparisonOperators(F64)).Concat(GetMathOperators(F64)));
+        F80.Members.AddRange(GetEqualityOperators(F80).Concat(GetComparisonOperators(F80)).Concat(GetMathOperators(F80)));
+        F128.Members.AddRange(GetEqualityOperators(F128).Concat(GetComparisonOperators(F128)).Concat(GetMathOperators(F128)));
     }
 
     public static ReadOnlyList<PredefinedType> All { get; } = new(typeof(PredefinedTypes)
@@ -63,59 +63,49 @@ internal static class PredefinedTypes
         .Select(f => (PredefinedType)f.GetValue(null)!)
         .ToArray());
 
-    private static List<Operator> GetMathOperators(PrimType type)
+    private static IEnumerable<Operator> GetMathOperators(PrimType type)
     {
-        return [
-            new Operator("+", new FunctionType([new("x", type)], type)),
-            new Operator("-", new FunctionType([new("x", type)], type)),
-            new Operator("++", new FunctionType([new("x", type)], type)),
-            new Operator("--", new FunctionType([new("x", type)], type)),
-            new Operator("+", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("-", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("*", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("/", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("%", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("**", new FunctionType([new("x", type), new("y", type)], type))
-         ];
+        yield return new Operator(SyntaxKind.UnaryPlusOperator, new FunctionType([new("x", type)], type));
+        yield return new Operator(SyntaxKind.UnaryMinusOperator, new FunctionType([new("x", type)], type));
+        yield return new Operator(SyntaxKind.PrefixIncrementOperator, new FunctionType([new("x", type)], type));
+        yield return new Operator(SyntaxKind.PrefixDecrementOperator, new FunctionType([new("x", type)], type));
+        yield return new Operator(SyntaxKind.AddOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.SubtractOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.MultiplyOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.DivideOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.ModuloOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.PowerOperator, new FunctionType([new("x", type), new("y", type)], type));
     }
 
-    private static List<Operator> GetBitwiseOperators(PrimType type)
+    private static IEnumerable<Operator> GetBitwiseOperators(PrimType type)
     {
-        return [
-            new Operator("~", new FunctionType([new("x", type)], type)),
-            new Operator("&", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("|", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("^", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator("<<", new FunctionType([new("x", type), new("y", type)], type)),
-            new Operator(">>", new FunctionType([new("x", type), new("y", type)], type)),
-        ];
+        yield return new Operator(SyntaxKind.OnesComplementOperator, new FunctionType([new("x", type)], type));
+        yield return new Operator(SyntaxKind.BitwiseAndOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.BitwiseOrOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.ExclusiveOrOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.LeftShiftOperator, new FunctionType([new("x", type), new("y", type)], type));
+        yield return new Operator(SyntaxKind.RightShiftOperator, new FunctionType([new("x", type), new("y", type)], type));
     }
 
-    private static List<Operator> GetEqualityOperators(PrimType type)
+    private static IEnumerable<Operator> GetEqualityOperators(PrimType type)
     {
-        return [
-            new Operator("==", new FunctionType([new("x", type), new("y", type)], Bool)),
-            new Operator("!=", new FunctionType([new("x", type), new("y", type)], Bool)),
-        ];
+        yield return new Operator(SyntaxKind.EqualsOperator, new FunctionType([new("x", type), new("y", type)], Bool));
+        yield return new Operator(SyntaxKind.NotEqualsOperator, new FunctionType([new("x", type), new("y", type)], Bool));
     }
 
-    private static List<Operator> GetComparisonOperators(PrimType type)
+    private static IEnumerable<Operator> GetComparisonOperators(PrimType type)
     {
-        return [
-            new Operator("<", new FunctionType([new("x", type), new("y", type)], Bool)),
-            new Operator("<=", new FunctionType([new("x", type), new("y", type)], Bool)),
-            new Operator(">", new FunctionType([new("x", type), new("y", type)], Bool)),
-            new Operator(">=", new FunctionType([new("x", type), new("y", type)], Bool)),
-        ];
+        yield return new Operator(SyntaxKind.LessThanOperator, new FunctionType([new("x", type), new("y", type)], Bool));
+        yield return new Operator(SyntaxKind.LessThanOrEqualOperator, new FunctionType([new("x", type), new("y", type)], Bool));
+        yield return new Operator(SyntaxKind.GreaterThanOperator, new FunctionType([new("x", type), new("y", type)], Bool));
+        yield return new Operator(SyntaxKind.GreaterThanOrEqualOperator, new FunctionType([new("x", type), new("y", type)], Bool));
     }
 
-    private static List<Operator> GetLogicalOperators(PrimType type)
+    private static IEnumerable<Operator> GetLogicalOperators(PrimType type)
     {
-        return [
-            new Operator("!", new FunctionType([new("x", type)], Bool)),
-            new Operator("&&", new FunctionType([new("x", type), new("y", type)], Bool)),
-            new Operator("||", new FunctionType([new("x", type), new("y", type)], Bool)),
-        ];
+        yield return new Operator(SyntaxKind.NotOperator, new FunctionType([new("x", type)], Bool));
+        yield return new Operator(SyntaxKind.LogicalAndOperator, new FunctionType([new("x", type), new("y", type)], Bool));
+        yield return new Operator(SyntaxKind.LogicalOrOperator, new FunctionType([new("x", type), new("y", type)], Bool));
     }
 
     //public static T AddExplicitConversionOperators(PrimType type)
@@ -129,16 +119,5 @@ internal static class PredefinedTypes
     //    type.Operators.AddRange(types.Select(other => new Operator(ImplicitConversion, type, other)));
     //    return type;
     //}
-}
-
-file static class PrimTypeExtensions
-{
-    public static void SetOperators(this PrimType type, params List<List<Operator>> operators)
-    {
-        SetOperators(type, [.. operators.SelectMany(x => x)]);
-
-        [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "set_Operators")]
-        static extern void SetOperators(PrimType type, ReadOnlyList<Operator> operators);
-    }
 }
 

@@ -1,5 +1,7 @@
-﻿using CodeAnalysis.Syntax;
+﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Operators;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
@@ -7,12 +9,11 @@ partial class Parser
     private static ExpressionSyntax ParseBinaryExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator, int parentPrecedence = 0)
     {
         ExpressionSyntax left;
-        var (unaryExpression, unaryPrecedence) = SyntaxFacts.GetUnaryOperatorPrecedence(iterator.Current.SyntaxKind);
-        if (unaryExpression != 0 && unaryPrecedence >= parentPrecedence)
+        if (TryParseUnaryOperator(syntaxTree, iterator, parentPrecedence, out var unaryOperator))
         {
-            var operationToken = iterator.Next();
-            var operand = ParseBinaryExpression(syntaxTree, iterator, unaryPrecedence);
-            left = new UnaryExpressionSyntax(unaryExpression, syntaxTree, operationToken, operand);
+            var syntaxKind = SyntaxFacts.GetUnaryOperatorExpression(unaryOperator.SyntaxKind);
+            var operand = ParseBinaryExpression(syntaxTree, iterator, unaryOperator.Precedence);
+            left = new UnaryExpressionSyntax(syntaxKind, syntaxTree, unaryOperator, operand);
         }
         else
         {
@@ -21,15 +22,48 @@ partial class Parser
 
         while (true)
         {
-            var (binaryExpression, binaryPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(iterator.Current.SyntaxKind);
-            if (binaryExpression is 0 || binaryPrecedence <= parentPrecedence)
+            if (!TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator))
                 break;
 
-            var @operator = iterator.Next();
-            var right = ParseBinaryExpression(syntaxTree, iterator, binaryPrecedence);
-            left = new BinaryExpressionSyntax(binaryExpression, syntaxTree, left, @operator, right);
+            var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);
+            var right = ParseBinaryExpression(syntaxTree, iterator, binaryOperator.Precedence);
+            left = new BinaryExpressionSyntax(syntaxKind, syntaxTree, left, binaryOperator, right);
 
         }
         return left;
+
+        static bool TryParseUnaryOperator(
+            SyntaxTree syntaxTree,
+            SyntaxTokenIterator iterator,
+            int parentPrecedence,
+            [MaybeNullWhen(false)] out OperatorSyntax unaryOperator)
+        {
+            var (operatorKind, precedence) = SyntaxFacts.GetUnaryOperatorPrecedence(iterator.Current.SyntaxKind);
+            if (operatorKind is not 0 && precedence >= parentPrecedence)
+            {
+                var operatorToken = iterator.Next();
+                unaryOperator = new OperatorSyntax(operatorKind, syntaxTree, operatorToken, precedence);
+                return true;
+            }
+            unaryOperator = null;
+            return false;
+        }
+
+        static bool TryParseBinaryOperator(
+            SyntaxTree syntaxTree,
+            SyntaxTokenIterator iterator,
+            int parentPrecedence,
+            [MaybeNullWhen(false)] out OperatorSyntax binaryOperator)
+        {
+            var (operatorKind, precedence) = SyntaxFacts.GetBinaryOperatorPrecedence(iterator.Current.SyntaxKind);
+            if (operatorKind is not 0 && precedence >= parentPrecedence)
+            {
+                var operatorToken = iterator.Next();
+                binaryOperator = new OperatorSyntax(operatorKind, syntaxTree, operatorToken, precedence);
+                return true;
+            }
+            binaryOperator = null;
+            return false;
+        }
     }
 }

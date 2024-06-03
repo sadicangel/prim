@@ -7,5 +7,6 @@ internal sealed record class Property(
 )
     : Member(Name)
 {
+    public override PrimType Type { get; } = Type;
     public override string ToString() => $"{Name}: {Type.Name}";
 }

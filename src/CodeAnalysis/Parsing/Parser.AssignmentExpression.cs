@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Operators;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
@@ -10,6 +11,8 @@ partial class Parser
         // TODO: Allow more expressions here.
         var left = ParseIdentifierNameExpression(syntaxTree, iterator);
         var operatorToken = iterator.Next();
+        var (operatorKind, operatorPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(operatorToken.SyntaxKind);
+        var @operator = new OperatorSyntax(operatorKind, syntaxTree, operatorToken, operatorPrecedence);
         var syntaxKind = operatorToken.SyntaxKind switch
         {
             SyntaxKind.EqualsToken => SyntaxKind.SimpleAssignmentExpression,
@@ -29,6 +32,6 @@ partial class Parser
         };
         var right = ParseExpression(syntaxTree, iterator);
 
-        return new AssignmentExpressionSyntax(syntaxKind, syntaxTree, left, operatorToken, right);
+        return new AssignmentExpressionSyntax(syntaxKind, syntaxTree, left, @operator, right);
     }
 }

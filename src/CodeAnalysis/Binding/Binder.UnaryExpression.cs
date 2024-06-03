@@ -14,32 +14,29 @@ partial class Binder
         if (operand.Type.IsNever)
             return operand;
 
-        var (expressionKind, operatorKind) = syntax.SyntaxKind switch
+        var expressionKind = syntax.SyntaxKind switch
         {
-            SyntaxKind.UnaryPlusExpression => (BoundKind.UnaryPlusExpression, BoundKind.UnaryPlusOperator),
-            SyntaxKind.UnaryMinusExpression => (BoundKind.UnaryMinusExpression, BoundKind.UnaryMinusOperator),
-            SyntaxKind.PrefixIncrementExpression => (BoundKind.PrefixIncrementExpression, BoundKind.PrefixIncrementOperator),
-            SyntaxKind.PrefixDecrementExpression => (BoundKind.PrefixDecrementExpression, BoundKind.PrefixDecrementOperator),
-            SyntaxKind.OnesComplementExpression => (BoundKind.OnesComplementExpression, BoundKind.OnesComplementOperator),
-            SyntaxKind.NotExpression => (BoundKind.NotExpression, BoundKind.NotOperator),
+            SyntaxKind.UnaryPlusExpression => BoundKind.UnaryPlusExpression,
+            SyntaxKind.UnaryMinusExpression => BoundKind.UnaryMinusExpression,
+            SyntaxKind.PrefixIncrementExpression => BoundKind.PrefixIncrementExpression,
+            SyntaxKind.PrefixDecrementExpression => BoundKind.PrefixDecrementExpression,
+            SyntaxKind.OnesComplementExpression => BoundKind.OnesComplementExpression,
+            SyntaxKind.NotExpression => BoundKind.NotExpression,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 
-
-        var operatorName = SyntaxFacts.GetText(syntax.Operator.SyntaxKind)
-            ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.Operator.SyntaxKind}'");
-        var operators = operand.Type.GetUnaryOperators(operatorName, operand.Type, PredefinedTypes.Any);
+        var operators = operand.Type.GetUnaryOperators(syntax.Operator.SyntaxKind, operand.Type, PredefinedTypes.Any);
         if (operators is [])
         {
-            context.Diagnostics.ReportUndefinedUnaryOperator(syntax.Operator, operand.Type.Name);
+            context.Diagnostics.ReportUndefinedUnaryOperator(syntax.Operator.OperatorToken, operand.Type.Name);
             return new BoundNeverExpression(syntax);
         }
 
         Debug.Assert(operators.Count == 1,
-            $"Unexpected result for {nameof(PrimType.GetUnaryOperators)}({operatorName}, {operand.Type}, {operand.Type})");
+            $"Unexpected result for {nameof(PrimType.GetUnaryOperators)}({syntax.Operator.Text}, {operand.Type}, {operand.Type})");
 
         var @operator = operators[0];
-        var operatorSymbol = new OperatorSymbol(operatorKind, syntax.Operator, @operator);
+        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
 
         return new BoundUnaryExpression(expressionKind, syntax, operatorSymbol, operand);
     }

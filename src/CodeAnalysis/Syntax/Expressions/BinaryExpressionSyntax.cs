@@ -1,10 +1,11 @@
-﻿
+﻿using CodeAnalysis.Syntax.Operators;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class BinaryExpressionSyntax(
     SyntaxKind SyntaxKind,
     SyntaxTree SyntaxTree,
     ExpressionSyntax Left,
-    SyntaxToken Operator,
+    OperatorSyntax Operator,
     ExpressionSyntax Right)
     : ExpressionSyntax(SyntaxKind, SyntaxTree)
 {

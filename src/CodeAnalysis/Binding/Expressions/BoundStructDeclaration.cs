@@ -5,13 +5,13 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundStructDeclaration(
     SyntaxNode SyntaxNode,
     StructSymbol StructSymbol,
-    BoundList<BoundPropertyDeclaration> Properties)
+    BoundList<BoundMemberDeclaration> Members)
     : BoundDeclaration(BoundKind.StructDeclaration, SyntaxNode, StructSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
         yield return StructSymbol;
-        foreach (var property in Properties)
-            yield return property;
+        foreach (var members in Members)
+            yield return members;
     }
 }

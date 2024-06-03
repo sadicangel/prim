@@ -1,17 +1,17 @@
-﻿
-using CodeAnalysis.Syntax.Types;
+﻿using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class PropertyDeclarationSyntax(
+
+public sealed record class MethodDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken,
     SyntaxToken ColonToken,
-    TypeSyntax Type,
+    FunctionTypeSyntax Type,
     SyntaxToken OperatorToken,
-    ExpressionSyntax Init)
-    : MemberDeclarationSyntax(SyntaxKind.PropertyDeclaration, SyntaxTree)
+    ExpressionSyntax Body)
+    : MemberDeclarationSyntax(SyntaxKind.MethodDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => OperatorToken.SyntaxKind is SyntaxKind.ColonToken; }
+    public bool IsMutable { get => OperatorToken.SyntaxKind is SyntaxKind.EqualsToken; }
 
     public override IEnumerable<SyntaxNode> Children()
     {
@@ -19,6 +19,6 @@ public sealed record class PropertyDeclarationSyntax(
         yield return ColonToken;
         yield return Type;
         yield return OperatorToken;
-        yield return Init;
+        yield return Body;
     }
 }

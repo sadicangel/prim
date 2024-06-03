@@ -63,26 +63,53 @@ internal static partial class Binder
         if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
             throw new UnreachableException($"Type '{structName}' was not declared");
 
-        var properties = new List<Property>(syntax.Properties.Count);
-        var declaredPropertyNames = new HashSet<string>();
+        var members = new List<Member>(syntax.Members.Count);
+        using (context.PushScope())
         {
-            foreach (var propertySyntax in syntax.Properties)
+            foreach (var memberSyntax in syntax.Members)
             {
-                var propertyName = propertySyntax.IdentifierToken.Text.ToString();
-                var propertyType = BindType(propertySyntax.Type, context);
-                if (!declaredPropertyNames.Add(propertyName))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, propertyName);
-                var property = new Property(propertyName, propertyType, propertySyntax.IsReadOnly);
-                properties.Add(property);
+                members.Add(memberSyntax.SyntaxKind switch
+                {
+                    SyntaxKind.PropertyDeclaration => BindProperty((PropertyDeclarationSyntax)memberSyntax, context),
+                    SyntaxKind.MethodDeclaration => BindMethod((MethodDeclarationSyntax)memberSyntax, context),
+                    SyntaxKind.OperatorDeclaration => BindOperator((OperatorDeclarationSyntax)memberSyntax, context),
+                    _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{memberSyntax.SyntaxKind}'")
+                });
             }
         }
 
-        structSymbol = new StructSymbol(syntax, structName, new NamedType(structName)
-        {
-            Properties = [.. properties]
-        });
+        // FIXME: Can this be done in a way that we don't have to modify the type after construction?
+        structSymbol.Type.Members.AddRange(members);
 
-        context.BoundScope.Replace(structSymbol);
+        static Property BindProperty(PropertyDeclarationSyntax syntax, BindingContext context)
+        {
+            var name = syntax.IdentifierToken.Text.ToString();
+            var type = BindType(syntax.Type, context);
+            var member = new Property(name, type, syntax.IsReadOnly);
+            if (!context.BoundScope.Declare(new PropertySymbol(syntax, member)))
+                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
+            return member;
+        }
+
+        static Method BindMethod(MethodDeclarationSyntax syntax, BindingContext context)
+        {
+            var name = syntax.IdentifierToken.Text.ToString();
+            var type = (FunctionType)BindType(syntax.Type, context);
+            var member = new Method(name, type);
+            if (!context.BoundScope.Declare(new MethodSymbol(syntax, member)))
+                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
+            return member;
+        }
+
+        static Operator BindOperator(OperatorDeclarationSyntax syntax, BindingContext context)
+        {
+            var type = (FunctionType)BindType(syntax.Type, context);
+            var kind = syntax.Operator.SyntaxKind;
+            var member = new Operator(kind, type);
+            if (!context.BoundScope.Declare(new OperatorSymbol(syntax, member)))
+                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.Operator.Text.ToString());
+            return member;
+        }
     }
 
     private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BindingContext context)
