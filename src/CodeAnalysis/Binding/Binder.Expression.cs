@@ -62,7 +62,7 @@ partial class Binder
             SyntaxKind.PrefixDecrementExpression or
             SyntaxKind.OnesComplementExpression or
             SyntaxKind.NotExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindUnaryExpression((UnaryExpressionSyntax)syntax, context),
             SyntaxKind.AddExpression or
             SyntaxKind.SubtractExpression or
             SyntaxKind.MultiplyExpression or
@@ -83,7 +83,7 @@ partial class Binder
             SyntaxKind.GreaterThanExpression or
             SyntaxKind.GreaterThanOrEqualExpression or
             SyntaxKind.CoalesceExpression =>
-                throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                BindBinaryExpression((BinaryExpressionSyntax)syntax, context),
             _ =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
         };

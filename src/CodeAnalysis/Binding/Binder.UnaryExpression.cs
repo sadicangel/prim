@@ -14,17 +14,20 @@ partial class Binder
         if (operand.Type.IsNever)
             return operand;
 
-        var (expressionKind, operatorKind, operatorName) = syntax.SyntaxKind switch
+        var (expressionKind, operatorKind) = syntax.SyntaxKind switch
         {
-            SyntaxKind.UnaryPlusExpression => (BoundKind.UnaryPlusExpression, BoundKind.UnaryPlusOperator, "+"),
-            SyntaxKind.UnaryMinusExpression => (BoundKind.UnaryMinusExpression, BoundKind.UnaryMinusOperator, "-"),
-            SyntaxKind.PrefixIncrementExpression => (BoundKind.PrefixIncrementExpression, BoundKind.PrefixIncrementOperator, "++"),
-            SyntaxKind.PrefixDecrementExpression => (BoundKind.PrefixDecrementExpression, BoundKind.PrefixDecrementOperator, "--"),
-            SyntaxKind.OnesComplementExpression => (BoundKind.OnesComplementExpression, BoundKind.OnesComplementOperator, "~"),
-            SyntaxKind.NotExpression => (BoundKind.NotExpression, BoundKind.NotOperator, "!"),
+            SyntaxKind.UnaryPlusExpression => (BoundKind.UnaryPlusExpression, BoundKind.UnaryPlusOperator),
+            SyntaxKind.UnaryMinusExpression => (BoundKind.UnaryMinusExpression, BoundKind.UnaryMinusOperator),
+            SyntaxKind.PrefixIncrementExpression => (BoundKind.PrefixIncrementExpression, BoundKind.PrefixIncrementOperator),
+            SyntaxKind.PrefixDecrementExpression => (BoundKind.PrefixDecrementExpression, BoundKind.PrefixDecrementOperator),
+            SyntaxKind.OnesComplementExpression => (BoundKind.OnesComplementExpression, BoundKind.OnesComplementOperator),
+            SyntaxKind.NotExpression => (BoundKind.NotExpression, BoundKind.NotOperator),
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 
+
+        var operatorName = SyntaxFacts.GetText(syntax.Operator.SyntaxKind)
+            ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.Operator.SyntaxKind}'");
         var operators = operand.Type.GetUnaryOperators(operatorName, operand.Type, PredefinedTypes.Any);
         if (operators is [])
         {
