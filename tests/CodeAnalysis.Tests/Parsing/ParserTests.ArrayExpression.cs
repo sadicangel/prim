@@ -17,7 +17,7 @@ partial class ParserTests
     }
 
     [Fact]
-    public void Parse_ArrayExpression_TrailingComma()
+    public void Parse_ArrayExpression_with_trailing_comma()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("""
             [

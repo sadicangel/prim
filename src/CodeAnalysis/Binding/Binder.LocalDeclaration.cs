@@ -9,7 +9,7 @@ partial class Binder
         Declare(syntax.Declaration, context);
         var declaration = BindDeclaration(syntax.Declaration, context);
         // We can just bind the actual declaration because LocalDeclarationSyntax
-        // is just an DeclarationSyntax for a non global scope.
+        // is just a DeclarationSyntax for a non global scope.
         return declaration;
     }
 }

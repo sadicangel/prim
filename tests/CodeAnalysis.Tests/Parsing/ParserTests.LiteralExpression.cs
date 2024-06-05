@@ -91,5 +91,4 @@ public partial class ParserTests
         Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.StrLiteralExpression, node.SyntaxKind);
     }
-
 }

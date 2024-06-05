@@ -59,6 +59,7 @@ public partial class ScannerTests
         new(SyntaxKind.StrLiteralToken, "\"test\""),
         new(SyntaxKind.StrLiteralToken, "\"te\\\"st\""),
     ];
+
     private static readonly TokenData[] s_all_tokens = Enum.GetValues<SyntaxKind>()
         .Select(sk => new TokenData(sk, SyntaxFacts.GetText(sk)!))
         .Where(td => td.Text is not null).Concat(s_literal_tokens)

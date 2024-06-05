@@ -9,7 +9,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static BoundDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BindingContext context)
+    private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BindingContext context)
     {
         var symbolName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not StructSymbol structSymbol)

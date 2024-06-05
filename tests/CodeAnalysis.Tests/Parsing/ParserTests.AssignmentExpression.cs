@@ -3,7 +3,7 @@
 public partial class ParserTests
 {
     [Fact]
-    public void Parse_AssignmentExpression_Simple()
+    public void Parse_SimpleAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a = 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -11,7 +11,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.SimpleAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Add()
+    public void Parse_AddAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a += 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -19,7 +19,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.AddAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Subtract()
+    public void Parse_SubtractAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a -= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -27,7 +27,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.SubtractAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Multiply()
+    public void Parse_MultiplyAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a *= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -35,7 +35,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.MultiplyAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Divide()
+    public void Parse_DivideAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a /= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -43,7 +43,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.DivideAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Modulo()
+    public void Parse_ModuloAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a %= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -51,7 +51,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.ModuloAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Power()
+    public void Parse_PowerAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a **= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -59,7 +59,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.PowerAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_And()
+    public void Parse_AndAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a &= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -67,7 +67,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.AndAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_ExclusiveOr()
+    public void Parse_ExclusiveOrAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a ^= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -75,7 +75,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.ExclusiveOrAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Or()
+    public void Parse_OrAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a |= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -83,7 +83,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.OrAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_LeftShift()
+    public void Parse_LeftShiftAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a <<= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -91,7 +91,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.LeftShiftAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_RightShift()
+    public void Parse_RightShiftAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a >>= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
@@ -99,7 +99,7 @@ public partial class ParserTests
         Assert.Equal(SyntaxKind.RightShiftAssignmentExpression, node.SyntaxKind);
     }
     [Fact]
-    public void Parse_AssignmentExpression_Coalesce()
+    public void Parse_CoalesceAssignmentExpression()
     {
         var tree = SyntaxTree.ParseScript(new SourceText("a ??= 3"));
         var node = Assert.Single(tree.Root.SyntaxNodes);
