@@ -31,29 +31,166 @@ internal static class PredefinedTypes
 
     static PredefinedTypes()
     {
-        Str.AddEqualityOperators();
+        Str
+            .AddEqualityOperators()
+            .AddMember(new Operator(
+                SyntaxKind.AddOperator,
+                new FunctionType([new Parameter("x", Str), new Parameter("y", Any)], Str)))
+            .AddMember(new Operator(
+                SyntaxKind.AddOperator,
+                new FunctionType([new Parameter("x", Any), new Parameter("y", Str)], Str)));
 
-        Bool.AddEqualityOperators().AddLogicalOperators();
+        Bool
+            .AddEqualityOperators()
+            .AddLogicalOperators();
 
-        I8.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        I16.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        I32.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        I64.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        I128.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        ISize.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
+        I8
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(I16, I32, I64, I128, ISize, F16, F32, F64, F80, F128)
+            .AddExplicitConversion(U8, U16, U32, U64, U128, USize);
 
-        U8.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        U16.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        U32.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        U64.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        U128.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
-        USize.AddEqualityOperators().AddComparisonOperators().AddBitwiseOperators().AddMathOperators();
+        I16
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(I32, I64, I128, ISize, F16, F32, F64, F80, F128)
+            .AddExplicitConversion(I8, U8, U16, U32, U64, U128, USize);
 
-        F16.AddEqualityOperators().AddComparisonOperators().AddMathOperators();
-        F32.AddEqualityOperators().AddComparisonOperators().AddMathOperators();
-        F64.AddEqualityOperators().AddComparisonOperators().AddMathOperators();
-        F80.AddEqualityOperators().AddComparisonOperators().AddMathOperators();
-        F128.AddEqualityOperators().AddComparisonOperators().AddMathOperators();
+        I32
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(I64, I128, ISize, F32, F64, F80, F128)
+            .AddExplicitConversion(I8, I16, U8, U16, U32, U64, U128, USize, F16);
+
+        I64
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(I128, ISize, F32, F64, F80, F128)
+            .AddExplicitConversion(I8, I16, I32, U8, U16, U32, U64, U128, USize, F16);
+
+        I128
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddExplicitConversion(I8, I16, I32, I64, ISize, U8, U16, U32, U64, U128, USize, F16, F32, F64, F80, F128);
+
+        ISize
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddExplicitConversion(I8, I16, I32, I64, I128, U8, U16, U32, U64, U128, USize, F16, F32, F64, F80, F128);
+
+
+        U8
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(U16, U32, U64, U128, USize, F16, F32, F64, F80, F128)
+            .AddExplicitConversion(I8, I16, I32, I64, I128, ISize);
+
+        U16
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(U32, U64, U128, USize, F16, F32, F64, F80, F128)
+            .AddExplicitConversion(U8, I8, I16, I32, I64, I128, ISize);
+
+        U32
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(U64, U128, USize, F32, F64, F80, F128)
+            .AddExplicitConversion(U8, U16, I8, I16, I32, I64, I128, ISize, F16);
+
+        U64
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(U128, USize, F32, F64, F80, F128)
+            .AddExplicitConversion(U8, U16, U32, I8, I16, I32, I64, I128, ISize, F16);
+
+        U128
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddExplicitConversion(I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, USize, F16, F32, F64, F80, F128);
+
+        USize
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddBitwiseOperators()
+            .AddMathOperators()
+            .AddExplicitConversion(I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize, F16, F32, F64, F80, F128);
+
+        F16
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(F32, F64, F80, F128)
+            .AddExplicitConversion(I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
+
+        F32
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(F64, F80, F128)
+            .AddExplicitConversion(F16, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
+
+        F64
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(F80, F128)
+            .AddExplicitConversion(F16, F32, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
+
+        F80
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddMathOperators()
+            .AddImplicitConversion(F128)
+            .AddExplicitConversion(F16, F32, F64, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
+
+        F128
+            .AddEqualityOperators()
+            .AddComparisonOperators()
+            .AddMathOperators()
+            .AddExplicitConversion(F16, F32, F64, F80, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
+    }
+
+    private static PrimType AddMember(this PrimType type, Member member)
+    {
+        switch (member)
+        {
+            case Property property:
+                type.AddProperty(property);
+                break;
+            case Method method:
+                type.AddMethod(method);
+                break;
+            case Operator @operator:
+                type.AddOperator(@operator);
+                break;
+            case Conversion conversion:
+                type.AddConversion(conversion);
+                break;
+        }
+
+        return type;
     }
 
     private static PrimType AddMathOperators(this PrimType type)
@@ -147,6 +284,20 @@ internal static class PredefinedTypes
         type.AddOperator(new Operator(
             SyntaxKind.LogicalOrOperator,
             new FunctionType([new("x", type), new("y", type)], Bool)));
+        return type;
+    }
+
+    private static PrimType AddImplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targeTypes)
+    {
+        foreach (var targeType in targeTypes)
+            type.AddConversion(new Conversion(SyntaxKind.ImplicitKeyword, new FunctionType([new Parameter("x", type)], targeType)));
+        return type;
+    }
+
+    private static PrimType AddExplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targeTypes)
+    {
+        foreach (var targeType in targeTypes)
+            type.AddConversion(new Conversion(SyntaxKind.ExplicitKeyword, new FunctionType([new Parameter("x", type)], targeType)));
         return type;
     }
 }

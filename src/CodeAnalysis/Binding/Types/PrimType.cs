@@ -77,7 +77,7 @@ internal abstract record class PrimType(string Name)
         return _members.OfType<Operator>()
             .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 1)
-            .Where(o => o.Type.Parameters[0].Type == operandType)
+            .Where(o => o.Type.Parameters[0].Type.IsAny || o.Type.Parameters[0].Type == operandType)
             .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
             .ToList();
     }
@@ -87,8 +87,8 @@ internal abstract record class PrimType(string Name)
         return _members.OfType<Operator>()
             .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 2)
-            .Where(o => o.Type.Parameters[0].Type == leftType)
-            .Where(o => o.Type.Parameters[1].Type == rightType)
+            .Where(o => o.Type.Parameters[0].Type.IsAny || o.Type.Parameters[0].Type == leftType)
+            .Where(o => o.Type.Parameters[1].Type.IsAny || o.Type.Parameters[1].Type == rightType)
             .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
             .ToList();
     }
@@ -110,8 +110,8 @@ internal abstract record class PrimType(string Name)
     public Conversion? GetConversion(PrimType sourceType, PrimType targetType)
     {
         return _members.OfType<Conversion>()
-            .Where(x => x.Type.Parameters[0].Type == sourceType)
-            .Where(x => x.Type.ReturnType == targetType)
+            .Where(x => x.Type.Parameters[0].Type.IsAny || x.Type.Parameters[0].Type == sourceType)
+            .Where(x => x.Type.ReturnType.IsAny || x.Type.ReturnType == targetType)
             .SingleOrDefault();
     }
 }
