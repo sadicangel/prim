@@ -18,12 +18,11 @@ partial class Binder
         {
             SyntaxKind.UnaryPlusExpression => BoundKind.UnaryPlusExpression,
             SyntaxKind.UnaryMinusExpression => BoundKind.UnaryMinusExpression,
-            SyntaxKind.PrefixIncrementExpression => BoundKind.PrefixIncrementExpression,
-            SyntaxKind.PrefixDecrementExpression => BoundKind.PrefixDecrementExpression,
             SyntaxKind.OnesComplementExpression => BoundKind.OnesComplementExpression,
             SyntaxKind.NotExpression => BoundKind.NotExpression,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
+
 
         var operators = operand.Type.GetUnaryOperators(syntax.Operator.SyntaxKind, operand.Type, PredefinedTypes.Any);
         if (operators is [])
@@ -32,10 +31,9 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        Debug.Assert(operators.Count == 1,
-            $"Unexpected result for {nameof(PrimType.GetUnaryOperators)}({syntax.Operator.Text}, {operand.Type}, {operand.Type})");
+        if (operators is not [var @operator])
+            throw new UnreachableException($"Unexpected result for {nameof(PrimType.GetUnaryOperators)}({syntax.Operator.Text}, {operand.Type}, {operand.Type})");
 
-        var @operator = operators[0];
         var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
 
         return new BoundUnaryExpression(expressionKind, syntax, operatorSymbol, operand);

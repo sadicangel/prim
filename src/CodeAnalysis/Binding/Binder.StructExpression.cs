@@ -23,10 +23,9 @@ partial class Binder
                 context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.IdentifierToken.Text.ToString());
                 continue;
             }
-            var propertySymbol = new PropertySymbol(propertySyntax, property);
             var init = BindExpression(propertySyntax.Init, context);
-            var propExpr = new BoundPropertyExpression(propertySyntax, propertySymbol, init);
-            properties.Add(propExpr);
+            var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property), init);
+            properties.Add(expression);
         }
         return new BoundStructExpression(syntax, structSymbol, properties.ToBoundList());
     }

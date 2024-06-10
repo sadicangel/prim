@@ -256,12 +256,6 @@ internal static class Scanner
                 value = null;
                 return 2;
 
-            case ['-', '-', ..]:
-                kind = SyntaxKind.MinusMinusToken;
-                range = position..(position + 2);
-                value = null;
-                return 2;
-
             case ['-', '=', ..]:
                 kind = SyntaxKind.MinusEqualsToken;
                 range = position..(position + 2);
@@ -303,12 +297,6 @@ internal static class Scanner
                 range = position..(position + 1);
                 value = null;
                 return 1;
-
-            case ['+', '+', ..]:
-                kind = SyntaxKind.PlusPlusToken;
-                range = position..(position + 2);
-                value = null;
-                return 2;
 
             case ['+', '=', ..]:
                 kind = SyntaxKind.PlusEqualsToken;

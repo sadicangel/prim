@@ -158,7 +158,10 @@ public partial class BinderTests
     [Fact]
     public void Bind_CoalesceExpression()
     {
-        var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 ?? 2"));
+        var syntaxTree = SyntaxTree.ParseScript(new SourceText("""
+            x: ?i32 = null;
+            x ?? 2
+            """));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.Root.BoundNodes[^1];
         Assert.Equal(BoundKind.CoalesceExpression, node.BoundKind);

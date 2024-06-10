@@ -56,10 +56,10 @@ partial class Binder
                 BindArrayExpression((ArrayExpressionSyntax)syntax, context),
             SyntaxKind.StructExpression =>
                 BindStructExpression((StructExpressionSyntax)syntax, context),
+            SyntaxKind.ConversionExpression =>
+                BindConversionExpression((ConversionExpressionSyntax)syntax, context),
             SyntaxKind.UnaryPlusExpression or
             SyntaxKind.UnaryMinusExpression or
-            SyntaxKind.PrefixIncrementExpression or
-            SyntaxKind.PrefixDecrementExpression or
             SyntaxKind.OnesComplementExpression or
             SyntaxKind.NotExpression =>
                 BindUnaryExpression((UnaryExpressionSyntax)syntax, context),

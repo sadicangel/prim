@@ -10,7 +10,7 @@ partial class Parser
     {
         // TODO: Allow more expressions here.
         var left = ParseIdentifierNameExpression(syntaxTree, iterator);
-        var operatorToken = iterator.Next();
+        var operatorToken = iterator.Match();
         var (operatorKind, operatorPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(operatorToken.SyntaxKind);
         var @operator = new OperatorSyntax(operatorKind, syntaxTree, operatorToken, operatorPrecedence);
         var syntaxKind = operatorToken.SyntaxKind switch

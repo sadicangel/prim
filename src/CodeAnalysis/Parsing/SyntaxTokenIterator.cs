@@ -21,37 +21,27 @@ internal record class SyntaxTokenIterator(IReadOnlyList<SyntaxToken> Tokens)
         return Tokens[index];
     }
 
-    public SyntaxToken Next()
+    public bool TryMatch(SyntaxKind syntaxKind, [MaybeNullWhen(false)] out SyntaxToken token)
     {
-        var current = Current;
-        ++Index;
-        return current;
-    }
-
-    public SyntaxToken Match(SyntaxKind syntaxKind)
-    {
-        if (!TryMatch(syntaxKind, out var token))
+        if (syntaxKind == Current.SyntaxKind)
         {
-            if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
-                Current.SyntaxTree.Diagnostics.ReportUnexpectedToken(syntaxKind, Current);
-
-            return new SyntaxToken(
-                syntaxKind,
-                Current.SyntaxTree,
-                Current.Range,
-                SyntaxFactory.EmptyTrivia(),
-                SyntaxFactory.EmptyTrivia(),
-                string.Empty);
+            token = Current;
+            ++Index;
+            return true;
         }
-        _successiveMatchTokenErrors = 0;
-        return token;
+        token = null;
+        return false;
     }
-
-    public bool TryMatch(SyntaxKind syntaxKind, [MaybeNullWhen(false)] out SyntaxToken token) =>
-        (token = Current.SyntaxKind == syntaxKind ? Next() : null) is not null;
 
     public SyntaxToken Match(params ReadOnlySpan<SyntaxKind> syntaxKinds)
     {
+        if (syntaxKinds.Length == 0)
+        {
+            var current = Current;
+            ++Index;
+            return current;
+        }
+
         foreach (var syntaxKind in syntaxKinds)
         {
             if (TryMatch(syntaxKind, out var token))

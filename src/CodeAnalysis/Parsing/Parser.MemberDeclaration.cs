@@ -10,10 +10,32 @@ partial class Parser
     {
         return iterator.Current.SyntaxKind switch
         {
+            SyntaxKind.ImplicitKeyword or SyntaxKind.ExplicitKeyword => ParseConversionDeclaration(syntaxTree, iterator),
             _ when SyntaxFacts.IsOperator(iterator.Current.SyntaxKind) => ParseOperatorDeclaration(syntaxTree, iterator),
             _ when iterator.Peek(1).SyntaxKind is SyntaxKind.ParenthesisOpenToken => ParseMethodDeclaration(syntaxTree, iterator),
             _ => ParsePropertyDeclaration(syntaxTree, iterator),
         };
+
+        static ConversionDeclarationSyntax ParseConversionDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        {
+            var conversionKeyword = iterator.Match([SyntaxKind.ImplicitKeyword, SyntaxKind.ExplicitKeyword]);
+            var colonToken = iterator.Match(SyntaxKind.ColonToken);
+            var type = ParseType(syntaxTree, iterator);
+            if (type is not FunctionTypeSyntax functionType)
+                throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(FunctionTypeSyntax)}'");
+            var equalsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+            var body = ParseTerminatedExpression(syntaxTree, iterator);
+
+            // TODO: Validate that function only has 1 parameter.
+
+            return new ConversionDeclarationSyntax(
+                syntaxTree,
+                conversionKeyword,
+                colonToken,
+                functionType,
+                equalsToken,
+                body);
+        }
 
         static OperatorDeclarationSyntax ParseOperatorDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
         {
@@ -24,6 +46,8 @@ partial class Parser
                 throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(FunctionTypeSyntax)}'");
             var equalsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
             var body = ParseTerminatedExpression(syntaxTree, iterator);
+
+            // TODO: Validate that function only has 1 or 2 parameters.
 
             var (operatorKind, operatorPrecedence) = functionType.Parameters.Count == 1
                 ? SyntaxFacts.GetUnaryOperatorPrecedence(operatorToken.SyntaxKind)

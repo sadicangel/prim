@@ -29,7 +29,7 @@ partial class Parser
             // No tokens consumed. Skip the current token to avoid infinite loop.
             // No need to report any extra error as parse methods already failed.
             if (iterator.Current == start)
-                _ = iterator.Next();
+                _ = iterator.Match();
         }
 
         return new SeparatedSyntaxList<TNode>(nodes.ToSyntaxList());

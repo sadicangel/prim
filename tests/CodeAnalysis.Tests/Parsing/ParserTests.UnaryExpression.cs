@@ -17,8 +17,6 @@ partial class ParserTests
         {
             { SyntaxKind.UnaryPlusExpression, "+" },
             { SyntaxKind.UnaryMinusExpression, "-" },
-            { SyntaxKind.PrefixIncrementExpression, "++" },
-            { SyntaxKind.PrefixDecrementExpression, "--" },
             { SyntaxKind.OnesComplementExpression, "~" },
             { SyntaxKind.NotExpression, "!" },
         };

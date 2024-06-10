@@ -57,7 +57,7 @@ partial class Parser
 
             static PredefinedTypeSyntax ParsePredefinedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
             {
-                var predefinedTypeToken = iterator.Next();
+                var predefinedTypeToken = iterator.Match();
                 return new PredefinedTypeSyntax(syntaxTree, predefinedTypeToken);
             }
 

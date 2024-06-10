@@ -43,7 +43,6 @@ public static class SyntaxFacts
             SyntaxKind.LessThanLessThanEqualsToken => "<<=",
             SyntaxKind.MinusToken => "-",
             SyntaxKind.MinusEqualsToken => "-=",
-            SyntaxKind.MinusMinusToken => "--",
             SyntaxKind.ParenthesisOpenToken => "(",
             SyntaxKind.ParenthesisCloseToken => ")",
             SyntaxKind.PercentToken => "%",
@@ -53,7 +52,6 @@ public static class SyntaxFacts
             SyntaxKind.PipePipeToken => "||",
             SyntaxKind.PlusToken => "+",
             SyntaxKind.PlusEqualsToken => "+=",
-            SyntaxKind.PlusPlusToken => "++",
             SyntaxKind.SemicolonToken => ";",
             SyntaxKind.SlashToken => "/",
             SyntaxKind.SlashEqualsToken => "/=",
@@ -71,8 +69,11 @@ public static class SyntaxFacts
             SyntaxKind.F64LiteralToken => null,
             SyntaxKind.StrLiteralToken => null,
 
+            SyntaxKind.AsKeyword => "as",
             SyntaxKind.IfKeyword => "if",
+            SyntaxKind.ImplicitKeyword => "implicit",
             SyntaxKind.ElseKeyword => "else",
+            SyntaxKind.ExplicitKeyword => "explicit",
             SyntaxKind.WhileKeyword => "while",
             SyntaxKind.ForKeyword => "for",
             SyntaxKind.ContinueKeyword => "continue",
@@ -162,6 +163,7 @@ public static class SyntaxFacts
             SyntaxKind.PropertyDeclaration => null,
             SyntaxKind.MethodDeclaration => null,
             SyntaxKind.OperatorDeclaration => null,
+            SyntaxKind.ConversionDeclaration => null,
             SyntaxKind.LocalDeclaration => null,
 
             SyntaxKind.EmptyExpression => null,
@@ -171,10 +173,10 @@ public static class SyntaxFacts
             SyntaxKind.StructExpression => null,
             SyntaxKind.PropertyExpression => null,
 
+            SyntaxKind.ConversionExpression => null,
+
             SyntaxKind.UnaryPlusExpression => null,
             SyntaxKind.UnaryMinusExpression => null,
-            SyntaxKind.PrefixIncrementExpression => null,
-            SyntaxKind.PrefixDecrementExpression => null,
             SyntaxKind.OnesComplementExpression => null,
             SyntaxKind.NotExpression => null,
 
@@ -201,8 +203,6 @@ public static class SyntaxFacts
 
             SyntaxKind.UnaryPlusOperator => null,
             SyntaxKind.UnaryMinusOperator => null,
-            SyntaxKind.PrefixIncrementOperator => null,
-            SyntaxKind.PrefixDecrementOperator => null,
             SyntaxKind.OnesComplementOperator => null,
             SyntaxKind.NotOperator => null,
 
@@ -235,8 +235,11 @@ public static class SyntaxFacts
     {
         return syntaxText switch
         {
+            "as" => SyntaxKind.AsKeyword,
             "if" => SyntaxKind.IfKeyword,
+            "implicit" => SyntaxKind.ImplicitKeyword,
             "else" => SyntaxKind.ElseKeyword,
+            "explicit" => SyntaxKind.ExplicitKeyword,
             "while" => SyntaxKind.WhileKeyword,
             "for" => SyntaxKind.ForKeyword,
             "continue" => SyntaxKind.ContinueKeyword,
@@ -281,8 +284,6 @@ public static class SyntaxFacts
     public static bool IsOperator(SyntaxKind syntaxKind) => syntaxKind
         is SyntaxKind.PlusToken
         or SyntaxKind.MinusToken
-        or SyntaxKind.PlusPlusToken
-        or SyntaxKind.MinusMinusToken
         or SyntaxKind.TildeToken
         or SyntaxKind.BangToken
         or SyntaxKind.StarToken
@@ -330,8 +331,6 @@ public static class SyntaxFacts
         SyntaxKind.MinusToken => (SyntaxKind.UnaryMinusOperator, 8),
         SyntaxKind.PlusToken => (SyntaxKind.UnaryPlusOperator, 8),
         SyntaxKind.TildeToken => (SyntaxKind.OnesComplementOperator, 8),
-        SyntaxKind.PlusPlusToken => (SyntaxKind.PrefixIncrementOperator, 8),
-        SyntaxKind.MinusMinusToken => (SyntaxKind.PrefixDecrementOperator, 8),
         _ => (0, 0),
     };
 
@@ -341,8 +340,6 @@ public static class SyntaxFacts
         SyntaxKind.UnaryMinusOperator => SyntaxKind.UnaryMinusExpression,
         SyntaxKind.UnaryPlusOperator => SyntaxKind.UnaryPlusExpression,
         SyntaxKind.OnesComplementOperator => SyntaxKind.OnesComplementExpression,
-        SyntaxKind.PrefixIncrementOperator => SyntaxKind.PrefixIncrementExpression,
-        SyntaxKind.PrefixDecrementOperator => SyntaxKind.PrefixDecrementExpression,
         _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{operatorKind}'")
     };
 
@@ -405,8 +402,6 @@ public static class SyntaxFacts
     {
         SyntaxKind.UnaryPlusOperator => "+",
         SyntaxKind.UnaryMinusOperator => "-",
-        SyntaxKind.PrefixIncrementOperator => "++",
-        SyntaxKind.PrefixDecrementOperator => "--",
         SyntaxKind.OnesComplementOperator => "~",
         SyntaxKind.NotOperator => "!",
         SyntaxKind.AddOperator => "+",

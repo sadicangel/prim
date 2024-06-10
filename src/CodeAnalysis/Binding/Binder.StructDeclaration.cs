@@ -15,60 +15,74 @@ partial class Binder
         if (context.BoundScope.Lookup(symbolName) is not StructSymbol structSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(StructDeclarationSyntax)}'");
 
-        var members = new BoundList<BoundMemberDeclaration>.Builder(structSymbol.Type.Members.Count);
-        using (context.PushScope())
+        var members = new BoundList<BoundMemberDeclaration>.Builder(syntax.Members.Count);
+        foreach (var member in syntax.Members)
         {
-            foreach (var member in syntax.Members)
+            members.Add(member.SyntaxKind switch
             {
-                members.Add(member.SyntaxKind switch
-                {
-                    SyntaxKind.PropertyDeclaration =>
-                        BindPropertyDeclaration(structSymbol.Type, (PropertyDeclarationSyntax)member, context),
-                    SyntaxKind.MethodDeclaration =>
-                        BindMethodDeclaration(structSymbol.Type, (MethodDeclarationSyntax)member, context),
-                    SyntaxKind.OperatorDeclaration =>
-                        BindOperatorDeclaration(structSymbol.Type, (OperatorDeclarationSyntax)member, context),
-                    _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{member.SyntaxKind}'")
-                });
-            }
+                SyntaxKind.PropertyDeclaration =>
+                    BindPropertyDeclaration((PropertyDeclarationSyntax)member, structSymbol, context),
+                SyntaxKind.MethodDeclaration =>
+                    BindMethodDeclaration((MethodDeclarationSyntax)member, structSymbol, context),
+                SyntaxKind.OperatorDeclaration =>
+                    BindOperatorDeclaration((OperatorDeclarationSyntax)member, structSymbol, context),
+                SyntaxKind.ConversionDeclaration =>
+                    BindConversionDeclaration((ConversionDeclarationSyntax)member, structSymbol, context),
+                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{member.SyntaxKind}'")
+            });
         }
         return new BoundStructDeclaration(syntax, structSymbol, members.ToBoundList());
 
-        static BoundPropertyDeclaration BindPropertyDeclaration(NamedType structType, PropertyDeclarationSyntax syntax, BindingContext context)
+        static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
         {
-            var property = structType.GetProperty(syntax.IdentifierToken.Text)
+            var property = structSymbol.Type.GetProperty(syntax.IdentifierToken.Text)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.IdentifierToken.Text}'");
-            var propertySymbol = new PropertySymbol(syntax, property);
-            if (!context.BoundScope.Declare(propertySymbol))
-                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, propertySymbol.Name);
+
             // TODO: Allow init expression to be optional.
             var init = BindExpression(syntax.Init, context);
+
+            var propertySymbol = new PropertySymbol(syntax, property);
 
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }
 
-        static BoundMethodDeclaration BindMethodDeclaration(NamedType structType, MethodDeclarationSyntax syntax, BindingContext context)
+        static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
-            var method = structType.GetMethod(syntax.IdentifierToken.Text, type)
+            var method = structSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'"); ;
-            var methodSymbol = new MethodSymbol(syntax, method);
-            if (!context.BoundScope.Declare(methodSymbol))
-                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, methodSymbol.Name);
+
             var body = BindExpression(syntax.Body, context);
+
+            var methodSymbol = new MethodSymbol(syntax, method);
+
             return new BoundMethodDeclaration(syntax, methodSymbol, body);
         }
 
-        static BoundOperatorDeclaration BindOperatorDeclaration(NamedType structType, OperatorDeclarationSyntax syntax, BindingContext context)
+        static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
-            var @operator = structType.GetOperator(syntax.Operator.SyntaxKind, type)
+            var @operator = structSymbol.Type.GetOperator(syntax.Operator.SyntaxKind, type)
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.Operator.Text}'"); ;
-            var operatorSymbol = new OperatorSymbol(syntax, @operator);
-            if (!context.BoundScope.Declare(operatorSymbol))
-                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, operatorSymbol.Name);
+
             var body = BindExpression(syntax.Body, context);
+
+            var operatorSymbol = new OperatorSymbol(syntax, @operator);
+
             return new BoundOperatorDeclaration(syntax, operatorSymbol, body);
+        }
+
+        static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        {
+            var type = (FunctionType)BindType(syntax.Type, context);
+            var conversion = structSymbol.Type.GetConversion(type)
+                ?? throw new UnreachableException($"Unexpected conversion '{type}'"); ;
+
+            var body = BindExpression(syntax.Body, context);
+
+            var conversionSymbol = new ConversionSymbol(syntax, conversion);
+
+            return new BoundConversionDeclaration(syntax, conversionSymbol, body);
         }
     }
 }

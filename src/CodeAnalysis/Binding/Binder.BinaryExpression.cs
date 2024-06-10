@@ -41,16 +41,19 @@ partial class Binder
         var operators = left.Type.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
         if (operators is [])
         {
-            context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
-            return new BoundNeverExpression(syntax);
+            operators = right.Type.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
+            if (operators is [])
+            {
+                context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
+                return new BoundNeverExpression(syntax);
+            }
         }
-        if (operators.Count > 1)
+        if (operators is not [var @operator])
         {
             context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
             return new BoundNeverExpression(syntax);
         }
 
-        var @operator = operators[0];
         var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
 
         return new BoundBinaryExpression(expressionKind, syntax, left, operatorSymbol, right);

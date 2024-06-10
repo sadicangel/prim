@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis;
 public sealed record class Compilation(ReadOnlyList<SyntaxTree> SyntaxTrees, DiagnosticBag Diagnostics, Compilation? Previous = null)
 {
-    private readonly BoundScope _scope = Previous?._scope ?? BoundScope.Global();
+    private readonly BoundScope _scope = Previous?._scope ?? new GlobalScope();
 
     internal ReadOnlyList<BoundTree> Compile()
     {

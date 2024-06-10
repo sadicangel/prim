@@ -23,7 +23,7 @@ partial class Binder
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
         };
 
-        static PredefinedType BindPredefinedType(PredefinedTypeSyntax syntax, BindingContext context)
+        static StructType BindPredefinedType(PredefinedTypeSyntax syntax, BindingContext context)
         {
             _ = context;
             return syntax.PredefinedTypeToken.SyntaxKind switch

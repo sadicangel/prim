@@ -47,7 +47,6 @@ public enum SyntaxKind
     LessThanLessThanEqualsToken,
     MinusToken,
     MinusEqualsToken,
-    MinusMinusToken,
     ParenthesisOpenToken,
     ParenthesisCloseToken,
     PercentToken,
@@ -57,7 +56,6 @@ public enum SyntaxKind
     PipePipeToken,
     PlusToken,
     PlusEqualsToken,
-    PlusPlusToken,
     SemicolonToken,
     SlashToken,
     SlashEqualsToken,
@@ -67,8 +65,11 @@ public enum SyntaxKind
     StarStarEqualsToken,
     TildeToken,
 
+    AsKeyword,
     IfKeyword,
+    ImplicitKeyword,
     ElseKeyword,
+    ExplicitKeyword,
     WhileKeyword,
     ForKeyword,
     ContinueKeyword,
@@ -162,6 +163,7 @@ public enum SyntaxKind
     PropertyDeclaration,
     MethodDeclaration,
     OperatorDeclaration,
+    ConversionDeclaration,
     LocalDeclaration,
 
     EmptyExpression,
@@ -171,10 +173,10 @@ public enum SyntaxKind
     StructExpression,
     PropertyExpression,
 
+    ConversionExpression,
+
     UnaryPlusExpression,
     UnaryMinusExpression,
-    PrefixIncrementExpression,
-    PrefixDecrementExpression,
     OnesComplementExpression,
     NotExpression,
 
@@ -201,8 +203,6 @@ public enum SyntaxKind
 
     UnaryPlusOperator,
     UnaryMinusOperator,
-    PrefixIncrementOperator,
-    PrefixDecrementOperator,
     OnesComplementOperator,
     NotOperator,
 

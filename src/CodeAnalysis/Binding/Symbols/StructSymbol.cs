@@ -3,8 +3,8 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Symbols;
 
-internal sealed record class StructSymbol(SyntaxNode SyntaxNode, string Name, NamedType Type)
-    : Symbol(BoundKind.Struct, SyntaxNode, Name)
+internal sealed record class StructSymbol(SyntaxNode SyntaxNode, StructType Type)
+    : Symbol(BoundKind.Struct, SyntaxNode, Type.Name)
 {
-    public override NamedType Type { get; } = Type;
+    public override StructType Type { get; } = Type;
 }

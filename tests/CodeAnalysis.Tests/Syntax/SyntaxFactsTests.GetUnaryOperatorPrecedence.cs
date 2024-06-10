@@ -6,8 +6,6 @@ public sealed partial class SyntaxFactsTests
         SyntaxKind.MinusToken,
         SyntaxKind.PlusToken,
         SyntaxKind.TildeToken,
-        SyntaxKind.PlusPlusToken,
-        SyntaxKind.MinusMinusToken,
     ];
 
     public static TheoryData<SyntaxKind> GetUnaryOperators() => new(s_unaryOperators);

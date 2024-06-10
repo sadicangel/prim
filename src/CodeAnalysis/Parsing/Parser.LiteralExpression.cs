@@ -7,7 +7,7 @@ partial class Parser
 {
     public static LiteralExpressionSyntax ParseLiteralExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
-        var literalToken = iterator.Next();
+        var literalToken = iterator.Match();
 
         return literalToken.SyntaxKind switch
         {

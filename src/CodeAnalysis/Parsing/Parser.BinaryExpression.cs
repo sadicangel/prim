@@ -22,12 +22,22 @@ partial class Parser
 
         while (true)
         {
-            if (!TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator))
+            if (iterator.Current.SyntaxKind is SyntaxKind.AsKeyword)
+            {
+                var asKeyword = iterator.Match(SyntaxKind.AsKeyword);
+                var type = ParseType(syntaxTree, iterator);
+                left = new ConversionExpressionSyntax(syntaxTree, left, asKeyword, type);
+            }
+            else if (TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator))
+            {
+                var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);
+                var right = ParseBinaryExpression(syntaxTree, iterator, binaryOperator.Precedence);
+                left = new BinaryExpressionSyntax(syntaxKind, syntaxTree, left, binaryOperator, right);
+            }
+            else
+            {
                 break;
-
-            var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);
-            var right = ParseBinaryExpression(syntaxTree, iterator, binaryOperator.Precedence);
-            left = new BinaryExpressionSyntax(syntaxKind, syntaxTree, left, binaryOperator, right);
+            }
 
         }
         return left;
@@ -41,7 +51,7 @@ partial class Parser
             var (operatorKind, precedence) = SyntaxFacts.GetUnaryOperatorPrecedence(iterator.Current.SyntaxKind);
             if (operatorKind is not 0 && precedence >= parentPrecedence)
             {
-                var operatorToken = iterator.Next();
+                var operatorToken = iterator.Match();
                 unaryOperator = new OperatorSyntax(operatorKind, syntaxTree, operatorToken, precedence);
                 return true;
             }
@@ -58,7 +68,7 @@ partial class Parser
             var (operatorKind, precedence) = SyntaxFacts.GetBinaryOperatorPrecedence(iterator.Current.SyntaxKind);
             if (operatorKind is not 0 && precedence >= parentPrecedence)
             {
-                var operatorToken = iterator.Next();
+                var operatorToken = iterator.Match();
                 binaryOperator = new OperatorSyntax(operatorKind, syntaxTree, operatorToken, precedence);
                 return true;
             }

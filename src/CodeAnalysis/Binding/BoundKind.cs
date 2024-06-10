@@ -30,6 +30,7 @@ internal enum BoundKind
     PropertyDeclaration,
     MethodDeclaration,
     OperatorDeclaration,
+    ConversionDeclaration,
     LocalDeclaration,
 
     EmptyExpression,
@@ -39,10 +40,10 @@ internal enum BoundKind
     StructExpression,
     PropertyExpression,
 
+    ConversionExpression,
+
     UnaryPlusExpression,
     UnaryMinusExpression,
-    PrefixIncrementExpression,
-    PrefixDecrementExpression,
     OnesComplementExpression,
     NotExpression,
 
@@ -71,13 +72,12 @@ internal enum BoundKind
     Parameter,
     Struct,
     Property,
+    Conversion,
     Method,
     Variable,
 
     UnaryPlusOperator,
     UnaryMinusOperator,
-    PrefixIncrementOperator,
-    PrefixDecrementOperator,
     OnesComplementOperator,
     NotOperator,
 

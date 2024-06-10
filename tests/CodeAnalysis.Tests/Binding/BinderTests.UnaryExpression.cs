@@ -38,23 +38,4 @@ public partial class BinderTests
         var node = boundTree.Root.BoundNodes[^1];
         Assert.Equal(BoundKind.OnesComplementExpression, node.BoundKind);
     }
-
-    [Fact]
-    public void Bind_PrefixIncrementExpression()
-    {
-        var syntaxTree = SyntaxTree.ParseScript(new SourceText("a: i32 = 0; ++a"));
-        var boundTree = BoundTree.Bind(syntaxTree, _scope);
-        var node = boundTree.Root.BoundNodes[^1];
-        Assert.Equal(BoundKind.PrefixIncrementExpression, node.BoundKind);
-    }
-
-    [Fact]
-    public void Bind_PrefixDecrementExpression()
-    {
-        var syntaxTree = SyntaxTree.ParseScript(new SourceText("a: i32 = 0; --a"));
-        var boundTree = BoundTree.Bind(syntaxTree, _scope);
-        var node = boundTree.Root.BoundNodes[^1];
-        Assert.Equal(BoundKind.PrefixDecrementExpression, node.BoundKind);
-    }
-
 }

@@ -7,7 +7,7 @@ partial class Binder
 {
     private static BoundArrayExpression BindArrayExpression(ArrayExpressionSyntax syntax, BindingContext context)
     {
-        PrimType type = PredefinedTypes.Unknown;
+        PrimType type = PredefinedTypes.Type;
         var expressions = new BoundList<BoundExpression>.Builder(syntax.Expressions.Count);
         foreach (var expressionSyntax in syntax.Expressions)
         {

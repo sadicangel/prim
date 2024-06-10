@@ -16,7 +16,7 @@ internal readonly record struct BindingContext(BoundTree BoundTree, BoundScope B
         public TempScope(BindingContext parent)
         {
             _parent = parent;
-            _parent._scopes.Push(BoundScope.ChildOf(_parent.BoundScope));
+            _parent._scopes.Push(new BoundScope(_parent.BoundScope));
         }
         public void Dispose() => _parent._scopes?.Pop();
     }
