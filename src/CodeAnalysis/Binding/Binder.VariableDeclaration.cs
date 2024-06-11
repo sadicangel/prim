@@ -9,9 +9,9 @@ partial class Binder
     private static BoundVariableDeclaration BindVariableDeclaration(VariableDeclarationSyntax syntax, BindingContext context)
     {
         var symbolName = syntax.IdentifierToken.Text.ToString();
-        if (context.BoundScope.Lookup(symbolName) is not VariableSymbol symbol)
+        if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(VariableDeclarationSyntax)}'");
-        var expression = BindExpression(syntax.Expression, context);
-        return new BoundVariableDeclaration(syntax, symbol, expression);
+        var expression = Convert(BindExpression(syntax.Expression, context), variableSymbol.Type, isExplicit: false, context);
+        return new BoundVariableDeclaration(syntax, variableSymbol, expression);
     }
 }

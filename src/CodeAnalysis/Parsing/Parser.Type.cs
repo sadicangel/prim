@@ -9,7 +9,7 @@ partial class Parser
         // type         : predefined | named | option | union | array | function
         // predefined   : identifier (predefined names)
         // named        : identifier
-        // option       : type '?'
+        // option       : '?' type 
         // union        : type '|' type
         // array        : '[' type ':' expr ']'
         // function     : '(' parameters? ')' '->' type

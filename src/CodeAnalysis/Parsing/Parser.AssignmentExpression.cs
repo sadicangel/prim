@@ -8,7 +8,7 @@ partial class Parser
 {
     private static AssignmentExpressionSyntax ParseAssignmentExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
     {
-        // TODO: Allow more expressions here.
+        // TODO: Allow non identifier expressions here.
         var left = ParseIdentifierNameExpression(syntaxTree, iterator);
         var operatorToken = iterator.Match();
         var (operatorKind, operatorPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(operatorToken.SyntaxKind);

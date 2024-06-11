@@ -23,10 +23,12 @@ partial class Binder
                 context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.IdentifierToken.Text.ToString());
                 continue;
             }
-            var init = BindExpression(propertySyntax.Init, context);
+
+            var init = Convert(BindExpression(propertySyntax.Init, context), property.Type, isExplicit: false, context);
             var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property), init);
             properties.Add(expression);
         }
+        // TODO: Report un-initialized property members.
         return new BoundStructExpression(syntax, structSymbol, properties.ToBoundList());
     }
 }

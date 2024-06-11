@@ -38,8 +38,8 @@ partial class Binder
             var property = structSymbol.Type.GetProperty(syntax.IdentifierToken.Text)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.IdentifierToken.Text}'");
 
-            // TODO: Allow init expression to be optional.
-            var init = BindExpression(syntax.Init, context);
+            // TODO: Allow init expression to be optional, if property is optional.
+            var init = Convert(BindExpression(syntax.Init, context), property.Type, isExplicit: false, context);
 
             var propertySymbol = new PropertySymbol(syntax, property);
 

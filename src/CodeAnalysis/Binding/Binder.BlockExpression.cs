@@ -12,9 +12,8 @@ partial class Binder
         foreach (var expressionSyntax in syntax.Expressions)
         {
             var expression = BindExpression(expressionSyntax, context);
-            if (!type.IsNever)
-                type = expression.Type;
             expressions.Add(expression);
+            type = expression.Type;
         }
         return new BoundBlockExpression(syntax, type, expressions.ToBoundList());
     }
