@@ -1,5 +1,5 @@
-﻿using CodeAnalysis.Binding.Types;
-using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal abstract record class Symbol(BoundKind BoundKind, SyntaxNode Syntax, string Name)

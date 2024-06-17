@@ -1,6 +1,6 @@
-﻿namespace CodeAnalysis.Binding.Types.Metadata;
+﻿namespace CodeAnalysis.Types.Metadata;
 
-internal sealed record class Property(
+public sealed record class Property(
     string Name,
     PrimType Type,
     bool IsReadOnly

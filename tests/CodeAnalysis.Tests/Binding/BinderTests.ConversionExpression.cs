@@ -1,5 +1,5 @@
 ﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Binding.Types;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Tests.Binding;
 public partial class BinderTests

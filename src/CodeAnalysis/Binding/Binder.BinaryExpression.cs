@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Binding.Types;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder

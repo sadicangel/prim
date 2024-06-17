@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Binding.Types;
-using CodeAnalysis.Binding.Types.Metadata;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Types;
+using CodeAnalysis.Types;
+using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 

@@ -1,9 +1,9 @@
-﻿using CodeAnalysis.Binding.Types.Metadata;
-using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Types.Metadata;
 
-namespace CodeAnalysis.Binding.Types;
+namespace CodeAnalysis.Types;
 
-internal sealed record class OptionType : PrimType
+public sealed record class OptionType : PrimType
 {
     public OptionType(PrimType underlyingType) : base($"?{underlyingType.Name}")
     {

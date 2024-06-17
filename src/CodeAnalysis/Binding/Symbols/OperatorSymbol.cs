@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
-using CodeAnalysis.Binding.Types;
-using CodeAnalysis.Binding.Types.Metadata;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Types;
+using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class OperatorSymbol(

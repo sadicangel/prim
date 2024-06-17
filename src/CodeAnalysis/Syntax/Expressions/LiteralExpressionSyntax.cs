@@ -3,7 +3,7 @@ public sealed record class LiteralExpressionSyntax(
     SyntaxKind SyntaxKind,
     SyntaxTree SyntaxTree,
     SyntaxToken LiteralToken,
-    object? LiteralValue)
+    object LiteralValue)
     : ExpressionSyntax(SyntaxKind, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()

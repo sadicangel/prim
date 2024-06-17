@@ -1,8 +1,8 @@
-﻿using CodeAnalysis.Binding.Types.Metadata;
+﻿using CodeAnalysis.Types.Metadata;
 
-namespace CodeAnalysis.Binding.Types;
+namespace CodeAnalysis.Types;
 
-internal sealed record class FunctionType : PrimType
+public sealed record class FunctionType : PrimType
 {
     public FunctionType(ReadOnlyList<Parameter> parameters, PrimType returnType)
         : base($"({string.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}")

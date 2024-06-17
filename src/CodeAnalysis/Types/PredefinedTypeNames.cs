@@ -1,6 +1,6 @@
 ﻿using BindingFlags = System.Reflection.BindingFlags;
 
-namespace CodeAnalysis.Binding.Types;
+namespace CodeAnalysis.Types;
 
 internal static class PredefinedTypeNames
 {

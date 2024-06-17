@@ -1,7 +1,7 @@
-﻿using CodeAnalysis.Binding.Types.Metadata;
-using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Types.Metadata;
 
-namespace CodeAnalysis.Binding.Types;
+namespace CodeAnalysis.Types;
 internal static class PredefinedTypes
 {
     public static readonly StructType Any = new(PredefinedTypeNames.Any);

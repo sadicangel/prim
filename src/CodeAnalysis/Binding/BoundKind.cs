@@ -21,7 +21,6 @@ internal enum BoundKind
     FalseLiteralExpression,
     NullLiteralExpression,
 
-    GroupExpression,
     AssignmentExpression,
 
     VariableDeclaration,

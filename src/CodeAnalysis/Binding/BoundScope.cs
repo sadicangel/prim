@@ -1,15 +1,15 @@
 ﻿using System.Collections;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Binding.Types;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 
 internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
 {
-    private static GlobalScope? s_globalScope;
+    private static GlobalBoundScope? s_globalScope;
 
-    public GlobalScope GlobalScope { get => s_globalScope ??= new GlobalScope(); }
+    public GlobalBoundScope GlobalScope { get => s_globalScope ??= new GlobalBoundScope(); }
 
     protected Dictionary<string, Symbol>? Symbols { get; set; }
 
@@ -40,9 +40,9 @@ internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
-internal sealed class GlobalScope : BoundScope
+internal sealed class GlobalBoundScope : BoundScope
 {
-    internal GlobalScope() : base()
+    internal GlobalBoundScope() : base()
     {
         Symbols = new Dictionary<string, Symbol>()
         {

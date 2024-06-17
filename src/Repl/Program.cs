@@ -1,3 +1,8 @@
-﻿using Spectre.Console;
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
 
-AnsiConsole.MarkupLine("Hello, [green]v0.3[/]!");
+const string Code = """
+name: str = "test";
+""";
+
+var syntaxTree = SyntaxTree.Parse(new SourceText(Code));

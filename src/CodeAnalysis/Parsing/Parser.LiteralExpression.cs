@@ -16,23 +16,25 @@ partial class Parser
             SyntaxKind.FalseKeyword =>
                 new LiteralExpressionSyntax(SyntaxKind.FalseLiteralExpression, syntaxTree, literalToken, false),
             SyntaxKind.NullKeyword =>
-                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, null),
+                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, UnitValueProvider.Value),
             SyntaxKind.I32LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.I32LiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.I32LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.U32LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.U32LiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.U32LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.I64LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.I64LiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.I64LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.U64LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.U64LiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.U64LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.F32LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.F32LiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.F32LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.F64LiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.F64LiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.F64LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.StrLiteralToken =>
-                new LiteralExpressionSyntax(SyntaxKind.StrLiteralExpression, syntaxTree, literalToken, literalToken.Value),
+                new LiteralExpressionSyntax(SyntaxKind.StrLiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             _ =>
                 throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{literalToken.SyntaxKind}' for {nameof(LiteralExpressionSyntax)}")
         };
     }
 }
+
+file static class UnitValueProvider { public static readonly object Value = new(); }

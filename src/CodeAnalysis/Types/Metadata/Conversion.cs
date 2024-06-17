@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Syntax;
 
-namespace CodeAnalysis.Binding.Types.Metadata;
-internal sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Type)
+namespace CodeAnalysis.Types.Metadata;
+public sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Type)
     : Member($"{GetConversionPrefix(ConversionKind)}<{Type.Name}>")
 {
     public override FunctionType Type { get; } = Type;

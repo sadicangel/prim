@@ -5,7 +5,7 @@ public sealed record class SourceText(string Text, string FilePath)
 
     public SourceText(string text) : this(text, string.Empty) { }
 
-    public string FileName { get; } = String.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetFileName(FilePath);
+    public string FileName { get; } = string.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetFileName(FilePath);
 
     public int Length { get => Text.Length; }
 

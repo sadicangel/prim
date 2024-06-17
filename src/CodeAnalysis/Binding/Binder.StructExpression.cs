@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Binding.Types.Metadata;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
