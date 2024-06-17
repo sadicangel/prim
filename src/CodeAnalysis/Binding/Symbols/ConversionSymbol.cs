@@ -4,9 +4,9 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class ConversionSymbol(
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     Conversion Conversion)
-    : MemberSymbol(BoundKind.Conversion, SyntaxNode, Conversion.Name)
+    : MemberSymbol(BoundKind.Conversion, Syntax, Conversion.Name)
 {
     public override FunctionType Type { get; } = Conversion.Type;
 }

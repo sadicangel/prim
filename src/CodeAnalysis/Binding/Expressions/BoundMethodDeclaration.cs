@@ -4,10 +4,10 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundMethodDeclaration(
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     MethodSymbol MethodSymbol,
     BoundExpression Body)
-    : BoundMemberDeclaration(BoundKind.MethodDeclaration, SyntaxNode, MethodSymbol.Type)
+    : BoundMemberDeclaration(BoundKind.MethodDeclaration, Syntax, MethodSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {

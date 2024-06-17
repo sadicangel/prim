@@ -5,9 +5,9 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class PropertySymbol(
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     Property Property)
-    : Symbol(BoundKind.Property, SyntaxNode, $"{Property.Name}")
+    : Symbol(BoundKind.Property, Syntax, $"{Property.Name}")
 {
     public override PrimType Type { get; } = Property.Type;
 }

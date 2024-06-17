@@ -5,9 +5,9 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class OperatorSymbol(
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     Operator Operator)
-    : MemberSymbol(GetBoundKind(Operator.OperatorKind), SyntaxNode, $"{GetOperatorName(Operator.OperatorKind)}<{Operator.Type.Name}>")
+    : MemberSymbol(GetBoundKind(Operator.OperatorKind), Syntax, $"{GetOperatorName(Operator.OperatorKind)}<{Operator.Type.Name}>")
 {
     public override FunctionType Type { get; } = Operator.Type;
 

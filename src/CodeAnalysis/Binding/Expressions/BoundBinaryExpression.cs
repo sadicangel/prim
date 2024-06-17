@@ -5,11 +5,11 @@ namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundBinaryExpression(
     BoundKind BoundKind,
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     BoundExpression Left,
     OperatorSymbol OperatorSymbol,
     BoundExpression Right)
-    : BoundExpression(BoundKind, SyntaxNode, OperatorSymbol.Type)
+    : BoundExpression(BoundKind, Syntax, OperatorSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {

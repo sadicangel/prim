@@ -8,7 +8,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindBinaryExpression(BinaryExpressionSyntax syntax, BindingContext context)
+    private static BoundExpression BindBinaryExpression(BinaryExpressionSyntax syntax, BinderContext context)
     {
         var left = BindExpression(syntax.Left, context);
         var right = BindExpression(syntax.Right, context);

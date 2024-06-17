@@ -5,10 +5,10 @@ namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundUnaryExpression(
     BoundKind BoundKind,
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     OperatorSymbol OperatorSymbol,
     BoundExpression Operand)
-    : BoundExpression(BoundKind, SyntaxNode, OperatorSymbol.Type)
+    : BoundExpression(BoundKind, Syntax, OperatorSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {

@@ -13,7 +13,7 @@ internal static partial class Binder
 
     public static BoundCompilationUnit Bind(BoundTree boundTree, BoundScope boundScope)
     {
-        var context = new BindingContext(boundTree, boundScope);
+        var context = new BinderContext(boundTree, boundScope);
 
         var compilationUnit = boundTree.SyntaxTree.Root;
 
@@ -37,7 +37,7 @@ internal static partial class Binder
         return BindCompilationUnit(compilationUnit, context);
     }
 
-    private static Symbol Declare(DeclarationSyntax syntax, BindingContext context)
+    private static Symbol Declare(DeclarationSyntax syntax, BinderContext context)
     {
         return syntax.SyntaxKind switch
         {
@@ -48,7 +48,7 @@ internal static partial class Binder
         };
     }
 
-    private static StructSymbol DeclareStruct(StructDeclarationSyntax syntax, BindingContext context)
+    private static StructSymbol DeclareStruct(StructDeclarationSyntax syntax, BinderContext context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         var structSymbol = new StructSymbol(syntax, new StructType(structName));
@@ -57,7 +57,7 @@ internal static partial class Binder
         return structSymbol;
     }
 
-    private static void DeclareStructMembers(StructDeclarationSyntax syntax, BindingContext context)
+    private static void DeclareStructMembers(StructDeclarationSyntax syntax, BinderContext context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
@@ -75,7 +75,7 @@ internal static partial class Binder
             };
         }
 
-        static int BindProperty(PropertyDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static int BindProperty(PropertyDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var name = syntax.IdentifierToken.Text.ToString();
             var type = BindType(syntax.Type, context);
@@ -85,7 +85,7 @@ internal static partial class Binder
             return 0;
         }
 
-        static int BindMethod(MethodDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static int BindMethod(MethodDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var name = syntax.IdentifierToken.Text.ToString();
             var type = (FunctionType)BindType(syntax.Type, context);
@@ -94,7 +94,7 @@ internal static partial class Binder
             return 0;
         }
 
-        static int BindOperator(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static int BindOperator(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var kind = syntax.Operator.SyntaxKind;
@@ -103,7 +103,7 @@ internal static partial class Binder
             return 0;
         }
 
-        static int BindConversion(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static int BindConversion(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var kind = syntax.ConversionKeyword.SyntaxKind;
@@ -113,7 +113,7 @@ internal static partial class Binder
         }
     }
 
-    private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BindingContext context)
+    private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BinderContext context)
     {
         var functionName = syntax.IdentifierToken.Text.ToString();
         var functionType = (FunctionType)BindType(syntax.Type, context);
@@ -123,7 +123,7 @@ internal static partial class Binder
         return functionSymbol;
     }
 
-    private static VariableSymbol DeclareVariable(VariableDeclarationSyntax syntax, BindingContext context)
+    private static VariableSymbol DeclareVariable(VariableDeclarationSyntax syntax, BinderContext context)
     {
         var variableName = syntax.IdentifierToken.Text.ToString();
         var variableType = BindType(syntax.Type, context);

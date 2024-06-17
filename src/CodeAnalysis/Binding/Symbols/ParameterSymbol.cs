@@ -4,8 +4,8 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Symbols;
 
-internal sealed record class ParameterSymbol(SyntaxNode SyntaxNode, Parameter Parameter)
-    : MemberSymbol(BoundKind.Parameter, SyntaxNode, Parameter.Name)
+internal sealed record class ParameterSymbol(SyntaxNode Syntax, Parameter Parameter)
+    : MemberSymbol(BoundKind.Parameter, Syntax, Parameter.Name)
 {
     public override PrimType Type { get; } = Parameter.Type;
 }

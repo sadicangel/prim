@@ -7,7 +7,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundLiteralExpression BindLiteralExpression(LiteralExpressionSyntax syntax, BindingContext context)
+    private static BoundLiteralExpression BindLiteralExpression(LiteralExpressionSyntax syntax, BinderContext context)
     {
         _ = context;
         var (kind, type) = syntax.SyntaxKind switch

@@ -2,8 +2,8 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
-internal sealed record class BoundIdentifierNameExpression(SyntaxNode SyntaxNode, Symbol NameSymbol)
-    : BoundExpression(BoundKind.IdentifierNameExpression, SyntaxNode, NameSymbol.Type)
+internal sealed record class BoundIdentifierNameExpression(SyntaxNode Syntax, Symbol NameSymbol)
+    : BoundExpression(BoundKind.IdentifierNameExpression, Syntax, NameSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {

@@ -4,6 +4,6 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal abstract record class BoundMemberDeclaration(
     BoundKind BoundKind,
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     PrimType Type)
-    : BoundDeclaration(BoundKind, SyntaxNode, Type);
+    : BoundDeclaration(BoundKind, Syntax, Type);

@@ -10,7 +10,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static PrimType BindType(TypeSyntax syntax, BindingContext context)
+    private static PrimType BindType(TypeSyntax syntax, BinderContext context)
     {
         return syntax.SyntaxKind switch
         {
@@ -23,7 +23,7 @@ partial class Binder
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
         };
 
-        static StructType BindPredefinedType(PredefinedTypeSyntax syntax, BindingContext context)
+        static StructType BindPredefinedType(PredefinedTypeSyntax syntax, BinderContext context)
         {
             _ = context;
             return syntax.PredefinedTypeToken.SyntaxKind switch
@@ -56,7 +56,7 @@ partial class Binder
             };
         }
 
-        static PrimType BindNamedType(NamedTypeSyntax syntax, BindingContext context)
+        static PrimType BindNamedType(NamedTypeSyntax syntax, BinderContext context)
         {
             var structName = syntax.IdentifierToken.Text.ToString();
             if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
@@ -67,7 +67,7 @@ partial class Binder
             return structSymbol.Type;
         }
 
-        static PrimType BindOptionType(OptionTypeSyntax syntax, BindingContext context)
+        static PrimType BindOptionType(OptionTypeSyntax syntax, BinderContext context)
         {
             var underlyingType = BindType(syntax.UnderlyingType, context);
             if (underlyingType.IsNever)
@@ -75,7 +75,7 @@ partial class Binder
             return new OptionType(underlyingType);
         }
 
-        static PrimType BindArrayType(ArrayTypeSyntax syntax, BindingContext context)
+        static PrimType BindArrayType(ArrayTypeSyntax syntax, BinderContext context)
         {
             var elementType = BindType(syntax.ElementType, context);
             if (elementType.IsNever)
@@ -94,7 +94,7 @@ partial class Binder
             return new ArrayType(elementType, (int)length.Value!);
         }
 
-        static PrimType BindFunctionType(FunctionTypeSyntax syntax, BindingContext context)
+        static PrimType BindFunctionType(FunctionTypeSyntax syntax, BinderContext context)
         {
             var returnType = BindType(syntax.ReturnType, context);
             if (!returnType.IsNever)
@@ -119,7 +119,7 @@ partial class Binder
             return new FunctionType(new(parameters), returnType);
         }
 
-        static PrimType BindUnionType(UnionTypeSyntax syntax, BindingContext context)
+        static PrimType BindUnionType(UnionTypeSyntax syntax, BinderContext context)
         {
             var types = new List<PrimType>(syntax.Types.Count);
             foreach (var typeSyntax in syntax.Types)

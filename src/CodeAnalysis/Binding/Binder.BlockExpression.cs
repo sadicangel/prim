@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax, BindingContext context)
+    private static BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax, BinderContext context)
     {
         PrimType type = PredefinedTypes.Unit;
         var expressions = new BoundList<BoundExpression>.Builder(syntax.Expressions.Count);

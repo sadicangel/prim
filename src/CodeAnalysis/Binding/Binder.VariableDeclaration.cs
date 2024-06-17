@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundVariableDeclaration BindVariableDeclaration(VariableDeclarationSyntax syntax, BindingContext context)
+    private static BoundVariableDeclaration BindVariableDeclaration(VariableDeclarationSyntax syntax, BinderContext context)
     {
         var symbolName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)

@@ -9,7 +9,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BindingContext context)
+    private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BinderContext context)
     {
         var symbolName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not StructSymbol structSymbol)
@@ -33,7 +33,7 @@ partial class Binder
         }
         return new BoundStructDeclaration(syntax, structSymbol, members.ToBoundList());
 
-        static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var property = structSymbol.Type.GetProperty(syntax.IdentifierToken.Text)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.IdentifierToken.Text}'");
@@ -46,7 +46,7 @@ partial class Binder
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }
 
-        static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var method = structSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
@@ -59,7 +59,7 @@ partial class Binder
             return new BoundMethodDeclaration(syntax, methodSymbol, body);
         }
 
-        static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var @operator = structSymbol.Type.GetOperator(syntax.Operator.SyntaxKind, type)
@@ -72,7 +72,7 @@ partial class Binder
             return new BoundOperatorDeclaration(syntax, operatorSymbol, body);
         }
 
-        static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BindingContext context)
+        static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var conversion = structSymbol.Type.GetConversion(type)

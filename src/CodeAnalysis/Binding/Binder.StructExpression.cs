@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindStructExpression(StructExpressionSyntax syntax, BindingContext context)
+    private static BoundExpression BindStructExpression(StructExpressionSyntax syntax, BinderContext context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)

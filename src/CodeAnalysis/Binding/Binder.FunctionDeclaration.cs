@@ -7,7 +7,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static BoundFunctionDeclaration BindFunctionDeclaration(FunctionDeclarationSyntax syntax, BindingContext context)
+    private static BoundFunctionDeclaration BindFunctionDeclaration(FunctionDeclarationSyntax syntax, BinderContext context)
     {
         var symbolName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not FunctionSymbol symbol)

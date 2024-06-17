@@ -3,10 +3,10 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundConversionDeclaration(
-    SyntaxNode SyntaxNode,
+    SyntaxNode Syntax,
     ConversionSymbol ConversionSymbol,
     BoundExpression Expression)
-    : BoundMemberDeclaration(BoundKind.ConversionDeclaration, SyntaxNode, ConversionSymbol.Type)
+    : BoundMemberDeclaration(BoundKind.ConversionDeclaration, Syntax, ConversionSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
