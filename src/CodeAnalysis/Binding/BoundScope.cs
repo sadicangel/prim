@@ -13,7 +13,7 @@ internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
 
     protected Dictionary<string, Symbol>? Symbols { get; set; }
 
-    public BoundScope? Parent { get; } = parent;
+    public BoundScope? Parent { get => parent ?? GlobalScope; }
 
     public bool Declare(Symbol symbol) => (Symbols ??= []).TryAdd(symbol.Name, symbol);
 

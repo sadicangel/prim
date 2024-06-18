@@ -3,7 +3,6 @@ using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Types;
-using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 
@@ -79,7 +78,7 @@ internal static partial class Binder
         {
             var name = syntax.IdentifierToken.Text.ToString();
             var type = BindType(syntax.Type, context);
-            if (!structSymbol.Type.AddProperty(new Property(name, type, syntax.IsReadOnly)))
+            if (!structSymbol.Type.AddProperty(name, type, syntax.IsReadOnly))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
 
             return 0;
@@ -89,7 +88,7 @@ internal static partial class Binder
         {
             var name = syntax.IdentifierToken.Text.ToString();
             var type = (FunctionType)BindType(syntax.Type, context);
-            if (!structSymbol.Type.AddMethod(new Method(name, type)))
+            if (!structSymbol.Type.AddMethod(name, type))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
             return 0;
         }
@@ -98,7 +97,7 @@ internal static partial class Binder
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var kind = syntax.Operator.SyntaxKind;
-            if (!structSymbol.Type.AddOperator(new Operator(kind, type)))
+            if (!structSymbol.Type.AddOperator(kind, type))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.Operator.Text.ToString());
             return 0;
         }
@@ -107,7 +106,7 @@ internal static partial class Binder
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var kind = syntax.ConversionKeyword.SyntaxKind;
-            if (!structSymbol.Type.AddConversion(new Conversion(kind, type)))
+            if (!structSymbol.Type.AddConversion(kind, type))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.ConversionKeyword.Text.ToString());
             return 0;
         }

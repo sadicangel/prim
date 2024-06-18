@@ -8,15 +8,15 @@ public sealed record class OptionType : PrimType
     public OptionType(PrimType underlyingType) : base($"?{underlyingType.Name}")
     {
         UnderlyingType = underlyingType;
-        AddOperator(new Operator(
+        AddOperator(
             SyntaxKind.CoalesceOperator,
-            new FunctionType([new Parameter("x", this), new Parameter("y", this)], this)));
-        AddOperator(new Operator(
+            new FunctionType([new Parameter("x", this), new Parameter("y", this)], this));
+        AddOperator(
             SyntaxKind.CoalesceOperator,
-            new FunctionType([new Parameter("x", this), new Parameter("y", UnderlyingType)], UnderlyingType)));
-        AddConversion(new Conversion(
+            new FunctionType([new Parameter("x", this), new Parameter("y", UnderlyingType)], UnderlyingType));
+        AddConversion(
             SyntaxKind.ImplicitKeyword,
-            new FunctionType([new Parameter("x", UnderlyingType)], this)));
+            new FunctionType([new Parameter("x", UnderlyingType)], this));
     }
 
     public PrimType UnderlyingType { get; init; }

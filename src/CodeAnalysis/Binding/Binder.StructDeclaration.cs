@@ -41,7 +41,7 @@ partial class Binder
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Convert(BindExpression(syntax.Init, context), property.Type, isExplicit: false, context);
 
-            var propertySymbol = new PropertySymbol(syntax, property);
+            var propertySymbol = new PropertySymbol(syntax, property, structSymbol);
 
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }
@@ -54,7 +54,7 @@ partial class Binder
 
             var body = BindExpression(syntax.Body, context);
 
-            var methodSymbol = new MethodSymbol(syntax, method);
+            var methodSymbol = new MethodSymbol(syntax, method, structSymbol);
 
             return new BoundMethodDeclaration(syntax, methodSymbol, body);
         }
@@ -67,7 +67,7 @@ partial class Binder
 
             var body = BindExpression(syntax.Body, context);
 
-            var operatorSymbol = new OperatorSymbol(syntax, @operator);
+            var operatorSymbol = new OperatorSymbol(syntax, @operator, structSymbol);
 
             return new BoundOperatorDeclaration(syntax, operatorSymbol, body);
         }
@@ -80,7 +80,7 @@ partial class Binder
 
             var body = BindExpression(syntax.Body, context);
 
-            var conversionSymbol = new ConversionSymbol(syntax, conversion);
+            var conversionSymbol = new ConversionSymbol(syntax, conversion, structSymbol);
 
             return new BoundConversionDeclaration(syntax, conversionSymbol, body);
         }

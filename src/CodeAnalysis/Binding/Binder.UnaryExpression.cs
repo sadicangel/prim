@@ -23,7 +23,7 @@ partial class Binder
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 
-
+        var containingType = operand.Type;
         var operators = operand.Type.GetUnaryOperators(syntax.Operator.SyntaxKind, operand.Type, PredefinedTypes.Any);
         if (operators is [])
         {
@@ -34,7 +34,12 @@ partial class Binder
         if (operators is not [var @operator])
             throw new UnreachableException($"Unexpected result for {nameof(PrimType.GetUnaryOperators)}({syntax.Operator.Text}, {operand.Type}, {operand.Type})");
 
-        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
+        var containingSymbol = containingType is not StructType structType
+            ? null
+            : context.BoundScope.Lookup(structType.Name) as StructSymbol;
+
+
+        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator, containingSymbol);
 
         return new BoundUnaryExpression(expressionKind, syntax, operatorSymbol, operand);
     }

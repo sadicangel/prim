@@ -33,12 +33,15 @@ internal static class PredefinedTypes
     {
         Str
             .AddEqualityOperators()
-            .AddMember(new Operator(
-                SyntaxKind.AddOperator,
-                new FunctionType([new Parameter("x", Str), new Parameter("y", Any)], Str)))
-            .AddMember(new Operator(
-                SyntaxKind.AddOperator,
-                new FunctionType([new Parameter("x", Any), new Parameter("y", Str)], Str)));
+            .AddMembers(type =>
+            {
+                type.AddOperator(
+                    SyntaxKind.AddOperator,
+                    new FunctionType([new Parameter("x", Str), new Parameter("y", Any)], Str));
+                type.AddOperator(
+                    SyntaxKind.AddOperator,
+                    new FunctionType([new Parameter("x", Any), new Parameter("y", Str)], Str));
+            });
 
         Bool
             .AddEqualityOperators()
@@ -172,132 +175,117 @@ internal static class PredefinedTypes
             .AddExplicitConversion(F16, F32, F64, F80, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
     }
 
-    private static PrimType AddMember(this PrimType type, Member member)
+    private static PrimType AddMembers(this PrimType type, Action<PrimType> add)
     {
-        switch (member)
-        {
-            case Property property:
-                type.AddProperty(property);
-                break;
-            case Method method:
-                type.AddMethod(method);
-                break;
-            case Operator @operator:
-                type.AddOperator(@operator);
-                break;
-            case Conversion conversion:
-                type.AddConversion(conversion);
-                break;
-        }
-
+        add(type);
         return type;
     }
 
     private static PrimType AddMathOperators(this PrimType type)
     {
-        type.AddOperator(new Operator(
+        type.AddOperator(
             SyntaxKind.UnaryPlusOperator,
-            new FunctionType([new("x", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type)], type));
+        type.AddOperator(
             SyntaxKind.UnaryMinusOperator,
-            new FunctionType([new("x", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type)], type));
+        type.AddOperator(
             SyntaxKind.AddOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.SubtractOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.MultiplyOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.DivideOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.ModuloOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.PowerOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
+            new FunctionType([new("x", type), new("y", type)], type));
         return type;
     }
 
     private static PrimType AddBitwiseOperators(this PrimType type)
     {
-        type.AddOperator(new Operator(
+        type.AddOperator(
             SyntaxKind.OnesComplementOperator,
-            new FunctionType([new("x", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type)], type));
+        type.AddOperator(
             SyntaxKind.BitwiseAndOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.BitwiseOrOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.ExclusiveOrOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.LeftShiftOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], type));
+        type.AddOperator(
             SyntaxKind.RightShiftOperator,
-            new FunctionType([new("x", type), new("y", type)], type)));
+            new FunctionType([new("x", type), new("y", type)], type));
         return type;
     }
 
     private static PrimType AddEqualityOperators(this PrimType type)
     {
-        type.AddOperator(new Operator(
+        type.AddOperator(
             SyntaxKind.EqualsOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], Bool));
+        type.AddOperator(
             SyntaxKind.NotEqualsOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
+            new FunctionType([new("x", type), new("y", type)], Bool));
         return type;
     }
 
     private static PrimType AddComparisonOperators(this PrimType type)
     {
-        type.AddOperator(new Operator(
+        type.AddOperator(
             SyntaxKind.LessThanOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], Bool));
+        type.AddOperator(
             SyntaxKind.LessThanOrEqualOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], Bool));
+        type.AddOperator(
             SyntaxKind.GreaterThanOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], Bool));
+        type.AddOperator(
             SyntaxKind.GreaterThanOrEqualOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
+            new FunctionType([new("x", type), new("y", type)], Bool));
         return type;
     }
 
     private static PrimType AddLogicalOperators(this PrimType type)
     {
-        type.AddOperator(new Operator(
+        type.AddOperator(
             SyntaxKind.NotOperator,
-            new FunctionType([new("x", type)], Bool)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type)], Bool));
+        type.AddOperator(
             SyntaxKind.LogicalAndOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
-        type.AddOperator(new Operator(
+            new FunctionType([new("x", type), new("y", type)], Bool));
+        type.AddOperator(
             SyntaxKind.LogicalOrOperator,
-            new FunctionType([new("x", type), new("y", type)], Bool)));
+            new FunctionType([new("x", type), new("y", type)], Bool));
         return type;
     }
 
-    private static PrimType AddImplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targeTypes)
+    private static PrimType AddImplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targetTypes)
     {
-        foreach (var targeType in targeTypes)
-            type.AddConversion(new Conversion(SyntaxKind.ImplicitKeyword, new FunctionType([new Parameter("x", type)], targeType)));
+        foreach (var targetType in targetTypes)
+            type.AddConversion(SyntaxKind.ImplicitKeyword, new FunctionType([new Parameter("x", type)], targetType));
         return type;
     }
 
-    private static PrimType AddExplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targeTypes)
+    private static PrimType AddExplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targetTypes)
     {
-        foreach (var targeType in targeTypes)
-            type.AddConversion(new Conversion(SyntaxKind.ExplicitKeyword, new FunctionType([new Parameter("x", type)], targeType)));
+        foreach (var targetType in targetTypes)
+            type.AddConversion(SyntaxKind.ExplicitKeyword, new FunctionType([new Parameter("x", type)], targetType));
         return type;
     }
 }

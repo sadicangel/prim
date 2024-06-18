@@ -25,7 +25,7 @@ partial class Binder
             }
 
             var init = Convert(BindExpression(propertySyntax.Init, context), property.Type, isExplicit: false, context);
-            var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property), init);
+            var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property, structSymbol), init);
             properties.Add(expression);
         }
         // TODO: Report un-initialized property members.

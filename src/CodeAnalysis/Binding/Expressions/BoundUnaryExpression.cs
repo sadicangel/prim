@@ -8,7 +8,7 @@ internal sealed record class BoundUnaryExpression(
     SyntaxNode Syntax,
     OperatorSymbol OperatorSymbol,
     BoundExpression Operand)
-    : BoundExpression(BoundKind, Syntax, OperatorSymbol.Type)
+    : BoundExpression(BoundKind, Syntax, OperatorSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {

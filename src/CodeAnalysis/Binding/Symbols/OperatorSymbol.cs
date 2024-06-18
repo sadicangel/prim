@@ -4,41 +4,12 @@ using CodeAnalysis.Types;
 using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding.Symbols;
-internal sealed record class OperatorSymbol(
-    SyntaxNode Syntax,
-    Operator Operator)
-    : MemberSymbol(GetBoundKind(Operator.OperatorKind), Syntax, $"{GetOperatorName(Operator.OperatorKind)}<{Operator.Type.Name}>")
+internal sealed record class OperatorSymbol(SyntaxNode Syntax, Operator Operator, StructSymbol? ContainingSymbol = null)
+    : MemberSymbol(GetBoundKind(Operator.OperatorKind), Syntax, Operator.Name, ContainingSymbol)
 {
     public override FunctionType Type { get; } = Operator.Type;
 
-    private static string GetOperatorName(SyntaxKind operatorKind) => operatorKind switch
-    {
-        SyntaxKind.UnaryPlusOperator => "+",
-        SyntaxKind.UnaryMinusOperator => "-",
-        SyntaxKind.OnesComplementOperator => "~",
-        SyntaxKind.NotOperator => "!",
-        SyntaxKind.AddOperator => "+",
-        SyntaxKind.SubtractOperator => "-",
-        SyntaxKind.MultiplyOperator => "*",
-        SyntaxKind.DivideOperator => "/",
-        SyntaxKind.ModuloOperator => "%",
-        SyntaxKind.PowerOperator => "**",
-        SyntaxKind.LeftShiftOperator => "<<",
-        SyntaxKind.RightShiftOperator => ">>",
-        SyntaxKind.LogicalOrOperator => "||",
-        SyntaxKind.LogicalAndOperator => "&&",
-        SyntaxKind.BitwiseOrOperator => "|",
-        SyntaxKind.BitwiseAndOperator => "&",
-        SyntaxKind.ExclusiveOrOperator => "^",
-        SyntaxKind.EqualsOperator => "==",
-        SyntaxKind.NotEqualsOperator => "!=",
-        SyntaxKind.LessThanOperator => "<",
-        SyntaxKind.LessThanOrEqualOperator => "<=",
-        SyntaxKind.GreaterThanOperator => ">",
-        SyntaxKind.GreaterThanOrEqualOperator => ">=",
-        SyntaxKind.CoalesceOperator => "??",
-        _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{operatorKind}'"),
-    };
+    public PrimType ReturnType { get => Type.ReturnType; }
 
     private static BoundKind GetBoundKind(SyntaxKind operatorKind) => operatorKind switch
     {

@@ -19,8 +19,13 @@ partial class Binder
             return expression;
         }
 
-        var conversion = expression.Type.GetConversion(expression.Type, type)
-            ?? type.GetConversion(expression.Type, type);
+        var containingType = expression.Type;
+        var conversion = containingType.GetConversion(expression.Type, type);
+        if (conversion is null)
+        {
+            containingType = type;
+            containingType.GetConversion(expression.Type, type);
+        }
 
         if (conversion is null)
         {
@@ -34,7 +39,11 @@ partial class Binder
             return new BoundNeverExpression(expression.Syntax);
         }
 
-        var conversionSymbol = new ConversionSymbol(expression.Syntax, conversion);
+        var containingSymbol = containingType is not StructType structType
+            ? null
+            : context.BoundScope.Lookup(structType.Name) as StructSymbol;
+
+        var conversionSymbol = new ConversionSymbol(expression.Syntax, conversion, containingSymbol);
 
         return new BoundConversionExpression(expression.Syntax, conversionSymbol, expression);
     }

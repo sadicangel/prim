@@ -4,10 +4,8 @@ using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding.Symbols;
 
-internal sealed record class MethodSymbol(
-    SyntaxNode Syntax,
-    Method Method)
-    : MemberSymbol(BoundKind.Method, Syntax, $"{Method.Name}<{Method.Type.Name}>")
+internal sealed record class MethodSymbol(SyntaxNode Syntax, Method Method, StructSymbol? ContainingSymbol = null)
+    : MemberSymbol(BoundKind.Method, Syntax, Method.Name, ContainingSymbol)
 {
     public override FunctionType Type { get; } = Method.Type;
 }

@@ -38,10 +38,12 @@ partial class Binder
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 
-        var operators = left.Type.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
+        var containingType = left.Type;
+        var operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
         if (operators is [])
         {
-            operators = right.Type.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
+            containingType = right.Type;
+            operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
             if (operators is [])
             {
                 context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
@@ -54,7 +56,11 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
+        var containingSymbol = containingType is not StructType structType
+            ? null
+            : context.BoundScope.Lookup(structType.Name) as StructSymbol;
+
+        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator, containingSymbol);
 
         return new BoundBinaryExpression(expressionKind, syntax, left, operatorSymbol, right);
     }

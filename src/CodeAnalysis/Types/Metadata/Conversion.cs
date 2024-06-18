@@ -2,8 +2,8 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Types.Metadata;
-public sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Type)
-    : Member($"{GetConversionPrefix(ConversionKind)}<{Type.Name}>")
+public sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Type, PrimType ContainingType)
+    : Member($"{GetConversionPrefix(ConversionKind)}<{Type.Name}>", ContainingType)
 {
     public override FunctionType Type { get; } = Type;
     public bool IsImplicit { get => ConversionKind is SyntaxKind.ImplicitKeyword; }

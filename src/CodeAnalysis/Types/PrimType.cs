@@ -12,6 +12,7 @@ public abstract record class PrimType(string Name)
     public bool IsAny { get => this == PredefinedTypes.Any; }
     public bool IsNever { get => this == PredefinedTypes.Never; }
     public bool IsUnknown { get => this == PredefinedTypes.Unknown; }
+    public bool IsPredefined { get => PredefinedTypeNames.All.Contains(Name); }
 
     private string GetDebuggerDisplay() => $"{Name}: {PredefinedTypeNames.Type}";
 
@@ -21,10 +22,10 @@ public abstract record class PrimType(string Name)
 
     public sealed override string ToString() => Name;
 
-    internal bool AddProperty(Property property)
+    internal bool AddProperty(string name, PrimType type, bool isReadonly)
     {
-        if (GetProperty(property.Name) is not null) return false;
-        _members.Add(property);
+        if (GetProperty(name) is not null) return false;
+        _members.Add(new Property(name, type, this, isReadonly));
         return true;
     }
 
@@ -38,10 +39,10 @@ public abstract record class PrimType(string Name)
         return null;
     }
 
-    internal bool AddMethod(Method method)
+    internal bool AddMethod(string name, FunctionType type)
     {
-        if (GetMethod(method.Name, method.Type) is not null) return false;
-        _members.Add(method);
+        if (GetMethod(name, type) is not null) return false;
+        _members.Add(new Method(name, type, this));
         return true;
     }
 
@@ -55,10 +56,10 @@ public abstract record class PrimType(string Name)
         return null;
     }
 
-    internal bool AddOperator(Operator @operator)
+    internal bool AddOperator(SyntaxKind operatorKind, FunctionType type)
     {
-        if (GetOperator(@operator.OperatorKind, @operator.Type) is not null) return false;
-        _members.Add(@operator);
+        if (GetOperator(operatorKind, type) is not null) return false;
+        _members.Add(new Operator(operatorKind, type, this));
         return true;
     }
 
@@ -93,10 +94,10 @@ public abstract record class PrimType(string Name)
             .ToList();
     }
 
-    internal bool AddConversion(Conversion conversion)
+    internal bool AddConversion(SyntaxKind conversionKind, FunctionType type)
     {
-        if (GetConversion(conversion.Type) is not null) return false;
-        _members.Add(conversion);
+        if (GetConversion(type) is not null) return false;
+        _members.Add(new Conversion(conversionKind, type, this));
         return true;
     }
 
