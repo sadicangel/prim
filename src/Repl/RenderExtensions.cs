@@ -1,6 +1,13 @@
 ﻿using System.Diagnostics;
+using CodeAnalysis.Binding;
+using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Operators;
+using CodeAnalysis.Syntax.Types;
 using Spectre.Console;
 
 namespace Repl;
@@ -103,6 +110,113 @@ internal static class RenderExtensions
     public static void WriteLine(this IAnsiConsole console, Diagnostic diagnostic)
     {
         console.Write(diagnostic);
+        console.WriteLine();
+    }
+
+    public static void Write(this IAnsiConsole console, SyntaxTree syntaxTree)
+    {
+        var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.SyntaxKind}[/]")
+            .Style("dim white");
+
+        WriteTo(syntaxTree.CompilationUnit, tree);
+
+        console.Write(new Panel(tree).Header(nameof(SyntaxTree)));
+
+        static void WriteTo(SyntaxNode syntaxNode, IHasTreeNodes treeNode)
+        {
+            foreach (var child in syntaxNode.Children())
+            {
+                switch (child)
+                {
+                    case SyntaxToken token:
+                        foreach (var trivia in token.LeadingTrivia)
+                            treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
+                        if (token.Value is not null)
+                            treeNode.AddNode($"[green3]{token.SyntaxKind}[/] {FormatLiteral(token)}");
+                        else
+                            treeNode.AddNode($"[green3]{token.SyntaxKind}[/] [darkseagreen2 i]{token.Text}[/]");
+                        foreach (var trivia in token.TrailingTrivia)
+                            treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
+                        break;
+
+                    case TypeSyntax type:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{type.Text}[/]"));
+                        // $"{base.Name}: {Type.Name}"
+                        break;
+
+                    case OperatorSyntax @operator:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/]"));
+                        break;
+
+                    case ExpressionSyntax expression:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/]"));
+                        break;
+
+                    default:
+                        throw new NotImplementedException(child.GetType().Name);
+                }
+            }
+        }
+
+        static string FormatLiteral(SyntaxToken token)
+        {
+            return token.SyntaxKind switch
+            {
+
+                SyntaxKind.I32LiteralToken or
+                SyntaxKind.U32LiteralToken or
+                SyntaxKind.I64LiteralToken or
+                SyntaxKind.U64LiteralToken or
+                SyntaxKind.F32LiteralToken or
+                SyntaxKind.F64LiteralToken => $"[gold3]{token.Value}[/]",
+                SyntaxKind.StrLiteralToken => $"[darkorange3]\"{token.Value}\"[/]",
+                SyntaxKind.TrueKeyword or
+                SyntaxKind.FalseKeyword or
+                SyntaxKind.NullKeyword => $"[blue3_1]{token.Value}[/]",
+                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{token.SyntaxKind}'"),
+            };
+        }
+    }
+
+    public static void WriteLine(this IAnsiConsole console, SyntaxTree syntaxTree)
+    {
+        console.Write(syntaxTree);
+        console.WriteLine();
+    }
+
+    public static void Write(this IAnsiConsole console, BoundTree boundTree)
+    {
+        var tree = new Tree($"[aqua]{boundTree.CompilationUnit.BoundKind}[/]")
+            .Style("dim white");
+
+        WriteTo(boundTree.CompilationUnit, tree);
+
+        console.Write(new Panel(tree).Header(nameof(BoundTree)));
+
+        static void WriteTo(BoundNode boundNode, IHasTreeNodes treeNode)
+        {
+            foreach (var child in boundNode.Children())
+            {
+                switch (child)
+                {
+                    case Symbol symbol:
+                        WriteTo(child, treeNode.AddNode($"[green3]{symbol.BoundKind}[/] [darkseagreen2 i]{symbol}[/]"));
+                        break;
+
+                    case BoundExpression expression:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{expression.Type}[/]"));
+                        break;
+
+                    default:
+                        throw new NotImplementedException(child.GetType().Name);
+                }
+            }
+        }
+    }
+
+    public static void WriteLine(this IAnsiConsole console, BoundTree boundTree)
+    {
+        console.Write(boundTree);
         console.WriteLine();
     }
 }

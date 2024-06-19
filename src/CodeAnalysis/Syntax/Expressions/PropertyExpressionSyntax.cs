@@ -7,7 +7,7 @@ public sealed record class PropertyExpressionSyntax(
     SyntaxToken IdentifierToken,
     SyntaxToken EqualsToken,
     ExpressionSyntax Init)
-    : SyntaxNode(SyntaxKind.PropertyExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.PropertyExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
