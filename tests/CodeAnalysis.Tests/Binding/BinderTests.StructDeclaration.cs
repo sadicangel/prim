@@ -13,7 +13,7 @@ public partial class BinderTests
             }
             """));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
-        var node = boundTree.Root.BoundNodes[^1];
+        var node = boundTree.CompilationUnit.BoundNodes[^1];
         Assert.Equal(BoundKind.StructDeclaration, node.BoundKind);
     }
 }

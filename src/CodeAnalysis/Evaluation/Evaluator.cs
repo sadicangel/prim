@@ -9,7 +9,7 @@ internal static partial class Evaluator
         var context = new EvaluatorContext(boundTree.Diagnostics, evaluatedScope);
         var value = LiteralValue.Unit as PrimValue;
 
-        foreach (var node in boundTree.Root.BoundNodes)
+        foreach (var node in boundTree.CompilationUnit.BoundNodes)
             value = EvaluateNode(node, context);
 
         return new EvaluatedResult(value, context.Diagnostics);

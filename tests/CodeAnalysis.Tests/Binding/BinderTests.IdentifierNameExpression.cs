@@ -11,7 +11,7 @@ public partial class BinderTests
             a
             """));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
-        var node = boundTree.Root.BoundNodes[^1];
+        var node = boundTree.CompilationUnit.BoundNodes[^1];
         Assert.Equal(BoundKind.IdentifierNameExpression, node.BoundKind);
     }
 }

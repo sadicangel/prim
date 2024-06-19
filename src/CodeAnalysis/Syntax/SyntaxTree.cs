@@ -9,10 +9,10 @@ public sealed class SyntaxTree
     private CompilationUnitSyntax? _compilationUnit;
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
-    private SyntaxTree(SourceText sourceText, ParseOptions options)
+    private SyntaxTree(SourceText sourceText, bool isScript)
     {
         SourceText = sourceText;
-        IsScript = options.IsScript;
+        IsScript = isScript;
     }
 
     public SourceText SourceText { get; }
@@ -53,9 +53,9 @@ public sealed class SyntaxTree
         return [.. syntaxTokens];
     }
 
-    public static SyntaxTree Parse(SourceText sourceText) => new(sourceText, new ParseOptions(IsScript: false));
+    public static SyntaxTree Parse(SourceText sourceText) => new(sourceText, isScript: false);
 
-    public static SyntaxTree ParseScript(SourceText sourceText) => new(sourceText, new ParseOptions(IsScript: true));
+    public static SyntaxTree ParseScript(SourceText sourceText) => new(sourceText, isScript: true);
 
     private readonly record struct ParseOptions(bool IsScript);
 }
