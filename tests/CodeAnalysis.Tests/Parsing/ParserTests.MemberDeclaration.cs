@@ -12,7 +12,7 @@ public partial class ParserTests
                 member: i32 = 0;
             }
             """));
-        var node = Assert.Single(tree.Root.SyntaxNodes);
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<StructDeclarationSyntax>(node);
         var member = Assert.Single(decl.Members);

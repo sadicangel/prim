@@ -13,11 +13,28 @@ internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
 
     protected Dictionary<string, Symbol>? Symbols { get; set; }
 
-    public BoundScope? Parent { get => parent ?? GlobalScope; }
+    public BoundScope Parent { get => parent ?? GlobalScope; }
 
     public bool Declare(Symbol symbol) => (Symbols ??= []).TryAdd(symbol.Name, symbol);
 
-    public Symbol? Lookup(string name) => Symbols?.GetValueOrDefault(name) ?? Parent?.Lookup(name);
+    public Symbol? Lookup(string name)
+    {
+        var scope = this;
+        var symbol = scope.Symbols?.GetValueOrDefault(name);
+        if (symbol is not null)
+            return symbol;
+
+        do
+        {
+            scope = scope.Parent;
+            symbol = scope.Symbols?.GetValueOrDefault(name);
+            if (symbol is not null)
+                return symbol;
+        }
+        while (scope != scope.Parent);
+
+        return null;
+    }
 
     public IEnumerator<Symbol> GetEnumerator()
     {

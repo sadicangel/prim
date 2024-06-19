@@ -6,10 +6,48 @@ using Spectre.Console;
 namespace Repl;
 internal static class RenderExtensions
 {
-    public static void Write(this IAnsiConsole console, PrimValue value)
+    private static void Indent(IAnsiConsole console, int indent, string indentString = "  ")
     {
-        console.Write(new Markup($"{value.Value} ", "grey66"));
-        console.Write(new Markup(value.Type.Name, "green i"));
+        for (var i = 0; i < indent; ++i)
+            console.Write(indentString);
+    }
+
+    public static void Write(this IAnsiConsole console, PrimValue value, int indent = 0)
+    {
+        Indent(console, indent);
+        switch (value)
+        {
+            case FunctionValue function:
+                console.Write(new Markup(function.Type.ToString(), "grey66"));
+                console.Write(" ");
+                console.Write(new Markup(value.Type.Name, "green i"));
+                break;
+            case LiteralValue literal:
+                console.Write(new Markup(literal.Value.ToString()!, "grey66"));
+                console.Write(" ");
+                console.Write(new Markup(value.Type.Name, "green i"));
+                break;
+            case ObjectValue @object:
+                console.MarkupLine("[grey66]{[/]");
+                ++indent;
+                foreach (var (ps, pv) in @object)
+                {
+                    Indent(console, indent);
+                    console.MarkupInterpolated($"[grey66]{ps.Name}: [/]");
+                    console.WriteLine(pv);
+                }
+                --indent;
+                console.Markup("[grey66]}[/] ");
+                console.Write(new Markup(value.Type.Name, "green i"));
+                break;
+            case StructValue @struct:
+                console.Write(new Markup(@struct.Type.ToString(), "grey66"));
+                console.Write(" ");
+                console.Write(new Markup(value.Type.Name, "green i"));
+                break;
+            default:
+                throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");
+        }
     }
 
     public static void WriteLine(this IAnsiConsole console, PrimValue value)

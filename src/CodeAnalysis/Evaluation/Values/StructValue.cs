@@ -4,24 +4,24 @@ using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Evaluation.Values;
 
-internal sealed record class StructValue(StructType Value) : PrimValue(PredefinedTypes.Type, Value)
+internal sealed record class StructValue(StructType StructType) : PrimValue(PredefinedTypes.Type)
 {
-    private readonly Dictionary<Symbol, PrimValue> _members = [];
+    public Dictionary<Symbol, PrimValue> Members { get; } = [];
 
-    public override StructType Value { get; } = Value;
+    public override StructType Value => StructType;
 
-    public PrimValue GetProperty(PropertySymbol symbol) => _members[symbol];
-    public void SetProperty(PropertySymbol symbol, PrimValue value) => _members[symbol] = value;
+    public PrimValue GetProperty(PropertySymbol symbol) => Members[symbol];
+    public void SetProperty(PropertySymbol symbol, PrimValue value) => Members[symbol] = value;
 
-    public FunctionValue GetMethod(MethodSymbol symbol) => _members[symbol] as FunctionValue
+    public FunctionValue GetMethod(MethodSymbol symbol) => Members[symbol] as FunctionValue
         ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    public void SetMethod(MethodSymbol symbol, FunctionValue value) => _members[symbol] = value;
+    public void SetMethod(MethodSymbol symbol, FunctionValue value) => Members[symbol] = value;
 
-    public FunctionValue GetOperator(OperatorSymbol symbol) => _members[symbol] as FunctionValue
+    public FunctionValue GetOperator(OperatorSymbol symbol) => Members[symbol] as FunctionValue
         ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    public void SetOperator(OperatorSymbol symbol, FunctionValue value) => _members[symbol] = value;
+    public void SetOperator(OperatorSymbol symbol, FunctionValue value) => Members[symbol] = value;
 
-    public FunctionValue GetConversion(ConversionSymbol symbol) => _members[symbol] as FunctionValue
+    public FunctionValue GetConversion(ConversionSymbol symbol) => Members[symbol] as FunctionValue
         ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    public void SetConversion(ConversionSymbol symbol, FunctionValue value) => _members[symbol] = value;
+    public void SetConversion(ConversionSymbol symbol, FunctionValue value) => Members[symbol] = value;
 }

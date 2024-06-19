@@ -11,7 +11,7 @@ public partial class ParserTests
                 y: i32 = 0;
             }
             """));
-        var node = Assert.Single(tree.Root.SyntaxNodes);
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.StructDeclaration, node.SyntaxKind);
     }

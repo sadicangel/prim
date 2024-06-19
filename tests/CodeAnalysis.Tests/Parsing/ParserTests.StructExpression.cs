@@ -10,7 +10,7 @@ public partial class ParserTests
                 .y = 4,
             }
             """));
-        var node = Assert.Single(tree.Root.SyntaxNodes);
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.StructExpression, node.SyntaxKind);
     }

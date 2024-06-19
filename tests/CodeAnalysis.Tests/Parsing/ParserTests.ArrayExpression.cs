@@ -11,7 +11,7 @@ partial class ParserTests
                 3
             ]
             """));
-        var node = Assert.Single(tree.Root.SyntaxNodes);
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.ArrayExpression, node.SyntaxKind);
     }
@@ -26,7 +26,7 @@ partial class ParserTests
                 3,
             ]
             """));
-        var node = Assert.Single(tree.Root.SyntaxNodes);
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.ArrayExpression, node.SyntaxKind);
     }

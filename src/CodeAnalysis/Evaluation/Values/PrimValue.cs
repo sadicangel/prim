@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Evaluation.Values;
-public abstract record class PrimValue(PrimType Type, object Value)
+public abstract record class PrimValue(PrimType Type)
 {
-    public virtual object Value { get; } = Value;
+    public abstract object Value { get; }
 }

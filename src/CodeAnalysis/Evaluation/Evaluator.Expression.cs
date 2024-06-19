@@ -42,8 +42,8 @@ partial class Evaluator
                 EvaluateVariableDeclaration((BoundVariableDeclaration)node, context),
             //BoundKind.FunctionDeclaration =>
             //    EvaluateFunctionDeclaration((BoundFunctionDeclaration)node, context),
-            //BoundKind.StructDeclaration =>
-            //    EvaluateStructDeclaration((BoundStructDeclaration)node, context),
+            BoundKind.StructDeclaration =>
+                EvaluateStructDeclaration((BoundStructDeclaration)node, context),
             //BoundKind.LocalDeclaration =>
             //    EvaluateLocalDeclaration((BoundLocalDeclaration)node, context),
             //BoundKind.EmptyExpression =>
@@ -54,8 +54,8 @@ partial class Evaluator
             //    EvaluateBlockExpression((BoundBlockExpression)node, context),
             //BoundKind.ArrayExpression =>
             //    EvaluateArrayExpression((BoundArrayExpression)node, context),
-            //BoundKind.StructExpression =>
-            //    EvaluateStructExpression((BoundStructExpression)node, context),
+            BoundKind.StructExpression =>
+                EvaluateStructExpression((BoundStructExpression)node, context),
             //BoundKind.ConversionExpression =>
             //    EvaluateConversionExpression((BoundConversionExpression)node, context),
             //BoundKind.UnaryPlusExpression or

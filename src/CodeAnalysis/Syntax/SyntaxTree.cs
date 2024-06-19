@@ -6,24 +6,26 @@ namespace CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
+    private CompilationUnitSyntax? _compilationUnit;
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
-    internal SyntaxTree(SourceText sourceText, Func<SyntaxTree, CompilationUnitSyntax> getRoot)
+    private SyntaxTree(SourceText sourceText, ParseOptions options)
     {
         SourceText = sourceText;
-        Root = getRoot.Invoke(this);
+        IsScript = options.IsScript;
     }
 
     public SourceText SourceText { get; }
-    public CompilationUnitSyntax Root { get; }
+    public bool IsScript { get; }
+    public CompilationUnitSyntax CompilationUnit { get => _compilationUnit ??= Parser.Parse(this); }
     public DiagnosticBag Diagnostics { get; init; } = [];
 
-    public override string ToString() => $"SyntaxTree {{ Root = {Root} }}";
+    public override string ToString() => $"SyntaxTree {{ CompilationUnit = {CompilationUnit} }}";
 
     internal SyntaxNode? GetParent(SyntaxNode node)
     {
         if (_nodeParents is null)
-            Interlocked.CompareExchange(ref _nodeParents, CreateNodeParents(Root), null);
+            Interlocked.CompareExchange(ref _nodeParents, CreateNodeParents(CompilationUnit), null);
 
         return _nodeParents[node];
 
@@ -46,21 +48,14 @@ public sealed class SyntaxTree
 
     public static SyntaxList<SyntaxToken> Scan(SourceText sourceText)
     {
-        static CompilationUnitSyntax Parse(SyntaxTree syntaxTree)
-        {
-            var tokens = new SyntaxList<SyntaxNode>.Builder();
-            tokens.AddRange(Scanner.Scan(syntaxTree));
-            var eof = tokens is [.., SyntaxToken last and { SyntaxKind: SyntaxKind.EofToken }]
-                ? last
-                : SyntaxFactory.Token(SyntaxKind.EofToken, syntaxTree);
-
-            return new CompilationUnitSyntax(syntaxTree, tokens.ToSyntaxList(), eof);
-        }
-
-        return new SyntaxList<SyntaxToken>([.. new SyntaxTree(sourceText, Parse).Root.SyntaxNodes.Cast<SyntaxToken>()]);
+        var syntaxTree = new SyntaxTree(sourceText, default);
+        var syntaxTokens = Scanner.Scan(syntaxTree);
+        return [.. syntaxTokens];
     }
 
-    public static SyntaxTree Parse(SourceText sourceText) => new(sourceText, Parser.Parse);
+    public static SyntaxTree Parse(SourceText sourceText) => new(sourceText, new ParseOptions(IsScript: false));
 
-    public static SyntaxTree ParseScript(SourceText sourceText) => new(sourceText, Parser.ParseScript);
+    public static SyntaxTree ParseScript(SourceText sourceText) => new(sourceText, new ParseOptions(IsScript: true));
+
+    private readonly record struct ParseOptions(bool IsScript);
 }

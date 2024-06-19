@@ -1,5 +1,6 @@
 ﻿using CodeAnalysis.Binding;
 using CodeAnalysis.Evaluation;
+using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Repl;
@@ -8,15 +9,20 @@ using Spectre.Console;
 var console = AnsiConsole.Console;
 
 const string Code = """
-name: str = "" + 2;
-name
+Point2d: struct = {
+    x: f32 = 0f;
+    y: f32 = 0f;
+}
+
+p: Point2d = Point2d {
+    .x = 2f,
+    .y = 6f,
+}
+
+p
 """;
 
-var syntaxTree = SyntaxTree.ParseScript(new SourceText(Code));
-var boundScope = new BoundScope();
-var boundTree = BoundTree.Bind(syntaxTree, boundScope);
-var evaluatedScope = new EvaluatedScope(EvaluatedScope.FromGlobalBoundScope(boundScope.GlobalScope));
-var (value, diagnostics) = Evaluator.Evaluate(boundTree, evaluatedScope);
+var (value, diagnostics) = Evaluate(new SourceText(Code));
 
 if (diagnostics.Count > 0)
 {
@@ -25,3 +31,20 @@ if (diagnostics.Count > 0)
 }
 
 console.WriteLine(value);
+
+static EvaluatedResult Evaluate(SourceText sourceText)
+{
+    var syntaxTree = SyntaxTree.ParseScript(sourceText);
+    if (syntaxTree.Diagnostics.HasErrorDiagnostics)
+    {
+        return new EvaluatedResult(LiteralValue.Unit, syntaxTree.Diagnostics);
+    }
+    var boundScope = new BoundScope();
+    var boundTree = BoundTree.Bind(syntaxTree, boundScope);
+    if (boundTree.Diagnostics.HasErrorDiagnostics)
+    {
+        return new EvaluatedResult(LiteralValue.Unit, boundTree.Diagnostics);
+    }
+    var evaluatedScope = new EvaluatedScope(EvaluatedScope.FromGlobalBoundScope(boundScope.GlobalScope));
+    return Evaluator.Evaluate(boundTree, evaluatedScope);
+}

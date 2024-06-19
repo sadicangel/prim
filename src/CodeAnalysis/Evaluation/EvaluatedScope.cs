@@ -82,6 +82,90 @@ internal class EvaluatedScope(EvaluatedScope? parent = null) : IEnumerable<PrimV
                         new FunctionValue(addAny.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(a.Type, a.Value + (string)b.Value)));
                 });
+            ((StructValue)map[boundScope.Bool])
+                .AddEqualityOperators<bool>(boundScope.Bool)
+                .AddLogicalOperators(boundScope.Bool);
+            ((StructValue)map[boundScope.I8])
+                .AddEqualityOperators<sbyte>(boundScope.I8)
+                .AddComparisonOperators<sbyte>(boundScope.I8)
+                .AddBitwiseOperators<sbyte>(boundScope.I8)
+                .AddMathOperators<sbyte>(boundScope.I8);
+            ((StructValue)map[boundScope.I16])
+                .AddEqualityOperators<short>(boundScope.I16)
+                .AddComparisonOperators<short>(boundScope.I16)
+                .AddBitwiseOperators<short>(boundScope.I16)
+                .AddMathOperators<short>(boundScope.I16);
+            ((StructValue)map[boundScope.I32])
+                .AddEqualityOperators<int>(boundScope.I32)
+                .AddComparisonOperators<int>(boundScope.I32)
+                .AddBitwiseOperators<int>(boundScope.I32)
+                .AddMathOperators<int>(boundScope.I32);
+            ((StructValue)map[boundScope.I64])
+                .AddEqualityOperators<long>(boundScope.I64)
+                .AddComparisonOperators<long>(boundScope.I64)
+                .AddBitwiseOperators<long>(boundScope.I64)
+                .AddMathOperators<long>(boundScope.I64);
+            ((StructValue)map[boundScope.I128])
+                .AddEqualityOperators<BigInteger>(boundScope.I64)
+                .AddComparisonOperators<BigInteger>(boundScope.I64)
+                .AddBitwiseOperators<BigInteger>(boundScope.I64)
+                .AddMathOperators<BigInteger>(boundScope.I64);
+            ((StructValue)map[boundScope.ISize])
+                .AddEqualityOperators<nint>(boundScope.I64)
+                .AddComparisonOperators<nint>(boundScope.I64)
+                .AddBitwiseOperators<nint>(boundScope.I64)
+                .AddMathOperators<nint>(boundScope.I64);
+            ((StructValue)map[boundScope.U8])
+                .AddEqualityOperators<byte>(boundScope.U8)
+                .AddComparisonOperators<byte>(boundScope.U8)
+                .AddBitwiseOperators<byte>(boundScope.U8)
+                .AddMathOperators<byte>(boundScope.U8);
+            ((StructValue)map[boundScope.U16])
+                .AddEqualityOperators<ushort>(boundScope.U16)
+                .AddComparisonOperators<ushort>(boundScope.U16)
+                .AddBitwiseOperators<ushort>(boundScope.U16)
+                .AddMathOperators<ushort>(boundScope.U16);
+            ((StructValue)map[boundScope.U32])
+                .AddEqualityOperators<uint>(boundScope.U32)
+                .AddComparisonOperators<uint>(boundScope.U32)
+                .AddBitwiseOperators<uint>(boundScope.U32)
+                .AddMathOperators<uint>(boundScope.U32);
+            ((StructValue)map[boundScope.U64])
+                .AddEqualityOperators<ulong>(boundScope.U64)
+                .AddComparisonOperators<ulong>(boundScope.U64)
+                .AddBitwiseOperators<ulong>(boundScope.U64)
+                .AddMathOperators<ulong>(boundScope.U64);
+            ((StructValue)map[boundScope.U128])
+                .AddEqualityOperators<BigInteger>(boundScope.U64)
+                .AddComparisonOperators<BigInteger>(boundScope.U64)
+                .AddBitwiseOperators<BigInteger>(boundScope.U64)
+                .AddMathOperators<BigInteger>(boundScope.U64);
+            ((StructValue)map[boundScope.USize])
+                .AddEqualityOperators<nuint>(boundScope.U64)
+                .AddComparisonOperators<nuint>(boundScope.U64)
+                .AddBitwiseOperators<nuint>(boundScope.U64)
+                .AddMathOperators<nuint>(boundScope.U64);
+            ((StructValue)map[boundScope.F16])
+                .AddEqualityOperators<Half>(boundScope.F16)
+                .AddComparisonOperators<Half>(boundScope.F16)
+                .AddMathOperators<Half>(boundScope.F16);
+            ((StructValue)map[boundScope.F32])
+                .AddEqualityOperators<float>(boundScope.F32)
+                .AddComparisonOperators<float>(boundScope.F32)
+                .AddMathOperators<float>(boundScope.F32);
+            ((StructValue)map[boundScope.F64])
+                .AddEqualityOperators<double>(boundScope.F64)
+                .AddComparisonOperators<double>(boundScope.F64)
+                .AddMathOperators<double>(boundScope.F64);
+            // TODO: Fix these types using double.
+            ((StructValue)map[boundScope.F80])
+                .AddEqualityOperators<double>(boundScope.F80)
+                .AddComparisonOperators<double>(boundScope.F80)
+                .AddMathOperators<double>(boundScope.F80);
+            ((StructValue)map[boundScope.F128])
+                .AddEqualityOperators<double>(boundScope.F128)
+                .AddComparisonOperators<double>(boundScope.F128)
+                .AddMathOperators<double>(boundScope.F128);
             return map;
         }
     }
@@ -104,7 +188,7 @@ file static class StructValueExtensions
                 unaryPlus,
                 symbol),
             new FunctionValue(unaryPlus.Type, (PrimValue a) => new LiteralValue(a.Type, +(T)a.Value)));
-        var unaryMinus = symbol.Type.GetBinaryOperators(SyntaxKind.UnaryMinusOperator, symbol.Type, symbol.Type, symbol.Type).Single();
+        var unaryMinus = symbol.Type.GetUnaryOperators(SyntaxKind.UnaryMinusOperator, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.MinusToken),
@@ -161,7 +245,7 @@ file static class StructValueExtensions
         return s;
     }
 
-    public static StructValue AddBitwiseOperators<T>(this StructValue s, StructSymbol symbol) where T : IBinaryInteger<T>, IShiftOperators<T, T, T>
+    public static StructValue AddBitwiseOperators<T>(this StructValue s, StructSymbol symbol) where T : IBinaryInteger<T>, IShiftOperators<T, int, T>
     {
         var onesComplement = symbol.Type.GetUnaryOperators(SyntaxKind.OnesComplementOperator, symbol.Type, symbol.Type).Single();
         s.SetOperator(
@@ -201,7 +285,7 @@ file static class StructValueExtensions
                 leftShift,
                 symbol),
             new FunctionValue(leftShift.Type, (PrimValue a, PrimValue b) =>
-                new LiteralValue(a.Type, (T)a.Value << (T)b.Value)));
+                new LiteralValue(a.Type, (T)a.Value << int.CreateTruncating((T)b.Value))));
         var rightShift = symbol.Type.GetBinaryOperators(SyntaxKind.RightShiftOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
@@ -209,7 +293,7 @@ file static class StructValueExtensions
                 rightShift,
                 symbol),
             new FunctionValue(rightShift.Type, (PrimValue a, PrimValue b) =>
-                new LiteralValue(a.Type, (T)a.Value >> (T)b.Value)));
+                new LiteralValue(a.Type, (T)a.Value >> int.CreateTruncating((T)b.Value))));
         return s;
     }
 
@@ -273,7 +357,7 @@ file static class StructValueExtensions
 
     public static StructValue AddLogicalOperators(this StructValue s, StructSymbol symbol)
     {
-        var not = symbol.Type.GetBinaryOperators(SyntaxKind.NotOperator, symbol.Type, symbol.Type, symbol.Type).Single();
+        var not = symbol.Type.GetUnaryOperators(SyntaxKind.NotOperator, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.BangToken),

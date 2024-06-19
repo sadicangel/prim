@@ -2,10 +2,10 @@
 
 namespace CodeAnalysis.Evaluation.Values;
 
-internal sealed record class FunctionValue(PrimType Type, Delegate Value) : PrimValue(Type, Value)
+internal sealed record class FunctionValue(PrimType Type, Delegate Delegate) : PrimValue(Type)
 {
-    public override Delegate Value { get; } = Value;
+    public override Delegate Value => Delegate;
 
     public PrimValue Invoke(params ReadOnlySpan<PrimValue> arguments) =>
-        (PrimValue)Value.DynamicInvoke(arguments.ToArray())!;
+        (PrimValue)Delegate.DynamicInvoke(arguments.ToArray())!;
 }

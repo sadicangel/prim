@@ -4,7 +4,7 @@ using CodeAnalysis.Text;
 namespace CodeAnalysis.Syntax;
 public static class SyntaxFactory
 {
-    private static readonly SyntaxTree s_emptySyntaxTree = new(new SourceText(""), static tree => new CompilationUnitSyntax(tree, [], Token(SyntaxKind.EofToken, tree)));
+    private static readonly SyntaxTree s_emptySyntaxTree = SyntaxTree.Parse(new SourceText(""));
     private static readonly SyntaxList<SyntaxTrivia> s_emptySyntaxTrivia = [];
 
     public static SyntaxList<SyntaxTrivia> EmptyTrivia() =>
