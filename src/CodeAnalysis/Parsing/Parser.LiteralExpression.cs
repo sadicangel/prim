@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    public static LiteralExpressionSyntax ParseLiteralExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    public static LiteralExpressionSyntax ParseLiteralExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var literalToken = iterator.Match();
 

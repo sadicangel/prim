@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static GroupExpressionSyntax ParseGroupExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static GroupExpressionSyntax ParseGroupExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         // '(' expr ')'
         var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);

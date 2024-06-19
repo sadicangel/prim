@@ -5,7 +5,7 @@ using CodeAnalysis.Text;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static LocalDeclarationSyntax ParseLocalDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static LocalDeclarationSyntax ParseLocalDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var declaration = ParseDeclaration(syntaxTree, iterator);
         if (!syntaxTree.IsScript && declaration is StructDeclarationSyntax structDeclaration)

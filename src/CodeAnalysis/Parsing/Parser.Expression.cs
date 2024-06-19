@@ -5,18 +5,18 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ExpressionSyntax ParseExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static ExpressionSyntax ParseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         return ParseExpressionPrivate(syntaxTree, iterator, isTerminated: false);
     }
 
-    private static ExpressionSyntax ParseTerminatedExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static ExpressionSyntax ParseTerminatedExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         return ParseExpressionPrivate(syntaxTree, iterator, isTerminated: true);
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    private static ExpressionSyntax ParseExpressionPrivate(SyntaxTree syntaxTree, SyntaxTokenIterator iterator, bool isTerminated)
+    private static ExpressionSyntax ParseExpressionPrivate(SyntaxTree syntaxTree, SyntaxIterator iterator, bool isTerminated)
     {
         return iterator.Current.SyntaxKind switch
         {

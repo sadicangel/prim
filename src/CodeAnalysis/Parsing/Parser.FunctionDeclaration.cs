@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Types;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static FunctionDeclarationSyntax ParseFunctionDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static FunctionDeclarationSyntax ParseFunctionDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);

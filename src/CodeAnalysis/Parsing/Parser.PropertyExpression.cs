@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static PropertyExpressionSyntax ParsePropertyExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static PropertyExpressionSyntax ParsePropertyExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var dotToken = iterator.Match(SyntaxKind.DotToken);
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);

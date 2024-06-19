@@ -5,7 +5,7 @@ partial class Parser
 {
     private static SyntaxList<TNode> ParseSyntaxList<TNode>(
         SyntaxTree syntaxTree,
-        SyntaxTokenIterator iterator,
+        SyntaxIterator iterator,
         ReadOnlySpan<SyntaxKind> endingKinds,
         ParseNode<TNode> parseNode)
         where TNode : SyntaxNode

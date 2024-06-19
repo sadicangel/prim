@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static StructExpressionSyntax ParseStructExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static StructExpressionSyntax ParseStructExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);

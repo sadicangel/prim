@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Operators;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static AssignmentExpressionSyntax ParseAssignmentExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static AssignmentExpressionSyntax ParseAssignmentExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         // TODO: Allow non identifier expressions here.
         var left = ParseIdentifierNameExpression(syntaxTree, iterator);

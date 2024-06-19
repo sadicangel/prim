@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Types;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static TypeSyntax ParseType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static TypeSyntax ParseType(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         // type         : predefined | named | option | union | array | function
         // predefined   : identifier (predefined names)
@@ -31,13 +31,13 @@ partial class Parser
             _ => ReportInvalidType(syntaxTree, iterator)
         };
 
-        static TypeSyntax ReportInvalidType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        static TypeSyntax ReportInvalidType(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
             syntaxTree.Diagnostics.ReportExpectedTypeDefinition(iterator.Current.Location);
             return new PredefinedTypeSyntax(syntaxTree, iterator.Current);
         }
 
-        static TypeSyntax ParseTypeSingle(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        static TypeSyntax ParseTypeSingle(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
             return iterator.Current.SyntaxKind switch
             {
@@ -55,26 +55,26 @@ partial class Parser
                     ReportInvalidType(syntaxTree, iterator),
             };
 
-            static PredefinedTypeSyntax ParsePredefinedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+            static PredefinedTypeSyntax ParsePredefinedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var predefinedTypeToken = iterator.Match();
                 return new PredefinedTypeSyntax(syntaxTree, predefinedTypeToken);
             }
 
-            static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+            static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
                 return new NamedTypeSyntax(syntaxTree, identifierToken);
             }
 
-            static OptionTypeSyntax ParseOptionType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+            static OptionTypeSyntax ParseOptionType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var hookToken = iterator.Match(SyntaxKind.HookToken);
                 var underlyingType = ParseTypeSingle(syntaxTree, iterator);
                 return new OptionTypeSyntax(syntaxTree, hookToken, underlyingType);
             }
 
-            static ArrayTypeSyntax ParseArrayType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+            static ArrayTypeSyntax ParseArrayType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
                 var elementType = ParseTypeSingle(syntaxTree, iterator);
@@ -84,7 +84,7 @@ partial class Parser
                 return new ArrayTypeSyntax(syntaxTree, bracketOpenToken, elementType, colonToken, length, bracketCloseToken);
             }
 
-            static FunctionTypeSyntax ParseFunctionType(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+            static FunctionTypeSyntax ParseFunctionType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
                 var parameters = ParseSeparatedSyntaxList(

@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Types;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static MemberDeclarationSyntax ParseMemberDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+    private static MemberDeclarationSyntax ParseMemberDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         return iterator.Current.SyntaxKind switch
         {
@@ -16,7 +16,7 @@ partial class Parser
             _ => ParsePropertyDeclaration(syntaxTree, iterator),
         };
 
-        static ConversionDeclarationSyntax ParseConversionDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        static ConversionDeclarationSyntax ParseConversionDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
             var conversionKeyword = iterator.Match([SyntaxKind.ImplicitKeyword, SyntaxKind.ExplicitKeyword]);
             var colonToken = iterator.Match(SyntaxKind.ColonToken);
@@ -37,7 +37,7 @@ partial class Parser
                 body);
         }
 
-        static OperatorDeclarationSyntax ParseOperatorDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        static OperatorDeclarationSyntax ParseOperatorDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
             var operatorToken = iterator.Match();
             var colonToken = iterator.Match(SyntaxKind.ColonToken);
@@ -62,7 +62,7 @@ partial class Parser
                 body);
         }
 
-        static MethodDeclarationSyntax ParseMethodDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        static MethodDeclarationSyntax ParseMethodDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
             var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
             var colonToken = iterator.Match(SyntaxKind.ColonToken);
@@ -81,7 +81,7 @@ partial class Parser
                 body);
         }
 
-        static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTree syntaxTree, SyntaxTokenIterator iterator)
+        static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
             var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
             var colonToken = iterator.Match(SyntaxKind.ColonToken);

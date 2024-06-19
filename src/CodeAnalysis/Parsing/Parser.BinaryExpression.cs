@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Operators;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ExpressionSyntax ParseBinaryExpression(SyntaxTree syntaxTree, SyntaxTokenIterator iterator, int parentPrecedence = 0)
+    private static ExpressionSyntax ParseBinaryExpression(SyntaxTree syntaxTree, SyntaxIterator iterator, int parentPrecedence = 0)
     {
         ExpressionSyntax left;
         if (TryParseUnaryOperator(syntaxTree, iterator, parentPrecedence, out var unaryOperator))
@@ -44,7 +44,7 @@ partial class Parser
 
         static bool TryParseUnaryOperator(
             SyntaxTree syntaxTree,
-            SyntaxTokenIterator iterator,
+            SyntaxIterator iterator,
             int parentPrecedence,
             [MaybeNullWhen(false)] out OperatorSyntax unaryOperator)
         {
@@ -61,7 +61,7 @@ partial class Parser
 
         static bool TryParseBinaryOperator(
             SyntaxTree syntaxTree,
-            SyntaxTokenIterator iterator,
+            SyntaxIterator iterator,
             int parentPrecedence,
             [MaybeNullWhen(false)] out OperatorSyntax binaryOperator)
         {

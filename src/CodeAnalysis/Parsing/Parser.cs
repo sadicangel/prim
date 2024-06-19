@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Parsing;
 internal static partial class Parser
 {
-    private delegate T ParseNode<out T>(SyntaxTree syntaxTree, SyntaxTokenIterator iterator) where T : SyntaxNode;
+    private delegate T ParseNode<out T>(SyntaxTree syntaxTree, SyntaxIterator iterator) where T : SyntaxNode;
 
     internal static CompilationUnitSyntax Parse(SyntaxTree syntaxTree)
     {
@@ -15,7 +15,7 @@ internal static partial class Parser
             return new CompilationUnitSyntax(syntaxTree, [], SyntaxFactory.Token(SyntaxKind.EofToken, syntaxTree));
         }
 
-        var iterator = new SyntaxTokenIterator(tokens);
+        var iterator = new SyntaxIterator(tokens);
 
         var expressions = ParseSyntaxList(syntaxTree, iterator, [SyntaxKind.EofToken], parseNode);
 

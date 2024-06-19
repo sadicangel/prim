@@ -3,7 +3,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
 
-internal record class SyntaxTokenIterator(IReadOnlyList<SyntaxToken> Tokens)
+internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
 {
     private const int MaxSuccessiveMatchTokenErrors = 1;
 
