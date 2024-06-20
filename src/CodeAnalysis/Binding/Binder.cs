@@ -9,9 +9,14 @@ internal static partial class Binder
 
     public static BoundCompilationUnit Bind(BoundTree boundTree, BoundScope boundScope)
     {
-        var context = new BinderContext(boundTree, boundScope);
-
         var compilationUnit = boundTree.SyntaxTree.CompilationUnit;
+
+        if (compilationUnit.SyntaxTree.Diagnostics.HasErrorDiagnostics)
+        {
+            return new BoundCompilationUnit(compilationUnit, []);
+        }
+
+        var context = new BinderContext(boundTree, boundScope);
 
         var declarations = compilationUnit.SyntaxNodes
             .OfType<DeclarationSyntax>()
