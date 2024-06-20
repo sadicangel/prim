@@ -21,6 +21,29 @@ internal class EvaluatedScope(EvaluatedScope? parent = null) : IEnumerable<PrimV
             throw new UnreachableException(DiagnosticMessage.SymbolRedeclaration(symbol.Name));
     }
 
+    public void Replace(Symbol symbol, PrimValue value)
+    {
+        var scope = this;
+        if (scope.Values?.ContainsKey(symbol) is true)
+        {
+            scope.Values[symbol] = value;
+            return;
+        }
+
+        do
+        {
+            scope = scope.Parent;
+            if (scope.Values?.ContainsKey(symbol) is true)
+            {
+                scope.Values[symbol] = value;
+                return;
+            }
+        }
+        while (scope != scope.Parent);
+
+        throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
+    }
+
     public PrimValue Lookup(Symbol symbol)
     {
         var scope = this;

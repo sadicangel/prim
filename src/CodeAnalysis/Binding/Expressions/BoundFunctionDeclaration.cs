@@ -5,12 +5,12 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundFunctionDeclaration(
     SyntaxNode Syntax,
     FunctionSymbol NameSymbol,
-    BoundExpression Expression)
+    BoundFunctionBodyExpression Body)
     : BoundDeclaration(BoundKind.FunctionDeclaration, Syntax, NameSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
         yield return NameSymbol;
-        yield return Expression;
+        yield return Body;
     }
 }

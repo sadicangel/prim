@@ -13,25 +13,8 @@ partial class Binder
         if (context.BoundScope.Lookup(symbolName) is not FunctionSymbol functionSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(FunctionDeclarationSyntax)}'");
 
-        using (context.PushScope())
-        {
-            foreach (var parameter in functionSymbol.Type.Parameters)
-            {
-                context.BoundScope.Declare(
-                    new VariableSymbol(
-                        functionSymbol.Syntax,
-                        parameter.Name,
-                        parameter.Type,
-                        IsReadOnly: false));
-            }
-            var body = Coerce(BindExpression(syntax.Body, context), functionSymbol.Type.ReturnType, context);
+        var body = BindFunctionBody(syntax.Body, functionSymbol, context);
 
-            if (body.Type.IsNever)
-            {
-                return body;
-            }
-
-            return new BoundFunctionDeclaration(syntax, functionSymbol, body);
-        }
+        return new BoundFunctionDeclaration(syntax, functionSymbol, body);
     }
 }

@@ -13,7 +13,7 @@ partial class Interpreter
         }
 
         var value = EvaluateExpression(node.Right, context);
-        context.EvaluatedScope.Declare(identifierName.NameSymbol, value);
+        context.EvaluatedScope.Replace(identifierName.NameSymbol, value);
         return value;
     }
 }

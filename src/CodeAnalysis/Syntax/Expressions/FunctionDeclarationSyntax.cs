@@ -10,7 +10,7 @@ public sealed record class FunctionDeclarationSyntax(
     ExpressionSyntax Body)
     : DeclarationSyntax(SyntaxKind.FunctionDeclaration, SyntaxTree)
 {
-    public bool IsMutable { get => OperatorToken.SyntaxKind is SyntaxKind.EqualsToken; }
+    public bool IsReadOnly { get => OperatorToken.SyntaxKind is SyntaxKind.ColonToken; }
 
     public override IEnumerable<SyntaxNode> Children()
     {

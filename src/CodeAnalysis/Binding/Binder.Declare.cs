@@ -3,25 +3,26 @@ using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Types;
+using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static Symbol Declare(DeclarationSyntax syntax, BinderContext context, bool isForwardDeclarationOnly = false)
+    private static Symbol Declare(DeclarationSyntax syntax, BinderContext context, bool isTopLevel)
     {
         return syntax.SyntaxKind switch
         {
             SyntaxKind.VariableDeclaration => DeclareVariable((VariableDeclarationSyntax)syntax, context),
-            SyntaxKind.FunctionDeclaration => DeclareFunction((FunctionDeclarationSyntax)syntax, context),
-            SyntaxKind.StructDeclaration => DeclareStruct((StructDeclarationSyntax)syntax, context, isForwardDeclarationOnly),
+            SyntaxKind.FunctionDeclaration => DeclareFunction((FunctionDeclarationSyntax)syntax, context, isTopLevel),
+            SyntaxKind.StructDeclaration => DeclareStruct((StructDeclarationSyntax)syntax, context, isTopLevel),
             _ => throw new UnreachableException($"Unexpected {nameof(DeclarationSyntax)} '{syntax.GetType().Name}'")
         };
     }
 
-    private static StructSymbol DeclareStruct(StructDeclarationSyntax syntax, BinderContext context, bool isForwardDeclarationOnly = false)
+    private static StructSymbol DeclareStruct(StructDeclarationSyntax syntax, BinderContext context, bool isTopLevel)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
-        if (isForwardDeclarationOnly)
+        if (isTopLevel)
         {
             var structSymbol = new StructSymbol(syntax, new StructType(structName));
             if (!context.BoundScope.Declare(structSymbol))
@@ -91,13 +92,35 @@ partial class Binder
         }
     }
 
-    private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BinderContext context)
+    private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BinderContext context, bool isTopLevel)
     {
+        if (isTopLevel && !syntax.IsReadOnly)
+            context.Diagnostics.ReportMutableGlobalDeclaration(syntax.Location, "function");
+
+        var parameterSymbols = new BoundList<VariableSymbol>.Builder();
+        var seenParameterNames = new HashSet<string>();
+        foreach (var parameterSyntax in syntax.Type.Parameters)
+        {
+            var parameterName = parameterSyntax.IdentifierToken.Text.ToString();
+            if (!seenParameterNames.Add(parameterName))
+                context.Diagnostics.ReportSymbolRedeclaration(parameterSyntax.Location, parameterName);
+            var parameterType = BindType(parameterSyntax.Type, context);
+            var parameterSymbol = new VariableSymbol(parameterSyntax, parameterName, parameterType, IsReadOnly: false);
+            parameterSymbols.Add(parameterSymbol);
+        }
         var functionName = syntax.IdentifierToken.Text.ToString();
-        var functionType = (FunctionType)BindType(syntax.Type, context);
-        var functionSymbol = new FunctionSymbol(syntax, functionName, functionType);
+        var functionReturnType = BindType(syntax.Type.ReturnType, context);
+        var functionType = new FunctionType([.. parameterSymbols.Select(p => new Parameter(p.Name, p.Type))], functionReturnType);
+        var functionSymbol = new FunctionSymbol(
+            syntax,
+            functionName,
+            functionType,
+            parameterSymbols.ToBoundList(),
+            IsReadOnly: isTopLevel || syntax.IsReadOnly);
+
         if (!context.BoundScope.Declare(functionSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, functionName);
+
         return functionSymbol;
     }
 

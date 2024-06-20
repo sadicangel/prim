@@ -24,16 +24,16 @@ internal static partial class Binder
             .ToDictionary(g => g.Key, g => g.ToList());
 
         foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, s_emptyDeclarationList))
-            DeclareStruct((StructDeclarationSyntax)declaration, context, isForwardDeclarationOnly: true);
+            DeclareStruct((StructDeclarationSyntax)declaration, context, isTopLevel: true);
 
         foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.FunctionDeclaration, s_emptyDeclarationList))
-            DeclareFunction((FunctionDeclarationSyntax)declaration, context);
+            DeclareFunction((FunctionDeclarationSyntax)declaration, context, isTopLevel: true);
 
         foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.VariableDeclaration, s_emptyDeclarationList))
             DeclareVariable((VariableDeclarationSyntax)declaration, context);
 
         foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, s_emptyDeclarationList))
-            DeclareStruct((StructDeclarationSyntax)declaration, context);
+            DeclareStruct((StructDeclarationSyntax)declaration, context, isTopLevel: false);
 
         return BindCompilationUnit(compilationUnit, context);
     }

@@ -32,6 +32,8 @@ internal enum BoundKind
     ConversionDeclaration,
     LocalDeclaration,
 
+    FunctionBodyExpression,
+
     EmptyExpression,
     StatementExpression,
     BlockExpression,
@@ -68,7 +70,6 @@ internal enum BoundKind
     CoalesceExpression,
 
     FunctionSymbol,
-    ParameterSymbol,
     StructSymbol,
     PropertySymbol,
     ConversionSymbol,

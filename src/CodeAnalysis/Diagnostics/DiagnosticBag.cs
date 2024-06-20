@@ -82,8 +82,10 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedTypeName, actualTypeName));
     internal void ReportInvalidImplicitConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceTypeName, targetTypeName));
-    internal void ReportInvalidReassignment(SourceLocation location, string symbolName) =>
-        ReportError(location, DiagnosticMessage.InvalidReassignment(symbolName));
+    internal void ReportMutableGlobalDeclaration(SourceLocation location, string declarationKind) =>
+        ReportError(location, DiagnosticMessage.MutableGlobalDeclaration(declarationKind));
+    internal void ReportReadOnlyAssignment(SourceLocation location, string symbolName) =>
+        ReportError(location, DiagnosticMessage.ReadOnlyAssignment(symbolName));
     internal void ReportRedundantConversion(SourceLocation location) =>
         ReportWarning(location, DiagnosticMessage.RedundantConversion());
     internal void ReportSymbolRedeclaration(SourceLocation location, string symbolName) =>

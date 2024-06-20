@@ -24,8 +24,14 @@ partial class Binder
                 continue;
             }
 
+            if (property.IsReadOnly)
+            {
+                context.Diagnostics.ReportReadOnlyAssignment(propertySyntax.Location, property.Name);
+                continue;
+            }
+
             var init = Convert(BindExpression(propertySyntax.Init, context), property.Type, isExplicit: false, context);
-            var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property, structSymbol), init);
+            var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property, IsReadOnly: property.IsReadOnly, structSymbol), init);
             properties.Add(expression);
         }
         // TODO: Report un-initialized property members.

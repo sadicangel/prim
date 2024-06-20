@@ -40,8 +40,10 @@ internal static class DiagnosticMessage
         $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
     public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
-    public static string InvalidReassignment(string symbolName) =>
-        $"Invalid reassignment of read-only symbol '{symbolName}'";
+    public static string MutableGlobalDeclaration(string declarationKind) =>
+        $"Invalid global '{declarationKind}' declaration. Must be readonly";
+    public static string ReadOnlyAssignment(string symbolName) =>
+        $"Invalid assignment of '{symbolName}'. It is read-only";
     public static string RedundantConversion() =>
         "Conversion is redundant";
     public static string SymbolRedeclaration(string symbolName) =>

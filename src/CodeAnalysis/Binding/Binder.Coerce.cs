@@ -7,7 +7,7 @@ partial class Binder
 {
     private static BoundExpression Coerce(BoundExpression expression, PrimType type, BinderContext context)
     {
-        if (type.IsAny)
+        if (type.IsAny || expression.Type.IsNever)
             return expression;
 
         if (expression.Type == type)
@@ -31,7 +31,7 @@ partial class Binder
 
         if (conversion.IsExplicit)
         {
-            context.Diagnostics.ReportInvalidExpressionType(expression.Syntax.Location, type.Name, expression.Type.Name);
+            //context.Diagnostics.ReportInvalidExpressionType(expression.Syntax.Location, type.Name, expression.Type.Name);
             context.Diagnostics.ReportInvalidImplicitConversion(expression.Syntax.Location, expression.Type.Name, type.Name);
             return new BoundNeverExpression(expression.Syntax);
         }

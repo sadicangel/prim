@@ -41,7 +41,7 @@ public readonly struct SyntaxList<T>(List<T> nodes) : IReadOnlyList<T>
 
     public static bool operator !=(SyntaxList<T> left, SyntaxList<T> right) => !(left == right);
 
-    public struct Builder
+    public struct Builder : IEnumerable<T>
     {
         private List<T>? _nodes;
 
@@ -65,6 +65,16 @@ public readonly struct SyntaxList<T>(List<T> nodes) : IReadOnlyList<T>
             _nodes = null;
             return list;
         }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            if (_nodes is not null)
+                yield break;
+            foreach (var node in Nodes)
+                yield return node;
+        }
+
+        public IEnumerator GetEnumerator() => GetEnumerator();
     }
 }
 

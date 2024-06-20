@@ -41,7 +41,7 @@ partial class Binder
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Convert(BindExpression(syntax.Init, context), property.Type, isExplicit: false, context);
 
-            var propertySymbol = new PropertySymbol(syntax, property, structSymbol);
+            var propertySymbol = new PropertySymbol(syntax, property, syntax.IsReadOnly, structSymbol);
 
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }

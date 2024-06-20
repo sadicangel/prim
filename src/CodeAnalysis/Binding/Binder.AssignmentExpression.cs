@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Diagnostics;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
@@ -23,9 +24,9 @@ partial class Binder
 
         var symbol = ((BoundIdentifierNameExpression)left).NameSymbol;
 
-        if (symbol is not VariableSymbol variableSymbol || variableSymbol.IsReadOnly is false)
+        if (symbol.IsReadOnly)
         {
-            context.Diagnostics.ReportInvalidReassignment(left.Syntax.Location, symbol.Name);
+            context.Diagnostics.ReportReadOnlyAssignment(left.Syntax.Location, symbol.Name);
             return new BoundNeverExpression(syntax);
         }
 
@@ -33,10 +34,16 @@ partial class Binder
 
         if (syntax.SyntaxKind is SyntaxKind.SimpleAssignmentExpression)
         {
-            right = BindExpression(syntax.Right, context);
+            right = symbol switch
+            {
+                VariableSymbol _ => BindExpression(syntax.Right, context),
+                FunctionSymbol f => BindFunctionBody(syntax.Right, f, context),
+                _ => throw new UnreachableException($"Unexpected symbol '{symbol.GetType().Name}'")
+            };
         }
         else
         {
+            // Note: We don't need to handle functions because none of these operators is not defined for them.
             // TODO: Do this in the lowering step instead?
             var (operatorKind, operatorPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(syntax.Operator.SyntaxKind);
             var binaryExpressionKind = SyntaxFacts.GetBinaryOperatorExpression(operatorKind);
@@ -48,8 +55,13 @@ partial class Binder
                 syntax.Right);
 
             right = BindBinaryExpression(binaryExpressionSyntax, context);
-            if (right is not BoundBinaryExpression binaryExpression)
-                return right;
+        }
+
+        right = Coerce(right, left.Type, context);
+
+        if (right.Type.IsNever)
+        {
+            return right;
         }
 
         return new BoundAssignmentExpression(syntax, left.Type, left, right);

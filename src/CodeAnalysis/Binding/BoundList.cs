@@ -41,7 +41,7 @@ internal readonly struct BoundList<T>(List<T> nodes) : IReadOnlyList<T>
 
     public static bool operator !=(BoundList<T> left, BoundList<T> right) => !(left == right);
 
-    public struct Builder(int capacity)
+    public struct Builder(int capacity) : IEnumerable<T>
     {
         private List<T>? _nodes = new(capacity);
 
@@ -65,6 +65,16 @@ internal readonly struct BoundList<T>(List<T> nodes) : IReadOnlyList<T>
             _nodes = null;
             return list;
         }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            if (_nodes is not null)
+                yield break;
+            foreach (var node in Nodes)
+                yield return node;
+        }
+
+        public IEnumerator GetEnumerator() => GetEnumerator();
     }
 }
 
