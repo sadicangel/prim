@@ -1,54 +1,29 @@
-﻿using CodeAnalysis.Binding;
+﻿using CodeAnalysis;
+using CodeAnalysis.Binding;
 using CodeAnalysis.Evaluation;
-using CodeAnalysis.Evaluation.Values;
-using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Repl;
 using Spectre.Console;
 
 var console = AnsiConsole.Console;
 
-const string Code = """
-Point2d: struct = {
-    x: f32 = 0f;
-    y: f32 = 0f;
-}
+var previousCompilation = default(Compilation);
+var previousEvaluatedScope = EvaluatedScope.FromGlobalBoundScope(BoundScope.GlobalScope);
 
-p: Point2d = Point2d {
-    .x = 2f,
-    .y = 2f + 4f,
-}
-
-p
-""";
-
-var (value, diagnostics) = Evaluate(console, new SourceText(Code));
-
-if (diagnostics.Count > 0)
+while (true)
 {
-    foreach (var diagnostic in diagnostics)
-        console.WriteLine(diagnostic);
-}
+    var code = console.Prompt(new TextPrompt<string>(">"));
 
-console.WriteLine(value);
+    var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
 
-static EvaluatedResult Evaluate(IAnsiConsole console, SourceText sourceText)
-{
-    var syntaxTree = SyntaxTree.ParseScript(sourceText);
-    if (syntaxTree.Diagnostics.HasErrorDiagnostics)
+    if (compilation.Diagnostics.HasErrorDiagnostics)
     {
-        return new EvaluatedResult(LiteralValue.Unit, syntaxTree.Diagnostics);
+        foreach (var diagnostic in compilation.Diagnostics)
+            console.WriteLine(diagnostic);
+        continue;
     }
-    console.WriteLine(syntaxTree);
 
-    var boundScope = new BoundScope();
-    var boundTree = BoundTree.Bind(syntaxTree, boundScope);
-    if (boundTree.Diagnostics.HasErrorDiagnostics)
-    {
-        return new EvaluatedResult(LiteralValue.Unit, boundTree.Diagnostics);
-    }
-    console.WriteLine(boundTree);
-
-    var evaluatedScope = new EvaluatedScope(EvaluatedScope.FromGlobalBoundScope(boundScope.GlobalScope));
-    return Evaluator.Evaluate(boundTree, evaluatedScope);
+    var evaluatedScope = new EvaluatedScope(previousEvaluatedScope);
+    var value = Evaluator.Evaluate(compilation.BoundTrees[0], evaluatedScope);
+    console.WriteLine(value);
 }
