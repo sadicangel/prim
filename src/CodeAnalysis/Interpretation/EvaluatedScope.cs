@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Numerics;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Types;
 

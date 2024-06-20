@@ -1,8 +1,8 @@
 ﻿using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Expressions;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 
-namespace CodeAnalysis.Evaluation;
+namespace CodeAnalysis.Interpretation;
 partial class Evaluator
 {
     private static PrimValue EvaluateExpression(BoundExpression node, EvaluatorContext context)

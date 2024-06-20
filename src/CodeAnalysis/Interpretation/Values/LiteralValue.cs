@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Types;
 
-namespace CodeAnalysis.Evaluation.Values;
+namespace CodeAnalysis.Interpretation.Values;
 
 internal sealed record class LiteralValue(PrimType Type, object Value) : PrimValue(Type)
 {

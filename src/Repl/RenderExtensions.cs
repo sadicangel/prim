@@ -3,7 +3,7 @@ using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Syntax.Operators;

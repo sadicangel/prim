@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Types;
 
-namespace CodeAnalysis.Evaluation.Values;
+namespace CodeAnalysis.Interpretation.Values;
 
 internal sealed record class FunctionValue(PrimType Type, Delegate Delegate) : PrimValue(Type)
 {

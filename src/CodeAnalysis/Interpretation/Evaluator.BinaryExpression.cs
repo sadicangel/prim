@@ -1,8 +1,8 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 
-namespace CodeAnalysis.Evaluation;
+namespace CodeAnalysis.Interpretation;
 partial class Evaluator
 {
     private static PrimValue EvaluateBinaryExpression(BoundBinaryExpression node, EvaluatorContext context)

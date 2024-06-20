@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
 
-namespace CodeAnalysis.Evaluation;
+namespace CodeAnalysis.Interpretation;
 
 internal readonly record struct EvaluatorContext(DiagnosticBag Diagnostics, EvaluatedScope EvaluatedScope)
 {

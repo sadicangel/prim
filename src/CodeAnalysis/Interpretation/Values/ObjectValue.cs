@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using CodeAnalysis.Binding.Symbols;
 
-namespace CodeAnalysis.Evaluation.Values;
+namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class ObjectValue(StructValue Struct)
     : PrimValue(Struct.StructType), IEnumerable<KeyValuePair<PropertySymbol, PrimValue>>
 {

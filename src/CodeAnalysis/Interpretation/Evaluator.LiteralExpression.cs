@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Expressions;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Types;
 
-namespace CodeAnalysis.Evaluation;
+namespace CodeAnalysis.Interpretation;
 partial class Evaluator
 {
     private static LiteralValue EvaluateLiteralExpression(BoundLiteralExpression node, EvaluatorContext context)

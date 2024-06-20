@@ -2,7 +2,7 @@
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Types;
 
-namespace CodeAnalysis.Evaluation.Values;
+namespace CodeAnalysis.Interpretation.Values;
 
 internal sealed record class StructValue(StructType StructType) : PrimValue(PredefinedTypes.Type)
 {

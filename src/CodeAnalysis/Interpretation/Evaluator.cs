@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 
-namespace CodeAnalysis.Evaluation;
+namespace CodeAnalysis.Interpretation;
 internal static partial class Evaluator
 {
     public static PrimValue Evaluate(BoundTree boundTree, EvaluatedScope evaluatedScope)

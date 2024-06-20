@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
-using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Interpretation.Values;
 
-namespace CodeAnalysis.Evaluation;
+namespace CodeAnalysis.Interpretation;
 partial class Evaluator
 {
     private static ObjectValue EvaluateStructExpression(BoundStructExpression node, EvaluatorContext context)
