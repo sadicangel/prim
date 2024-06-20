@@ -6,18 +6,19 @@ namespace CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    private CompilationUnitSyntax? _compilationUnit;
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
     private SyntaxTree(SourceText sourceText, bool isScript)
     {
         SourceText = sourceText;
         IsScript = isScript;
+        // TODO: Make this lazy evaluated?
+        CompilationUnit = Parser.Parse(this);
     }
 
     public SourceText SourceText { get; }
     public bool IsScript { get; }
-    public CompilationUnitSyntax CompilationUnit { get => _compilationUnit ??= Parser.Parse(this); }
+    public CompilationUnitSyntax CompilationUnit { get; }
     public DiagnosticBag Diagnostics { get; init; } = [];
 
     public override string ToString() => $"SyntaxTree {{ CompilationUnit = {CompilationUnit} }}";
@@ -48,7 +49,7 @@ public sealed class SyntaxTree
 
     public static SyntaxList<SyntaxToken> Scan(SourceText sourceText)
     {
-        var syntaxTree = new SyntaxTree(sourceText, default);
+        var syntaxTree = new SyntaxTree(sourceText, isScript: false);
         var syntaxTokens = Scanner.Scan(syntaxTree);
         return [.. syntaxTokens];
     }
