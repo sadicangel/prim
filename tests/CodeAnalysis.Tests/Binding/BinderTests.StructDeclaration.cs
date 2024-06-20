@@ -8,8 +8,8 @@ public partial class BinderTests
     {
         var syntaxTree = SyntaxTree.Parse(new SourceText("""
             Point2d: struct = {
-                x: i32;
-                y: i32;
+                x: i32 = 0;
+                y: i32 = 0;
             }
             """));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
