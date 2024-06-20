@@ -97,7 +97,7 @@ partial class Binder
         static PrimType BindFunctionType(FunctionTypeSyntax syntax, BinderContext context)
         {
             var returnType = BindType(syntax.ReturnType, context);
-            if (!returnType.IsNever)
+            if (returnType.IsNever)
                 return returnType;
 
 

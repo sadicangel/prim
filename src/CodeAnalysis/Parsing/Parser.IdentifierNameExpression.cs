@@ -6,7 +6,9 @@ partial class Parser
 {
     private static IdentifierNameExpressionSyntax ParseIdentifierNameExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var identifierToken = SyntaxFacts.IsPredefinedType(iterator.Current.SyntaxKind)
+            ? iterator.Match()
+            : iterator.Match(SyntaxKind.IdentifierToken);
         return new IdentifierNameExpressionSyntax(syntaxTree, identifierToken);
     }
 }

@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundDeclaration BindLocalDeclaration(LocalDeclarationSyntax syntax, BinderContext context)
+    private static BoundExpression BindLocalDeclaration(LocalDeclarationSyntax syntax, BinderContext context)
     {
         Declare(syntax.Declaration, context);
         var declaration = BindDeclaration(syntax.Declaration, context);

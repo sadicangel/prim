@@ -29,7 +29,7 @@ internal static class RenderExtensions
                 console.Write(" ");
                 console.Write(new Markup(value.Type.Name, "green i"));
                 break;
-            case LiteralValue literal:
+            case VariableValue literal:
                 console.Write(new Markup(literal.Value.ToString()!, "grey66"));
                 console.Write(" ");
                 console.Write(new Markup(value.Type.Name, "green i"));
@@ -44,11 +44,12 @@ internal static class RenderExtensions
                     console.WriteLine(pv);
                 }
                 --indent;
+                Indent(console, indent);
                 console.Markup("[grey66]}[/] ");
                 console.Write(new Markup(value.Type.Name, "green i"));
                 break;
             case StructValue @struct:
-                console.Write(new Markup(@struct.Type.ToString(), "grey66"));
+                console.Write(new Markup(@struct.Value.Name, "grey66"));
                 console.Write(" ");
                 console.Write(new Markup(value.Type.Name, "green i"));
                 break;
@@ -93,7 +94,7 @@ internal static class RenderExtensions
         var underline = string.Empty;
         if (startLine == endLine)
         {
-            underline = String.Create(diagnostic.Location.StartCharacter + highlight.Length, diagnostic.Location.StartCharacter, static (span, start) =>
+            underline = string.Create(diagnostic.Location.StartCharacter + highlight.Length, diagnostic.Location.StartCharacter, static (span, start) =>
             {
                 span[..start].Fill(' ');
                 span[start..].Fill('^');

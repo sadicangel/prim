@@ -75,23 +75,50 @@ public abstract record class PrimType(string Name)
 
     internal List<Operator> GetUnaryOperators(SyntaxKind operatorKind, PrimType operandType, PrimType resultType)
     {
-        return _members.OfType<Operator>()
+        var operators = _members.OfType<Operator>()
             .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 1)
             .Where(o => o.Type.Parameters[0].Type.IsAny || o.Type.Parameters[0].Type == operandType)
             .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
             .ToList();
+
+        if (operators.Count > 1)
+        {
+            var @operator = operators.SingleOrDefault(o =>
+                o.OperatorKind == operatorKind &&
+                o.Type.Parameters.Count == 1 &&
+                o.Type.Parameters[0].Type == operandType);
+
+            if (@operator is not null)
+                return [@operator];
+        }
+
+        return operators;
     }
 
     internal List<Operator> GetBinaryOperators(SyntaxKind operatorKind, PrimType leftType, PrimType rightType, PrimType resultType)
     {
-        return _members.OfType<Operator>()
+        var operators = _members.OfType<Operator>()
             .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 2)
             .Where(o => o.Type.Parameters[0].Type.IsAny || o.Type.Parameters[0].Type == leftType)
             .Where(o => o.Type.Parameters[1].Type.IsAny || o.Type.Parameters[1].Type == rightType)
             .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
             .ToList();
+
+        if (operators.Count > 1)
+        {
+            var @operator = operators.SingleOrDefault(o =>
+                o.OperatorKind == operatorKind &&
+                o.Type.Parameters.Count == 2 &&
+                o.Type.Parameters[0].Type == leftType &&
+                o.Type.Parameters[1].Type == rightType);
+
+            if (@operator is not null)
+                return [@operator];
+        }
+
+        return operators;
     }
 
     internal bool AddConversion(SyntaxKind conversionKind, FunctionType type)

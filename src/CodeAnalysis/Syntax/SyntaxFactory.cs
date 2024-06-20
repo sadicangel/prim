@@ -1,10 +1,8 @@
 ﻿using CodeAnalysis.Syntax.Operators;
-using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
 public static class SyntaxFactory
 {
-    private static readonly SyntaxTree s_emptySyntaxTree = SyntaxTree.Parse(new SourceText(""));
     private static readonly SyntaxList<SyntaxTrivia> s_emptySyntaxTrivia = [];
 
     public static SyntaxList<SyntaxTrivia> EmptyTrivia() =>
@@ -14,7 +12,7 @@ public static class SyntaxFactory
         new(syntaxTree.SourceText.Length, syntaxTree.SourceText.Length);
 
     public static SyntaxToken SyntheticToken(SyntaxKind syntaxKind) =>
-        new SyntaxToken(syntaxKind, s_emptySyntaxTree, EmptyRange(s_emptySyntaxTree), s_emptySyntaxTrivia, s_emptySyntaxTrivia, SyntaxFacts.GetText(syntaxKind));
+        new SyntaxToken(syntaxKind, SyntaxTree.Empty, EmptyRange(SyntaxTree.Empty), s_emptySyntaxTrivia, s_emptySyntaxTrivia, SyntaxFacts.GetText(syntaxKind));
 
     public static SyntaxToken Token(SyntaxKind syntaxKind, SyntaxTree syntaxTree, string? text = null) =>
         new(syntaxKind, syntaxTree, EmptyRange(syntaxTree), s_emptySyntaxTrivia, s_emptySyntaxTrivia, text ?? SyntaxFacts.GetText(syntaxKind));

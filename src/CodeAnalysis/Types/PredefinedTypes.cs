@@ -37,6 +37,9 @@ internal static class PredefinedTypes
             {
                 type.AddOperator(
                     SyntaxKind.AddOperator,
+                    new FunctionType([new Parameter("x", Str), new Parameter("y", Str)], Str));
+                type.AddOperator(
+                    SyntaxKind.AddOperator,
                     new FunctionType([new Parameter("x", Str), new Parameter("y", Any)], Str));
                 type.AddOperator(
                     SyntaxKind.AddOperator,

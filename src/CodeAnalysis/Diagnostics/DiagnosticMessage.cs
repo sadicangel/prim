@@ -30,12 +30,18 @@ internal static class DiagnosticMessage
     // Binding error messages.
     public static string AmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftTypeName}' and '{rightTypeName}'";
+    public static string AmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
+        $"Unary operator '{@operator.Text}' is ambiguous on operand of type '{operandTypeName}'";
     public static string InvalidArrayLength() =>
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";
+    public static string InvalidExpressionType(string expectedTypeName, string actualTypeName) =>
+        $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
     public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
+    public static string InvalidReassignment(string symbolName) =>
+        $"Invalid reassignment of read-only symbol '{symbolName}'";
     public static string RedundantConversion() =>
         "Conversion is redundant";
     public static string SymbolRedeclaration(string symbolName) =>
@@ -53,17 +59,15 @@ internal static class DiagnosticMessage
 
 
     //public static string InvalidArgumentType(Parameter parameter, PrimType actualType) => $"Invalid expression of type '{actualType.Name}' provided for parameter '{parameter.Name}' of type '{parameter.Type.Name}'";
-    //public static string InvalidExpressionType(PrimType expectedType, PrimType actualType) => $"Invalid expression of type '{actualType.Name}'. Expected '{expectedType.Name}'";
     //public static string InvalidNumberOfArguments(FunctionType functionType, int actualNumberOfArguments) => $"Function '{functionType.Name}' requires {functionType.Parameters.Count} arguments but was given {actualNumberOfArguments}";
     //public static string InvalidSymbolType(PrimType expectedType, PrimType actualType) => $"Invalid symbol of type '{actualType.Name}'. Expected '{expectedType.Name}'";
-    //public static string SymbolReassignment(Symbol symbol) => $"Reassignment of read-only symbol '{symbol.Name}'";
+
 
     //public static string InvalidExpressionType(PrimType actualType) => $"Invalid expression of type '{actualType}'";
     //public static string InvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
     //public static string InvalidBreakOrContinue() => "No enclosing loop out of which to break or continue";
     //public static string InvalidReturn() => "No enclosing function out of which to return";
     //public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
-    //public static string InvalidReturnExpression(string functionName, PrimType expectedType) => $"Function '{functionName}' expects an expression of a type convertible to '{expectedType}'";
     //public static string NotAllPathsReturn() => "Not all code paths return a value";
     //public static string UnreachableCode() => "Unreachable code detected";
 }

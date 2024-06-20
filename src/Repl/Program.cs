@@ -1,6 +1,4 @@
 ﻿using CodeAnalysis;
-using CodeAnalysis.Binding;
-using CodeAnalysis.Interpretation;
 using CodeAnalysis.Text;
 using Repl;
 using Spectre.Console;
@@ -8,7 +6,7 @@ using Spectre.Console;
 var console = AnsiConsole.Console;
 
 var previousCompilation = default(Compilation);
-var previousEvaluatedScope = EvaluatedScope.FromGlobalBoundScope(BoundScope.GlobalScope);
+var previousEvaluation = default(Evaluation);
 
 while (true)
 {
@@ -23,7 +21,10 @@ while (true)
         continue;
     }
 
-    var evaluatedScope = new EvaluatedScope(previousEvaluatedScope);
-    var value = Interpreter.Evaluate(compilation.BoundTrees[0], evaluatedScope);
-    console.WriteLine(value);
+    var evaluation = Evaluation.Evaluate(compilation, previousEvaluation);
+
+    console.WriteLine(evaluation.Values[0]);
+
+    previousCompilation = compilation;
+    previousEvaluation = evaluation;
 }

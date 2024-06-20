@@ -32,7 +32,11 @@ partial class Binder
         }
 
         if (operators is not [var @operator])
-            throw new UnreachableException($"Unexpected result for {nameof(PrimType.GetUnaryOperators)}({syntax.Operator.Text}, {operand.Type}, {operand.Type})");
+        {
+            // TODO: Is this case ever possible?
+            context.Diagnostics.ReportAmbiguousUnaryOperator(syntax.Operator.OperatorToken, operand.Type.Name);
+            return new BoundNeverExpression(syntax);
+        }
 
         var containingSymbol = containingType is not StructType structType
             ? null

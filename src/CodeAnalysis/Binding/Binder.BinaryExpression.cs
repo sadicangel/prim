@@ -50,6 +50,7 @@ partial class Binder
                 return new BoundNeverExpression(syntax);
             }
         }
+
         if (operators is not [var @operator])
         {
             context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);

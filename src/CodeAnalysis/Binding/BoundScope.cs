@@ -7,21 +7,9 @@ namespace CodeAnalysis.Binding;
 
 internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
 {
-    private static GlobalBoundScope? s_globalScope;
-
-    public static GlobalBoundScope GlobalScope
-    {
-        get
-        {
-            if (s_globalScope is null)
-                Interlocked.CompareExchange(ref s_globalScope, new GlobalBoundScope(), null);
-            return s_globalScope;
-        }
-    }
-
     protected Dictionary<string, Symbol>? Symbols { get; set; }
 
-    public BoundScope Parent { get => parent ?? GlobalScope; }
+    public BoundScope Parent { get => parent ?? GlobalBoundScope.Instance; }
 
     public bool Declare(Symbol symbol) => (Symbols ??= []).TryAdd(symbol.Name, symbol);
 
@@ -67,7 +55,18 @@ internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
 
 internal sealed class GlobalBoundScope : BoundScope
 {
-    internal GlobalBoundScope() : base()
+    private static GlobalBoundScope? s_instance;
+    public static GlobalBoundScope Instance
+    {
+        get
+        {
+            if (s_instance is null)
+                Interlocked.CompareExchange(ref s_instance, new GlobalBoundScope(), null);
+            return s_instance;
+        }
+    }
+
+    private GlobalBoundScope() : base()
     {
         Symbols = new Dictionary<string, Symbol>()
         {

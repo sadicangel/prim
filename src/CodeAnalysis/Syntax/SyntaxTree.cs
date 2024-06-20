@@ -8,6 +8,13 @@ public sealed class SyntaxTree
 {
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
+    private SyntaxTree()
+    {
+        SourceText = new SourceText("");
+        IsScript = false;
+        CompilationUnit = new CompilationUnitSyntax(this, [], SyntaxFactory.Token(SyntaxKind.EofToken, this));
+    }
+
     private SyntaxTree(SourceText sourceText, bool isScript)
     {
         SourceText = sourceText;
@@ -15,6 +22,8 @@ public sealed class SyntaxTree
         // TODO: Make this lazy evaluated?
         CompilationUnit = Parser.Parse(this);
     }
+
+    internal static SyntaxTree Empty { get; } = new();
 
     public SourceText SourceText { get; }
     public bool IsScript { get; }

@@ -4,10 +4,10 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static LiteralValue EvaluateNeverExpression(BoundNeverExpression node, InterpreterContext context)
+    private static VariableValue EvaluateNeverExpression(BoundNeverExpression node, InterpreterContext context)
     {
         _ = node;
         _ = context;
-        return LiteralValue.Unit;
+        return VariableValue.Unit;
     }
 }

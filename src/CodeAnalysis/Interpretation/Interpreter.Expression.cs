@@ -24,24 +24,12 @@ partial class Interpreter
             BoundKind.FalseLiteralExpression or
             BoundKind.NullLiteralExpression =>
                 EvaluateLiteralExpression((BoundLiteralExpression)node, context),
-            //BoundKind.SimpleAssignmentExpression or
-            //BoundKind.AddAssignmentExpression or
-            //BoundKind.SubtractAssignmentExpression or
-            //BoundKind.MultiplyAssignmentExpression or
-            //BoundKind.DivideAssignmentExpression or
-            //BoundKind.ModuloAssignmentExpression or
-            //BoundKind.PowerAssignmentExpression or
-            //BoundKind.AndAssignmentExpression or
-            //BoundKind.ExclusiveOrAssignmentExpression or
-            //BoundKind.OrAssignmentExpression or
-            //BoundKind.LeftShiftAssignmentExpression or
-            //BoundKind.RightShiftAssignmentExpression or
-            //BoundKind.CoalesceAssignmentExpression =>
-            //    EvaluateAssignmentExpression((BoundAssignmentExpression)node, context),
+            BoundKind.AssignmentExpression =>
+                EvaluateAssignmentExpression((BoundAssignmentExpression)node, context),
             BoundKind.VariableDeclaration =>
                 EvaluateVariableDeclaration((BoundVariableDeclaration)node, context),
-            //BoundKind.FunctionDeclaration =>
-            //    EvaluateFunctionDeclaration((BoundFunctionDeclaration)node, context),
+            BoundKind.FunctionDeclaration =>
+                EvaluateFunctionDeclaration((BoundFunctionDeclaration)node, context),
             BoundKind.StructDeclaration =>
                 EvaluateStructDeclaration((BoundStructDeclaration)node, context),
             //BoundKind.LocalDeclaration =>
