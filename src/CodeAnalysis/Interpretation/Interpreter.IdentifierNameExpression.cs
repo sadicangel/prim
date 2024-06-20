@@ -2,9 +2,9 @@
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
-partial class Evaluator
+partial class Interpreter
 {
-    private static PrimValue EvaluateIdentifierNameExpression(BoundIdentifierNameExpression node, EvaluatorContext context)
+    private static PrimValue EvaluateIdentifierNameExpression(BoundIdentifierNameExpression node, InterpreterContext context)
     {
         return context.EvaluatedScope.Lookup(node.NameSymbol);
     }

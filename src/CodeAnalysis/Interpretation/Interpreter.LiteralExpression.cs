@@ -5,9 +5,9 @@ using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Interpretation;
-partial class Evaluator
+partial class Interpreter
 {
-    private static LiteralValue EvaluateLiteralExpression(BoundLiteralExpression node, EvaluatorContext context)
+    private static LiteralValue EvaluateLiteralExpression(BoundLiteralExpression node, InterpreterContext context)
     {
         _ = context;
         return node.BoundKind switch

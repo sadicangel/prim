@@ -4,9 +4,9 @@ using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
-partial class Evaluator
+partial class Interpreter
 {
-    private static PrimValue EvaluateNode(BoundNode node, EvaluatorContext context)
+    private static PrimValue EvaluateNode(BoundNode node, InterpreterContext context)
     {
         return node switch
         {

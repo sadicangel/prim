@@ -5,9 +5,9 @@ using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
 
-partial class Evaluator
+partial class Interpreter
 {
-    private static StructValue EvaluateStructDeclaration(BoundStructDeclaration node, EvaluatorContext context)
+    private static StructValue EvaluateStructDeclaration(BoundStructDeclaration node, InterpreterContext context)
     {
         var structValue = new StructValue(node.StructSymbol.Type);
         context.EvaluatedScope.Declare(node.StructSymbol, structValue);
@@ -29,14 +29,14 @@ partial class Evaluator
         }
         return structValue;
 
-        static object EvaluatePropertyDeclaration(BoundPropertyDeclaration member, StructValue structValue, EvaluatorContext context)
+        static object EvaluatePropertyDeclaration(BoundPropertyDeclaration member, StructValue structValue, InterpreterContext context)
         {
             var value = EvaluateExpression(member.Expression, context);
             structValue.SetProperty(member.PropertySymbol, value);
             return 0;
         }
 
-        static object EvaluateMethodDeclaration(BoundMethodDeclaration member, StructValue structValue, EvaluatorContext context)
+        static object EvaluateMethodDeclaration(BoundMethodDeclaration member, StructValue structValue, InterpreterContext context)
         {
             _ = member;
             _ = structValue;
@@ -44,7 +44,7 @@ partial class Evaluator
             return 0;
         }
 
-        static object EvaluateOperatorDeclaration(BoundOperatorDeclaration member, StructValue structValue, EvaluatorContext context)
+        static object EvaluateOperatorDeclaration(BoundOperatorDeclaration member, StructValue structValue, InterpreterContext context)
         {
             _ = member;
             _ = structValue;
@@ -52,7 +52,7 @@ partial class Evaluator
             return 0;
         }
 
-        static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, EvaluatorContext context)
+        static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, InterpreterContext context)
         {
             _ = member;
             _ = structValue;

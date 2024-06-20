@@ -24,6 +24,6 @@ while (true)
     }
 
     var evaluatedScope = new EvaluatedScope(previousEvaluatedScope);
-    var value = Evaluator.Evaluate(compilation.BoundTrees[0], evaluatedScope);
+    var value = Interpreter.Evaluate(compilation.BoundTrees[0], evaluatedScope);
     console.WriteLine(value);
 }

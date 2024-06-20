@@ -3,9 +3,9 @@ using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
-partial class Evaluator
+partial class Interpreter
 {
-    private static PrimValue EvaluateBinaryExpression(BoundBinaryExpression node, EvaluatorContext context)
+    private static PrimValue EvaluateBinaryExpression(BoundBinaryExpression node, InterpreterContext context)
     {
         if (node.OperatorSymbol.ContainingSymbol is StructSymbol structSymbol)
         {

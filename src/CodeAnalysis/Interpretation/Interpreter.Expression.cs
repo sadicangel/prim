@@ -3,9 +3,9 @@ using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
-partial class Evaluator
+partial class Interpreter
 {
-    private static PrimValue EvaluateExpression(BoundExpression node, EvaluatorContext context)
+    private static PrimValue EvaluateExpression(BoundExpression node, InterpreterContext context)
     {
         return node.BoundKind switch
         {

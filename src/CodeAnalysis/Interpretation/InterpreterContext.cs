@@ -3,7 +3,7 @@ using CodeAnalysis.Diagnostics;
 
 namespace CodeAnalysis.Interpretation;
 
-internal readonly record struct EvaluatorContext(DiagnosticBag Diagnostics, EvaluatedScope EvaluatedScope)
+internal readonly record struct InterpreterContext(DiagnosticBag Diagnostics, EvaluatedScope EvaluatedScope)
 {
     private readonly Stack<EvaluatedScope> _scopes = new([EvaluatedScope]);
     public EvaluatedScope EvaluatedScope { get => _scopes.Peek(); }
@@ -12,8 +12,8 @@ internal readonly record struct EvaluatorContext(DiagnosticBag Diagnostics, Eval
 
     internal readonly ref struct TempScope
     {
-        private readonly EvaluatorContext _parent;
-        public TempScope(EvaluatorContext parent)
+        private readonly InterpreterContext _parent;
+        public TempScope(InterpreterContext parent)
         {
             _parent = parent;
             _parent._scopes.Push(new EvaluatedScope(_parent.EvaluatedScope));

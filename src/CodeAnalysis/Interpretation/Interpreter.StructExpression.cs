@@ -3,9 +3,9 @@ using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
-partial class Evaluator
+partial class Interpreter
 {
-    private static ObjectValue EvaluateStructExpression(BoundStructExpression node, EvaluatorContext context)
+    private static ObjectValue EvaluateStructExpression(BoundStructExpression node, InterpreterContext context)
     {
         var structValue = context.EvaluatedScope.Lookup(node.StructSymbol) as StructValue
             ?? throw new UnreachableException($"Unexpected struct value '{context.EvaluatedScope.Lookup(node.StructSymbol)}'");
