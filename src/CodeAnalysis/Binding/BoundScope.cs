@@ -9,7 +9,15 @@ internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
 {
     private static GlobalBoundScope? s_globalScope;
 
-    public GlobalBoundScope GlobalScope { get => s_globalScope ??= new GlobalBoundScope(); }
+    public static GlobalBoundScope GlobalScope
+    {
+        get
+        {
+            if (s_globalScope is null)
+                Interlocked.CompareExchange(ref s_globalScope, new GlobalBoundScope(), null);
+            return s_globalScope;
+        }
+    }
 
     protected Dictionary<string, Symbol>? Symbols { get; set; }
 
