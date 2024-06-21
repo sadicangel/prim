@@ -126,8 +126,6 @@ public static class SyntaxFacts
             SyntaxKind.FunctionType => null,
             SyntaxKind.UnionType => null,
             SyntaxKind.Parameter => null,
-            SyntaxKind.ParameterList => null,
-            SyntaxKind.TypeList => null,
 
             SyntaxKind.IdentifierNameExpression => null,
 

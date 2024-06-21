@@ -3,6 +3,7 @@
 namespace CodeAnalysis.Syntax;
 
 [DebuggerDisplay("Count = {Count}")]
+[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
 public readonly struct SeparatedSyntaxList<T>(SyntaxList<SyntaxNode> syntaxNodes)
     : IEquatable<SeparatedSyntaxList<T>>, IReadOnlyList<T> where T : SyntaxNode
 {

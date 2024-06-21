@@ -44,6 +44,8 @@ partial class Interpreter
             //    EvaluateBlockExpression((BoundBlockExpression)node, context),
             //BoundKind.ArrayExpression =>
             //    EvaluateArrayExpression((BoundArrayExpression)node, context),
+            BoundKind.InvocationExpression =>
+                EvaluateInvocationExpression((BoundInvocationExpression)node, context),
             BoundKind.StructExpression =>
                 EvaluateStructExpression((BoundStructExpression)node, context),
             //BoundKind.ConversionExpression =>

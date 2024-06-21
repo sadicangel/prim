@@ -122,8 +122,7 @@ public enum SyntaxKind
     FunctionType,
     UnionType,
     Parameter,
-    ParameterList,
-    TypeList,
+    Argument,
 
     CompilationUnit,
 
@@ -172,6 +171,8 @@ public enum SyntaxKind
     ArrayExpression,
     StructExpression,
     PropertyExpression,
+
+    InvocationExpression,
 
     ConversionExpression,
 

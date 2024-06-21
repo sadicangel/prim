@@ -1,8 +1,11 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace CodeAnalysis.Binding;
 
+[DebuggerDisplay("Count = {Count}")]
+[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
 [CollectionBuilder(typeof(BoundListBuilder), nameof(BoundListBuilder.Create))]
 internal readonly struct BoundList<T>(List<T> nodes) : IReadOnlyList<T>
     where T : BoundNode
@@ -68,7 +71,7 @@ internal readonly struct BoundList<T>(List<T> nodes) : IReadOnlyList<T>
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            if (_nodes is not null)
+            if (_nodes is null)
                 yield break;
             foreach (var node in Nodes)
                 yield return node;

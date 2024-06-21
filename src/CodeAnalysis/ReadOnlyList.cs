@@ -1,8 +1,11 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace CodeAnalysis;
 
+[DebuggerDisplay("Count = {Count}")]
+[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
 [CollectionBuilder(typeof(ReadOnlyListBuilder), nameof(ReadOnlyListBuilder.Create))]
 public sealed class ReadOnlyList<T> : IReadOnlyList<T>, IEquatable<ReadOnlyList<T>>
 {

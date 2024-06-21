@@ -40,7 +40,7 @@ file static class SyntaxKindSpanExtensions
 {
     public static bool Contains(this ReadOnlySpan<SyntaxKind> l, SyntaxKind v)
     {
-        for (int i = 0; i < l.Length; ++i)
+        for (var i = 0; i < l.Length; ++i)
             if (l[i] == v)
                 return true;
         return false;

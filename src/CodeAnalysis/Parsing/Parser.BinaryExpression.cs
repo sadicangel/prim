@@ -20,25 +20,45 @@ partial class Parser
             left = ParsePrimaryExpression(syntaxTree, iterator);
         }
 
-        while (true)
+begin:
+        switch (iterator.Current.SyntaxKind)
         {
-            if (iterator.Current.SyntaxKind is SyntaxKind.AsKeyword)
-            {
-                var asKeyword = iterator.Match(SyntaxKind.AsKeyword);
-                var type = ParseType(syntaxTree, iterator);
-                left = new ConversionExpressionSyntax(syntaxTree, left, asKeyword, type);
-            }
-            else if (TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator))
-            {
-                var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);
-                var right = ParseBinaryExpression(syntaxTree, iterator, binaryOperator.Precedence);
-                left = new BinaryExpressionSyntax(syntaxKind, syntaxTree, left, binaryOperator, right);
-            }
-            else
-            {
-                break;
-            }
+            case SyntaxKind.AsKeyword:
+                {
+                    var asKeyword = iterator.Match(SyntaxKind.AsKeyword);
+                    var type = ParseType(syntaxTree, iterator);
+                    left = new ConversionExpressionSyntax(syntaxTree, left, asKeyword, type);
+                }
+                goto begin;
 
+            case SyntaxKind.ParenthesisOpenToken:
+                {
+                    var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
+                    var arguments = ParseSeparatedSyntaxList(
+                        syntaxTree,
+                        iterator,
+                        SyntaxKind.CommaToken,
+                        [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
+                        ParseArgument);
+                    var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
+
+                    left = new InvocationExpressionSyntax(syntaxTree, left, parenthesisOpenToken, arguments, parenthesisCloseToken);
+
+                    static ArgumentSyntax ParseArgument(SyntaxTree syntaxTree, SyntaxIterator iterator)
+                    {
+                        var expression = ParseExpression(syntaxTree, iterator);
+                        return new ArgumentSyntax(syntaxTree, expression);
+                    }
+                }
+                goto begin;
+
+            case SyntaxKind _ when TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator):
+                {
+                    var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);
+                    var right = ParseBinaryExpression(syntaxTree, iterator, binaryOperator.Precedence);
+                    left = new BinaryExpressionSyntax(syntaxKind, syntaxTree, left, binaryOperator, right);
+                }
+                goto begin;
         }
         return left;
 
