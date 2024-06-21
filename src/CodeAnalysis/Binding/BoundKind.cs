@@ -30,7 +30,6 @@ internal enum BoundKind
     MethodDeclaration,
     OperatorDeclaration,
     ConversionDeclaration,
-    LocalDeclaration,
 
     FunctionBodyExpression,
 

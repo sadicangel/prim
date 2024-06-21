@@ -74,12 +74,16 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftTypeName, rightTypeName));
     internal void ReportAmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousUnaryOperator(@operator, operandTypeName));
+    internal void ReportInvalidArgumentListLength(SourceLocation location, string functionName, int expectedLength, int actualLength) =>
+        ReportError(location, DiagnosticMessage.InvalidArgumentListLength(functionName, expectedLength, actualLength));
     internal void ReportInvalidArrayLength(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidArrayLength());
     internal void ReportInvalidConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidConversion(sourceTypeName, targetTypeName));
     internal void ReportInvalidExpressionType(SourceLocation location, string expectedTypeName, string actualTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedTypeName, actualTypeName));
+    internal void ReportInvalidFunctionSymbol(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidFunctionSymbol());
     internal void ReportInvalidImplicitConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceTypeName, targetTypeName));
     internal void ReportMutableGlobalDeclaration(SourceLocation location, string declarationKind) =>
@@ -102,9 +106,6 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
-    //internal void ReportInvalidNumberOfArguments(SourceLocation location, FunctionType functionType, int actualNumberOfArguments) => ReportError(location, DiagnosticMessage.InvalidNumberOfArguments(functionType, actualNumberOfArguments));
-    //internal void ReportInvalidSymbolType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidSymbolType(expectedType, actualType));
-    //internal void ReportInvalidExpressionType(SourceLocation location, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(actualType));
     //internal void ReportInvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Location, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));
     //internal void ReportInvalidBreakOrContinue(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidBreakOrContinue());
     //internal void ReportInvalidReturn(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidReturn());

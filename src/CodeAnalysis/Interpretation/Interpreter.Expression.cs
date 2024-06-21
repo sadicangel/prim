@@ -32,8 +32,6 @@ partial class Interpreter
                 EvaluateFunctionDeclaration((BoundFunctionDeclaration)node, context),
             BoundKind.StructDeclaration =>
                 EvaluateStructDeclaration((BoundStructDeclaration)node, context),
-            //BoundKind.LocalDeclaration =>
-            //    EvaluateLocalDeclaration((BoundLocalDeclaration)node, context),
             BoundKind.FunctionBodyExpression =>
                 EvaluateFunctionBody((BoundFunctionBodyExpression)node, context),
             //BoundKind.EmptyExpression =>

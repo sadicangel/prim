@@ -32,12 +32,16 @@ internal static class DiagnosticMessage
         $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftTypeName}' and '{rightTypeName}'";
     public static string AmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         $"Unary operator '{@operator.Text}' is ambiguous on operand of type '{operandTypeName}'";
+    public static string InvalidArgumentListLength(string functionName, int expectedLength, int actualLength) =>
+        $"Function '{functionName}' expects {expectedLength} arguments but was given {actualLength}";
     public static string InvalidArrayLength() =>
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";
     public static string InvalidExpressionType(string expectedTypeName, string actualTypeName) =>
         $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
+    public static string InvalidFunctionSymbol() =>
+        $"Not a function";
     public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
     public static string MutableGlobalDeclaration(string declarationKind) =>
@@ -60,9 +64,6 @@ internal static class DiagnosticMessage
         $"Undefined unary operator '{@operator.Text}' for type '{operandTypeName}'";
 
 
-    //public static string InvalidArgumentType(Parameter parameter, PrimType actualType) => $"Invalid expression of type '{actualType.Name}' provided for parameter '{parameter.Name}' of type '{parameter.Type.Name}'";
-    //public static string InvalidNumberOfArguments(FunctionType functionType, int actualNumberOfArguments) => $"Function '{functionType.Name}' requires {functionType.Parameters.Count} arguments but was given {actualNumberOfArguments}";
-    //public static string InvalidSymbolType(PrimType expectedType, PrimType actualType) => $"Invalid symbol of type '{actualType.Name}'. Expected '{expectedType.Name}'";
 
 
     //public static string InvalidExpressionType(PrimType actualType) => $"Invalid expression of type '{actualType}'";
