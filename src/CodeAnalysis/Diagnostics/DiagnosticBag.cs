@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
@@ -15,6 +16,8 @@ public interface IReadOnlyDiagnosticBag : IReadOnlyList<Diagnostic>
     public IEnumerable<Diagnostic> GetWarnings() => this.Where(d => d.Severity is DiagnosticSeverity.Warning);
 }
 
+[DebuggerDisplay("Count = {Count}")]
+[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
 public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 {
     private readonly List<Diagnostic> _diagnostics;
@@ -76,14 +79,16 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousUnaryOperator(@operator, operandTypeName));
     internal void ReportInvalidArgumentListLength(SourceLocation location, string functionName, int expectedLength, int actualLength) =>
         ReportError(location, DiagnosticMessage.InvalidArgumentListLength(functionName, expectedLength, actualLength));
+    internal void ReportInvalidArray(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidArray());
     internal void ReportInvalidArrayLength(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidArrayLength());
     internal void ReportInvalidConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidConversion(sourceTypeName, targetTypeName));
     internal void ReportInvalidExpressionType(SourceLocation location, string expectedTypeName, string actualTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedTypeName, actualTypeName));
-    internal void ReportInvalidFunctionSymbol(SourceLocation location) =>
-        ReportError(location, DiagnosticMessage.InvalidFunctionSymbol());
+    internal void ReportInvalidFunction(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidFunction());
     internal void ReportInvalidImplicitConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceTypeName, targetTypeName));
     internal void ReportMutableGlobalDeclaration(SourceLocation location, string declarationKind) =>

@@ -173,6 +173,8 @@ public static class SyntaxFacts
             SyntaxKind.PropertyExpression => null,
 
             SyntaxKind.ConversionExpression => null,
+
+            SyntaxKind.IndexExpression => null,
             SyntaxKind.InvocationExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,

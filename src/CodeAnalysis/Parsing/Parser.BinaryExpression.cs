@@ -31,6 +31,16 @@ begin:
                 }
                 goto begin;
 
+            case SyntaxKind.BracketOpenToken:
+                {
+                    var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
+                    var index = ParseExpression(syntaxTree, iterator);
+                    var bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
+
+                    left = new IndexExpressionSyntax(syntaxTree, left, bracketOpenToken, index, bracketCloseToken);
+                }
+                goto begin;
+
             case SyntaxKind.ParenthesisOpenToken:
                 {
                     var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);

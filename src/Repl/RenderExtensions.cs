@@ -24,18 +24,27 @@ internal static class RenderExtensions
         Indent(console, indent);
         switch (value)
         {
+            case ArrayValue array:
+
+                console.MarkupInterpolated($"[grey66]{"["}[/]");
+                var first = true;
+                foreach (var element in array)
+                {
+                    if (first) first = false;
+                    else console.Write(", ");
+                    console.Write(element);
+                }
+                console.MarkupInterpolated($"[grey66]{"]"}[/] ");
+                console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
+                break;
             case FunctionValue function:
-                console.Write(new Markup(function.Type.ToString(), "grey66"));
-                console.Write(" ");
-                console.Write(new Markup(value.Type.Name, "green i"));
+                console.MarkupInterpolated($"[grey66]{function.Type}[/] [green i]{value.Type.Name}[/]");
                 break;
             case VariableValue literal:
-                console.Write(new Markup(literal.Value.ToString()!, "grey66"));
-                console.Write(" ");
-                console.Write(new Markup(value.Type.Name, "green i"));
+                console.MarkupInterpolated($"[grey66]{literal.Value}[/] [green i]{value.Type.Name}[/]");
                 break;
             case ObjectValue @object:
-                console.MarkupLine("[grey66]{[/]");
+                console.MarkupLineInterpolated($"[grey66]{"{"}[/]");
                 ++indent;
                 foreach (var (ps, pv) in @object)
                 {
@@ -45,13 +54,11 @@ internal static class RenderExtensions
                 }
                 --indent;
                 Indent(console, indent);
-                console.Markup("[grey66]}[/] ");
-                console.Write(new Markup(value.Type.Name, "green i"));
+                console.MarkupInterpolated($"[grey66]{"}"}[/] ");
+                console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
                 break;
             case StructValue @struct:
-                console.Write(new Markup(@struct.Value.Name, "grey66"));
-                console.Write(" ");
-                console.Write(new Markup(value.Type.Name, "green i"));
+                console.MarkupInterpolated($"[grey66]{@struct.Value.Name}[/] [green i]{value.Type.Name}[/]");
                 break;
             default:
                 throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");
@@ -101,11 +108,11 @@ internal static class RenderExtensions
             });
         }
 
-        console.Write(new Markup($"""
-                [{colour}]{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): {diagnostic.Message}[/]
-                    {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
-                    {underline}
-                """));
+        console.MarkupInterpolated($"""
+            [{colour}]{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): {diagnostic.Message}[/]
+            {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
+            {underline}
+            """);
     }
 
     public static void WriteLine(this IAnsiConsole console, Diagnostic diagnostic)

@@ -82,7 +82,7 @@ partial class Binder
                 return elementType;
 
             // TODO: Allow any constant value coercible to i32 (or isize?).
-            if (syntax.SyntaxKind is not SyntaxKind.I32LiteralExpression)
+            if (syntax.Length.SyntaxKind is not SyntaxKind.I32LiteralExpression)
             {
                 context.Diagnostics.ReportInvalidArrayLength(syntax.Length.Location);
                 return PredefinedTypes.Never;

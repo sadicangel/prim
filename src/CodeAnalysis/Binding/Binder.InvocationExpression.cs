@@ -9,9 +9,10 @@ partial class Binder
     private static BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax, BinderContext context)
     {
         var expression = BindExpression(syntax.Expression, context);
+        // TODO: Consider using an operator instead?
         if (expression.Type is not FunctionType functionType)
         {
-            context.Diagnostics.ReportInvalidFunctionSymbol(syntax.Expression.Location);
+            context.Diagnostics.ReportInvalidFunction(syntax.Expression.Location);
             return new BoundNeverExpression(syntax);
         }
 

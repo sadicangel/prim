@@ -40,6 +40,7 @@ internal enum BoundKind
     StructExpression,
     PropertyExpression,
 
+    IndexExpression,
     InvocationExpression,
 
     ConversionExpression,

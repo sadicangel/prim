@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Interpretation.Values;
 
-internal sealed record class FunctionValue(PrimType Type, Delegate Delegate) : PrimValue(Type)
+internal sealed record class FunctionValue(FunctionType FunctionType, Delegate Delegate) : PrimValue(FunctionType)
 {
     public override Delegate Value => Delegate;
 

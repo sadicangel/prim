@@ -5,12 +5,12 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundArrayExpression(
     SyntaxNode Syntax,
     PrimType Type,
-    BoundList<BoundExpression> Expressions)
+    BoundList<BoundExpression> Elements)
     : BoundExpression(BoundKind.ArrayExpression, Syntax, Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        foreach (var expression in Expressions)
-            yield return expression;
+        foreach (var element in Elements)
+            yield return element;
     }
 }
