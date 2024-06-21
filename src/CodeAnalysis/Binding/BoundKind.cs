@@ -36,9 +36,9 @@ internal enum BoundKind
     EmptyExpression,
     StatementExpression,
     BlockExpression,
-    ArrayExpression,
-    StructExpression,
-    PropertyExpression,
+    ArrayInitExpression,
+    StructInitExpression,
+    PropertyInitExpression,
 
     IndexExpression,
     InvocationExpression,

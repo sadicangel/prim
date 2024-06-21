@@ -169,8 +169,8 @@ public enum SyntaxKind
     StatementExpression,
     BlockExpression,
     ArrayExpression,
-    StructExpression,
-    PropertyExpression,
+    StructInitExpression,
+    PropertyInitExpression,
 
     IndexExpression,
     InvocationExpression,

@@ -12,6 +12,6 @@ public partial class ParserTests
             """));
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
-        Assert.Equal(SyntaxKind.StructExpression, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.StructInitExpression, node.SyntaxKind);
     }
 }

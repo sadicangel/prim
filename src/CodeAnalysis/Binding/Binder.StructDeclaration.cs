@@ -39,7 +39,7 @@ partial class Binder
                 ?? throw new UnreachableException($"Unexpected property '{syntax.IdentifierToken.Text}'");
 
             // TODO: Allow init expression to be optional, if property is optional.
-            var init = Convert(BindExpression(syntax.Init, context), property.Type, isExplicit: false, context);
+            var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
 
             var propertySymbol = new PropertySymbol(syntax, property, syntax.IsReadOnly, structSymbol);
 

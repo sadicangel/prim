@@ -40,14 +40,14 @@ partial class Interpreter
             //    EvaluateStatementExpression((BoundStatementExpression)node, context),
             //BoundKind.BlockExpression =>
             //    EvaluateBlockExpression((BoundBlockExpression)node, context),
-            BoundKind.ArrayExpression =>
-                EvaluateArrayExpression((BoundArrayExpression)node, context),
+            BoundKind.ArrayInitExpression =>
+                EvaluateArrayInitExpression((BoundArrayInitExpression)node, context),
             BoundKind.IndexExpression =>
                 EvaluateIndexExpression((BoundIndexExpression)node, context),
             BoundKind.InvocationExpression =>
                 EvaluateInvocationExpression((BoundInvocationExpression)node, context),
-            BoundKind.StructExpression =>
-                EvaluateStructExpression((BoundStructExpression)node, context),
+            BoundKind.StructInitExpression =>
+                EvaluateStructInitExpression((BoundStructInitExpression)node, context),
             //BoundKind.ConversionExpression =>
             //    EvaluateConversionExpression((BoundConversionExpression)node, context),
             //BoundKind.UnaryPlusExpression or

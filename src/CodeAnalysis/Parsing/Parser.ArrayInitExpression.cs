@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ArrayExpressionSyntax ParseArrayExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static ArrayInitExpressionSyntax ParseArrayInitExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
         var elements = ParseSeparatedSyntaxList(
@@ -14,6 +14,6 @@ partial class Parser
             [SyntaxKind.BracketCloseToken, SyntaxKind.EofToken],
             ParseExpression);
         var bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
-        return new ArrayExpressionSyntax(syntaxTree, bracketOpenToken, elements, bracketCloseToken);
+        return new ArrayInitExpressionSyntax(syntaxTree, bracketOpenToken, elements, bracketCloseToken);
     }
 }

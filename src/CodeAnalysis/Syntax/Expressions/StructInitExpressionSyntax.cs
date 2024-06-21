@@ -1,13 +1,13 @@
 ﻿
 
 namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class StructExpressionSyntax(
+public sealed record class StructInitExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken,
     SyntaxToken BraceOpenToken,
-    SeparatedSyntaxList<PropertyExpressionSyntax> Properties,
+    SeparatedSyntaxList<PropertyInitExpressionSyntax> Properties,
     SyntaxToken BraceCloseToken)
-    : ExpressionSyntax(SyntaxKind.StructExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.StructInitExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

@@ -6,7 +6,7 @@ using CodeAnalysis.Types.Metadata;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindStructExpression(StructExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindStructInitExpression(StructInitExpressionSyntax syntax, BinderContext context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
@@ -15,7 +15,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var properties = new BoundList<BoundPropertyExpression>.Builder(syntax.Properties.Count);
+        var properties = new BoundList<BoundPropertyInitExpression>.Builder(syntax.Properties.Count);
         foreach (var propertySyntax in syntax.Properties)
         {
             if (structSymbol.Type.GetProperty(propertySyntax.IdentifierToken.Text) is not Property property)
@@ -30,11 +30,29 @@ partial class Binder
                 continue;
             }
 
-            var init = Convert(BindExpression(propertySyntax.Init, context), property.Type, isExplicit: false, context);
-            var expression = new BoundPropertyExpression(propertySyntax, new PropertySymbol(propertySyntax, property, IsReadOnly: property.IsReadOnly, structSymbol), init);
+            var propertySymbol = new PropertySymbol(
+                syntax,
+                property,
+                IsReadOnly: property.IsReadOnly,
+                structSymbol);
+            var expression = BindPropertyInitExpression(propertySyntax, propertySymbol, context);
             properties.Add(expression);
         }
+
         // TODO: Report un-initialized property members.
-        return new BoundStructExpression(syntax, structSymbol, properties.ToBoundList());
+        return new BoundStructInitExpression(syntax, structSymbol, properties.ToBoundList());
+
+        static BoundPropertyInitExpression BindPropertyInitExpression(
+            PropertyInitExpressionSyntax syntax,
+            PropertySymbol property,
+            BinderContext context)
+        {
+            var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
+            var expression = new BoundPropertyInitExpression(
+                syntax,
+                property,
+                init);
+            return expression;
+        }
     }
 }

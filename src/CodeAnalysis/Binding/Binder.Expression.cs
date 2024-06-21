@@ -53,9 +53,9 @@ partial class Binder
             SyntaxKind.BlockExpression =>
                 BindBlockExpression((BlockExpressionSyntax)syntax, context),
             SyntaxKind.ArrayExpression =>
-                BindArrayExpression((ArrayExpressionSyntax)syntax, context),
-            SyntaxKind.StructExpression =>
-                BindStructExpression((StructExpressionSyntax)syntax, context),
+                BindArrayInitExpression((ArrayInitExpressionSyntax)syntax, context),
+            SyntaxKind.StructInitExpression =>
+                BindStructInitExpression((StructInitExpressionSyntax)syntax, context),
             SyntaxKind.IndexExpression =>
                 BindIndexExpression((IndexExpressionSyntax)syntax, context),
             SyntaxKind.InvocationExpression =>

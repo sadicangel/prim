@@ -5,7 +5,7 @@ using CodeAnalysis.Types;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundArrayExpression BindArrayExpression(ArrayExpressionSyntax syntax, BinderContext context)
+    private static BoundArrayInitExpression BindArrayInitExpression(ArrayInitExpressionSyntax syntax, BinderContext context)
     {
         var types = new HashSet<PrimType>();
         var elements = new BoundList<BoundExpression>.Builder(syntax.Elements.Count);
@@ -26,6 +26,6 @@ partial class Binder
 
         var arrayType = new ArrayType(elementType, elements.Count);
 
-        return new BoundArrayExpression(syntax, arrayType, elements.ToBoundList());
+        return new BoundArrayInitExpression(syntax, arrayType, elements.ToBoundList());
     }
 }

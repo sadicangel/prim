@@ -2,11 +2,11 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
-internal sealed record class BoundPropertyExpression(
+internal sealed record class BoundPropertyInitExpression(
     SyntaxNode Syntax,
     PropertySymbol PropertySymbol,
     BoundExpression Expression)
-    : BoundExpression(BoundKind.PropertyExpression, Syntax, PropertySymbol.Type)
+    : BoundExpression(BoundKind.PropertyInitExpression, Syntax, PropertySymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
