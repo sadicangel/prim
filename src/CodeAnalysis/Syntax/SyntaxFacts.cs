@@ -126,6 +126,7 @@ public static class SyntaxFacts
             SyntaxKind.FunctionType => null,
             SyntaxKind.UnionType => null,
             SyntaxKind.Parameter => null,
+            SyntaxKind.Argument => null,
 
             SyntaxKind.IdentifierNameExpression => null,
 
@@ -172,6 +173,7 @@ public static class SyntaxFacts
             SyntaxKind.PropertyExpression => null,
 
             SyntaxKind.ConversionExpression => null,
+            SyntaxKind.InvocationExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,
             SyntaxKind.UnaryMinusExpression => null,
