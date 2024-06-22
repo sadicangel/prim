@@ -174,7 +174,7 @@ public enum SyntaxKind
 
     IndexExpression,
     InvocationExpression,
-
+    MemberAccessExpression,
     ConversionExpression,
 
     UnaryPlusExpression,
@@ -202,6 +202,11 @@ public enum SyntaxKind
     GreaterThanExpression,
     GreaterThanOrEqualExpression,
     CoalesceExpression,
+
+    IndexOperator,
+    InvocationOperator,
+    MemberAccessOperator,
+    ConversionOperator,
 
     UnaryPlusOperator,
     UnaryMinusOperator,

@@ -3,7 +3,6 @@ using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -24,7 +23,7 @@ partial class Binder
         };
 
         var containingType = operand.Type;
-        var operators = operand.Type.GetUnaryOperators(syntax.Operator.SyntaxKind, operand.Type, PredefinedTypes.Any);
+        var operators = operand.Type.GetUnaryOperators(syntax.Operator.SyntaxKind, operand.Type);
         if (operators is [])
         {
             context.Diagnostics.ReportUndefinedUnaryOperator(syntax.Operator.OperatorToken, operand.Type.Name);
@@ -38,12 +37,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var containingSymbol = containingType is not StructType structType
-            ? null
-            : context.BoundScope.Lookup(structType.Name) as StructSymbol;
-
-
-        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator, containingSymbol);
+        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
 
         return new BoundUnaryExpression(expressionKind, syntax, operatorSymbol, operand);
     }

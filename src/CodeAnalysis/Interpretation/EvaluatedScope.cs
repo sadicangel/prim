@@ -147,26 +147,23 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                     s.SetOperator(
                         new OperatorSymbol(
                             SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
-                            add,
-                            global.Str),
+                            add),
                         new FunctionValue(add.Type, (PrimValue a, PrimValue b) =>
-                            new VariableValue(a.Type, (string)a.Value + (string)b.Value)));
+                            new LiteralValue(s, a.Type, (string)a.Value + (string)b.Value)));
                     var addStr = global.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, global.Str.Type, PredefinedTypes.Any, global.Str.Type).Single();
                     s.SetOperator(
                         new OperatorSymbol(
                             SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
-                            addStr,
-                            global.Str),
+                            addStr),
                         new FunctionValue(addStr.Type, (PrimValue a, PrimValue b) =>
-                            new VariableValue(a.Type, (string)a.Value + b.Value)));
+                            new LiteralValue(s, a.Type, (string)a.Value + b.Value)));
                     var addAny = global.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, PredefinedTypes.Any, global.Str.Type, global.Str.Type).Single();
                     s.SetOperator(
                         new OperatorSymbol(
                             SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
-                            addAny,
-                            global.Str),
+                            addAny),
                         new FunctionValue(addAny.Type, (PrimValue a, PrimValue b) =>
-                            new VariableValue(a.Type, a.Value + (string)b.Value)));
+                            new LiteralValue(s, a.Type, a.Value + (string)b.Value)));
                 });
             ((StructValue)map[global.Bool])
                 .AddEqualityOperators<bool>(global.Bool)
@@ -296,62 +293,54 @@ file static class StructValueExtensions
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
-                unaryPlus,
-                symbol),
-            new FunctionValue(unaryPlus.Type, (PrimValue a) => new VariableValue(a.Type, +(T)a.Value)));
+                unaryPlus),
+            new FunctionValue(unaryPlus.Type, (PrimValue a) => new LiteralValue(s, a.Type, +(T)a.Value)));
         var unaryMinus = symbol.Type.GetUnaryOperators(SyntaxKind.UnaryMinusOperator, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.MinusToken),
-                unaryMinus,
-                symbol),
-            new FunctionValue(unaryMinus.Type, (PrimValue a) => new VariableValue(a.Type, -(T)a.Value)));
+                unaryMinus),
+            new FunctionValue(unaryMinus.Type, (PrimValue a) => new LiteralValue(s, a.Type, -(T)a.Value)));
         var add = symbol.Type.GetBinaryOperators(SyntaxKind.AddOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
-                add,
-                symbol),
+                add),
             new FunctionValue(add.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value + (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value + (T)b.Value)));
         var subtract = symbol.Type.GetBinaryOperators(SyntaxKind.SubtractOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.MinusToken),
-                subtract,
-                symbol),
+                subtract),
             new FunctionValue(subtract.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value - (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value - (T)b.Value)));
         var multiply = symbol.Type.GetBinaryOperators(SyntaxKind.MultiplyOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.StarToken),
-                multiply,
-                symbol),
+                multiply),
             new FunctionValue(multiply.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value * (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value * (T)b.Value)));
         var divide = symbol.Type.GetBinaryOperators(SyntaxKind.DivideOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.SlashToken),
-                divide,
-                symbol),
+                divide),
             new FunctionValue(divide.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value / (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value / (T)b.Value)));
         var modulo = symbol.Type.GetBinaryOperators(SyntaxKind.ModuloOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.PercentToken),
-                modulo,
-                symbol),
+                modulo),
             new FunctionValue(modulo.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value % (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value % (T)b.Value)));
         var power = symbol.Type.GetBinaryOperators(SyntaxKind.PowerOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.StarStarToken),
-                power,
-                symbol),
+                power),
             new FunctionValue(power.Type, (PrimValue a, PrimValue b) => T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value)))));
         return s;
     }
@@ -362,49 +351,43 @@ file static class StructValueExtensions
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.TildeToken),
-                onesComplement,
-                symbol),
-            new FunctionValue(onesComplement.Type, (PrimValue a) => new VariableValue(a.Type, ~(T)a.Value)));
+                onesComplement),
+            new FunctionValue(onesComplement.Type, (PrimValue a) => new LiteralValue(s, a.Type, ~(T)a.Value)));
         var bitwiseAnd = symbol.Type.GetBinaryOperators(SyntaxKind.BitwiseAndOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.AmpersandToken),
-                bitwiseAnd,
-                symbol),
+                bitwiseAnd),
             new FunctionValue(bitwiseAnd.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value & (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value & (T)b.Value)));
         var bitwiseOr = symbol.Type.GetBinaryOperators(SyntaxKind.BitwiseOrOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.PipeToken),
-                bitwiseOr,
-                symbol),
+                bitwiseOr),
             new FunctionValue(bitwiseOr.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value | (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value | (T)b.Value)));
         var exclusiveOr = symbol.Type.GetBinaryOperators(SyntaxKind.ExclusiveOrOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.HatToken),
-                exclusiveOr,
-                symbol),
+                exclusiveOr),
             new FunctionValue(exclusiveOr.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value ^ (T)b.Value)));
+                new LiteralValue(s, a.Type, (T)a.Value ^ (T)b.Value)));
         var leftShift = symbol.Type.GetBinaryOperators(SyntaxKind.LeftShiftOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.LessThanLessThanToken),
-                leftShift,
-                symbol),
+                leftShift),
             new FunctionValue(leftShift.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value << int.CreateTruncating((T)b.Value))));
+                new LiteralValue(s, a.Type, (T)a.Value << int.CreateTruncating((T)b.Value))));
         var rightShift = symbol.Type.GetBinaryOperators(SyntaxKind.RightShiftOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.BangToken),
-                rightShift,
-                symbol),
+                rightShift),
             new FunctionValue(rightShift.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(a.Type, (T)a.Value >> int.CreateTruncating((T)b.Value))));
+                new LiteralValue(s, a.Type, (T)a.Value >> int.CreateTruncating((T)b.Value))));
         return s;
     }
 
@@ -414,18 +397,16 @@ file static class StructValueExtensions
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.EqualsEqualsToken),
-                equals,
-                symbol),
+                equals),
             new FunctionValue(equals.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, ((T)a.Value).Equals(b.Value))));
+                new LiteralValue(s, PredefinedTypes.Bool, ((T)a.Value).Equals(b.Value))));
         var notEquals = symbol.Type.GetBinaryOperators(SyntaxKind.NotEqualsOperator, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.BangEqualsToken),
-                notEquals,
-                symbol),
+                notEquals),
             new FunctionValue(notEquals.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, !((T)a.Value).Equals(b.Value))));
+                new LiteralValue(s, PredefinedTypes.Bool, !((T)a.Value).Equals(b.Value))));
         return s;
     }
 
@@ -435,34 +416,30 @@ file static class StructValueExtensions
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.LessThanToken),
-                lessThan,
-                symbol),
+                lessThan),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, (T)a.Value < (T)b.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value < (T)b.Value)));
         var lessThanOrEqual = symbol.Type.GetBinaryOperators(SyntaxKind.LessThanOrEqualOperator, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.LessThanEqualsToken),
-                lessThanOrEqual,
-                symbol),
+                lessThanOrEqual),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, (T)a.Value <= (T)b.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value <= (T)b.Value)));
         var greaterThan = symbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanOperator, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.GreaterThanToken),
-                greaterThan,
-                symbol),
+                greaterThan),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, (T)a.Value > (T)b.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value > (T)b.Value)));
         var greaterThanOrEqual = symbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanOrEqualOperator, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.GreaterThanEqualsToken),
-                greaterThanOrEqual,
-                symbol),
+                greaterThanOrEqual),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, (T)a.Value >= (T)b.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value >= (T)b.Value)));
         return s;
     }
 
@@ -472,26 +449,23 @@ file static class StructValueExtensions
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.BangToken),
-                not,
-                symbol),
+                not),
             new FunctionValue(not.Type, (PrimValue a) =>
-                new VariableValue(PredefinedTypes.Bool, !(bool)a.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, !(bool)a.Value)));
         var logicalAnd = symbol.Type.GetBinaryOperators(SyntaxKind.LogicalAndOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.AmpersandAmpersandToken),
-                logicalAnd,
-                symbol),
+                logicalAnd),
             new FunctionValue(logicalAnd.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, (bool)a.Value && (bool)b.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value && (bool)b.Value)));
         var logicalOr = symbol.Type.GetBinaryOperators(SyntaxKind.LogicalOrOperator, symbol.Type, symbol.Type, symbol.Type).Single();
         s.SetOperator(
             new OperatorSymbol(
                 SyntaxFactory.SyntheticToken(SyntaxKind.PipePipeToken),
-                logicalOr,
-                symbol),
+                logicalOr),
             new FunctionValue(logicalOr.Type, (PrimValue a, PrimValue b) =>
-                new VariableValue(PredefinedTypes.Bool, (bool)a.Value || (bool)b.Value)));
+                new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value || (bool)b.Value)));
         return s;
     }
 

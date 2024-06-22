@@ -22,7 +22,7 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
 {
     private readonly List<Diagnostic> _diagnostics;
 
-    public DiagnosticBag() => _diagnostics = new();
+    public DiagnosticBag() => _diagnostics = [];
     public DiagnosticBag(IEnumerable<Diagnostic> diagnostics) => _diagnostics = new(diagnostics);
 
     public int Count { get => _diagnostics.Count; }
@@ -75,10 +75,12 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     // Binding Errors.
     internal void ReportAmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftTypeName, rightTypeName));
+    internal void ReportAmbiguousInvocationOperator(SourceLocation location, params ReadOnlySpan<string> typeNames) =>
+        ReportError(location, DiagnosticMessage.AmbiguousInvocationOperator(typeNames));
     internal void ReportAmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousUnaryOperator(@operator, operandTypeName));
-    internal void ReportInvalidArgumentListLength(SourceLocation location, string functionName, int expectedLength, int actualLength) =>
-        ReportError(location, DiagnosticMessage.InvalidArgumentListLength(functionName, expectedLength, actualLength));
+    internal void ReportInvalidArgumentListLength(SourceLocation location, int listLength) =>
+        ReportError(location, DiagnosticMessage.InvalidArgumentListLength(listLength));
     internal void ReportInvalidArray(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidArray());
     internal void ReportInvalidArrayLength(SourceLocation location) =>
@@ -87,8 +89,6 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.InvalidConversion(sourceTypeName, targetTypeName));
     internal void ReportInvalidExpressionType(SourceLocation location, string expectedTypeName, string actualTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedTypeName, actualTypeName));
-    internal void ReportInvalidFunction(SourceLocation location) =>
-        ReportError(location, DiagnosticMessage.InvalidFunction());
     internal void ReportInvalidImplicitConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidImplicitConversion(sourceTypeName, targetTypeName));
     internal void ReportMutableGlobalDeclaration(SourceLocation location, string declarationKind) =>
@@ -101,6 +101,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftTypeName, rightTypeName));
+    internal void ReportUndefinedInvocationOperator(SourceLocation location, string containingTypeName) =>
+        ReportError(location, DiagnosticMessage.UndefinedInvocationOperator(containingTypeName));
     internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));
     internal void ReportUndefinedTypeMember(SourceLocation location, string typeName, string memberName) =>
         ReportError(location, DiagnosticMessage.UndefinedTypeMember(typeName, memberName));

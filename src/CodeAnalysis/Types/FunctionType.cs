@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Types.Metadata;
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Types;
 
@@ -9,9 +10,10 @@ public sealed record class FunctionType : PrimType
     {
         Parameters = parameters;
         ReturnType = returnType;
+        AddOperator(SyntaxKind.InvocationOperator, this);
     }
 
-    public IReadOnlyList<Parameter> Parameters { get; init; }
+    public ReadOnlyList<Parameter> Parameters { get; init; }
     public PrimType ReturnType { get; init; }
     public bool Equals(FunctionType? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();

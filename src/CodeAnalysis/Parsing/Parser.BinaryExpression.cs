@@ -31,6 +31,14 @@ begin:
                 }
                 goto begin;
 
+            case SyntaxKind.DotToken:
+                {
+                    var dotToken = iterator.Match(SyntaxKind.DotToken);
+                    var name = ParseIdentifierNameExpression(syntaxTree, iterator);
+                    left = new MemberAccessExpressionSyntax(syntaxTree, left, dotToken, name);
+                }
+                goto begin;
+
             case SyntaxKind.BracketOpenToken:
                 {
                     var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);

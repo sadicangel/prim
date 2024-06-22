@@ -30,10 +30,12 @@ internal static class DiagnosticMessage
     // Binding error messages.
     public static string AmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         $"Binary operator '{@operator.Text}' is ambiguous on operands of type '{leftTypeName}' and '{rightTypeName}'";
+    public static string AmbiguousInvocationOperator(params ReadOnlySpan<string> typeNames) =>
+        $"Invocation operator is ambiguous for argument list '({string.Join(", ", typeNames.ToArray())})'";
     public static string AmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         $"Unary operator '{@operator.Text}' is ambiguous on operand of type '{operandTypeName}'";
-    public static string InvalidArgumentListLength(string functionName, int expectedLength, int actualLength) =>
-        $"Function '{functionName}' expects {expectedLength} arguments but was given {actualLength}";
+    public static string InvalidArgumentListLength(int listLength) =>
+        $"Expression does not contain an overload that expects {listLength} arguments";
     public static string InvalidArray() =>
         $"Not an array";
     public static string InvalidArrayLength() =>
@@ -42,8 +44,6 @@ internal static class DiagnosticMessage
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";
     public static string InvalidExpressionType(string expectedTypeName, string actualTypeName) =>
         $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
-    public static string InvalidFunction() =>
-        $"Not a function";
     public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
     public static string MutableGlobalDeclaration(string declarationKind) =>
@@ -56,6 +56,8 @@ internal static class DiagnosticMessage
         $"Redeclaration of symbol '{symbolName}'";
     public static string UndefinedBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         $"Binary operator '{@operator.Text}' is not defined for types '{leftTypeName}' and '{rightTypeName}'";
+    public static string UndefinedInvocationOperator(string containingTypeName) =>
+        $"Invocation operator is not defined for type '{containingTypeName}'";
     public static string UndefinedType(string typeName) =>
         $"Undefined type '{typeName}'";
     public static string UndefinedTypeMember(string typeName, string memberName) =>
@@ -63,7 +65,7 @@ internal static class DiagnosticMessage
     public static string UndefinedSymbol(string symbolName) =>
         $"Undefined symbol '{symbolName}'";
     public static string UndefinedUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
-        $"Undefined unary operator '{@operator.Text}' for type '{operandTypeName}'";
+        $"Unary operator '{@operator.Text}' is not defined for type '{operandTypeName}'";
 
 
 

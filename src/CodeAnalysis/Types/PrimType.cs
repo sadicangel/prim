@@ -22,6 +22,34 @@ public abstract record class PrimType(string Name)
 
     public sealed override string ToString() => Name;
 
+    internal bool IsCoercibleTo(PrimType type) => IsCoercibleTo(type, out _);
+    internal bool IsCoercibleTo(PrimType type, out Conversion? conversion)
+    {
+        conversion = null;
+        if (type.IsAny || this == type)
+        {
+            return true;
+        }
+
+        conversion = GetConversion(this, type) ?? type.GetConversion(this, type);
+
+        return conversion is not null && conversion.IsImplicit;
+    }
+
+    internal bool IsConvertibleTo(PrimType type) => IsConvertibleTo(type, out _);
+    internal bool IsConvertibleTo(PrimType type, out Conversion? conversion)
+    {
+        conversion = null;
+        if (type.IsAny || this == type)
+        {
+            return true;
+        }
+
+        conversion = GetConversion(this, type) ?? type.GetConversion(this, type);
+
+        return conversion is not null;
+    }
+
     internal bool AddProperty(string name, PrimType type, bool isReadonly)
     {
         if (GetProperty(name) is not null) return false;
@@ -73,13 +101,24 @@ public abstract record class PrimType(string Name)
         return null;
     }
 
-    internal List<Operator> GetUnaryOperators(SyntaxKind operatorKind, PrimType operandType, PrimType resultType)
+    internal List<Operator> GetOperators(SyntaxKind operatorKind, Func<FunctionType, bool>? filter = null)
+    {
+        var operators = _members.OfType<Operator>()
+            .Where(o => o.OperatorKind == operatorKind);
+
+        if (filter is not null)
+            operators = operators.Where(o => filter(o.Type));
+
+        return operators.ToList();
+    }
+
+    internal List<Operator> GetUnaryOperators(SyntaxKind operatorKind, PrimType operandType, PrimType? resultType = null)
     {
         var operators = _members.OfType<Operator>()
             .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 1)
-            .Where(o => o.Type.Parameters[0].Type.IsAny || o.Type.Parameters[0].Type == operandType)
-            .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
+            .Where(o => operandType.IsCoercibleTo(o.Type.Parameters[0].Type))
+            .Where(o => resultType is null || resultType.IsCoercibleTo(o.Type.ReturnType))
             .ToList();
 
         if (operators.Count > 1)
@@ -96,14 +135,14 @@ public abstract record class PrimType(string Name)
         return operators;
     }
 
-    internal List<Operator> GetBinaryOperators(SyntaxKind operatorKind, PrimType leftType, PrimType rightType, PrimType resultType)
+    internal List<Operator> GetBinaryOperators(SyntaxKind operatorKind, PrimType leftType, PrimType rightType, PrimType? resultType = null)
     {
         var operators = _members.OfType<Operator>()
             .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.Type.Parameters.Count == 2)
-            .Where(o => o.Type.Parameters[0].Type.IsAny || o.Type.Parameters[0].Type == leftType)
-            .Where(o => o.Type.Parameters[1].Type.IsAny || o.Type.Parameters[1].Type == rightType)
-            .Where(o => resultType.IsAny || o.Type.ReturnType == resultType)
+            .Where(o => leftType.IsCoercibleTo(o.Type.Parameters[0].Type))
+            .Where(o => rightType.IsCoercibleTo(o.Type.Parameters[1].Type))
+            .Where(o => resultType is null || resultType.IsCoercibleTo(o.Type.ReturnType))
             .ToList();
 
         if (operators.Count > 1)

@@ -6,6 +6,5 @@ internal abstract record class MemberSymbol(
     BoundKind BoundKind,
     SyntaxNode Syntax,
     string Name,
-    bool IsReadOnly,
-    StructSymbol? ContainingSymbol)
+    bool IsReadOnly)
     : Symbol(BoundKind, Syntax, Name, IsReadOnly);

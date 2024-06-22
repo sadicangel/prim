@@ -3,7 +3,6 @@ using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -39,11 +38,11 @@ partial class Binder
         };
 
         var containingType = left.Type;
-        var operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
+        var operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type);
         if (operators is [])
         {
             containingType = right.Type;
-            operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type, PredefinedTypes.Any);
+            operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type);
             if (operators is [])
             {
                 context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
@@ -57,11 +56,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var containingSymbol = containingType is not StructType structType
-            ? null
-            : context.BoundScope.Lookup(structType.Name) as StructSymbol;
-
-        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator, containingSymbol);
+        var operatorSymbol = new OperatorSymbol(syntax.Operator, @operator);
 
         return new BoundBinaryExpression(expressionKind, syntax, left, operatorSymbol, right);
     }

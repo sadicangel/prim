@@ -40,7 +40,7 @@ internal static class RenderExtensions
             case FunctionValue function:
                 console.MarkupInterpolated($"[grey66]{function.Type}[/] [green i]{value.Type.Name}[/]");
                 break;
-            case VariableValue literal:
+            case LiteralValue literal:
                 console.MarkupInterpolated($"[grey66]{literal.Value}[/] [green i]{value.Type.Name}[/]");
                 break;
             case ObjectValue @object:

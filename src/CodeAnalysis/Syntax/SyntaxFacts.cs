@@ -172,10 +172,10 @@ public static class SyntaxFacts
             SyntaxKind.StructInitExpression => null,
             SyntaxKind.PropertyInitExpression => null,
 
-            SyntaxKind.ConversionExpression => null,
-
             SyntaxKind.IndexExpression => null,
             SyntaxKind.InvocationExpression => null,
+            SyntaxKind.MemberAccessExpression => null,
+            SyntaxKind.ConversionExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,
             SyntaxKind.UnaryMinusExpression => null,
@@ -202,6 +202,11 @@ public static class SyntaxFacts
             SyntaxKind.GreaterThanExpression => null,
             SyntaxKind.GreaterThanOrEqualExpression => null,
             SyntaxKind.CoalesceExpression => null,
+
+            SyntaxKind.IndexOperator => null,
+            SyntaxKind.InvocationOperator => null,
+            SyntaxKind.MemberAccessOperator => null,
+            SyntaxKind.ConversionOperator => null,
 
             SyntaxKind.UnaryPlusOperator => null,
             SyntaxKind.UnaryMinusOperator => null,
@@ -398,35 +403,6 @@ public static class SyntaxFacts
         SyntaxKind.ExclusiveOrOperator => SyntaxKind.ExclusiveOrExpression,
         SyntaxKind.CoalesceOperator => SyntaxKind.CoalesceExpression,
         _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{operatorKind}'")
-    };
-
-    public static string GetOperatorName(SyntaxKind operatorKind) => operatorKind switch
-    {
-        SyntaxKind.UnaryPlusOperator => "+",
-        SyntaxKind.UnaryMinusOperator => "-",
-        SyntaxKind.OnesComplementOperator => "~",
-        SyntaxKind.NotOperator => "!",
-        SyntaxKind.AddOperator => "+",
-        SyntaxKind.SubtractOperator => "-",
-        SyntaxKind.MultiplyOperator => "*",
-        SyntaxKind.DivideOperator => "/",
-        SyntaxKind.ModuloOperator => "%",
-        SyntaxKind.PowerOperator => "**",
-        SyntaxKind.LeftShiftOperator => "<<",
-        SyntaxKind.RightShiftOperator => ">>",
-        SyntaxKind.LogicalOrOperator => "||",
-        SyntaxKind.LogicalAndOperator => "&&",
-        SyntaxKind.BitwiseOrOperator => "|",
-        SyntaxKind.BitwiseAndOperator => "&",
-        SyntaxKind.ExclusiveOrOperator => "^",
-        SyntaxKind.EqualsOperator => "==",
-        SyntaxKind.NotEqualsOperator => "!=",
-        SyntaxKind.LessThanOperator => "<",
-        SyntaxKind.LessThanOrEqualOperator => "<=",
-        SyntaxKind.GreaterThanOperator => ">",
-        SyntaxKind.GreaterThanOrEqualOperator => ">=",
-        SyntaxKind.CoalesceOperator => "??",
-        _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{operatorKind}'"),
     };
 
     public static SyntaxKind GetExpressionOperator(SyntaxKind expressionKind) => expressionKind switch
