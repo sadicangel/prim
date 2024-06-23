@@ -78,6 +78,11 @@ internal enum BoundKind
     MethodSymbol,
     VariableSymbol,
 
+    IndexOperator,
+    InvocationOperator,
+    MemberAccessOperator,
+    ConversionOperator,
+
     UnaryPlusOperator,
     UnaryMinusOperator,
     OnesComplementOperator,

@@ -50,7 +50,7 @@ partial class Binder
 
         var operatorSymbol = new OperatorSymbol(syntax, @operator);
 
-        return new BoundInvocationExpression(syntax, expression, operatorSymbol, arguments, @operator.ReturnType);
+        return new BoundInvocationExpression(syntax, expression, operatorSymbol, arguments);
 
         static BoundExpression BindArgument(ArgumentSyntax syntax, BinderContext context)
         {

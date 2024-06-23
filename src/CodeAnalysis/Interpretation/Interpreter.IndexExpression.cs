@@ -6,9 +6,10 @@ partial class Interpreter
 {
     private static PrimValue EvaluateIndexExpression(BoundIndexExpression node, InterpreterContext context)
     {
-        var array = (ArrayValue)EvaluateExpression(node.Expression, context);
+        var expression = EvaluateExpression(node.Expression, context);
+        var function = expression.GetOperator(node.OperatorSymbol);
         var index = EvaluateExpression(node.Index, context);
-        var value = array[index];
+        var value = function.Invoke(index);
         return value;
     }
 }

@@ -36,8 +36,6 @@ internal static class DiagnosticMessage
         $"Unary operator '{@operator.Text}' is ambiguous on operand of type '{operandTypeName}'";
     public static string InvalidArgumentListLength(int listLength) =>
         $"Expression does not contain an overload that expects {listLength} arguments";
-    public static string InvalidArray() =>
-        $"Not an array";
     public static string InvalidArrayLength() =>
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
@@ -56,6 +54,8 @@ internal static class DiagnosticMessage
         $"Redeclaration of symbol '{symbolName}'";
     public static string UndefinedBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         $"Binary operator '{@operator.Text}' is not defined for types '{leftTypeName}' and '{rightTypeName}'";
+    public static string UndefinedIndexOperator(string containingTypeName) =>
+        $"Index operator is not defined for type '{containingTypeName}'";
     public static string UndefinedInvocationOperator(string containingTypeName) =>
         $"Invocation operator is not defined for type '{containingTypeName}'";
     public static string UndefinedType(string typeName) =>

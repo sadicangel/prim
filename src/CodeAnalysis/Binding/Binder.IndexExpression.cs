@@ -1,4 +1,6 @@
 ﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Types;
 
@@ -8,12 +10,17 @@ partial class Binder
     private static BoundExpression BindIndexExpression(IndexExpressionSyntax syntax, BinderContext context)
     {
         var expression = BindExpression(syntax.Expression, context);
-        // TODO: Consider using an operator instead?
-        if (expression.Type is not ArrayType arrayType)
+
+        // TODO: Allow different index operators.
+        var @operator = expression.Type.GetOperators(SyntaxKind.IndexOperator).SingleOrDefault();
+
+        if (@operator is null)
         {
-            context.Diagnostics.ReportInvalidArray(syntax.Expression.Location);
+            context.Diagnostics.ReportUndefinedIndexOperator(syntax.Location, expression.Type.Name);
             return new BoundNeverExpression(syntax);
         }
+
+        var operatorSymbol = new OperatorSymbol(syntax, @operator);
 
         var index = Coerce(BindExpression(syntax.Index, context), PredefinedTypes.I32, context);
         if (index.Type.IsNever)
@@ -23,6 +30,6 @@ partial class Binder
 
         // TODO: If index is const, check bounds.
 
-        return new BoundIndexExpression(syntax, expression, index, arrayType.ElementType);
+        return new BoundIndexExpression(syntax, expression, operatorSymbol, index);
     }
 }

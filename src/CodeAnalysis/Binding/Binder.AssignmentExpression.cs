@@ -43,7 +43,7 @@ partial class Binder
         }
         else
         {
-            // Note: We don't need to handle functions because none of these operators is not defined for them.
+            // Note: We don't need to handle functions because none of these operators is defined for them.
             // TODO: Do this in the lowering step instead?
             var (operatorKind, operatorPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(syntax.Operator.SyntaxKind);
             var binaryExpressionKind = SyntaxFacts.GetBinaryOperatorExpression(operatorKind);

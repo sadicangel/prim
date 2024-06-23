@@ -81,8 +81,6 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousUnaryOperator(@operator, operandTypeName));
     internal void ReportInvalidArgumentListLength(SourceLocation location, int listLength) =>
         ReportError(location, DiagnosticMessage.InvalidArgumentListLength(listLength));
-    internal void ReportInvalidArray(SourceLocation location) =>
-        ReportError(location, DiagnosticMessage.InvalidArray());
     internal void ReportInvalidArrayLength(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidArrayLength());
     internal void ReportInvalidConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
@@ -101,6 +99,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.SymbolRedeclaration(symbolName));
     internal void ReportUndefinedBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.UndefinedBinaryOperator(@operator, leftTypeName, rightTypeName));
+    internal void ReportUndefinedIndexOperator(SourceLocation location, string containingTypeName) =>
+        ReportError(location, DiagnosticMessage.UndefinedInvocationOperator(containingTypeName));
     internal void ReportUndefinedInvocationOperator(SourceLocation location, string containingTypeName) =>
         ReportError(location, DiagnosticMessage.UndefinedInvocationOperator(containingTypeName));
     internal void ReportUndefinedType(SourceLocation location, string typeName) => ReportError(location, DiagnosticMessage.UndefinedType(typeName));

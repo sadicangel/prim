@@ -13,6 +13,10 @@ internal sealed record class OperatorSymbol(SyntaxNode Syntax, Operator Operator
 
     private static BoundKind GetBoundKind(SyntaxKind operatorKind) => operatorKind switch
     {
+        SyntaxKind.IndexOperator => BoundKind.IndexOperator,
+        SyntaxKind.InvocationOperator => BoundKind.InvocationOperator,
+        SyntaxKind.MemberAccessOperator => BoundKind.MemberAccessOperator,
+        SyntaxKind.ConversionOperator => BoundKind.ConversionOperator,
         SyntaxKind.UnaryPlusOperator => BoundKind.UnaryPlusOperator,
         SyntaxKind.UnaryMinusOperator => BoundKind.UnaryMinusOperator,
         SyntaxKind.OnesComplementOperator => BoundKind.OnesComplementOperator,
