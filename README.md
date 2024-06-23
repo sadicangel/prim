@@ -17,10 +17,15 @@ b: i32 = 29;
 sum: (a: i32, b: i32) -> i32 = {
   return a + b;
 }
+double. (x: i32) -> i32 = x * 2;
 
 // Structs.
 Point2D: struct = {
   x: f32;
   y: f32;
 }
+point: Point2D = {
+  .x = 0,
+  .y = 1,
+};
 ```
