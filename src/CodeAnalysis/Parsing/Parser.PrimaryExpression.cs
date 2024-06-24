@@ -15,7 +15,7 @@ partial class Parser
             _ => iterator.Peek(1).SyntaxKind switch
             {
                 SyntaxKind.ColonToken => ParseLocalDeclaration(syntaxTree, iterator),
-                SyntaxKind @operator when SyntaxFacts.IsAssignmentOperator(@operator) => ParseAssignmentExpression(syntaxTree, iterator),
+                SyntaxKind.EqualsToken => ParseAssignmentExpression(syntaxTree, iterator),
                 _ => ParseIdentifierNameExpression(syntaxTree, iterator),
             }
         };

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Binding;
@@ -30,32 +29,12 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var right = default(BoundExpression);
-
-        if (syntax.SyntaxKind is SyntaxKind.SimpleAssignmentExpression)
+        var right = symbol switch
         {
-            right = symbol switch
-            {
-                VariableSymbol _ => BindExpression(syntax.Right, context),
-                FunctionSymbol f => BindFunctionBody(syntax.Right, f, context),
-                _ => throw new UnreachableException($"Unexpected symbol '{symbol.GetType().Name}'")
-            };
-        }
-        else
-        {
-            // Note: We don't need to handle functions because none of these operators is defined for them.
-            // TODO: Do this in the lowering step instead?
-            var (operatorKind, operatorPrecedence) = SyntaxFacts.GetBinaryOperatorPrecedence(syntax.Operator.SyntaxKind);
-            var binaryExpressionKind = SyntaxFacts.GetBinaryOperatorExpression(operatorKind);
-            var binaryExpressionSyntax = new BinaryExpressionSyntax(
-                binaryExpressionKind,
-                syntax.SyntaxTree,
-                syntax.Left,
-                SyntaxFactory.Operator(operatorKind, syntax.SyntaxTree, operatorPrecedence),
-                syntax.Right);
-
-            right = BindBinaryExpression(binaryExpressionSyntax, context);
-        }
+            VariableSymbol _ => BindExpression(syntax.Right, context),
+            FunctionSymbol f => BindFunctionBody(syntax.Right, f, context),
+            _ => throw new UnreachableException($"Unexpected symbol '{symbol.GetType().Name}'")
+        };
 
         right = Coerce(right, left.Type, context);
 

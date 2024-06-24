@@ -142,19 +142,6 @@ public static class SyntaxFacts
             SyntaxKind.NullLiteralExpression => null,
 
             SyntaxKind.GroupExpression => null,
-            SyntaxKind.SimpleAssignmentExpression => null,
-            SyntaxKind.AddAssignmentExpression => null,
-            SyntaxKind.SubtractAssignmentExpression => null,
-            SyntaxKind.MultiplyAssignmentExpression => null,
-            SyntaxKind.DivideAssignmentExpression => null,
-            SyntaxKind.ModuloAssignmentExpression => null,
-            SyntaxKind.PowerAssignmentExpression => null,
-            SyntaxKind.AndAssignmentExpression => null,
-            SyntaxKind.ExclusiveOrAssignmentExpression => null,
-            SyntaxKind.OrAssignmentExpression => null,
-            SyntaxKind.LeftShiftAssignmentExpression => null,
-            SyntaxKind.RightShiftAssignmentExpression => null,
-            SyntaxKind.CoalesceAssignmentExpression => null,
 
             SyntaxKind.VariableDeclaration => null,
             SyntaxKind.FunctionDeclaration => null,
@@ -203,6 +190,8 @@ public static class SyntaxFacts
             SyntaxKind.GreaterThanOrEqualExpression => null,
             SyntaxKind.CoalesceExpression => null,
 
+            SyntaxKind.AssignmentExpression => null,
+
             SyntaxKind.IndexOperator => null,
             SyntaxKind.InvocationOperator => null,
             SyntaxKind.MemberAccessOperator => null,
@@ -233,6 +222,8 @@ public static class SyntaxFacts
             SyntaxKind.GreaterThanOperator => null,
             SyntaxKind.GreaterThanOrEqualOperator => null,
             SyntaxKind.CoalesceOperator => null,
+
+            SyntaxKind.AssignmentOperator => null,
 
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };
@@ -306,22 +297,8 @@ public static class SyntaxFacts
         or SyntaxKind.LessThanToken
         or SyntaxKind.LessThanEqualsToken
         or SyntaxKind.GreaterThanToken
-        or SyntaxKind.GreaterThanEqualsToken;
-
-    public static bool IsAssignmentOperator(SyntaxKind syntaxKind) => syntaxKind
-        is SyntaxKind.EqualsToken
-        or SyntaxKind.PlusEqualsToken
-        or SyntaxKind.MinusEqualsToken
-        or SyntaxKind.StarEqualsToken
-        or SyntaxKind.SlashEqualsToken
-        or SyntaxKind.PercentEqualsToken
-        or SyntaxKind.StarStarEqualsToken
-        or SyntaxKind.LessThanLessThanEqualsToken
-        or SyntaxKind.GreaterThanGreaterThanEqualsToken
-        or SyntaxKind.AmpersandEqualsToken
-        or SyntaxKind.PipeEqualsToken
-        or SyntaxKind.HatEqualsToken
-        or SyntaxKind.HookHookEqualsToken;
+        or SyntaxKind.GreaterThanEqualsToken
+        or SyntaxKind.EqualsToken;
 
     public static bool IsKeyword(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.NullKeyword;
@@ -356,7 +333,6 @@ public static class SyntaxFacts
         //SyntaxKind.ParenthesisOpenToken => 10,
         //SyntaxKind.DotToken => 9,
         //SyntaxKind.DotDotToken => 8,
-
         SyntaxKind.StarStarToken => (SyntaxKind.PowerOperator, 7),
         SyntaxKind.PercentToken => (SyntaxKind.ModuloOperator, 6),
         SyntaxKind.StarToken => (SyntaxKind.MultiplyOperator, 6),
@@ -377,6 +353,7 @@ public static class SyntaxFacts
         SyntaxKind.PipePipeToken => (SyntaxKind.LogicalOrOperator, 1),
         SyntaxKind.HatToken => (SyntaxKind.ExclusiveOrOperator, 1),
         SyntaxKind.HookHookToken => (SyntaxKind.CoalesceOperator, 1),
+        //SyntaxKind.EqualsToken
         _ => (0, 0),
     };
 
@@ -403,36 +380,5 @@ public static class SyntaxFacts
         SyntaxKind.ExclusiveOrOperator => SyntaxKind.ExclusiveOrExpression,
         SyntaxKind.CoalesceOperator => SyntaxKind.CoalesceExpression,
         _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{operatorKind}'")
-    };
-
-    public static SyntaxKind GetExpressionOperator(SyntaxKind expressionKind) => expressionKind switch
-    {
-        SyntaxKind.AddExpression => SyntaxKind.AddOperator,
-        SyntaxKind.AddAssignmentExpression => SyntaxKind.AddOperator,
-        SyntaxKind.SubtractExpression => SyntaxKind.SubtractOperator,
-        SyntaxKind.SubtractAssignmentExpression => SyntaxKind.SubtractOperator,
-        SyntaxKind.MultiplyExpression => SyntaxKind.MultiplyOperator,
-        SyntaxKind.MultiplyAssignmentExpression => SyntaxKind.MultiplyOperator,
-        SyntaxKind.DivideExpression => SyntaxKind.DivideOperator,
-        SyntaxKind.DivideAssignmentExpression => SyntaxKind.DivideOperator,
-        SyntaxKind.ModuloExpression => SyntaxKind.ModuloOperator,
-        SyntaxKind.ModuloAssignmentExpression => SyntaxKind.ModuloOperator,
-        SyntaxKind.PowerExpression => SyntaxKind.PowerOperator,
-        SyntaxKind.PowerAssignmentExpression => SyntaxKind.PowerOperator,
-        SyntaxKind.LeftShiftExpression => SyntaxKind.LeftShiftOperator,
-        SyntaxKind.LeftShiftAssignmentExpression => SyntaxKind.LeftShiftOperator,
-        SyntaxKind.RightShiftExpression => SyntaxKind.RightShiftOperator,
-        SyntaxKind.RightShiftAssignmentExpression => SyntaxKind.RightShiftOperator,
-        SyntaxKind.LogicalOrExpression => SyntaxKind.LogicalOrOperator,
-        SyntaxKind.BitwiseOrExpression => SyntaxKind.BitwiseOrOperator,
-        SyntaxKind.OrAssignmentExpression => SyntaxKind.BitwiseOrOperator,
-        SyntaxKind.LogicalAndExpression => SyntaxKind.LogicalAndOperator,
-        SyntaxKind.BitwiseAndExpression => SyntaxKind.BitwiseAndOperator,
-        SyntaxKind.AndAssignmentExpression => SyntaxKind.BitwiseAndOperator,
-        SyntaxKind.ExclusiveOrExpression => SyntaxKind.ExclusiveOrOperator,
-        SyntaxKind.ExclusiveOrAssignmentExpression => SyntaxKind.ExclusiveOrOperator,
-        SyntaxKind.CoalesceExpression => SyntaxKind.CoalesceOperator,
-        SyntaxKind.CoalesceAssignmentExpression => SyntaxKind.CoalesceOperator,
-        _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{expressionKind}'"),
     };
 }

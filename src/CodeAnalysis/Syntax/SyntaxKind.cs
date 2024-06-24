@@ -142,19 +142,6 @@ public enum SyntaxKind
     NullLiteralExpression,
 
     GroupExpression,
-    SimpleAssignmentExpression,
-    AddAssignmentExpression,
-    SubtractAssignmentExpression,
-    MultiplyAssignmentExpression,
-    DivideAssignmentExpression,
-    ModuloAssignmentExpression,
-    PowerAssignmentExpression,
-    AndAssignmentExpression,
-    ExclusiveOrAssignmentExpression,
-    OrAssignmentExpression,
-    LeftShiftAssignmentExpression,
-    RightShiftAssignmentExpression,
-    CoalesceAssignmentExpression,
 
     VariableDeclaration,
     FunctionDeclaration,
@@ -203,6 +190,8 @@ public enum SyntaxKind
     GreaterThanOrEqualExpression,
     CoalesceExpression,
 
+    AssignmentExpression,
+
     IndexOperator,
     InvocationOperator,
     MemberAccessOperator,
@@ -233,4 +222,6 @@ public enum SyntaxKind
     GreaterThanOperator,
     GreaterThanOrEqualOperator,
     CoalesceOperator,
+
+    AssignmentOperator,
 }

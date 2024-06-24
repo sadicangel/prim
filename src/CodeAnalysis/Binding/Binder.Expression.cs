@@ -24,19 +24,7 @@ partial class Binder
                 BindLiteralExpression((LiteralExpressionSyntax)syntax, context),
             SyntaxKind.GroupExpression =>
                 BindGroupExpression((GroupExpressionSyntax)syntax, context),
-            SyntaxKind.SimpleAssignmentExpression or
-            SyntaxKind.AddAssignmentExpression or
-            SyntaxKind.SubtractAssignmentExpression or
-            SyntaxKind.MultiplyAssignmentExpression or
-            SyntaxKind.DivideAssignmentExpression or
-            SyntaxKind.ModuloAssignmentExpression or
-            SyntaxKind.PowerAssignmentExpression or
-            SyntaxKind.AndAssignmentExpression or
-            SyntaxKind.ExclusiveOrAssignmentExpression or
-            SyntaxKind.OrAssignmentExpression or
-            SyntaxKind.LeftShiftAssignmentExpression or
-            SyntaxKind.RightShiftAssignmentExpression or
-            SyntaxKind.CoalesceAssignmentExpression =>
+            SyntaxKind.AssignmentExpression =>
                 BindAssignmentExpression((AssignmentExpressionSyntax)syntax, context),
             SyntaxKind.VariableDeclaration =>
                 BindVariableDeclaration((VariableDeclarationSyntax)syntax, context),
