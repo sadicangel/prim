@@ -1,0 +1,14 @@
+﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Interpretation.Values;
+
+namespace CodeAnalysis.Interpretation;
+partial class Interpreter
+{
+    private static PrimValue EvaluateConversionExpression(BoundConversionExpression node, InterpreterContext context)
+    {
+        var expression = EvaluateExpression(node.Expression, context);
+        var function = expression.GetConversion(node.ConversionSymbol);
+        var value = function.Invoke(expression);
+        return value;
+    }
+}

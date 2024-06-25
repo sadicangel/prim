@@ -130,34 +130,34 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
 
         static Dictionary<Symbol, PrimValue> MapPredefinedTypes()
         {
-            var global = GlobalBoundScope.Instance;
-            var map = new Dictionary<Symbol, PrimValue>();
+            var g = GlobalBoundScope.Instance;
+            var m = new Dictionary<Symbol, PrimValue>();
             foreach (var name in PredefinedTypeNames.All)
             {
-                var symbol = global.Lookup(name) as StructSymbol
+                var symbol = g.Lookup(name) as StructSymbol
                     ?? throw new UnreachableException(DiagnosticMessage.UndefinedType(name));
-                map[symbol] = new StructValue(symbol.Type);
+                m[symbol] = new StructValue(symbol.Type);
                 // TODO: Create members for struct.
             }
-            ((StructValue)map[global.Str])
-                .AddEqualityOperators<string>(global.Str)
+            ((StructValue)m[g.Str])
+                .AddEqualityOperators<string>(g.Str)
                 .AddMembers(s =>
                 {
-                    var add = global.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, global.Str.Type, global.Str.Type, global.Str.Type).Single();
+                    var add = g.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, g.Str.Type, g.Str.Type, g.Str.Type).Single();
                     s.SetOperator(
                         new OperatorSymbol(
                             SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
                             add),
                         new FunctionValue(add.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, (string)a.Value + (string)b.Value)));
-                    var addStr = global.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, global.Str.Type, PredefinedTypes.Any, global.Str.Type).Single();
+                    var addStr = g.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, g.Str.Type, PredefinedTypes.Any, g.Str.Type).Single();
                     s.SetOperator(
                         new OperatorSymbol(
                             SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
                             addStr),
                         new FunctionValue(addStr.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, (string)a.Value + b.Value)));
-                    var addAny = global.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, PredefinedTypes.Any, global.Str.Type, global.Str.Type).Single();
+                    var addAny = g.Str.Type.GetBinaryOperators(SyntaxKind.AddOperator, PredefinedTypes.Any, g.Str.Type, g.Str.Type).Single();
                     s.SetOperator(
                         new OperatorSymbol(
                             SyntaxFactory.SyntheticToken(SyntaxKind.PlusToken),
@@ -165,91 +165,124 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                         new FunctionValue(addAny.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, a.Value + (string)b.Value)));
                 });
-            ((StructValue)map[global.Bool])
-                .AddEqualityOperators<bool>(global.Bool)
-                .AddLogicalOperators(global.Bool);
-            ((StructValue)map[global.I8])
-                .AddEqualityOperators<sbyte>(global.I8)
-                .AddComparisonOperators<sbyte>(global.I8)
-                .AddBitwiseOperators<sbyte>(global.I8)
-                .AddMathOperators<sbyte>(global.I8);
-            ((StructValue)map[global.I16])
-                .AddEqualityOperators<short>(global.I16)
-                .AddComparisonOperators<short>(global.I16)
-                .AddBitwiseOperators<short>(global.I16)
-                .AddMathOperators<short>(global.I16);
-            ((StructValue)map[global.I32])
-                .AddEqualityOperators<int>(global.I32)
-                .AddComparisonOperators<int>(global.I32)
-                .AddBitwiseOperators<int>(global.I32)
-                .AddMathOperators<int>(global.I32);
-            ((StructValue)map[global.I64])
-                .AddEqualityOperators<long>(global.I64)
-                .AddComparisonOperators<long>(global.I64)
-                .AddBitwiseOperators<long>(global.I64)
-                .AddMathOperators<long>(global.I64);
-            ((StructValue)map[global.I128])
-                .AddEqualityOperators<BigInteger>(global.I64)
-                .AddComparisonOperators<BigInteger>(global.I64)
-                .AddBitwiseOperators<BigInteger>(global.I64)
-                .AddMathOperators<BigInteger>(global.I64);
-            ((StructValue)map[global.ISize])
-                .AddEqualityOperators<nint>(global.I64)
-                .AddComparisonOperators<nint>(global.I64)
-                .AddBitwiseOperators<nint>(global.I64)
-                .AddMathOperators<nint>(global.I64);
-            ((StructValue)map[global.U8])
-                .AddEqualityOperators<byte>(global.U8)
-                .AddComparisonOperators<byte>(global.U8)
-                .AddBitwiseOperators<byte>(global.U8)
-                .AddMathOperators<byte>(global.U8);
-            ((StructValue)map[global.U16])
-                .AddEqualityOperators<ushort>(global.U16)
-                .AddComparisonOperators<ushort>(global.U16)
-                .AddBitwiseOperators<ushort>(global.U16)
-                .AddMathOperators<ushort>(global.U16);
-            ((StructValue)map[global.U32])
-                .AddEqualityOperators<uint>(global.U32)
-                .AddComparisonOperators<uint>(global.U32)
-                .AddBitwiseOperators<uint>(global.U32)
-                .AddMathOperators<uint>(global.U32);
-            ((StructValue)map[global.U64])
-                .AddEqualityOperators<ulong>(global.U64)
-                .AddComparisonOperators<ulong>(global.U64)
-                .AddBitwiseOperators<ulong>(global.U64)
-                .AddMathOperators<ulong>(global.U64);
-            ((StructValue)map[global.U128])
-                .AddEqualityOperators<BigInteger>(global.U64)
-                .AddComparisonOperators<BigInteger>(global.U64)
-                .AddBitwiseOperators<BigInteger>(global.U64)
-                .AddMathOperators<BigInteger>(global.U64);
-            ((StructValue)map[global.USize])
-                .AddEqualityOperators<nuint>(global.U64)
-                .AddComparisonOperators<nuint>(global.U64)
-                .AddBitwiseOperators<nuint>(global.U64)
-                .AddMathOperators<nuint>(global.U64);
-            ((StructValue)map[global.F16])
-                .AddEqualityOperators<Half>(global.F16)
-                .AddComparisonOperators<Half>(global.F16)
-                .AddMathOperators<Half>(global.F16);
-            ((StructValue)map[global.F32])
-                .AddEqualityOperators<float>(global.F32)
-                .AddComparisonOperators<float>(global.F32)
-                .AddMathOperators<float>(global.F32);
-            ((StructValue)map[global.F64])
-                .AddEqualityOperators<double>(global.F64)
-                .AddComparisonOperators<double>(global.F64)
-                .AddMathOperators<double>(global.F64);
+
+            R M<T>(StructSymbol s) => new((StructValue)m[s], typeof(T));
+
+            ((StructValue)m[g.Bool])
+                .AddEqualityOperators<bool>(g.Bool)
+                .AddLogicalOperators(g.Bool);
+            ((StructValue)m[g.I8])
+                .AddEqualityOperators<sbyte>(g.I8)
+                .AddComparisonOperators<sbyte>(g.I8)
+                .AddBitwiseOperators<sbyte>(g.I8)
+                .AddMathOperators<sbyte>(g.I8)
+                .AddImplicitConversion<sbyte>(M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<sbyte>(M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+            ((StructValue)m[g.I16])
+                .AddEqualityOperators<short>(g.I16)
+                .AddComparisonOperators<short>(g.I16)
+                .AddBitwiseOperators<short>(g.I16)
+                .AddMathOperators<short>(g.I16)
+                .AddImplicitConversion<short>(M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<short>(M<sbyte>(g.I8), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+            ((StructValue)m[g.I32])
+                .AddEqualityOperators<int>(g.I32)
+                .AddComparisonOperators<int>(g.I32)
+                .AddBitwiseOperators<int>(g.I32)
+                .AddMathOperators<int>(g.I32)
+                .AddImplicitConversion<int>(M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<int>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+            ((StructValue)m[g.I64])
+                .AddEqualityOperators<long>(g.I64)
+                .AddComparisonOperators<long>(g.I64)
+                .AddBitwiseOperators<long>(g.I64)
+                .AddMathOperators<long>(g.I64)
+                .AddImplicitConversion<long>(M<BigInteger>(g.I128), M<nint>(g.ISize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<long>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+            ((StructValue)m[g.I128])
+                .AddEqualityOperators<BigInteger>(g.I64)
+                .AddComparisonOperators<BigInteger>(g.I64)
+                .AddBitwiseOperators<BigInteger>(g.I64)
+                .AddMathOperators<BigInteger>(g.I64)
+                .AddExplicitConversion<BigInteger>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+            ((StructValue)m[g.ISize])
+                .AddEqualityOperators<nint>(g.I64)
+                .AddComparisonOperators<nint>(g.I64)
+                .AddBitwiseOperators<nint>(g.I64)
+                .AddMathOperators<nint>(g.I64)
+                .AddExplicitConversion<nint>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize))
+                .AddExplicitConversion<nint>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128));
+            ((StructValue)m[g.U8])
+                .AddEqualityOperators<byte>(g.U8)
+                .AddComparisonOperators<byte>(g.U8)
+                .AddBitwiseOperators<byte>(g.U8)
+                .AddMathOperators<byte>(g.U8)
+                .AddImplicitConversion<byte>(M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<byte>(M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize));
+            ((StructValue)m[g.U16])
+                .AddEqualityOperators<ushort>(g.U16)
+                .AddComparisonOperators<ushort>(g.U16)
+                .AddBitwiseOperators<ushort>(g.U16)
+                .AddMathOperators<ushort>(g.U16)
+                .AddImplicitConversion<ushort>(M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<ushort>(M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8));
+            ((StructValue)m[g.U32])
+                .AddEqualityOperators<uint>(g.U32)
+                .AddComparisonOperators<uint>(g.U32)
+                .AddBitwiseOperators<uint>(g.U32)
+                .AddMathOperators<uint>(g.U32)
+                .AddImplicitConversion<uint>(M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<uint>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16));
+            ((StructValue)m[g.U64])
+                .AddEqualityOperators<ulong>(g.U64)
+                .AddComparisonOperators<ulong>(g.U64)
+                .AddBitwiseOperators<ulong>(g.U64)
+                .AddMathOperators<ulong>(g.U64)
+                .AddImplicitConversion<ulong>(M<BigInteger>(g.U128), M<nuint>(g.USize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<ulong>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32));
+            ((StructValue)m[g.U128])
+                .AddEqualityOperators<BigInteger>(g.U64)
+                .AddComparisonOperators<BigInteger>(g.U64)
+                .AddBitwiseOperators<BigInteger>(g.U64)
+                .AddMathOperators<BigInteger>(g.U64)
+                .AddExplicitConversion<BigInteger>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64));
+            ((StructValue)m[g.USize])
+                .AddEqualityOperators<nuint>(g.U64)
+                .AddComparisonOperators<nuint>(g.U64)
+                .AddBitwiseOperators<nuint>(g.U64)
+                .AddMathOperators<nuint>(g.U64)
+                .AddExplicitConversion<nuint>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+            ((StructValue)m[g.F16])
+                .AddEqualityOperators<Half>(g.F16)
+                .AddComparisonOperators<Half>(g.F16)
+                .AddMathOperators<Half>(g.F16)
+                .AddImplicitConversion<Half>(M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<Half>(M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
+            ((StructValue)m[g.F32])
+                .AddEqualityOperators<float>(g.F32)
+                .AddComparisonOperators<float>(g.F32)
+                .AddMathOperators<float>(g.F32)
+                .AddImplicitConversion<float>(M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<float>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
+            ((StructValue)m[g.F64])
+                .AddEqualityOperators<double>(g.F64)
+                .AddComparisonOperators<double>(g.F64)
+                .AddMathOperators<double>(g.F64)
+                .AddImplicitConversion<double>(M<double>(g.F80), M<double>(g.F128))
+                .AddExplicitConversion<double>(M<Half>(g.F16), M<float>(g.F32), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             // TODO: Fix these types using double.
-            ((StructValue)map[global.F80])
-                .AddEqualityOperators<double>(global.F80)
-                .AddComparisonOperators<double>(global.F80)
-                .AddMathOperators<double>(global.F80);
-            ((StructValue)map[global.F128])
-                .AddEqualityOperators<double>(global.F128)
-                .AddComparisonOperators<double>(global.F128)
-                .AddMathOperators<double>(global.F128);
-            return map;
+            ((StructValue)m[g.F80])
+                .AddEqualityOperators<double>(g.F80)
+                .AddComparisonOperators<double>(g.F80)
+                .AddMathOperators<double>(g.F80)
+                .AddImplicitConversion<double>(M<double>(g.F128))
+                .AddExplicitConversion<double>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
+            ((StructValue)m[g.F128])
+                .AddEqualityOperators<double>(g.F128)
+                .AddComparisonOperators<double>(g.F128)
+                .AddMathOperators<double>(g.F128)
+                .AddExplicitConversion<double>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
+            return m;
         }
     }
 
@@ -278,6 +311,8 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
     public StructValue F80 { get; }
     public StructValue F128 { get; }
 }
+
+file readonly record struct R(StructValue Struct, Type ClrType);
 
 file static class StructValueExtensions
 {
@@ -469,15 +504,35 @@ file static class StructValueExtensions
         return s;
     }
 
-    public static StructValue AddImplicitConversion(this StructValue s, params ReadOnlySpan<PrimType> targetTypes)
+    public static StructValue AddImplicitConversion<T>(this StructValue s, params ReadOnlySpan<R> targetTypes)
     {
-        _ = targetTypes;
+        foreach (var (targetStruct, targetTypeCLR) in targetTypes)
+        {
+            var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
+                ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
+            s.SetConversion(
+                new ConversionSymbol(
+                    SyntaxFactory.SyntheticToken(SyntaxKind.ImplicitKeyword),
+                    conversion),
+                new FunctionValue(conversion.Type, (PrimValue x) =>
+                    new LiteralValue(targetStruct, targetStruct.StructType, Convert.ChangeType(x.Value, targetTypeCLR))));
+        }
         return s;
     }
 
-    public static StructValue AddExplicitConversion(this StructValue s, params ReadOnlySpan<PrimType> targetTypes)
+    public static StructValue AddExplicitConversion<T>(this StructValue s, params ReadOnlySpan<R> targetTypes)
     {
-        _ = targetTypes;
+        foreach (var (targetStruct, targetTypeCLR) in targetTypes)
+        {
+            var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
+                ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
+            s.SetConversion(
+                new ConversionSymbol(
+                    SyntaxFactory.SyntheticToken(SyntaxKind.ExplicitKeyword),
+                    conversion),
+                new FunctionValue(conversion.Type, (PrimValue x) =>
+                    new LiteralValue(targetStruct, targetStruct.StructType, Convert.ChangeType(x.Value, targetTypeCLR))));
+        }
         return s;
     }
 }
