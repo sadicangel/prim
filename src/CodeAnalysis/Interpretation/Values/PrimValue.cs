@@ -9,6 +9,9 @@ public abstract record class PrimValue(PrimType Type)
 
     public abstract object Value { get; }
 
+    internal virtual PrimValue GetMember(Symbol symbol) => Members[symbol];
+    internal virtual void SetMember(Symbol symbol, PrimValue value) => Members[symbol] = value;
+
     internal virtual PrimValue GetProperty(PropertySymbol symbol) => Members[symbol];
     internal virtual void SetProperty(PropertySymbol symbol, PrimValue value) => Members[symbol] = value;
 

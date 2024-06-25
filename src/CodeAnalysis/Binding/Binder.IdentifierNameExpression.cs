@@ -20,6 +20,6 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        return new BoundIdentifierNameExpression(syntax, symbol);
+        return new BoundLocalReference(syntax, symbol);
     }
 }

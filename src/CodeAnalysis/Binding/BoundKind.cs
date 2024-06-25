@@ -8,8 +8,6 @@ internal enum BoundKind
 
     NeverExpression,
 
-    IdentifierNameExpression,
-
     I32LiteralExpression,
     U32LiteralExpression,
     I64LiteralExpression,
@@ -31,6 +29,10 @@ internal enum BoundKind
     OperatorDeclaration,
     ConversionDeclaration,
 
+    LocalReference,
+    MemberReference,
+    IndexReference,
+
     FunctionBodyExpression,
 
     EmptyExpression,
@@ -39,8 +41,6 @@ internal enum BoundKind
     ArrayInitExpression,
     StructInitExpression,
     PropertyInitExpression,
-
-    IndexExpression,
     InvocationExpression,
 
     ConversionExpression,

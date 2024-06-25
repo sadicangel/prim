@@ -50,6 +50,8 @@ public abstract record class PrimType(string Name)
         return conversion is not null;
     }
 
+    internal Member? GetMember(string name) => _members.SingleOrDefault(m => m.Name == name);
+
     internal bool AddProperty(string name, PrimType type, bool isReadonly)
     {
         if (GetProperty(name) is not null) return false;

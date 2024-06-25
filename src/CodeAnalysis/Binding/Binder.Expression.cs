@@ -44,6 +44,8 @@ partial class Binder
                 BindArrayInitExpression((ArrayInitExpressionSyntax)syntax, context),
             SyntaxKind.StructInitExpression =>
                 BindStructInitExpression((StructInitExpressionSyntax)syntax, context),
+            SyntaxKind.MemberAccessExpression =>
+                BindMemberAccessExpression((MemberAccessExpressionSyntax)syntax, context),
             SyntaxKind.IndexExpression =>
                 BindIndexExpression((IndexExpressionSyntax)syntax, context),
             SyntaxKind.InvocationExpression =>

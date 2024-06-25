@@ -6,6 +6,4 @@ internal abstract record class BoundExpression(
     BoundKind BoundKind,
     SyntaxNode Syntax,
     PrimType Type)
-    : BoundNode(BoundKind, Syntax)
-{
-}
+    : BoundNode(BoundKind, Syntax);

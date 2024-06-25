@@ -11,8 +11,8 @@ partial class Interpreter
         {
             BoundKind.NeverExpression =>
                 EvaluateNeverExpression((BoundNeverExpression)node, context),
-            BoundKind.IdentifierNameExpression =>
-                EvaluateIdentifierNameExpression((BoundIdentifierNameExpression)node, context),
+            BoundKind.LocalReference =>
+                EvaluateLocalReference((BoundLocalReference)node, context),
             BoundKind.I32LiteralExpression or
             BoundKind.U32LiteralExpression or
             BoundKind.I64LiteralExpression or
@@ -42,8 +42,10 @@ partial class Interpreter
             //    EvaluateBlockExpression((BoundBlockExpression)node, context),
             BoundKind.ArrayInitExpression =>
                 EvaluateArrayInitExpression((BoundArrayInitExpression)node, context),
-            BoundKind.IndexExpression =>
-                EvaluateIndexExpression((BoundIndexExpression)node, context),
+            BoundKind.MemberReference =>
+                EvaluateMemberReference((BoundMemberReference)node, context),
+            BoundKind.IndexReference =>
+                EvaluateIndexReference((BoundIndexReference)node, context),
             BoundKind.InvocationExpression =>
                 EvaluateInvocationExpression((BoundInvocationExpression)node, context),
             BoundKind.StructInitExpression =>

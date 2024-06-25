@@ -20,7 +20,9 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var operatorSymbol = new OperatorSymbol(syntax, @operator);
+        // TODO: Actually check where this should be readonly or not.
+        // Maybe the indexer should be a property instead?
+        var operatorSymbol = new OperatorSymbol(syntax, @operator, IsReadOnly: false);
 
         var index = Coerce(BindExpression(syntax.Index, context), PredefinedTypes.I32, context);
         if (index.Type.IsNever)
@@ -30,6 +32,6 @@ partial class Binder
 
         // TODO: If index is const, check bounds.
 
-        return new BoundIndexExpression(syntax, expression, operatorSymbol, index);
+        return new BoundIndexReference(syntax, expression, operatorSymbol, index);
     }
 }

@@ -2,12 +2,12 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
-internal sealed record class BoundIndexExpression(
+internal sealed record class BoundIndexReference(
     SyntaxNode Syntax,
     BoundExpression Expression,
     OperatorSymbol OperatorSymbol,
     BoundExpression Index)
-    : BoundExpression(BoundKind.IndexExpression, Syntax, OperatorSymbol.ReturnType)
+    : BoundReference(BoundKind.IndexReference, Syntax, OperatorSymbol, OperatorSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {

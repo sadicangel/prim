@@ -70,6 +70,15 @@ begin:
                 }
                 goto begin;
 
+            case SyntaxKind.EqualsToken:
+                {
+                    var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
+                    var @operator = new OperatorSyntax(SyntaxKind.EqualsOperator, syntaxTree, equalsToken, Precedence: 0);
+                    var right = ParseBinaryExpression(syntaxTree, iterator);
+                    left = new AssignmentExpressionSyntax(syntaxTree, left, @operator, right);
+                }
+                goto begin;
+
             case SyntaxKind _ when TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator):
                 {
                     var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);

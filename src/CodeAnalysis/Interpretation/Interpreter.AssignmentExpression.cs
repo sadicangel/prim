@@ -6,14 +6,14 @@ partial class Interpreter
 {
     private static PrimValue EvaluateAssignmentExpression(BoundAssignmentExpression node, InterpreterContext context)
     {
-        // TODO: Allow non identifier expressions.
-        if (node.Left is not BoundIdentifierNameExpression identifierName)
+        var left = EvaluateExpression(node.Left, context);
+        if (left is not ReferenceValue @ref)
         {
             throw new NotSupportedException($"Unexpected left hand side of {nameof(BoundAssignmentExpression)} '{node.Left.BoundKind}'");
         }
 
         var value = EvaluateExpression(node.Right, context);
-        context.EvaluatedScope.Replace(identifierName.NameSymbol, value);
+        @ref.ReferencedValue = value;
         return value;
     }
 }

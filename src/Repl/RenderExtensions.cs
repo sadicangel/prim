@@ -60,6 +60,9 @@ internal static class RenderExtensions
             case StructValue @struct:
                 console.MarkupInterpolated($"[grey66]{@struct.Value.Name}[/] [green i]{value.Type.Name}[/]");
                 break;
+            case ReferenceValue reference:
+                console.Write(reference.ReferencedValue, indent);
+                break;
             default:
                 throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");
         }

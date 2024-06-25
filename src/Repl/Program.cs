@@ -10,7 +10,12 @@ var previousEvaluation = default(Evaluation);
 
 while (true)
 {
-    var code = console.Prompt(new TextPrompt<string>(">"));
+    var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
+        C: struct = { i: i32 = 0; }
+        c: C = C { .i = 10 }
+        c.i = 15
+
+        """));
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
 
