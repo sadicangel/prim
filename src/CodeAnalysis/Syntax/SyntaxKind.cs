@@ -224,4 +224,6 @@ public enum SyntaxKind
     CoalesceOperator,
 
     AssignmentOperator,
+
+    IfElseExpression,
 }

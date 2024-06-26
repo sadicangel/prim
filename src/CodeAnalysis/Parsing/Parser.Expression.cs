@@ -20,7 +20,7 @@ partial class Parser
     {
         return iterator.Current.SyntaxKind switch
         {
-            //SyntaxKind.IfKeyword => ParseIfElseExpression(syntaxTree, iterator),
+            SyntaxKind.IfKeyword => ParseIfElseExpression(syntaxTree, iterator),
             //SyntaxKind.ForKeyword => ParseForExpression(syntaxTree, iterator),
             //SyntaxKind.WhileKeyword => ParseWhileExpression(syntaxTree, iterator),
             //SyntaxKind.BreakKeyword => ParseBreakExpression(syntaxTree, iterator),

@@ -78,6 +78,8 @@ partial class Binder
             SyntaxKind.GreaterThanOrEqualExpression or
             SyntaxKind.CoalesceExpression =>
                 BindBinaryExpression((BinaryExpressionSyntax)syntax, context),
+            SyntaxKind.IfElseExpression =>
+                BindIfElseExpression((IfElseExpressionSyntax)syntax, context),
             _ =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
         };

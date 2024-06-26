@@ -108,4 +108,6 @@ internal enum BoundKind
     GreaterThanOperator,
     GreaterThanOrEqualOperator,
     CoalesceOperator,
+
+    IfElseExpression,
 }

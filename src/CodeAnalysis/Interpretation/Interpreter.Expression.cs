@@ -78,6 +78,8 @@ partial class Interpreter
             BoundKind.GreaterThanOrEqualExpression or
             BoundKind.CoalesceExpression =>
                 EvaluateBinaryExpression((BoundBinaryExpression)node, context),
+            BoundKind.IfElseExpression =>
+                EvaluateIfElseExpression((BoundIfElseExpression)node, context),
             _ =>
                 throw new NotImplementedException(node.BoundKind.ToString()),
         };
