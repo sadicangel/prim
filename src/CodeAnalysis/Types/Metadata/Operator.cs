@@ -48,7 +48,7 @@ public sealed record class Operator(SyntaxKind OperatorKind, FunctionType Type, 
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{operatorKind}'"),
         };
 
-        var name = $"{prefix}: {type.Name}";
+        var name = $"{prefix}({string.Join(',', type.Parameters.Select(p => p.Type.Name))})->{type.ReturnType}";
 
         return name;
     }

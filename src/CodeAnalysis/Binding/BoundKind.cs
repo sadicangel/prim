@@ -47,6 +47,7 @@ internal enum BoundKind
     BinaryExpression,
 
     IfElseExpression,
+    WhileExpression,
 
     FunctionSymbol,
     StructSymbol,

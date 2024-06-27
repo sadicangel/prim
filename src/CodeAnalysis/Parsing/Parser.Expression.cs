@@ -22,7 +22,7 @@ partial class Parser
         {
             SyntaxKind.IfKeyword => ParseIfElseExpression(syntaxTree, iterator),
             //SyntaxKind.ForKeyword => ParseForExpression(syntaxTree, iterator),
-            //SyntaxKind.WhileKeyword => ParseWhileExpression(syntaxTree, iterator),
+            SyntaxKind.WhileKeyword => ParseWhileExpression(syntaxTree, iterator),
             //SyntaxKind.BreakKeyword => ParseBreakExpression(syntaxTree, iterator),
             //SyntaxKind.ContinueKeyword => ParseContinueExpression(syntaxTree, iterator),
             //SyntaxKind.ReturnKeyword => ParseReturnExpression(syntaxTree, iterator),

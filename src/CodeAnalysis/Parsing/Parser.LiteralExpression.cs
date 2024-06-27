@@ -16,7 +16,7 @@ partial class Parser
             SyntaxKind.FalseKeyword =>
                 new LiteralExpressionSyntax(SyntaxKind.FalseLiteralExpression, syntaxTree, literalToken, false),
             SyntaxKind.NullKeyword =>
-                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, UnitValueProvider.Value),
+                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, Unit.Value),
             SyntaxKind.I32LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.I32LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.U32LiteralToken =>
@@ -36,5 +36,3 @@ partial class Parser
         };
     }
 }
-
-file static class UnitValueProvider { public static readonly object Value = new(); }

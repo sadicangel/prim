@@ -211,8 +211,12 @@ internal static class RenderExtensions
                 switch (child)
                 {
                     case Symbol symbol:
-                        WriteTo(child, treeNode.AddNode($"[green3]{symbol.BoundKind}[/] [darkseagreen2 i]{symbol}[/]"));
+                        WriteTo(child, treeNode.AddNode($"[gold3]{symbol.BoundKind}[/] [darkseagreen2 i]{symbol}[/]"));
                         break;
+
+                    //case BoundExpression expression when expression.ConstValue is not null:
+                    //    WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] ({expression.ConstValue}) [darkseagreen2 i]{expression.Type}[/]"));
+                    //    break;
 
                     case BoundExpression expression:
                         WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{expression.Type}[/]"));

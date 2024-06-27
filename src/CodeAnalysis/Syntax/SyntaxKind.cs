@@ -193,6 +193,7 @@ public enum SyntaxKind
     AssignmentExpression,
 
     IfElseExpression,
+    WhileExpression,
 
     IndexOperator,
     InvocationOperator,

@@ -27,6 +27,8 @@ partial class ConstFolder
                 FoldBinaryExpression((BoundBinaryExpression)node),
             BoundKind.IfElseExpression =>
                 FoldIfElseExpression((BoundIfElseExpression)node),
+            BoundKind.VariableDeclaration or
+            BoundKind.LocalReference => null,
             _ =>
                 throw new NotImplementedException(node.BoundKind.ToString()),
         };

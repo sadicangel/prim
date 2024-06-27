@@ -38,8 +38,8 @@ partial class Interpreter
             //    EvaluateEmptyExpression((BoundEmptyExpression)node, context),
             //BoundKind.StatementExpression =>
             //    EvaluateStatementExpression((BoundStatementExpression)node, context),
-            //BoundKind.BlockExpression =>
-            //    EvaluateBlockExpression((BoundBlockExpression)node, context),
+            BoundKind.BlockExpression =>
+                EvaluateBlockExpression((BoundBlockExpression)node, context),
             BoundKind.ArrayInitExpression =>
                 EvaluateArrayInitExpression((BoundArrayInitExpression)node, context),
             BoundKind.MemberReference =>
@@ -58,6 +58,8 @@ partial class Interpreter
                 EvaluateBinaryExpression((BoundBinaryExpression)node, context),
             BoundKind.IfElseExpression =>
                 EvaluateIfElseExpression((BoundIfElseExpression)node, context),
+            BoundKind.WhileExpression =>
+                EvaluateWhileExpression((BoundWhileExpression)node, context),
             _ =>
                 throw new NotImplementedException(node.BoundKind.ToString()),
         };

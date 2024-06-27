@@ -22,6 +22,9 @@ while (true)
             continue;
     }
 
+    foreach (var boundTree in compilation.BoundTrees)
+        console.WriteLine(boundTree);
+
     var evaluation = Evaluation.Evaluate(compilation, previousEvaluation);
 
     console.WriteLine(evaluation.Values[0]);

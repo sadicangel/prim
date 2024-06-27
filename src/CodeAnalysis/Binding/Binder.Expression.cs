@@ -80,6 +80,8 @@ partial class Binder
                 BindBinaryExpression((BinaryExpressionSyntax)syntax, context),
             SyntaxKind.IfElseExpression =>
                 BindIfElseExpression((IfElseExpressionSyntax)syntax, context),
+            SyntaxKind.WhileExpression =>
+                BindWhileExpression((WhileExpressionSyntax)syntax, context),
             _ =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
         };
