@@ -71,6 +71,8 @@ internal enum BoundKind
     GreaterThanOrEqualExpression,
     CoalesceExpression,
 
+    IfElseExpression,
+
     FunctionSymbol,
     StructSymbol,
     PropertySymbol,
@@ -108,6 +110,4 @@ internal enum BoundKind
     GreaterThanOperator,
     GreaterThanOrEqualOperator,
     CoalesceOperator,
-
-    IfElseExpression,
 }

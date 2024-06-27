@@ -192,6 +192,8 @@ public enum SyntaxKind
 
     AssignmentExpression,
 
+    IfElseExpression,
+
     IndexOperator,
     InvocationOperator,
     MemberAccessOperator,
@@ -224,6 +226,4 @@ public enum SyntaxKind
     CoalesceOperator,
 
     AssignmentOperator,
-
-    IfElseExpression,
 }

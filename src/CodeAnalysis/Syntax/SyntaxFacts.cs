@@ -192,6 +192,8 @@ public static class SyntaxFacts
 
             SyntaxKind.AssignmentExpression => null,
 
+            SyntaxKind.IfElseExpression => null,
+
             SyntaxKind.IndexOperator => null,
             SyntaxKind.InvocationOperator => null,
             SyntaxKind.MemberAccessOperator => null,
