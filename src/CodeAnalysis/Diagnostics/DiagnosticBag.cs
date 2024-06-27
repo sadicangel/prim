@@ -110,6 +110,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.UndefinedSymbol(symbolName));
     internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandTypeName));
+    internal void ReportUnreachableCode(SourceLocation location) =>
+        ReportWarning(location, DiagnosticMessage.UnreachableCode());
 
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
@@ -118,12 +120,4 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     //internal void ReportInvalidReturn(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidReturn());
     //internal void ReportInvalidReturnExpression(SourceLocation location, string functionName) => ReportError(location, DiagnosticMessage.InvalidReturnExpression(functionName));
     //internal void ReportNotAllPathsReturn(SourceLocation location) => ReportError(location, DiagnosticMessage.NotAllPathsReturn());
-    //internal void ReportUnreachableCode(SyntaxNode unreachableNode)
-    //{
-    //    if (unreachableNode.NodeKind is SyntaxNodeKind.BlockExpression)
-    //        unreachableNode = ((/*BlockExpression*/dynamic)unreachableNode).Statements.FirstOrDefault() ?? unreachableNode;
-    //    var location = unreachableNode.FirstToken.Location;
-
-    //    ReportWarning(location, DiagnosticMessage.UnreachableCode());
-    //}
 }

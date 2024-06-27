@@ -4,7 +4,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static PrimValue EvaluateInvocationExpression(BoundInvocationExpression node, InterpreterContext context)
+    public static PrimValue EvaluateInvocationExpression(BoundInvocationExpression node, InterpreterContext context)
     {
         var expression = EvaluateExpression(node.Expression, context);
         var function = expression.GetOperator(node.OperatorSymbol);

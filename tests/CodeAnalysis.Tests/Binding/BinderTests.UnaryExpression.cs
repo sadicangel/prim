@@ -9,7 +9,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("!true"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.NotExpression, node.BoundKind);
+        Assert.Equal(BoundKind.UnaryExpression, node.BoundKind);
     }
 
     [Fact]
@@ -18,7 +18,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("-2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.UnaryMinusExpression, node.BoundKind);
+        Assert.Equal(BoundKind.UnaryExpression, node.BoundKind);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("+2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.UnaryPlusExpression, node.BoundKind);
+        Assert.Equal(BoundKind.UnaryExpression, node.BoundKind);
     }
 
     [Fact]
@@ -36,6 +36,6 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("~1"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.OnesComplementExpression, node.BoundKind);
+        Assert.Equal(BoundKind.UnaryExpression, node.BoundKind);
     }
 }

@@ -24,6 +24,7 @@ partial class Binder
             SyntaxKind.NullLiteralExpression => (BoundKind.NullLiteralExpression, PredefinedTypes.Unit),
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
+
         return new BoundLiteralExpression(kind, syntax, type, syntax.LiteralValue);
     }
 }

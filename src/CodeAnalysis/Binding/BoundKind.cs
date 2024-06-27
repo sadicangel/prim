@@ -35,8 +35,6 @@ internal enum BoundKind
 
     FunctionBodyExpression,
 
-    EmptyExpression,
-    StatementExpression,
     BlockExpression,
     ArrayInitExpression,
     StructInitExpression,
@@ -45,31 +43,8 @@ internal enum BoundKind
 
     ConversionExpression,
 
-    UnaryPlusExpression,
-    UnaryMinusExpression,
-    OnesComplementExpression,
-    NotExpression,
-
-    AddExpression,
-    SubtractExpression,
-    MultiplyExpression,
-    DivideExpression,
-    ModuloExpression,
-    PowerExpression,
-    LeftShiftExpression,
-    RightShiftExpression,
-    LogicalOrExpression,
-    LogicalAndExpression,
-    BitwiseOrExpression,
-    BitwiseAndExpression,
-    ExclusiveOrExpression,
-    EqualsExpression,
-    NotEqualsExpression,
-    LessThanExpression,
-    LessThanOrEqualExpression,
-    GreaterThanExpression,
-    GreaterThanOrEqualExpression,
-    CoalesceExpression,
+    UnaryExpression,
+    BinaryExpression,
 
     IfElseExpression,
 

@@ -1,9 +1,8 @@
 ﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Diagnostics;
 
 namespace CodeAnalysis.Interpretation;
 
-internal readonly record struct InterpreterContext(DiagnosticBag Diagnostics, EvaluatedScope EvaluatedScope)
+internal readonly record struct InterpreterContext(EvaluatedScope EvaluatedScope)
 {
     private readonly Stack<EvaluatedScope> _scopes = new([EvaluatedScope]);
     public EvaluatedScope EvaluatedScope { get => _scopes.Peek(); }

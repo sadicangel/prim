@@ -4,12 +4,11 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundBinaryExpression(
-    BoundKind BoundKind,
     SyntaxNode Syntax,
     BoundExpression Left,
     OperatorSymbol OperatorSymbol,
     BoundExpression Right)
-    : BoundExpression(BoundKind, Syntax, OperatorSymbol.ReturnType)
+    : BoundExpression(BoundKind.BinaryExpression, Syntax, OperatorSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {

@@ -9,7 +9,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 + 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.AddExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_SubtractExpression()
@@ -17,7 +17,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 - 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.SubtractExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_MultiplyExpression()
@@ -25,7 +25,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 * 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.MultiplyExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_DivideExpression()
@@ -33,7 +33,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 / 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.DivideExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_ModuloExpression()
@@ -41,7 +41,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 % 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.ModuloExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_PowerExpression()
@@ -49,7 +49,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 ** 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.PowerExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_LeftShiftExpression()
@@ -57,7 +57,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 << 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.LeftShiftExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_RightShiftExpression()
@@ -65,7 +65,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 >> 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.RightShiftExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_LogicalOrExpression()
@@ -73,7 +73,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("true || false"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.LogicalOrExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_LogicalAndExpression()
@@ -81,7 +81,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("true && true"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.LogicalAndExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_BitwiseOrExpression()
@@ -89,7 +89,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 | 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.BitwiseOrExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_BitwiseAndExpression()
@@ -97,7 +97,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 & 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.BitwiseAndExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_ExclusiveOrExpression()
@@ -105,7 +105,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 ^ 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.ExclusiveOrExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_EqualsExpression()
@@ -113,7 +113,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 == 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.EqualsExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_NotEqualsExpression()
@@ -121,7 +121,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 != 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.NotEqualsExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_LessThanExpression()
@@ -129,7 +129,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 < 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.LessThanExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_LessThanOrEqualExpression()
@@ -137,7 +137,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 <= 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.LessThanOrEqualExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_GreaterThanExpression()
@@ -145,7 +145,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 > 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.GreaterThanExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_GreaterThanOrEqualExpression()
@@ -153,7 +153,7 @@ public partial class BinderTests
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("2 >= 2"));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.GreaterThanOrEqualExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
     [Fact]
     public void Bind_CoalesceExpression()
@@ -164,6 +164,6 @@ public partial class BinderTests
             """));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.CoalesceExpression, node.BoundKind);
+        Assert.Equal(BoundKind.BinaryExpression, node.BoundKind);
     }
 }

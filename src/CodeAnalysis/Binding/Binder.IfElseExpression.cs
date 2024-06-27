@@ -25,6 +25,11 @@ partial class Binder
             return @else;
         }
 
+        if (condition.ConstValue is bool isTrue)
+        {
+            context.Diagnostics.ReportUnreachableCode((isTrue ? @else : then).Syntax.Location);
+        }
+
         var type = then.Type == @else.Type ? then.Type : new UnionType([then.Type, @else.Type]);
 
         return new BoundIfElseExpression(syntax, condition, then, @else, type);

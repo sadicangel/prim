@@ -66,6 +66,8 @@ internal static class DiagnosticMessage
         $"Undefined symbol '{symbolName}'";
     public static string UndefinedUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         $"Unary operator '{@operator.Text}' is not defined for type '{operandTypeName}'";
+    public static string UnreachableCode() =>
+        "Unreachable code detected";
 
 
 
@@ -76,5 +78,4 @@ internal static class DiagnosticMessage
     //public static string InvalidReturn() => "No enclosing function out of which to return";
     //public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
     //public static string NotAllPathsReturn() => "Not all code paths return a value";
-    //public static string UnreachableCode() => "Unreachable code detected";
 }

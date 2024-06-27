@@ -5,7 +5,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static PrimValue EvaluateExpression(BoundExpression node, InterpreterContext context)
+    public static PrimValue EvaluateExpression(BoundExpression node, InterpreterContext context)
     {
         return node.BoundKind switch
         {
@@ -52,31 +52,9 @@ partial class Interpreter
                 EvaluateStructInitExpression((BoundStructInitExpression)node, context),
             BoundKind.ConversionExpression =>
                 EvaluateConversionExpression((BoundConversionExpression)node, context),
-            //BoundKind.UnaryPlusExpression or
-            //BoundKind.UnaryMinusExpression or
-            //BoundKind.OnesComplementExpression or
-            //BoundKind.NotExpression =>
-            //    EvaluateUnaryExpression((BoundUnaryExpression)node, context),
-            BoundKind.AddExpression or
-            BoundKind.SubtractExpression or
-            BoundKind.MultiplyExpression or
-            BoundKind.DivideExpression or
-            BoundKind.ModuloExpression or
-            BoundKind.PowerExpression or
-            BoundKind.LeftShiftExpression or
-            BoundKind.RightShiftExpression or
-            BoundKind.LogicalOrExpression or
-            BoundKind.LogicalAndExpression or
-            BoundKind.BitwiseOrExpression or
-            BoundKind.BitwiseAndExpression or
-            BoundKind.ExclusiveOrExpression or
-            BoundKind.EqualsExpression or
-            BoundKind.NotEqualsExpression or
-            BoundKind.LessThanExpression or
-            BoundKind.LessThanOrEqualExpression or
-            BoundKind.GreaterThanExpression or
-            BoundKind.GreaterThanOrEqualExpression or
-            BoundKind.CoalesceExpression =>
+            BoundKind.UnaryExpression =>
+                EvaluateUnaryExpression((BoundUnaryExpression)node, context),
+            BoundKind.BinaryExpression =>
                 EvaluateBinaryExpression((BoundBinaryExpression)node, context),
             BoundKind.IfElseExpression =>
                 EvaluateIfElseExpression((BoundIfElseExpression)node, context),

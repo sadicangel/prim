@@ -14,11 +14,12 @@ while (true)
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
 
-    if (compilation.Diagnostics.HasErrorDiagnostics)
+    if (compilation.Diagnostics.Count > 0)
     {
         foreach (var diagnostic in compilation.Diagnostics)
             console.WriteLine(diagnostic);
-        continue;
+        if (compilation.Diagnostics.HasErrorDiagnostics)
+            continue;
     }
 
     var evaluation = Evaluation.Evaluate(compilation, previousEvaluation);
