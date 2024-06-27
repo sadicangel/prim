@@ -193,6 +193,7 @@ public static class SyntaxFacts
             SyntaxKind.AssignmentExpression => null,
 
             SyntaxKind.IfElseExpression => null,
+            SyntaxKind.WhileExpression => null,
 
             SyntaxKind.IndexOperator => null,
             SyntaxKind.InvocationOperator => null,
