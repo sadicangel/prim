@@ -10,18 +10,18 @@ partial class Interpreter
     private static LiteralValue EvaluateLiteralExpression(BoundLiteralExpression node, InterpreterContext context)
     {
         _ = context;
-        return node.BoundKind switch
+        var scope = GlobalEvaluatedScope.Instance;
+        return node.Type switch
         {
-            BoundKind.I32LiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.I32, PredefinedTypes.I32, (int)node.Value),
-            BoundKind.U32LiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.U32, PredefinedTypes.U32, (uint)node.Value),
-            BoundKind.I64LiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.I64, PredefinedTypes.I64, (long)node.Value),
-            BoundKind.U64LiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.U64, PredefinedTypes.U64, (ulong)node.Value),
-            BoundKind.F32LiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.F32, PredefinedTypes.F32, (float)node.Value),
-            BoundKind.F64LiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.F64, PredefinedTypes.F64, (double)node.Value),
-            BoundKind.StrLiteralExpression => new LiteralValue(GlobalEvaluatedScope.Instance.Str, PredefinedTypes.Str, (string)node.Value),
-            BoundKind.TrueLiteralExpression => LiteralValue.True,
-            BoundKind.FalseLiteralExpression => LiteralValue.False,
-            BoundKind.NullLiteralExpression => LiteralValue.Unit,
+            PrimType when node.Type == PredefinedTypes.I32 => new LiteralValue(scope.I32, node.Type, (int)node.Value),
+            PrimType when node.Type == PredefinedTypes.U32 => new LiteralValue(scope.U32, node.Type, (uint)node.Value),
+            PrimType when node.Type == PredefinedTypes.I64 => new LiteralValue(scope.I64, node.Type, (long)node.Value),
+            PrimType when node.Type == PredefinedTypes.U64 => new LiteralValue(scope.U64, node.Type, (ulong)node.Value),
+            PrimType when node.Type == PredefinedTypes.F32 => new LiteralValue(scope.F32, node.Type, (float)node.Value),
+            PrimType when node.Type == PredefinedTypes.F64 => new LiteralValue(scope.F64, node.Type, (double)node.Value),
+            PrimType when node.Type == PredefinedTypes.Str => new LiteralValue(scope.Str, node.Type, (string)node.Value),
+            PrimType when node.Type == PredefinedTypes.Bool => new LiteralValue(scope.Bool, node.Type, (bool)node.Value),
+            PrimType when node.Type == PredefinedTypes.Unit => new LiteralValue(scope.Unit, node.Type, node.Value),
             _ => throw new UnreachableException($"Unexpected {nameof(BoundKind)} '{node.BoundKind}'")
         };
     }

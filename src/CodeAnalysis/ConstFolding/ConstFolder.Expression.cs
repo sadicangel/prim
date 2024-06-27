@@ -8,16 +8,7 @@ partial class ConstFolder
     {
         return node.BoundKind switch
         {
-            BoundKind.I32LiteralExpression or
-            BoundKind.U32LiteralExpression or
-            BoundKind.I64LiteralExpression or
-            BoundKind.U64LiteralExpression or
-            BoundKind.F32LiteralExpression or
-            BoundKind.F64LiteralExpression or
-            BoundKind.StrLiteralExpression or
-            BoundKind.TrueLiteralExpression or
-            BoundKind.FalseLiteralExpression or
-            BoundKind.NullLiteralExpression =>
+            BoundKind.LiteralExpression =>
                 FoldLiteralExpression((BoundLiteralExpression)node),
             BoundKind.BlockExpression =>
                 FoldBlockExpression((BoundBlockExpression)node),

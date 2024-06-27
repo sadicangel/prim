@@ -8,16 +8,7 @@ internal enum BoundKind
 
     NeverExpression,
 
-    I32LiteralExpression,
-    U32LiteralExpression,
-    I64LiteralExpression,
-    U64LiteralExpression,
-    F32LiteralExpression,
-    F64LiteralExpression,
-    StrLiteralExpression,
-    TrueLiteralExpression,
-    FalseLiteralExpression,
-    NullLiteralExpression,
+    LiteralExpression,
 
     AssignmentExpression,
 

@@ -13,16 +13,7 @@ partial class Interpreter
                 EvaluateNeverExpression((BoundNeverExpression)node, context),
             BoundKind.LocalReference =>
                 EvaluateLocalReference((BoundLocalReference)node, context),
-            BoundKind.I32LiteralExpression or
-            BoundKind.U32LiteralExpression or
-            BoundKind.I64LiteralExpression or
-            BoundKind.U64LiteralExpression or
-            BoundKind.F32LiteralExpression or
-            BoundKind.F64LiteralExpression or
-            BoundKind.StrLiteralExpression or
-            BoundKind.TrueLiteralExpression or
-            BoundKind.FalseLiteralExpression or
-            BoundKind.NullLiteralExpression =>
+            BoundKind.LiteralExpression =>
                 EvaluateLiteralExpression((BoundLiteralExpression)node, context),
             BoundKind.AssignmentExpression =>
                 EvaluateAssignmentExpression((BoundAssignmentExpression)node, context),
