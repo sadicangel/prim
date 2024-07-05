@@ -4,13 +4,14 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundConversionDeclaration(
     SyntaxNode Syntax,
-    ConversionSymbol ConversionSymbol,
-    BoundExpression Expression)
-    : BoundMemberDeclaration(BoundKind.ConversionDeclaration, Syntax, ConversionSymbol.Type)
+    FunctionSymbol NameSymbol,
+    OperatorSymbol OperatorSymbol,
+    BoundFunctionBodyExpression Body)
+    : BoundMemberDeclaration(BoundKind.ConversionDeclaration, Syntax, NameSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return ConversionSymbol;
-        yield return Expression;
+        yield return NameSymbol;
+        yield return Body;
     }
 }

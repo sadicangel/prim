@@ -511,7 +511,7 @@ file static class StructValueExtensions
             var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
                 ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
             s.SetConversion(
-                new ConversionSymbol(
+                FunctionSymbol.FromConversion(
                     SyntaxFactory.SyntheticToken(SyntaxKind.ImplicitKeyword),
                     conversion),
                 new FunctionValue(conversion.Type, (PrimValue x) =>
@@ -527,7 +527,7 @@ file static class StructValueExtensions
             var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
                 ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
             s.SetConversion(
-                new ConversionSymbol(
+                FunctionSymbol.FromConversion(
                     SyntaxFactory.SyntheticToken(SyntaxKind.ExplicitKeyword),
                     conversion),
                 new FunctionValue(conversion.Type, (PrimValue x) =>

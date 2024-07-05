@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundConversionExpression(
     SyntaxNode Syntax,
-    ConversionSymbol ConversionSymbol,
+    FunctionSymbol ConversionSymbol,
     BoundExpression Expression)
     : BoundExpression(BoundKind.ConversionExpression, Syntax, ConversionSymbol.Type.ReturnType)
 {

@@ -50,7 +50,7 @@ partial class Binder
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var method = structSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
-                ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'"); ;
+                ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'");
 
             var body = BindExpression(syntax.Body, context);
 
@@ -63,7 +63,7 @@ partial class Binder
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var @operator = structSymbol.Type.GetOperator(syntax.Operator.SyntaxKind, type)
-                ?? throw new UnreachableException($"Unexpected operator '{syntax.Operator.Text}'"); ;
+                ?? throw new UnreachableException($"Unexpected operator '{syntax.Operator.Text}'");
 
             var body = BindExpression(syntax.Body, context);
 
@@ -76,13 +76,17 @@ partial class Binder
         {
             var type = (FunctionType)BindType(syntax.Type, context);
             var conversion = structSymbol.Type.GetConversion(type)
-                ?? throw new UnreachableException($"Unexpected conversion '{type}'"); ;
+                ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
-            var body = BindExpression(syntax.Body, context);
+            // TODO: Either here or when declaring, must ensure only 1 parameter.
+            var functionSymbol = FunctionSymbol.FromConversion(syntax, conversion, syntax.Type.Parameters[0]);
 
-            var conversionSymbol = new ConversionSymbol(syntax, conversion);
+            var @operator = functionSymbol.Type.GetOperators(SyntaxKind.InvocationOperator).Single();
+            var operatorSymbol = new OperatorSymbol(syntax, @operator);
 
-            return new BoundConversionDeclaration(syntax, conversionSymbol, body);
+            var body = BindFunctionBody(syntax.Body, functionSymbol, context);
+
+            return new BoundConversionDeclaration(syntax, functionSymbol, operatorSymbol, body);
         }
     }
 }

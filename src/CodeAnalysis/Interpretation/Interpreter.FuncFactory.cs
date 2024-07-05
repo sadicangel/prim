@@ -10,16 +10,25 @@ partial class Interpreter
 {
     private static class FuncFactory
     {
-        private static readonly MethodInfo s_pushScopeMethodInfo =
-            typeof(InterpreterContext).GetMethod(nameof(InterpreterContext.PushScope))!;
-        private static readonly MethodInfo s_disposeScopeMethodInfo =
-            typeof(InterpreterContext.TempScope).GetMethod(nameof(InterpreterContext.TempScope.Dispose))!;
-        private static readonly PropertyInfo s_evaluatedScopePropertyInfo =
-            typeof(InterpreterContext).GetProperty(nameof(InterpreterContext.EvaluatedScope))!;
-        private static readonly MethodInfo s_declareSymbolMethodInfo =
-            typeof(EvaluatedScope).GetMethod(nameof(EvaluatedScope.Declare))!;
-        private static readonly MethodInfo s_evaluateNodeMethodInfo =
-            typeof(Interpreter).GetMethod(nameof(EvaluateNode), BindingFlags.NonPublic | BindingFlags.Static)!;
+        private static readonly MethodInfo s_pushScopeMethodInfo;
+        private static readonly MethodInfo s_disposeScopeMethodInfo;
+        private static readonly PropertyInfo s_evaluatedScopePropertyInfo;
+        private static readonly MethodInfo s_declareSymbolMethodInfo;
+        private static readonly MethodInfo s_evaluateNodeMethodInfo;
+
+        static FuncFactory()
+        {
+            s_pushScopeMethodInfo = typeof(InterpreterContext).GetMethod(nameof(InterpreterContext.PushScope))
+                ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_pushScopeMethodInfo)}");
+            s_disposeScopeMethodInfo = typeof(InterpreterContext.TempScope).GetMethod(nameof(InterpreterContext.TempScope.Dispose))
+                ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_disposeScopeMethodInfo)}");
+            s_evaluatedScopePropertyInfo = typeof(InterpreterContext).GetProperty(nameof(InterpreterContext.EvaluatedScope))
+                ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluatedScopePropertyInfo)}");
+            s_declareSymbolMethodInfo = typeof(EvaluatedScope).GetMethod(nameof(EvaluatedScope.Declare))
+                ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_declareSymbolMethodInfo)}");
+            s_evaluateNodeMethodInfo = typeof(Interpreter).GetMethod(nameof(EvaluateNode), BindingFlags.Public | BindingFlags.Static)
+                ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluateNodeMethodInfo)}");
+        }
 
         public static Delegate Create(FunctionSymbol function, BoundFunctionBodyExpression body, InterpreterContext context)
         {

@@ -32,6 +32,6 @@ internal sealed record class ReferenceValue : PrimValue
     internal override FunctionValue GetOperator(OperatorSymbol symbol) => ReferencedValue.GetOperator(symbol);
     internal override void SetOperator(OperatorSymbol symbol, FunctionValue value) => ReferencedValue.SetOperator(symbol, value);
 
-    internal override FunctionValue GetConversion(ConversionSymbol symbol) => ReferencedValue.GetConversion(symbol);
-    internal override void SetConversion(ConversionSymbol symbol, FunctionValue value) => ReferencedValue.SetConversion(symbol, value);
+    internal override FunctionValue GetConversion(FunctionSymbol symbol) => ReferencedValue.GetConversion(symbol);
+    internal override void SetConversion(FunctionSymbol symbol, FunctionValue value) => ReferencedValue.SetConversion(symbol, value);
 }

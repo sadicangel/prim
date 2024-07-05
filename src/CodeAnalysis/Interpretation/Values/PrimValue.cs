@@ -28,7 +28,7 @@ public abstract record class PrimValue(PrimType Type)
         ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
     internal virtual void SetOperator(OperatorSymbol symbol, FunctionValue value) => Members[symbol] = value;
 
-    internal virtual FunctionValue GetConversion(ConversionSymbol symbol) => Members[symbol] as FunctionValue
+    internal virtual FunctionValue GetConversion(FunctionSymbol symbol) => Members[symbol] as FunctionValue
         ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    internal virtual void SetConversion(ConversionSymbol symbol, FunctionValue value) => Members[symbol] = value;
+    internal virtual void SetConversion(FunctionSymbol symbol, FunctionValue value) => Members[symbol] = value;
 }

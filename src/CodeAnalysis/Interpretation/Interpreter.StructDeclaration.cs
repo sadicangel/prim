@@ -52,11 +52,11 @@ partial class Interpreter
             return 0;
         }
 
-        static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, InterpreterContext context)
+        static object EvaluateConversionDeclaration(BoundConversionDeclaration node, StructValue structValue, InterpreterContext context)
         {
-            _ = member;
-            _ = structValue;
-            _ = context;
+            var functionValue = new FunctionValue(node.NameSymbol.Type, FuncFactory.Create(node.NameSymbol, node.Body, context));
+            functionValue.SetOperator(node.OperatorSymbol, functionValue);
+            structValue.SetConversion(node.NameSymbol, functionValue);
             return 0;
         }
     }

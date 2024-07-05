@@ -23,7 +23,7 @@ internal sealed record class LiteralValue : PrimValue
     internal override void SetMethod(MethodSymbol symbol, FunctionValue value) => throw new NotSupportedException();
     internal override FunctionValue GetOperator(OperatorSymbol symbol) => Struct.GetOperator(symbol);
     internal override void SetOperator(OperatorSymbol symbol, FunctionValue value) => throw new NotSupportedException();
-    internal override FunctionValue GetConversion(ConversionSymbol symbol) => Struct.GetConversion(symbol);
-    internal override void SetConversion(ConversionSymbol symbol, FunctionValue value) => throw new NotSupportedException();
+    internal override FunctionValue GetConversion(FunctionSymbol symbol) => Struct.GetConversion(symbol);
+    internal override void SetConversion(FunctionSymbol symbol, FunctionValue value) => throw new NotSupportedException();
 }
 
