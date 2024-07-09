@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Types;
 
@@ -12,6 +14,29 @@ internal class BoundScope(BoundScope? parent = null) : IEnumerable<Symbol>
     public BoundScope Parent { get => parent ?? GlobalBoundScope.Instance; }
 
     public bool Declare(Symbol symbol) => (Symbols ??= []).TryAdd(symbol.Name, symbol);
+
+    public void Replace(Symbol symbol)
+    {
+        var scope = this;
+        if (scope.Symbols?.ContainsKey(symbol.Name) is true)
+        {
+            scope.Symbols[symbol.Name] = symbol;
+            return;
+        }
+
+        do
+        {
+            scope = scope.Parent;
+            if (scope.Symbols?.ContainsKey(symbol.Name) is true)
+            {
+                scope.Symbols[symbol.Name] = symbol;
+                return;
+            }
+        }
+        while (scope != scope.Parent);
+
+        throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
+    }
 
     public Symbol? Lookup(string name)
     {

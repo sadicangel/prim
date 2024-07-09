@@ -5,19 +5,20 @@ public sealed record class VariableDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken,
     SyntaxToken ColonToken,
-    TypeSyntax Type,
-    SyntaxToken OperatorToken,
+    TypeSyntax? Type,
+    SyntaxToken ColonOrEqualsToken,
     ExpressionSyntax Expression)
     : DeclarationSyntax(SyntaxKind.VariableDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => OperatorToken.SyntaxKind is SyntaxKind.ColonToken; }
+    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
 
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return IdentifierToken;
         yield return ColonToken;
-        yield return Type;
-        yield return OperatorToken;
+        if (Type is not null)
+            yield return Type;
+        yield return ColonOrEqualsToken;
         yield return Expression;
     }
 }

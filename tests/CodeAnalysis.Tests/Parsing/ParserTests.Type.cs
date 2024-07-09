@@ -14,7 +14,7 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<VariableDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.PredefinedType, decl.Type.SyntaxKind);
+        Assert.Equal(SyntaxKind.PredefinedType, decl.Type?.SyntaxKind);
     }
 
     [Fact]
@@ -24,7 +24,7 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<VariableDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.NamedType, decl.Type.SyntaxKind);
+        Assert.Equal(SyntaxKind.NamedType, decl.Type?.SyntaxKind);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<VariableDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.OptionType, decl.Type.SyntaxKind);
+        Assert.Equal(SyntaxKind.OptionType, decl.Type?.SyntaxKind);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<VariableDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.UnionType, decl.Type.SyntaxKind);
+        Assert.Equal(SyntaxKind.UnionType, decl.Type?.SyntaxKind);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<VariableDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.ArrayType, decl.Type.SyntaxKind);
+        Assert.Equal(SyntaxKind.ArrayType, decl.Type?.SyntaxKind);
     }
 
     [Fact]
@@ -64,6 +64,6 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<FunctionDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.FunctionType, decl.Type.SyntaxKind);
+        Assert.Equal(SyntaxKind.FunctionType, decl.Type?.SyntaxKind);
     }
 }

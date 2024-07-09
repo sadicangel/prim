@@ -35,7 +35,7 @@ partial class Interpreter
             var disposableVar = Expression.Variable(typeof(InterpreterContext.TempScope), "<$>disposable");
             var contextConst = Expression.Constant(context, typeof(InterpreterContext));
             var evaluatedScope = Expression.Property(contextConst, s_evaluatedScopePropertyInfo);
-            var parameters = function.Type.Parameters.Select(p => Expression.Parameter(typeof(PrimValue), p.Name)).ToArray();
+            var parameters = function.FunctionType.Parameters.Select(p => Expression.Parameter(typeof(PrimValue), p.Name)).ToArray();
             var variables = function.Parameters.Select(p => Expression.Constant(p, typeof(VariableSymbol))).ToArray();
             var value = Expression.Variable(typeof(PrimValue), "value");
             var expression = Expression.Constant(body, typeof(BoundExpression));
@@ -48,7 +48,7 @@ partial class Interpreter
                         Expression.Call(contextConst, s_pushScopeMethodInfo)),
                     Expression.TryFinally(
                         Expression.Block(
-                            Expression.Block(function.Type.Parameters.Select((p, i) =>
+                            Expression.Block(function.FunctionType.Parameters.Select((p, i) =>
                                 Expression.Call(
                                     evaluatedScope,
                                     s_declareSymbolMethodInfo,

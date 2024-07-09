@@ -128,7 +128,7 @@ partial class Binder
     private static VariableSymbol DeclareVariable(VariableDeclarationSyntax syntax, BinderContext context)
     {
         var variableName = syntax.IdentifierToken.Text.ToString();
-        var variableType = BindType(syntax.Type, context);
+        var variableType = syntax.Type is null ? PredefinedTypes.Unknown : BindType(syntax.Type, context);
         var variableSymbol = new VariableSymbol(syntax, variableName, variableType, syntax.IsReadOnly);
         if (!context.BoundScope.Declare(variableSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);

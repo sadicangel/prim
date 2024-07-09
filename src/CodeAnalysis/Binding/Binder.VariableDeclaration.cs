@@ -11,7 +11,18 @@ partial class Binder
         var symbolName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(VariableDeclarationSyntax)}'");
-        var expression = Coerce(BindExpression(syntax.Expression, context), variableSymbol.Type, context);
+
+        var expression = BindExpression(syntax.Expression, context);
+
+        if (variableSymbol.Type.IsUnknown)
+        {
+            variableSymbol = variableSymbol with { Type = expression.Type };
+            context.BoundScope.Replace(variableSymbol);
+        }
+        else
+        {
+            expression = Coerce(expression, variableSymbol.Type, context);
+        }
         return new BoundVariableDeclaration(syntax, variableSymbol, expression);
     }
 }

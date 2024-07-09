@@ -21,7 +21,7 @@ partial class Parser
             var node = parseNode(syntaxTree, iterator);
             nodes.Add(node);
 
-            if (iterator.TryMatch(separatorKind, out var separatorToken))
+            if (iterator.TryMatch(out var separatorToken, separatorKind))
                 nodes.Add(separatorToken);
             else
                 parseNext = false;

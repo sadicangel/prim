@@ -8,14 +8,13 @@ namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class FunctionSymbol(
     SyntaxNode Syntax,
     string Name,
-    FunctionType Type,
+    FunctionType FunctionType,
     BoundList<VariableSymbol> Parameters,
     bool IsReadOnly,
     bool IsStatic)
-    : Symbol(BoundKind.FunctionSymbol, Syntax, Name, IsReadOnly, IsStatic)
+    : Symbol(BoundKind.FunctionSymbol, Syntax, Name, FunctionType, IsReadOnly, IsStatic)
 {
-    public override FunctionType Type { get; } = Type;
-    public PrimType ReturnType { get => Type.ReturnType; }
+    public PrimType ReturnType { get => FunctionType.ReturnType; }
 
     public static FunctionSymbol FromConversion(
         Conversion conversion,

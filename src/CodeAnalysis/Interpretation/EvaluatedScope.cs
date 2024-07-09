@@ -136,7 +136,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
             {
                 var symbol = g.Lookup(name) as StructSymbol
                     ?? throw new UnreachableException(DiagnosticMessage.UndefinedType(name));
-                m[symbol] = new StructValue(symbol.Type);
+                m[symbol] = new StructValue(symbol.StructType);
                 // TODO: Create members for struct.
             }
             ((StructValue)m[g.Str])

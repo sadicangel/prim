@@ -21,14 +21,25 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
         return Tokens[index];
     }
 
-    public bool TryMatch(SyntaxKind syntaxKind, [MaybeNullWhen(false)] out SyntaxToken token)
+    public bool TryMatch([MaybeNullWhen(false)] out SyntaxToken token, params ReadOnlySpan<SyntaxKind> syntaxKinds)
     {
-        if (syntaxKind == Current.SyntaxKind)
+        if (syntaxKinds.Length == 0)
         {
             token = Current;
             ++Index;
             return true;
         }
+
+        foreach (var syntaxKind in syntaxKinds)
+        {
+            if (syntaxKind == Current.SyntaxKind)
+            {
+                token = Current;
+                ++Index;
+                return true;
+            }
+        }
+
         token = null;
         return false;
     }
@@ -44,7 +55,7 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
 
         foreach (var syntaxKind in syntaxKinds)
         {
-            if (TryMatch(syntaxKind, out var token))
+            if (TryMatch(out var token, syntaxKind))
             {
                 _successiveMatchTokenErrors = 0;
                 return token;
