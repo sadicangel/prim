@@ -8,6 +8,7 @@ partial class Interpreter
     {
         var operand = EvaluateExpression(node.Operand, context);
         var function = operand.Get<FunctionValue>(node.FunctionSymbol);
-        return function.Invoke(operand);
+        var value = function.Invoke(operand);
+        return value;
     }
 }

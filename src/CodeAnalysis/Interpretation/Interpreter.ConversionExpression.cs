@@ -7,7 +7,7 @@ partial class Interpreter
     public static PrimValue EvaluateConversionExpression(BoundConversionExpression node, InterpreterContext context)
     {
         var expression = EvaluateExpression(node.Expression, context);
-        var function = expression.Get<FunctionValue>(node.ConversionSymbol);
+        var function = expression.Get<FunctionValue>(node.FunctionSymbol);
         var value = function.Invoke(expression);
         return value;
     }
