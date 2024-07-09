@@ -2,6 +2,7 @@
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -16,7 +17,15 @@ partial class Binder
 
         if (variableSymbol.Type.IsUnknown)
         {
-            variableSymbol = variableSymbol with { Type = expression.Type };
+            if (expression.Type.IsUnknown)
+            {
+                context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
+                variableSymbol = variableSymbol with { Type = PredefinedTypes.Never };
+            }
+            else
+            {
+                variableSymbol = variableSymbol with { Type = expression.Type };
+            }
             context.BoundScope.Replace(variableSymbol);
         }
         else

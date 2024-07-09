@@ -16,8 +16,8 @@ while (true)
             get_i: () -> i32 = this.i;
         }
 
-        v: Value = Value { .i = 10 }
-        a: i32 = v.get_i();
+        v:: Value { .i = 10 }
+        a:= v.get_i();
         a = v.get_i()
         a
         """));

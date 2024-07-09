@@ -44,6 +44,8 @@ internal static class DiagnosticMessage
         $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
     public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
+    public static string InvalidImplicitType(string typeName) =>
+        $"Invalid implicit type '{typeName}'";
     public static string MutableGlobalDeclaration(string declarationKind) =>
         $"Invalid global '{declarationKind}' declaration. Must be readonly";
     public static string ReadOnlyAssignment(string symbolName) =>
