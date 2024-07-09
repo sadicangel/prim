@@ -52,7 +52,18 @@ public abstract record class PrimType(string Name)
         return conversion is not null;
     }
 
-    internal Member? GetMember(string name) => _members.SingleOrDefault(m => m.Name == name);
+    internal List<Member> GetMembers(ReadOnlySpan<char> name)
+    {
+        var list = new List<Member>();
+        foreach (var member in _members)
+        {
+            var index = member.Name.IndexOf('<');
+            var memberName = index >= 0 ? member.Name.AsSpan(0, index) : member.Name;
+            if (memberName.Equals(name, StringComparison.Ordinal))
+                list.Add(member);
+        }
+        return list;
+    }
 
     internal bool AddProperty(string name, PrimType type, bool isReadonly)
     {
@@ -81,14 +92,10 @@ public abstract record class PrimType(string Name)
     }
 
     internal Method? GetMethod(ReadOnlySpan<char> name, FunctionType type)
-    {
-        foreach (var method in _members.OfType<Method>())
-        {
-            if (name.Equals(method.Name, StringComparison.Ordinal) && method.Type == type)
-                return method;
-        }
-        return null;
-    }
+        => GetMethod(SyntaxFacts.GetMethodName(name, type));
+
+    internal Method? GetMethod(string name) =>
+        _members.OfType<Method>().SingleOrDefault(m => m.Name == name);
 
     internal bool AddOperator(SyntaxKind operatorKind, FunctionType type)
     {

@@ -14,16 +14,20 @@ partial class Binder
         {
             return expression;
         }
-        var memberName = syntax.Name.IdentifierToken.Text.ToString();
-        Symbol memberSymbol = expression.Type.GetMember(memberName) switch
-        {
-            Property property => new PropertySymbol(syntax.Name, property, property.IsReadOnly, property.IsStatic),
-            Method method => FunctionSymbol.FromMethod(method, expression.Type),
-            Operator @operator => FunctionSymbol.FromOperator(@operator),
-            Conversion conversion => FunctionSymbol.FromConversion(conversion),
-            _ => throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'"),
-        };
 
-        return new BoundMemberReference(syntax.Name, expression, memberSymbol);
+        // TODO: Support multiple member references (overloading).
+        var symbol = expression.Type
+            .GetMembers(syntax.Name.IdentifierToken.Text)
+            .Select<Member, Symbol>(m => m switch
+            {
+                Property property => new PropertySymbol(syntax.Name, property, property.IsReadOnly, property.IsStatic),
+                Method method => FunctionSymbol.FromMethod(method, expression.Type),
+                Operator @operator => FunctionSymbol.FromOperator(@operator),
+                Conversion conversion => FunctionSymbol.FromConversion(conversion),
+                _ => throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'"),
+            })
+            .SingleOrDefault() ?? throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'");
+
+        return new BoundMemberReference(syntax.Name, expression, symbol);
     }
 }

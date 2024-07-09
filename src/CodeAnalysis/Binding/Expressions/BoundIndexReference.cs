@@ -5,14 +5,14 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundIndexReference(
     SyntaxNode Syntax,
     BoundExpression Expression,
-    FunctionSymbol FunctionSymbol,
+    Symbol Symbol,
     BoundExpression Index)
-    : BoundReference(BoundKind.IndexReference, Syntax, FunctionSymbol, FunctionSymbol.ReturnType)
+    : BoundReference(BoundKind.IndexReference, Syntax, Symbol)
 {
     public override IEnumerable<BoundNode> Children()
     {
         yield return Expression;
-        yield return FunctionSymbol;
+        yield return Symbol;
         yield return Index;
     }
 }

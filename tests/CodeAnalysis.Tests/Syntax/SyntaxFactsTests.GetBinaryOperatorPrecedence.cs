@@ -30,8 +30,7 @@ public sealed partial class SyntaxFactsTests
     [MemberData(nameof(GetBinaryOperators))]
     public void GetBinaryOperatorPrecedence_return_precedence_for_operator(SyntaxKind syntaxKind)
     {
-        var (expression, precedence) = SyntaxFacts.GetBinaryOperatorPrecedence(syntaxKind);
-        Assert.True(expression > 0);
+        var precedence = SyntaxFacts.GetBinaryOperatorPrecedence(syntaxKind);
         Assert.True(precedence > 0);
     }
 
@@ -41,8 +40,7 @@ public sealed partial class SyntaxFactsTests
     [MemberData(nameof(GetNonBinaryOperators))]
     public void GetBinaryOperatorPrecedence_returns_0_for_non_operator(SyntaxKind syntaxKind)
     {
-        var (expression, precedence) = SyntaxFacts.GetBinaryOperatorPrecedence(syntaxKind);
-        Assert.Equal((SyntaxKind)0, expression);
+        var precedence = SyntaxFacts.GetBinaryOperatorPrecedence(syntaxKind);
         Assert.Equal(0, precedence);
     }
 }

@@ -8,8 +8,8 @@ partial class Interpreter
     {
         var value = new ReferenceValue(
             node.Type,
-            getReferencedValue: () => context.EvaluatedScope.Lookup(node.NameSymbol),
-            setReferencedValue: pv => context.EvaluatedScope.Replace(node.NameSymbol, pv));
+            getReferencedValue: () => context.EvaluatedScope.Lookup(node.Symbol),
+            setReferencedValue: pv => context.EvaluatedScope.Replace(node.Symbol, pv));
 
         return value;
     }

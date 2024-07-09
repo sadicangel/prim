@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Tests.Syntax;
 public sealed partial class SyntaxFactsTests
 {
-    public static TheoryData<SyntaxKind> GetAllSyntaxKind() => new(Enum.GetValues<SyntaxKind>());
+    public static TheoryData<SyntaxKind> GetAllSyntaxKind() => new(Enum.GetValues<SyntaxKind>().Except([SyntaxKind.BracketOpenBracketCloseToken, SyntaxKind.ParenthesisOpenParenthesisCloseToken]));
 
     [Theory]
     [MemberData(nameof(GetAllSyntaxKind))]

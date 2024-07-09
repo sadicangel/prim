@@ -9,7 +9,7 @@ public sealed record class ArrayType : PrimType
         ElementType = elementType;
         Length = length;
         AddOperator(
-            SyntaxKind.IndexOperator,
+            SyntaxKind.BracketOpenBracketCloseToken,
             new FunctionType([new("index", PredefinedTypes.I32)], ElementType));
         //AddOperator(
         //    SyntaxKind.IndexOperator,

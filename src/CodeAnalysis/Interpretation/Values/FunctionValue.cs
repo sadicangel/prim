@@ -11,7 +11,7 @@ internal sealed record class FunctionValue : PrimValue
         FunctionType = functionType;
         Delegate = @delegate;
         Set(
-            FunctionSymbol.FromOperator(functionType.GetOperators(SyntaxKind.InvocationOperator).Single()),
+            FunctionSymbol.FromOperator(functionType.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken).Single()),
             this);
     }
 

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Syntax;
 
@@ -21,6 +22,7 @@ public static class SyntaxFacts
             SyntaxKind.BraceCloseToken => "}",
             SyntaxKind.BracketOpenToken => "[",
             SyntaxKind.BracketCloseToken => "]",
+            SyntaxKind.BracketOpenBracketCloseToken => "[]",
             SyntaxKind.ColonToken => ":",
             SyntaxKind.CommaToken => ",",
             SyntaxKind.DotToken => ".",
@@ -45,6 +47,7 @@ public static class SyntaxFacts
             SyntaxKind.MinusEqualsToken => "-=",
             SyntaxKind.ParenthesisOpenToken => "(",
             SyntaxKind.ParenthesisCloseToken => ")",
+            SyntaxKind.ParenthesisOpenParenthesisCloseToken => "()",
             SyntaxKind.PercentToken => "%",
             SyntaxKind.PercentEqualsToken => "%=",
             SyntaxKind.PipeToken => "|",
@@ -197,39 +200,6 @@ public static class SyntaxFacts
             SyntaxKind.IfElseExpression => null,
             SyntaxKind.WhileExpression => null,
 
-            SyntaxKind.IndexOperator => null,
-            SyntaxKind.InvocationOperator => null,
-            SyntaxKind.MemberAccessOperator => null,
-            SyntaxKind.ConversionOperator => null,
-
-            SyntaxKind.UnaryPlusOperator => null,
-            SyntaxKind.UnaryMinusOperator => null,
-            SyntaxKind.OnesComplementOperator => null,
-            SyntaxKind.NotOperator => null,
-
-            SyntaxKind.AddOperator => null,
-            SyntaxKind.SubtractOperator => null,
-            SyntaxKind.MultiplyOperator => null,
-            SyntaxKind.DivideOperator => null,
-            SyntaxKind.ModuloOperator => null,
-            SyntaxKind.PowerOperator => null,
-            SyntaxKind.LeftShiftOperator => null,
-            SyntaxKind.RightShiftOperator => null,
-            SyntaxKind.LogicalOrOperator => null,
-            SyntaxKind.LogicalAndOperator => null,
-            SyntaxKind.BitwiseOrOperator => null,
-            SyntaxKind.BitwiseAndOperator => null,
-            SyntaxKind.ExclusiveOrOperator => null,
-            SyntaxKind.EqualsOperator => null,
-            SyntaxKind.NotEqualsOperator => null,
-            SyntaxKind.LessThanOperator => null,
-            SyntaxKind.LessThanOrEqualOperator => null,
-            SyntaxKind.GreaterThanOperator => null,
-            SyntaxKind.GreaterThanOrEqualOperator => null,
-            SyntaxKind.CoalesceOperator => null,
-
-            SyntaxKind.AssignmentOperator => null,
-
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };
     }
@@ -286,6 +256,13 @@ public static class SyntaxFacts
         };
     }
 
+    public static string GetMethodName(ReadOnlySpan<char> name, FunctionType type) =>
+        $"{name}<{string.Join(',', type.Parameters.Select(p => p.Type.Name))}>";
+
+    public static string GetMethodName(SyntaxKind syntaxKind, FunctionType type) =>
+        GetMethodName(GetText(syntaxKind) ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntaxKind}'"), type);
+
+
     public static bool IsOperator(SyntaxKind syntaxKind) => syntaxKind
         is SyntaxKind.PlusToken
         or SyntaxKind.MinusToken
@@ -316,76 +293,71 @@ public static class SyntaxFacts
     public static bool IsNumberLiteralToken(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.F64LiteralToken;
 
-    public static (SyntaxKind Operator, int Precedence) GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
+    public static int GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
     {
-        SyntaxKind.BangToken => (SyntaxKind.NotOperator, 8),
-        SyntaxKind.MinusToken => (SyntaxKind.UnaryMinusOperator, 8),
-        SyntaxKind.PlusToken => (SyntaxKind.UnaryPlusOperator, 8),
-        SyntaxKind.TildeToken => (SyntaxKind.OnesComplementOperator, 8),
-        _ => (0, 0),
+        SyntaxKind.BangToken => 8,
+        SyntaxKind.MinusToken => 8,
+        SyntaxKind.PlusToken => 8,
+        SyntaxKind.TildeToken => 8,
+        _ => 0,
     };
 
     public static SyntaxKind GetUnaryOperatorExpression(SyntaxKind operatorKind) => operatorKind switch
     {
-        SyntaxKind.NotOperator => SyntaxKind.NotExpression,
-        SyntaxKind.UnaryMinusOperator => SyntaxKind.UnaryMinusExpression,
-        SyntaxKind.UnaryPlusOperator => SyntaxKind.UnaryPlusExpression,
-        SyntaxKind.OnesComplementOperator => SyntaxKind.OnesComplementExpression,
+        SyntaxKind.BangToken => SyntaxKind.NotExpression,
+        SyntaxKind.MinusToken => SyntaxKind.UnaryMinusExpression,
+        SyntaxKind.PlusToken => SyntaxKind.UnaryPlusExpression,
+        SyntaxKind.TildeToken => SyntaxKind.OnesComplementExpression,
         _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{operatorKind}'")
     };
 
-    public static (SyntaxKind Operator, int Precedence) GetBinaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
+    public static int GetBinaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
     {
-        //SyntaxKind.BracketOpenToken or
-        //SyntaxKind.ParenthesisOpenToken => 10,
-        //SyntaxKind.DotToken => 9,
-        //SyntaxKind.DotDotToken => 8,
-        SyntaxKind.StarStarToken => (SyntaxKind.PowerOperator, 7),
-        SyntaxKind.PercentToken => (SyntaxKind.ModuloOperator, 6),
-        SyntaxKind.StarToken => (SyntaxKind.MultiplyOperator, 6),
-        SyntaxKind.SlashToken => (SyntaxKind.DivideOperator, 6),
-        SyntaxKind.PlusToken => (SyntaxKind.AddOperator, 5),
-        SyntaxKind.MinusToken => (SyntaxKind.SubtractOperator, 5),
-        SyntaxKind.LessThanLessThanToken => (SyntaxKind.LeftShiftOperator, 4),
-        SyntaxKind.GreaterThanGreaterThanToken => (SyntaxKind.RightShiftOperator, 4),
-        SyntaxKind.EqualsEqualsToken => (SyntaxKind.EqualsOperator, 3),
-        SyntaxKind.BangEqualsToken => (SyntaxKind.NotEqualsOperator, 3),
-        SyntaxKind.LessThanToken => (SyntaxKind.LessThanOperator, 3),
-        SyntaxKind.LessThanEqualsToken => (SyntaxKind.LessThanOrEqualOperator, 3),
-        SyntaxKind.GreaterThanToken => (SyntaxKind.GreaterThanOperator, 3),
-        SyntaxKind.GreaterThanEqualsToken => (SyntaxKind.GreaterThanOrEqualOperator, 3),
-        SyntaxKind.AmpersandToken => (SyntaxKind.BitwiseAndOperator, 2),
-        SyntaxKind.AmpersandAmpersandToken => (SyntaxKind.LogicalAndOperator, 2),
-        SyntaxKind.PipeToken => (SyntaxKind.BitwiseOrOperator, 1),
-        SyntaxKind.PipePipeToken => (SyntaxKind.LogicalOrOperator, 1),
-        SyntaxKind.HatToken => (SyntaxKind.ExclusiveOrOperator, 1),
-        SyntaxKind.HookHookToken => (SyntaxKind.CoalesceOperator, 1),
-        //SyntaxKind.EqualsToken
-        _ => (0, 0),
+        SyntaxKind.StarStarToken => 7,
+        SyntaxKind.PercentToken => 6,
+        SyntaxKind.StarToken => 6,
+        SyntaxKind.SlashToken => 6,
+        SyntaxKind.PlusToken => 5,
+        SyntaxKind.MinusToken => 5,
+        SyntaxKind.LessThanLessThanToken => 4,
+        SyntaxKind.GreaterThanGreaterThanToken => 4,
+        SyntaxKind.EqualsEqualsToken => 3,
+        SyntaxKind.BangEqualsToken => 3,
+        SyntaxKind.LessThanToken => 3,
+        SyntaxKind.LessThanEqualsToken => 3,
+        SyntaxKind.GreaterThanToken => 3,
+        SyntaxKind.GreaterThanEqualsToken => 3,
+        SyntaxKind.AmpersandToken => 2,
+        SyntaxKind.AmpersandAmpersandToken => 2,
+        SyntaxKind.PipeToken => 1,
+        SyntaxKind.PipePipeToken => 1,
+        SyntaxKind.HatToken => 1,
+        SyntaxKind.HookHookToken => 1,
+        _ => 0,
     };
 
     public static SyntaxKind GetBinaryOperatorExpression(SyntaxKind operatorKind) => operatorKind switch
     {
-        SyntaxKind.PowerOperator => SyntaxKind.PowerExpression,
-        SyntaxKind.ModuloOperator => SyntaxKind.ModuloExpression,
-        SyntaxKind.MultiplyOperator => SyntaxKind.MultiplyExpression,
-        SyntaxKind.DivideOperator => SyntaxKind.DivideExpression,
-        SyntaxKind.AddOperator => SyntaxKind.AddExpression,
-        SyntaxKind.SubtractOperator => SyntaxKind.SubtractExpression,
-        SyntaxKind.LeftShiftOperator => SyntaxKind.LeftShiftExpression,
-        SyntaxKind.RightShiftOperator => SyntaxKind.RightShiftExpression,
-        SyntaxKind.EqualsOperator => SyntaxKind.EqualsExpression,
-        SyntaxKind.NotEqualsOperator => SyntaxKind.NotEqualsExpression,
-        SyntaxKind.LessThanOperator => SyntaxKind.LessThanExpression,
-        SyntaxKind.LessThanOrEqualOperator => SyntaxKind.LessThanOrEqualExpression,
-        SyntaxKind.GreaterThanOperator => SyntaxKind.GreaterThanExpression,
-        SyntaxKind.GreaterThanOrEqualOperator => SyntaxKind.GreaterThanOrEqualExpression,
-        SyntaxKind.BitwiseAndOperator => SyntaxKind.BitwiseAndExpression,
-        SyntaxKind.LogicalAndOperator => SyntaxKind.LogicalAndExpression,
-        SyntaxKind.BitwiseOrOperator => SyntaxKind.BitwiseOrExpression,
-        SyntaxKind.LogicalOrOperator => SyntaxKind.LogicalOrExpression,
-        SyntaxKind.ExclusiveOrOperator => SyntaxKind.ExclusiveOrExpression,
-        SyntaxKind.CoalesceOperator => SyntaxKind.CoalesceExpression,
+        SyntaxKind.StarStarToken => SyntaxKind.PowerExpression,
+        SyntaxKind.PercentToken => SyntaxKind.ModuloExpression,
+        SyntaxKind.StarToken => SyntaxKind.MultiplyExpression,
+        SyntaxKind.SlashToken => SyntaxKind.DivideExpression,
+        SyntaxKind.PlusToken => SyntaxKind.AddExpression,
+        SyntaxKind.MinusToken => SyntaxKind.SubtractExpression,
+        SyntaxKind.LessThanLessThanToken => SyntaxKind.LeftShiftExpression,
+        SyntaxKind.GreaterThanGreaterThanToken => SyntaxKind.RightShiftExpression,
+        SyntaxKind.EqualsEqualsToken => SyntaxKind.EqualsExpression,
+        SyntaxKind.BangEqualsToken => SyntaxKind.NotEqualsExpression,
+        SyntaxKind.LessThanToken => SyntaxKind.LessThanExpression,
+        SyntaxKind.LessThanEqualsToken => SyntaxKind.LessThanOrEqualExpression,
+        SyntaxKind.GreaterThanToken => SyntaxKind.GreaterThanExpression,
+        SyntaxKind.GreaterThanEqualsToken => SyntaxKind.GreaterThanOrEqualExpression,
+        SyntaxKind.AmpersandToken => SyntaxKind.BitwiseAndExpression,
+        SyntaxKind.AmpersandAmpersandToken => SyntaxKind.LogicalAndExpression,
+        SyntaxKind.PipeToken => SyntaxKind.BitwiseOrExpression,
+        SyntaxKind.PipePipeToken => SyntaxKind.LogicalOrExpression,
+        SyntaxKind.HatToken => SyntaxKind.ExclusiveOrExpression,
+        SyntaxKind.HookHookToken => SyntaxKind.CoalesceExpression,
         _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{operatorKind}'")
     };
 }

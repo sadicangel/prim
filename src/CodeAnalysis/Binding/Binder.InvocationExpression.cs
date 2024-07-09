@@ -10,7 +10,7 @@ partial class Binder
     private static BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax, BinderContext context)
     {
         var expression = BindExpression(syntax.Expression, context);
-        var operators = expression.Type.GetOperators(SyntaxKind.InvocationOperator);
+        var operators = expression.Type.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken);
 
         if (operators is [])
         {

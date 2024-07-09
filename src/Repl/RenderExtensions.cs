@@ -6,7 +6,6 @@ using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Operators;
 using CodeAnalysis.Syntax.Types;
 using Spectre.Console;
 
@@ -153,10 +152,6 @@ internal static class RenderExtensions
                     case TypeSyntax type:
                         WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{type.Text}[/]"));
                         // $"{base.Name}: {Type.Name}"
-                        break;
-
-                    case OperatorSyntax @operator:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/]"));
                         break;
 
                     case ExpressionSyntax expression:

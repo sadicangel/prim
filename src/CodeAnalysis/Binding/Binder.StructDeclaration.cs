@@ -62,8 +62,8 @@ partial class Binder
         static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
         {
             var type = (FunctionType)BindType(syntax.Type, context);
-            var @operator = structSymbol.Type.GetOperator(syntax.Operator.SyntaxKind, type)
-                ?? throw new UnreachableException($"Unexpected operator '{syntax.Operator.Text}'");
+            var @operator = structSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
+                ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
             var body = BindExpression(syntax.Body, context);
 

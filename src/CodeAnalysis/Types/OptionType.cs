@@ -9,10 +9,10 @@ public sealed record class OptionType : PrimType
     {
         UnderlyingType = underlyingType;
         AddOperator(
-            SyntaxKind.CoalesceOperator,
+            SyntaxKind.HookHookToken,
             new FunctionType([new Parameter("x", this), new Parameter("y", this)], this));
         AddOperator(
-            SyntaxKind.CoalesceOperator,
+            SyntaxKind.HookHookToken,
             new FunctionType([new Parameter("x", this), new Parameter("y", UnderlyingType)], UnderlyingType));
         AddConversion(
             SyntaxKind.ImplicitKeyword,

@@ -11,17 +11,17 @@ partial class Binder
         if (operand.Type.IsNever)
             return operand;
 
-        var operators = operand.Type.GetUnaryOperators(syntax.Operator.SyntaxKind, operand.Type);
+        var operators = operand.Type.GetUnaryOperators(syntax.OperatorToken.SyntaxKind, operand.Type);
         if (operators is [])
         {
-            context.Diagnostics.ReportUndefinedUnaryOperator(syntax.Operator.OperatorToken, operand.Type.Name);
+            context.Diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken, operand.Type.Name);
             return new BoundNeverExpression(syntax);
         }
 
         if (operators is not [var @operator])
         {
             // TODO: Is this case ever possible?
-            context.Diagnostics.ReportAmbiguousUnaryOperator(syntax.Operator.OperatorToken, operand.Type.Name);
+            context.Diagnostics.ReportAmbiguousUnaryOperator(syntax.OperatorToken, operand.Type.Name);
             return new BoundNeverExpression(syntax);
         }
 

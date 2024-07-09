@@ -1,6 +1,5 @@
 ﻿using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Operators;
 using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Parsing;
@@ -49,13 +48,9 @@ partial class Parser
 
             // TODO: Validate that function only has 1 or 2 parameters.
 
-            var (operatorKind, operatorPrecedence) = functionType.Parameters.Count == 1
-                ? SyntaxFacts.GetUnaryOperatorPrecedence(operatorToken.SyntaxKind)
-                : SyntaxFacts.GetBinaryOperatorPrecedence(operatorToken.SyntaxKind);
-
             return new OperatorDeclarationSyntax(
                 syntaxTree,
-                new OperatorSyntax(operatorKind, syntaxTree, operatorToken, operatorPrecedence),
+                operatorToken,
                 colonToken,
                 functionType,
                 equalsToken,

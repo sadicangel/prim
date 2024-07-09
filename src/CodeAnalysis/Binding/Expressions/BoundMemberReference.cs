@@ -5,11 +5,12 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundMemberReference(
     SyntaxNode Syntax,
     BoundExpression Expression,
-    Symbol NameSymbol)
-    : BoundReference(BoundKind.MemberReference, Syntax, NameSymbol, NameSymbol.Type)
+    Symbol Symbol)
+    : BoundReference(BoundKind.MemberReference, Syntax, Symbol)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return NameSymbol;
+        yield return Expression;
+        yield return Symbol;
     }
 }

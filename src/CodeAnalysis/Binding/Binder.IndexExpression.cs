@@ -12,7 +12,7 @@ partial class Binder
         var expression = BindExpression(syntax.Expression, context);
 
         // TODO: Allow different index operators.
-        var @operator = expression.Type.GetOperators(SyntaxKind.IndexOperator).SingleOrDefault();
+        var @operator = expression.Type.GetOperators(SyntaxKind.BracketOpenBracketCloseToken).SingleOrDefault();
 
         if (@operator is null)
         {

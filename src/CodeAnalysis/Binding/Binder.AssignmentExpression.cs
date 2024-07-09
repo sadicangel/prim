@@ -20,13 +20,13 @@ partial class Binder
             return @ref;
         }
 
-        if (@ref.NameSymbol.IsReadOnly)
+        if (@ref.Symbol.IsReadOnly)
         {
-            context.Diagnostics.ReportReadOnlyAssignment(@ref.Syntax.Location, @ref.NameSymbol.Name);
+            context.Diagnostics.ReportReadOnlyAssignment(@ref.Syntax.Location, @ref.Symbol.Name);
             return new BoundNeverExpression(syntax);
         }
 
-        var right = @ref.NameSymbol is FunctionSymbol func
+        var right = @ref.Symbol is FunctionSymbol func
             ? BindFunctionAssignmentExpression(syntax.Right, func, context)
             : BindExpression(syntax.Right, context);
 

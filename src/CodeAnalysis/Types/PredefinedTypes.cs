@@ -36,13 +36,13 @@ internal static class PredefinedTypes
             .AddMembers(type =>
             {
                 type.AddOperator(
-                    SyntaxKind.AddOperator,
+                    SyntaxKind.PlusToken,
                     new FunctionType([new Parameter("x", Str), new Parameter("y", Str)], Str));
                 type.AddOperator(
-                    SyntaxKind.AddOperator,
+                    SyntaxKind.PlusToken,
                     new FunctionType([new Parameter("x", Str), new Parameter("y", Any)], Str));
                 type.AddOperator(
-                    SyntaxKind.AddOperator,
+                    SyntaxKind.PlusToken,
                     new FunctionType([new Parameter("x", Any), new Parameter("y", Str)], Str));
             });
 
@@ -187,28 +187,28 @@ internal static class PredefinedTypes
     private static PrimType AddMathOperators(this PrimType type)
     {
         type.AddOperator(
-            SyntaxKind.UnaryPlusOperator,
+            SyntaxKind.PlusToken,
             new FunctionType([new("x", type)], type));
         type.AddOperator(
-            SyntaxKind.UnaryMinusOperator,
+            SyntaxKind.MinusToken,
             new FunctionType([new("x", type)], type));
         type.AddOperator(
-            SyntaxKind.AddOperator,
+            SyntaxKind.PlusToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.SubtractOperator,
+            SyntaxKind.MinusToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.MultiplyOperator,
+            SyntaxKind.StarToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.DivideOperator,
+            SyntaxKind.SlashToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.ModuloOperator,
+            SyntaxKind.PercentToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.PowerOperator,
+            SyntaxKind.StarStarToken,
             new FunctionType([new("x", type), new("y", type)], type));
         return type;
     }
@@ -216,22 +216,22 @@ internal static class PredefinedTypes
     private static PrimType AddBitwiseOperators(this PrimType type)
     {
         type.AddOperator(
-            SyntaxKind.OnesComplementOperator,
+            SyntaxKind.TildeToken,
             new FunctionType([new("x", type)], type));
         type.AddOperator(
-            SyntaxKind.BitwiseAndOperator,
+            SyntaxKind.AmpersandToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.BitwiseOrOperator,
+            SyntaxKind.PipeToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.ExclusiveOrOperator,
+            SyntaxKind.HatToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.LeftShiftOperator,
+            SyntaxKind.LessThanLessThanToken,
             new FunctionType([new("x", type), new("y", type)], type));
         type.AddOperator(
-            SyntaxKind.RightShiftOperator,
+            SyntaxKind.GreaterThanGreaterThanToken,
             new FunctionType([new("x", type), new("y", type)], type));
         return type;
     }
@@ -239,10 +239,10 @@ internal static class PredefinedTypes
     private static PrimType AddEqualityOperators(this PrimType type)
     {
         type.AddOperator(
-            SyntaxKind.EqualsOperator,
+            SyntaxKind.EqualsEqualsToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         type.AddOperator(
-            SyntaxKind.NotEqualsOperator,
+            SyntaxKind.BangEqualsToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         return type;
     }
@@ -250,16 +250,16 @@ internal static class PredefinedTypes
     private static PrimType AddComparisonOperators(this PrimType type)
     {
         type.AddOperator(
-            SyntaxKind.LessThanOperator,
+            SyntaxKind.LessThanToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         type.AddOperator(
-            SyntaxKind.LessThanOrEqualOperator,
+            SyntaxKind.LessThanEqualsToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         type.AddOperator(
-            SyntaxKind.GreaterThanOperator,
+            SyntaxKind.GreaterThanToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         type.AddOperator(
-            SyntaxKind.GreaterThanOrEqualOperator,
+            SyntaxKind.GreaterThanEqualsToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         return type;
     }
@@ -267,13 +267,13 @@ internal static class PredefinedTypes
     private static PrimType AddLogicalOperators(this PrimType type)
     {
         type.AddOperator(
-            SyntaxKind.NotOperator,
+            SyntaxKind.BangToken,
             new FunctionType([new("x", type)], Bool));
         type.AddOperator(
-            SyntaxKind.LogicalAndOperator,
+            SyntaxKind.AmpersandAmpersandToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         type.AddOperator(
-            SyntaxKind.LogicalOrOperator,
+            SyntaxKind.PipePipeToken,
             new FunctionType([new("x", type), new("y", type)], Bool));
         return type;
     }

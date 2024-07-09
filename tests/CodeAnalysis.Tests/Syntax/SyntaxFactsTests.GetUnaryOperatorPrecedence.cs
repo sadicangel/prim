@@ -14,8 +14,7 @@ public sealed partial class SyntaxFactsTests
     [MemberData(nameof(GetUnaryOperators))]
     public void GetUnaryOperatorPrecedence_return_precedence_for_operator(SyntaxKind syntaxKind)
     {
-        var (expression, precedence) = SyntaxFacts.GetUnaryOperatorPrecedence(syntaxKind);
-        Assert.True(expression > 0);
+        var precedence = SyntaxFacts.GetUnaryOperatorPrecedence(syntaxKind);
         Assert.True(precedence > 0);
     }
 
@@ -25,8 +24,7 @@ public sealed partial class SyntaxFactsTests
     [MemberData(nameof(GetNonUnaryOperators))]
     public void GetUnaryOperatorPrecedence_returns_0_for_non_operator(SyntaxKind syntaxKind)
     {
-        var (expression, precedence) = SyntaxFacts.GetUnaryOperatorPrecedence(syntaxKind);
-        Assert.Equal((SyntaxKind)0, expression);
+        var precedence = SyntaxFacts.GetUnaryOperatorPrecedence(syntaxKind);
         Assert.Equal(0, precedence);
     }
 }

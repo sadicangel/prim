@@ -10,9 +10,9 @@ partial class Interpreter
         var expression = EvaluateExpression(node.Expression, context);
         context.EvaluatedScope.Declare(VariableSymbol.This(expression.Type), expression, @throw: false);
         var memberReference = new ReferenceValue(
-            node.NameSymbol.Type,
-            () => expression.Get(node.NameSymbol),
-            pv => expression.Set(node.NameSymbol, pv));
+            node.Symbol.Type,
+            () => expression.Get(node.Symbol),
+            pv => expression.Set(node.Symbol, pv));
         return memberReference;
     }
 }

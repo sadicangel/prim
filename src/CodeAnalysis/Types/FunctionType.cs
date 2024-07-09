@@ -10,7 +10,7 @@ public sealed record class FunctionType : PrimType
     {
         Parameters = parameters;
         ReturnType = returnType;
-        AddOperator(SyntaxKind.InvocationOperator, this);
+        AddOperator(SyntaxKind.ParenthesisOpenParenthesisCloseToken, this);
     }
 
     public ReadOnlyList<Parameter> Parameters { get; init; }

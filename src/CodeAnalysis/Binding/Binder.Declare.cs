@@ -75,9 +75,9 @@ partial class Binder
             static int BindOperator(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
             {
                 var type = (FunctionType)BindType(syntax.Type, context);
-                var kind = syntax.Operator.SyntaxKind;
+                var kind = syntax.OperatorToken.SyntaxKind;
                 if (!structSymbol.Type.AddOperator(kind, type))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.Operator.Text.ToString());
+                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.OperatorToken.Text.ToString());
                 return 0;
             }
 

@@ -11,21 +11,21 @@ partial class Binder
         var right = BindExpression(syntax.Right, context);
 
         var containingType = left.Type;
-        var operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type);
+        var operators = containingType.GetBinaryOperators(syntax.OperatorToken.SyntaxKind, left.Type, right.Type);
         if (operators is [])
         {
             containingType = right.Type;
-            operators = containingType.GetBinaryOperators(syntax.Operator.SyntaxKind, left.Type, right.Type);
+            operators = containingType.GetBinaryOperators(syntax.OperatorToken.SyntaxKind, left.Type, right.Type);
             if (operators is [])
             {
-                context.Diagnostics.ReportUndefinedBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
+                context.Diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken, left.Type.Name, right.Type.Name);
                 return new BoundNeverExpression(syntax);
             }
         }
 
         if (operators is not [var @operator])
         {
-            context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.Operator.OperatorToken, left.Type.Name, right.Type.Name);
+            context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.OperatorToken, left.Type.Name, right.Type.Name);
             return new BoundNeverExpression(syntax);
         }
 
