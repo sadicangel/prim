@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using CodeAnalysis.Binding;
+﻿using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Types;
 
@@ -14,21 +13,7 @@ public abstract record class PrimValue(PrimType Type)
 
     public abstract object Value { get; }
 
-    internal virtual PrimValue GetMember(Symbol symbol) => Members[symbol];
-    internal virtual void SetMember(Symbol symbol, PrimValue value) => Members[symbol] = value;
-
-    internal virtual PrimValue GetProperty(PropertySymbol symbol) => Members[symbol];
-    internal virtual void SetProperty(PropertySymbol symbol, PrimValue value) => Members[symbol] = value;
-
-    internal virtual FunctionValue GetMethod(MethodSymbol symbol) => Members[symbol] as FunctionValue
-        ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    internal virtual void SetMethod(MethodSymbol symbol, FunctionValue value) => Members[symbol] = value;
-
-    internal virtual FunctionValue GetOperator(OperatorSymbol symbol) => Members[symbol] as FunctionValue
-        ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    internal virtual void SetOperator(OperatorSymbol symbol, FunctionValue value) => Members[symbol] = value;
-
-    internal virtual FunctionValue GetConversion(FunctionSymbol symbol) => Members[symbol] as FunctionValue
-        ?? throw new UnreachableException($"Unexpected symbol '{symbol}'");
-    internal virtual void SetConversion(FunctionSymbol symbol, FunctionValue value) => Members[symbol] = value;
+    internal virtual PrimValue Get(Symbol symbol) => Members[symbol];
+    internal T Get<T>(Symbol symbol) where T : PrimValue => (T)Get(symbol);
+    internal virtual void Set(Symbol symbol, PrimValue value) => Members[symbol] = value;
 }

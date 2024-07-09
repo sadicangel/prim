@@ -107,6 +107,8 @@ public enum SyntaxKind
     FalseKeyword,
     NullKeyword,
 
+    ThisKeyword,
+
     LineBreakTrivia,
     WhiteSpaceTrivia,
     SingleLineCommentTrivia,

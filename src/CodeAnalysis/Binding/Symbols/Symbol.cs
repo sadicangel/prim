@@ -2,7 +2,12 @@
 using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Symbols;
-internal abstract record class Symbol(BoundKind BoundKind, SyntaxNode Syntax, string Name, bool IsReadOnly)
+internal abstract record class Symbol(
+    BoundKind BoundKind,
+    SyntaxNode Syntax,
+    string Name,
+    bool IsReadOnly,
+    bool IsStatic)
     : BoundNode(BoundKind, Syntax)
 {
     public abstract PrimType Type { get; }

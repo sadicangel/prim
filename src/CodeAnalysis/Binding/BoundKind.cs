@@ -25,6 +25,7 @@ internal enum BoundKind
     IndexReference,
 
     FunctionBodyExpression,
+    MethodBodyExpression,
 
     BlockExpression,
     ArrayInitExpression,
@@ -43,7 +44,6 @@ internal enum BoundKind
     FunctionSymbol,
     StructSymbol,
     PropertySymbol,
-    MethodSymbol,
     VariableSymbol,
 
     IndexOperator,

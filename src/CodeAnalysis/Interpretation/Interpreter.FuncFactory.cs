@@ -30,15 +30,15 @@ partial class Interpreter
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluateNodeMethodInfo)}");
         }
 
-        public static Delegate Create(FunctionSymbol function, BoundFunctionBodyExpression body, InterpreterContext context)
+        public static Delegate Create(FunctionSymbol function, BoundExpression body, InterpreterContext context)
         {
             var disposableVar = Expression.Variable(typeof(InterpreterContext.TempScope), "<$>disposable");
             var contextConst = Expression.Constant(context, typeof(InterpreterContext));
             var evaluatedScope = Expression.Property(contextConst, s_evaluatedScopePropertyInfo);
             var parameters = function.Type.Parameters.Select(p => Expression.Parameter(typeof(PrimValue), p.Name)).ToArray();
-            var variables = body.ParameterSymbols.Select(p => Expression.Constant(p, typeof(VariableSymbol))).ToArray();
+            var variables = function.Parameters.Select(p => Expression.Constant(p, typeof(VariableSymbol))).ToArray();
             var value = Expression.Variable(typeof(PrimValue), "value");
-            var expression = Expression.Constant(body.Expression, typeof(BoundExpression));
+            var expression = Expression.Constant(body, typeof(BoundExpression));
 
             return Expression.Lambda(
                 Expression.Block(

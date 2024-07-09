@@ -7,7 +7,7 @@ partial class Interpreter
     public static PrimValue EvaluateInvocationExpression(BoundInvocationExpression node, InterpreterContext context)
     {
         var expression = EvaluateExpression(node.Expression, context);
-        var function = expression.GetOperator(node.OperatorSymbol);
+        var function = expression.Get<FunctionValue>(node.OperatorSymbol);
         var arguments = node.Arguments.Select(a => EvaluateExpression(a, context)).ToArray();
         var value = function.Invoke(arguments);
         return value;

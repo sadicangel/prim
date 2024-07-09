@@ -33,7 +33,8 @@ partial class Binder
             var propertySymbol = new PropertySymbol(
                 syntax,
                 property,
-                IsReadOnly: property.IsReadOnly);
+                property.IsReadOnly,
+                property.IsStatic);
             var expression = BindPropertyInitExpression(propertySyntax, propertySymbol, context);
             properties.Add(expression);
         }

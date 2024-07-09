@@ -13,12 +13,13 @@ while (true)
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
         Value: struct = {
             i: i32 = 0;
-            implicit: (v: Value) -> i32 = v.i;
+            get_i: () -> i32 = this.i;
         }
 
         v: Value = Value { .i = 10 }
-        v as i32
-
+        a: i32 = v.get_i();
+        a = v.get_i()
+        a
         """));
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);

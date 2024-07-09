@@ -3,7 +3,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Types.Metadata;
 public sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Type, PrimType ContainingType)
-    : Member($"{GetConversionPrefix(ConversionKind)}<{Type.Name}>", ContainingType)
+    : Member($"{GetConversionPrefix(ConversionKind)}<{Type.Name}>", ContainingType, IsReadOnly: true, IsStatic: true)
 {
     public override FunctionType Type { get; } = Type;
     public bool IsImplicit { get => ConversionKind is SyntaxKind.ImplicitKeyword; }

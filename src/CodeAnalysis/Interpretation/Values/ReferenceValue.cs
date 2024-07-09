@@ -20,18 +20,6 @@ internal sealed record class ReferenceValue : PrimValue
 
     public override object Value => ReferencedValue.Value;
 
-    internal override PrimValue GetMember(Symbol symbol) => ReferencedValue.GetMember(symbol);
-    internal override void SetMember(Symbol symbol, PrimValue value) => ReferencedValue.SetMember(symbol, value);
-
-    internal override PrimValue GetProperty(PropertySymbol symbol) => ReferencedValue.GetProperty(symbol);
-    internal override void SetProperty(PropertySymbol symbol, PrimValue value) => ReferencedValue.SetProperty(symbol, value);
-
-    internal override FunctionValue GetMethod(MethodSymbol symbol) => ReferencedValue.GetMethod(symbol);
-    internal override void SetMethod(MethodSymbol symbol, FunctionValue value) => ReferencedValue.SetMethod(symbol, value);
-
-    internal override FunctionValue GetOperator(OperatorSymbol symbol) => ReferencedValue.GetOperator(symbol);
-    internal override void SetOperator(OperatorSymbol symbol, FunctionValue value) => ReferencedValue.SetOperator(symbol, value);
-
-    internal override FunctionValue GetConversion(FunctionSymbol symbol) => ReferencedValue.GetConversion(symbol);
-    internal override void SetConversion(FunctionSymbol symbol, FunctionValue value) => ReferencedValue.SetConversion(symbol, value);
+    internal override PrimValue Get(Symbol symbol) => ReferencedValue.Get(symbol);
+    internal override void Set(Symbol symbol, PrimValue value) => ReferencedValue.Set(symbol, value);
 }

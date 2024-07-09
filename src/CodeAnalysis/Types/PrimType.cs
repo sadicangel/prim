@@ -14,6 +14,8 @@ public abstract record class PrimType(string Name)
     public bool IsUnknown { get => this == PredefinedTypes.Unknown; }
     public bool IsPredefined { get => PredefinedTypeNames.All.Contains(Name); }
 
+    public IReadOnlyList<Member> Members => _members;
+
     private string GetDebuggerDisplay() => $"{Name}: {PredefinedTypeNames.Type}";
 
     public virtual bool Equals(PrimType? other) => other is not null && Name == other.Name;
@@ -55,7 +57,8 @@ public abstract record class PrimType(string Name)
     internal bool AddProperty(string name, PrimType type, bool isReadonly)
     {
         if (GetProperty(name) is not null) return false;
-        _members.Add(new Property(name, type, this, isReadonly));
+        // TODO: Allow static properties.
+        _members.Add(new Property(name, type, this, isReadonly, IsStatic: false));
         return true;
     }
 
@@ -72,7 +75,8 @@ public abstract record class PrimType(string Name)
     internal bool AddMethod(string name, FunctionType type)
     {
         if (GetMethod(name, type) is not null) return false;
-        _members.Add(new Method(name, type, this));
+        // TODO: Allow static methods.
+        _members.Add(new Method(name, type, this, IsStatic: false));
         return true;
     }
 

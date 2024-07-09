@@ -14,7 +14,7 @@ partial class Binder
                 return expression;
             }
 
-            var conversionSymbol = FunctionSymbol.FromConversion(expression.Syntax, conversion);
+            var conversionSymbol = FunctionSymbol.FromConversion(conversion);
 
             return new BoundConversionExpression(expression.Syntax, conversionSymbol, expression);
         }

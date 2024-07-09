@@ -32,15 +32,14 @@ partial class Interpreter
         static object EvaluatePropertyDeclaration(BoundPropertyDeclaration member, StructValue structValue, InterpreterContext context)
         {
             var value = EvaluateExpression(member.Expression, context);
-            structValue.SetProperty(member.PropertySymbol, value);
+            structValue.Set(member.PropertySymbol, value);
             return 0;
         }
 
         static object EvaluateMethodDeclaration(BoundMethodDeclaration member, StructValue structValue, InterpreterContext context)
         {
-            _ = member;
-            _ = structValue;
-            _ = context;
+            var functionValue = new FunctionValue(member.FunctionSymbol.Type, FuncFactory.Create(member.FunctionSymbol, member.Body, context));
+            structValue.Set(member.FunctionSymbol, functionValue);
             return 0;
         }
 
@@ -52,11 +51,10 @@ partial class Interpreter
             return 0;
         }
 
-        static object EvaluateConversionDeclaration(BoundConversionDeclaration node, StructValue structValue, InterpreterContext context)
+        static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, InterpreterContext context)
         {
-            var functionValue = new FunctionValue(node.NameSymbol.Type, FuncFactory.Create(node.NameSymbol, node.Body, context));
-            functionValue.SetOperator(node.OperatorSymbol, functionValue);
-            structValue.SetConversion(node.NameSymbol, functionValue);
+            var functionValue = new FunctionValue(member.FunctionSymbol.Type, FuncFactory.Create(member.FunctionSymbol, member.Body, context));
+            structValue.Set(member.FunctionSymbol, functionValue);
             return 0;
         }
     }

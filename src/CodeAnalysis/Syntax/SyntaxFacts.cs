@@ -111,6 +111,8 @@ public static class SyntaxFacts
             SyntaxKind.FalseKeyword => "false",
             SyntaxKind.NullKeyword => "null",
 
+            SyntaxKind.ThisKeyword => "this",
+
             SyntaxKind.LineBreakTrivia => null,
             SyntaxKind.WhiteSpaceTrivia => null,
             SyntaxKind.SingleLineCommentTrivia => null,
@@ -277,6 +279,8 @@ public static class SyntaxFacts
             "true" => SyntaxKind.TrueKeyword,
             "false" => SyntaxKind.FalseKeyword,
             "null" => SyntaxKind.NullKeyword,
+
+            "this" => SyntaxKind.ThisKeyword,
 
             _ => SyntaxKind.IdentifierToken,
         };

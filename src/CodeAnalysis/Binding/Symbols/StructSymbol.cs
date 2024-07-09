@@ -4,7 +4,7 @@ using CodeAnalysis.Types;
 namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class StructSymbol(SyntaxNode Syntax, StructType Type)
-    : Symbol(BoundKind.StructSymbol, Syntax, Type.Name, IsReadOnly: true)
+    : Symbol(BoundKind.StructSymbol, Syntax, Type.Name, IsReadOnly: true, IsStatic: true)
 {
     public override StructType Type { get; } = Type;
 }

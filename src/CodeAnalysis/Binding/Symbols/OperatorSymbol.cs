@@ -5,7 +5,7 @@ using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class OperatorSymbol(SyntaxNode Syntax, Operator Operator, bool IsReadOnly = true)
-    : MemberSymbol(GetBoundKind(Operator.OperatorKind), Syntax, Operator.Name, IsReadOnly)
+    : Symbol(GetBoundKind(Operator.OperatorKind), Syntax, Operator.Name, IsReadOnly, IsStatic: true)
 {
     public override FunctionType Type { get; } = Operator.Type;
 

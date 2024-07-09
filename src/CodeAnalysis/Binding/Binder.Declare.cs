@@ -116,7 +116,8 @@ partial class Binder
             functionName,
             functionType,
             parameterSymbols.ToBoundList(),
-            IsReadOnly: isTopLevel || syntax.IsReadOnly);
+            IsReadOnly: isTopLevel || syntax.IsReadOnly,
+            IsStatic: true);
 
         if (!context.BoundScope.Declare(functionSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, functionName);

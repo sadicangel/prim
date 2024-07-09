@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundFunctionBodyExpression BindFunctionBody(
+    private static BoundExpression BindFunctionBody(
         ExpressionSyntax syntax,
         FunctionSymbol functionSymbol,
         BinderContext context)
@@ -19,9 +19,7 @@ partial class Binder
             }
 
             // TODO: Check for unused parameters.
-            var expression = Coerce(BindExpression(syntax, context), functionSymbol.ReturnType, context);
-
-            var body = new BoundFunctionBodyExpression(syntax, functionSymbol, functionSymbol.Parameters, expression);
+            var body = Coerce(BindExpression(syntax, context), functionSymbol.ReturnType, context);
 
             return body;
         }

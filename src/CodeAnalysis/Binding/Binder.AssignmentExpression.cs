@@ -27,7 +27,7 @@ partial class Binder
         }
 
         var right = @ref.NameSymbol is FunctionSymbol func
-            ? BindFunctionBody(syntax.Right, func, context)
+            ? BindFunctionAssignmentExpression(syntax.Right, func, context)
             : BindExpression(syntax.Right, context);
 
         right = Coerce(right, @ref.Type, context);

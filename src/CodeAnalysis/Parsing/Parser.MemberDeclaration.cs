@@ -12,7 +12,7 @@ partial class Parser
         {
             SyntaxKind.ImplicitKeyword or SyntaxKind.ExplicitKeyword => ParseConversionDeclaration(syntaxTree, iterator),
             _ when SyntaxFacts.IsOperator(iterator.Current.SyntaxKind) => ParseOperatorDeclaration(syntaxTree, iterator),
-            _ when iterator.Peek(1).SyntaxKind is SyntaxKind.ParenthesisOpenToken => ParseMethodDeclaration(syntaxTree, iterator),
+            _ when iterator.Peek(2).SyntaxKind is SyntaxKind.ParenthesisOpenToken => ParseMethodDeclaration(syntaxTree, iterator),
             _ => ParsePropertyDeclaration(syntaxTree, iterator),
         };
 

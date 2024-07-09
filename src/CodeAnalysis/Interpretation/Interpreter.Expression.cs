@@ -24,7 +24,7 @@ partial class Interpreter
             BoundKind.StructDeclaration =>
                 EvaluateStructDeclaration((BoundStructDeclaration)node, context),
             BoundKind.FunctionBodyExpression =>
-                EvaluateFunctionBody((BoundFunctionBodyExpression)node, context),
+                EvaluateFunctionAssignmentExpression((BoundFunctionAssignmentExpression)node, context),
             //BoundKind.EmptyExpression =>
             //    EvaluateEmptyExpression((BoundEmptyExpression)node, context),
             //BoundKind.StatementExpression =>

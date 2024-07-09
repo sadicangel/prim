@@ -41,7 +41,7 @@ partial class Binder
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
 
-            var propertySymbol = new PropertySymbol(syntax, property, syntax.IsReadOnly);
+            var propertySymbol = new PropertySymbol(syntax, property, syntax.IsReadOnly, property.IsStatic);
 
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }
@@ -52,11 +52,11 @@ partial class Binder
             var method = structSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'");
 
-            var body = BindExpression(syntax.Body, context);
+            var functionSymbol = FunctionSymbol.FromMethod(method, structSymbol.Type, syntax);
 
-            var methodSymbol = new MethodSymbol(syntax, method);
+            var body = BindFunctionBody(syntax.Body, functionSymbol, context);
 
-            return new BoundMethodDeclaration(syntax, methodSymbol, body);
+            return new BoundMethodDeclaration(syntax, functionSymbol, body);
         }
 
         static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
@@ -79,14 +79,11 @@ partial class Binder
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
             // TODO: Either here or when declaring, must ensure only 1 parameter.
-            var functionSymbol = FunctionSymbol.FromConversion(syntax, conversion, syntax.Type.Parameters[0]);
-
-            var @operator = functionSymbol.Type.GetOperators(SyntaxKind.InvocationOperator).Single();
-            var operatorSymbol = new OperatorSymbol(syntax, @operator);
+            var functionSymbol = FunctionSymbol.FromConversion(conversion, syntax);
 
             var body = BindFunctionBody(syntax.Body, functionSymbol, context);
 
-            return new BoundConversionDeclaration(syntax, functionSymbol, operatorSymbol, body);
+            return new BoundConversionDeclaration(syntax, functionSymbol, body);
         }
     }
 }
