@@ -13,9 +13,7 @@ internal sealed record class ArrayValue
         Elements = elements;
         var index = arrayType.GetOperators(SyntaxKind.IndexOperator).Single();
         Set(
-            new OperatorSymbol(
-                SyntaxFactory.SyntheticToken(SyntaxKind.IndexOperator),
-                index),
+            FunctionSymbol.FromOperator(index),
             new FunctionValue(
                 index.Type,
                 GetValue));

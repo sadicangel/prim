@@ -67,9 +67,9 @@ partial class Binder
 
             var body = BindExpression(syntax.Body, context);
 
-            var operatorSymbol = new OperatorSymbol(syntax, @operator);
+            var functionSymbol = FunctionSymbol.FromOperator(@operator, syntax);
 
-            return new BoundOperatorDeclaration(syntax, operatorSymbol, body);
+            return new BoundOperatorDeclaration(syntax, functionSymbol, body);
         }
 
         static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)

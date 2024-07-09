@@ -68,4 +68,21 @@ internal sealed record class FunctionSymbol(
 
         return methodSymbol;
     }
+
+    public static FunctionSymbol FromOperator(Operator @operator, OperatorDeclarationSyntax? syntax = null)
+    {
+        var parameters = @operator.Type.Parameters.Select((p, i) => new VariableSymbol(
+            syntax?.Type.Parameters[i] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
+            p.Name,
+            p.Type,
+            IsReadOnly: true));
+
+        return new FunctionSymbol(
+            syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(@operator.OperatorKind),
+            @operator.Name,
+            @operator.Type,
+            [.. parameters],
+            IsReadOnly: @operator.IsReadOnly,
+            IsStatic: @operator.IsStatic);
+    }
 }

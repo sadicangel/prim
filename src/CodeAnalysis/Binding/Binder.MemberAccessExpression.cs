@@ -19,7 +19,7 @@ partial class Binder
         {
             Property property => new PropertySymbol(syntax.Name, property, property.IsReadOnly, property.IsStatic),
             Method method => FunctionSymbol.FromMethod(method, expression.Type),
-            Operator @operator => new OperatorSymbol(syntax.Name, @operator),
+            Operator @operator => FunctionSymbol.FromOperator(@operator),
             Conversion conversion => FunctionSymbol.FromConversion(conversion),
             _ => throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'"),
         };

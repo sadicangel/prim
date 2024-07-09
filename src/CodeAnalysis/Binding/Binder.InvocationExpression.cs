@@ -48,9 +48,9 @@ partial class Binder
             }
         }
 
-        var operatorSymbol = new OperatorSymbol(syntax, @operator);
+        var functionSymbol = FunctionSymbol.FromOperator(@operator);
 
-        return new BoundInvocationExpression(syntax, expression, operatorSymbol, arguments);
+        return new BoundInvocationExpression(syntax, expression, functionSymbol, arguments);
 
         static BoundExpression BindArgument(ArgumentSyntax syntax, BinderContext context)
         {

@@ -5,13 +5,13 @@ namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundOperatorDeclaration(
     SyntaxNode Syntax,
-    OperatorSymbol OperatorSymbol,
+    FunctionSymbol FunctionSymbol,
     BoundExpression Expression)
-    : BoundMemberDeclaration(BoundKind.OperatorDeclaration, Syntax, OperatorSymbol.Type)
+    : BoundMemberDeclaration(BoundKind.OperatorDeclaration, Syntax, FunctionSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return OperatorSymbol;
+        yield return FunctionSymbol;
         yield return Expression;
     }
 }
