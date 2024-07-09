@@ -33,8 +33,6 @@ internal enum BoundKind
     PropertyInitExpression,
     InvocationExpression,
 
-    ConversionExpression,
-
     UnaryExpression,
     BinaryExpression,
 

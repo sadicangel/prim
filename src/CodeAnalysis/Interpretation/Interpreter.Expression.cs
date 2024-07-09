@@ -41,8 +41,6 @@ partial class Interpreter
                 EvaluateInvocationExpression((BoundInvocationExpression)node, context),
             BoundKind.StructInitExpression =>
                 EvaluateStructInitExpression((BoundStructInitExpression)node, context),
-            BoundKind.ConversionExpression =>
-                EvaluateConversionExpression((BoundConversionExpression)node, context),
             BoundKind.UnaryExpression =>
                 EvaluateUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression =>

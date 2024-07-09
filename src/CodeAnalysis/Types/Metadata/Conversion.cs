@@ -3,7 +3,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Types.Metadata;
 public sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Type, PrimType ContainingType)
-    : Member($"{GetConversionPrefix(ConversionKind)}<{Type.Name}>", ContainingType, IsReadOnly: true, IsStatic: true)
+    : Member(GetConversionName(ConversionKind, Type), ContainingType, IsReadOnly: true, IsStatic: true)
 {
     public override FunctionType Type { get; } = Type;
     public bool IsImplicit { get => ConversionKind is SyntaxKind.ImplicitKeyword; }
@@ -11,10 +11,17 @@ public sealed record class Conversion(SyntaxKind ConversionKind, FunctionType Ty
 
     public override string ToString() => $"{Name}: {Type.Name}";
 
-    private static string GetConversionPrefix(SyntaxKind conversionKind) => conversionKind switch
+    private static string GetConversionName(SyntaxKind conversionKind, FunctionType type)
     {
-        SyntaxKind.ImplicitKeyword => "implicit",
-        SyntaxKind.ExplicitKeyword => "explicit",
-        _ => throw new UnreachableException($"Unexpected conversion '{conversionKind}'")
-    };
+        var prefix = conversionKind switch
+        {
+            SyntaxKind.ImplicitKeyword => "implicit",
+            SyntaxKind.ExplicitKeyword => "explicit",
+            _ => throw new UnreachableException($"Unexpected conversion '{conversionKind}'")
+        };
+
+        var name = $"{prefix}({string.Join(',', type.Parameters.Select(p => p.Type.Name))})->{type.ReturnType}";
+
+        return name;
+    }
 }
