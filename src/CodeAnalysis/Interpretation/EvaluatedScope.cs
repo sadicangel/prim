@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
@@ -44,23 +45,30 @@ internal class EvaluatedScope(EvaluatedScope? parent = null) : IEnumerable<PrimV
         throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
     }
 
-    public PrimValue Lookup(Symbol symbol)
+    public bool TryLookup(Symbol symbol, [MaybeNullWhen(false)] out PrimValue value)
     {
         var scope = this;
-        var value = scope.Values?.GetValueOrDefault(symbol);
+        value = scope.Values?.GetValueOrDefault(symbol);
         if (value is not null)
-            return value;
+            return true;
 
         do
         {
             scope = scope.Parent;
             value = scope.Values?.GetValueOrDefault(symbol);
             if (value is not null)
-                return value;
+                return true;
         }
         while (scope != scope.Parent);
 
-        throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
+        return false;
+    }
+
+    public PrimValue Lookup(Symbol symbol)
+    {
+        if (!TryLookup(symbol, out var value))
+            throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
+        return value;
     }
 
     public IEnumerator<PrimValue> GetEnumerator()
@@ -134,7 +142,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
             var m = new Dictionary<Symbol, PrimValue>();
             foreach (var name in PredefinedTypeNames.All)
             {
-                var symbol = g.Lookup(name) as StructSymbol
+                var symbol = g.Lookup(name) as TypeSymbol
                     ?? throw new UnreachableException(DiagnosticMessage.UndefinedType(name));
                 m[symbol] = new StructValue(symbol);
                 // TODO: Create members for struct.
@@ -160,7 +168,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                             new LiteralValue(s, a.Type, a.Value + (string)b.Value)));
                 });
 
-            R M<T>(StructSymbol s) => new((StructValue)m[s], typeof(T));
+            R M<T>(TypeSymbol s) => new((StructValue)m[s], typeof(T));
 
             ((StructValue)m[g.Bool])
                 .AddEqualityOperators<bool>()
@@ -318,75 +326,75 @@ file static class StructValueExtensions
 
     public static StructValue AddMathOperators<T>(this StructValue s) where T : INumber<T>
     {
-        var unaryPlus = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.PlusToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var unaryPlus = s.TypeSymbol.Type.GetUnaryOperators(SyntaxKind.PlusToken, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(unaryPlus, s.StructSymbol),
+            MethodSymbol.FromOperator(unaryPlus, s.TypeSymbol),
             new FunctionValue(unaryPlus.Type, (PrimValue a) => new LiteralValue(s, a.Type, +(T)a.Value)));
-        var unaryMinus = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.MinusToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var unaryMinus = s.TypeSymbol.Type.GetUnaryOperators(SyntaxKind.MinusToken, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(unaryMinus, s.StructSymbol),
+            MethodSymbol.FromOperator(unaryMinus, s.TypeSymbol),
             new FunctionValue(unaryMinus.Type, (PrimValue a) => new LiteralValue(s, a.Type, -(T)a.Value)));
-        var add = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PlusToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var add = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.PlusToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(add, s.StructSymbol),
+            MethodSymbol.FromOperator(add, s.TypeSymbol),
             new FunctionValue(add.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value + (T)b.Value)));
-        var subtract = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.MinusToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var subtract = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.MinusToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(subtract, s.StructSymbol),
+            MethodSymbol.FromOperator(subtract, s.TypeSymbol),
             new FunctionValue(subtract.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value - (T)b.Value)));
-        var multiply = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.StarToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var multiply = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.StarToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(multiply, s.StructSymbol),
+            MethodSymbol.FromOperator(multiply, s.TypeSymbol),
             new FunctionValue(multiply.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value * (T)b.Value)));
-        var divide = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.SlashToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var divide = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.SlashToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(divide, s.StructSymbol),
+            MethodSymbol.FromOperator(divide, s.TypeSymbol),
             new FunctionValue(divide.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value / (T)b.Value)));
-        var modulo = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PercentToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var modulo = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.PercentToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(modulo, s.StructSymbol),
+            MethodSymbol.FromOperator(modulo, s.TypeSymbol),
             new FunctionValue(modulo.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value % (T)b.Value)));
-        var power = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.StarStarToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var power = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.StarStarToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(power, s.StructSymbol),
+            MethodSymbol.FromOperator(power, s.TypeSymbol),
             new FunctionValue(power.Type, (PrimValue a, PrimValue b) => T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value)))));
         return s;
     }
 
     public static StructValue AddBitwiseOperators<T>(this StructValue s) where T : IBinaryInteger<T>, IShiftOperators<T, int, T>
     {
-        var onesComplement = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.TildeToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var onesComplement = s.TypeSymbol.Type.GetUnaryOperators(SyntaxKind.TildeToken, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(onesComplement, s.StructSymbol),
+            MethodSymbol.FromOperator(onesComplement, s.TypeSymbol),
             new FunctionValue(onesComplement.Type, (PrimValue a) => new LiteralValue(s, a.Type, ~(T)a.Value)));
-        var bitwiseAnd = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.AmpersandToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var bitwiseAnd = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.AmpersandToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(bitwiseAnd, s.StructSymbol),
+            MethodSymbol.FromOperator(bitwiseAnd, s.TypeSymbol),
             new FunctionValue(bitwiseAnd.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value & (T)b.Value)));
-        var bitwiseOr = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PipeToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var bitwiseOr = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.PipeToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(bitwiseOr, s.StructSymbol),
+            MethodSymbol.FromOperator(bitwiseOr, s.TypeSymbol),
             new FunctionValue(bitwiseOr.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value | (T)b.Value)));
-        var exclusiveOr = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.HatToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var exclusiveOr = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.HatToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(exclusiveOr, s.StructSymbol),
+            MethodSymbol.FromOperator(exclusiveOr, s.TypeSymbol),
             new FunctionValue(exclusiveOr.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value ^ (T)b.Value)));
-        var leftShift = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanLessThanToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var leftShift = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanLessThanToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(leftShift, s.StructSymbol),
+            MethodSymbol.FromOperator(leftShift, s.TypeSymbol),
             new FunctionValue(leftShift.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value << int.CreateTruncating((T)b.Value))));
-        var rightShift = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanGreaterThanToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var rightShift = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanGreaterThanToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(rightShift, s.StructSymbol),
+            MethodSymbol.FromOperator(rightShift, s.TypeSymbol),
             new FunctionValue(rightShift.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value >> int.CreateTruncating((T)b.Value))));
         return s;
@@ -394,14 +402,14 @@ file static class StructValueExtensions
 
     public static StructValue AddEqualityOperators<T>(this StructValue s)
     {
-        var equals = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.EqualsEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
+        var equals = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.EqualsEqualsToken, s.TypeSymbol.Type, s.TypeSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            MethodSymbol.FromOperator(equals, s.StructSymbol),
+            MethodSymbol.FromOperator(equals, s.TypeSymbol),
             new FunctionValue(equals.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, ((T)a.Value).Equals(b.Value))));
-        var notEquals = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.BangEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
+        var notEquals = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.BangEqualsToken, s.TypeSymbol.Type, s.TypeSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            MethodSymbol.FromOperator(notEquals, s.StructSymbol),
+            MethodSymbol.FromOperator(notEquals, s.TypeSymbol),
             new FunctionValue(notEquals.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, !((T)a.Value).Equals(b.Value))));
         return s;
@@ -409,24 +417,24 @@ file static class StructValueExtensions
 
     public static StructValue AddComparisonOperators<T>(this StructValue s) where T : IComparisonOperators<T, T, bool>
     {
-        var lessThan = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
+        var lessThan = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanToken, s.TypeSymbol.Type, s.TypeSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            MethodSymbol.FromOperator(lessThan, s.StructSymbol),
+            MethodSymbol.FromOperator(lessThan, s.TypeSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value < (T)b.Value)));
-        var lessThanOrEqual = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
+        var lessThanOrEqual = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, s.TypeSymbol.Type, s.TypeSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            MethodSymbol.FromOperator(lessThanOrEqual, s.StructSymbol),
+            MethodSymbol.FromOperator(lessThanOrEqual, s.TypeSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value <= (T)b.Value)));
-        var greaterThan = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
+        var greaterThan = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanToken, s.TypeSymbol.Type, s.TypeSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            MethodSymbol.FromOperator(greaterThan, s.StructSymbol),
+            MethodSymbol.FromOperator(greaterThan, s.TypeSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value > (T)b.Value)));
-        var greaterThanOrEqual = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
+        var greaterThanOrEqual = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, s.TypeSymbol.Type, s.TypeSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            MethodSymbol.FromOperator(greaterThanOrEqual, s.StructSymbol),
+            MethodSymbol.FromOperator(greaterThanOrEqual, s.TypeSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value >= (T)b.Value)));
         return s;
@@ -434,19 +442,19 @@ file static class StructValueExtensions
 
     public static StructValue AddLogicalOperators(this StructValue s)
     {
-        var not = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.BangToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var not = s.TypeSymbol.Type.GetUnaryOperators(SyntaxKind.BangToken, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(not, s.StructSymbol),
+            MethodSymbol.FromOperator(not, s.TypeSymbol),
             new FunctionValue(not.Type, (PrimValue a) =>
                 new LiteralValue(s, PredefinedTypes.Bool, !(bool)a.Value)));
-        var logicalAnd = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.AmpersandAmpersandToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var logicalAnd = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.AmpersandAmpersandToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(logicalAnd, s.StructSymbol),
+            MethodSymbol.FromOperator(logicalAnd, s.TypeSymbol),
             new FunctionValue(logicalAnd.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value && (bool)b.Value)));
-        var logicalOr = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PipePipeToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
+        var logicalOr = s.TypeSymbol.Type.GetBinaryOperators(SyntaxKind.PipePipeToken, s.TypeSymbol.Type, s.TypeSymbol.Type, s.TypeSymbol.Type).Single();
         s.Set(
-            MethodSymbol.FromOperator(logicalOr, s.StructSymbol),
+            MethodSymbol.FromOperator(logicalOr, s.TypeSymbol),
             new FunctionValue(logicalOr.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value || (bool)b.Value)));
         return s;
@@ -456,12 +464,12 @@ file static class StructValueExtensions
     {
         foreach (var (targetStruct, targetTypeCLR) in targetTypes)
         {
-            var conversion = s.StructSymbol.Type.GetConversion(s.StructSymbol.Type, targetStruct.StructSymbol.Type)
-                ?? throw new UnreachableException($"Missing conversion from {s.StructSymbol.Type} to {targetStruct.StructSymbol.Type}");
+            var conversion = s.TypeSymbol.Type.GetConversion(s.TypeSymbol.Type, targetStruct.TypeSymbol.Type)
+                ?? throw new UnreachableException($"Missing conversion from {s.TypeSymbol.Type} to {targetStruct.TypeSymbol.Type}");
             s.Set(
-                MethodSymbol.FromConversion(conversion, s.StructSymbol),
+                MethodSymbol.FromConversion(conversion, s.TypeSymbol),
                 new FunctionValue(conversion.Type, (PrimValue x) =>
-                    new LiteralValue(targetStruct, targetStruct.StructSymbol.Type, Convert.ChangeType(x.Value, targetTypeCLR))));
+                    new LiteralValue(targetStruct, targetStruct.TypeSymbol.Type, Convert.ChangeType(x.Value, targetTypeCLR))));
         }
         return s;
     }
@@ -470,12 +478,12 @@ file static class StructValueExtensions
     {
         foreach (var (targetStruct, targetTypeCLR) in targetTypes)
         {
-            var conversion = s.StructSymbol.Type.GetConversion(s.StructSymbol.Type, targetStruct.StructSymbol.Type)
-                ?? throw new UnreachableException($"Missing conversion from {s.StructSymbol.Type} to {targetStruct.StructSymbol.Type}");
+            var conversion = s.TypeSymbol.Type.GetConversion(s.TypeSymbol.Type, targetStruct.TypeSymbol.Type)
+                ?? throw new UnreachableException($"Missing conversion from {s.TypeSymbol.Type} to {targetStruct.TypeSymbol.Type}");
             s.Set(
-                MethodSymbol.FromConversion(conversion, s.StructSymbol),
+                MethodSymbol.FromConversion(conversion, s.TypeSymbol),
                 new FunctionValue(conversion.Type, (PrimValue x) =>
-                    new LiteralValue(targetStruct, targetStruct.StructSymbol.Type, Convert.ChangeType(x.Value, targetTypeCLR))));
+                    new LiteralValue(targetStruct, targetStruct.TypeSymbol.Type, Convert.ChangeType(x.Value, targetTypeCLR))));
         }
         return s;
     }

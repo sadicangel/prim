@@ -59,12 +59,12 @@ partial class Binder
         static PrimType BindNamedType(NamedTypeSyntax syntax, BinderContext context)
         {
             var structName = syntax.IdentifierToken.Text.ToString();
-            if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
+            if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
             {
                 context.Diagnostics.ReportUndefinedType(syntax.IdentifierToken.Location, structName);
                 return PredefinedTypes.Never;
             }
-            return structSymbol.Type;
+            return typeSymbol.Type;
         }
 
         static PrimType BindOptionType(OptionTypeSyntax syntax, BinderContext context)

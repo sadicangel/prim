@@ -4,13 +4,13 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundStructDeclaration(
     SyntaxNode Syntax,
-    StructSymbol StructSymbol,
+    TypeSymbol TypeSymbol,
     BoundList<BoundMemberDeclaration> Members)
-    : BoundDeclaration(BoundKind.StructDeclaration, Syntax, StructSymbol.Type)
+    : BoundDeclaration(BoundKind.StructDeclaration, Syntax, TypeSymbol.Type)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return StructSymbol;
+        yield return TypeSymbol;
         foreach (var members in Members)
             yield return members;
     }

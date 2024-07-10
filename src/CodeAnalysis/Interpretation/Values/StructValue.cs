@@ -3,7 +3,7 @@ using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Interpretation.Values;
 
-internal sealed record class StructValue(StructSymbol StructSymbol) : PrimValue(PredefinedTypes.Type)
+internal sealed record class StructValue(TypeSymbol TypeSymbol) : PrimValue(PredefinedTypes.Type)
 {
-    public override StructType Value => StructSymbol.StructType;
+    public override PrimType Value => TypeSymbol.Type;
 }

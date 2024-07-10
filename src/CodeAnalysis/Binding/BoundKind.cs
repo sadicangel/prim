@@ -40,7 +40,6 @@ internal enum BoundKind
     WhileExpression,
 
     FunctionSymbol,
-    StructSymbol,
     PropertySymbol,
     MethodSymbol,
     VariableSymbol,

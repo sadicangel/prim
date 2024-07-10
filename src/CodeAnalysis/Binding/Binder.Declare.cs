@@ -19,22 +19,22 @@ partial class Binder
         };
     }
 
-    private static StructSymbol DeclareStruct(StructDeclarationSyntax syntax, BinderContext context, bool isTopLevel)
+    private static TypeSymbol DeclareStruct(StructDeclarationSyntax syntax, BinderContext context, bool isTopLevel)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         if (isTopLevel)
         {
-            var structSymbol = new StructSymbol(syntax, new StructType(structName), ContainingSymbol: null);
-            if (!context.BoundScope.Declare(structSymbol))
+            var typeSymbol = new TypeSymbol(syntax, new StructType(structName), ContainingSymbol: null);
+            if (!context.BoundScope.Declare(typeSymbol))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
-            return structSymbol;
+            return typeSymbol;
         }
         else
         {
-            if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
+            if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
             {
-                structSymbol = new StructSymbol(syntax, new StructType(structName), ContainingSymbol: null);
-                if (!context.BoundScope.Declare(structSymbol))
+                typeSymbol = new TypeSymbol(syntax, new StructType(structName), ContainingSymbol: null);
+                if (!context.BoundScope.Declare(typeSymbol))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             }
 
@@ -42,50 +42,50 @@ partial class Binder
             {
                 _ = memberSyntax.SyntaxKind switch
                 {
-                    SyntaxKind.PropertyDeclaration => BindProperty((PropertyDeclarationSyntax)memberSyntax, structSymbol, context),
-                    SyntaxKind.MethodDeclaration => BindMethod((MethodDeclarationSyntax)memberSyntax, structSymbol, context),
-                    SyntaxKind.OperatorDeclaration => BindOperator((OperatorDeclarationSyntax)memberSyntax, structSymbol, context),
-                    SyntaxKind.ConversionDeclaration => BindConversion((ConversionDeclarationSyntax)memberSyntax, structSymbol, context),
+                    SyntaxKind.PropertyDeclaration => BindProperty((PropertyDeclarationSyntax)memberSyntax, typeSymbol, context),
+                    SyntaxKind.MethodDeclaration => BindMethod((MethodDeclarationSyntax)memberSyntax, typeSymbol, context),
+                    SyntaxKind.OperatorDeclaration => BindOperator((OperatorDeclarationSyntax)memberSyntax, typeSymbol, context),
+                    SyntaxKind.ConversionDeclaration => BindConversion((ConversionDeclarationSyntax)memberSyntax, typeSymbol, context),
                     _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{memberSyntax.SyntaxKind}'")
                 };
             }
 
-            return structSymbol;
+            return typeSymbol;
 
 
-            static int BindProperty(PropertyDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
+            static int BindProperty(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
                 var name = syntax.IdentifierToken.Text.ToString();
                 var type = BindType(syntax.Type, context);
-                if (!structSymbol.Type.AddProperty(name, type, syntax.IsReadOnly))
+                if (!typeSymbol.Type.AddProperty(name, type, syntax.IsReadOnly))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
 
                 return 0;
             }
 
-            static int BindMethod(MethodDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
+            static int BindMethod(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
                 var name = syntax.IdentifierToken.Text.ToString();
                 var type = (FunctionType)BindType(syntax.Type, context);
-                if (!structSymbol.Type.AddMethod(name, type))
+                if (!typeSymbol.Type.AddMethod(name, type))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
                 return 0;
             }
 
-            static int BindOperator(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
+            static int BindOperator(OperatorDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
                 var type = (FunctionType)BindType(syntax.Type, context);
                 var kind = syntax.OperatorToken.SyntaxKind;
-                if (!structSymbol.Type.AddOperator(kind, type))
+                if (!typeSymbol.Type.AddOperator(kind, type))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.OperatorToken.Text.ToString());
                 return 0;
             }
 
-            static int BindConversion(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
+            static int BindConversion(ConversionDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
                 var type = (FunctionType)BindType(syntax.Type, context);
                 var kind = syntax.ConversionKeyword.SyntaxKind;
-                if (!structSymbol.Type.AddConversion(kind, type))
+                if (!typeSymbol.Type.AddConversion(kind, type))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.ConversionKeyword.Text.ToString());
                 return 0;
             }
