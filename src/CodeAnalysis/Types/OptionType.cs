@@ -17,6 +17,9 @@ public sealed record class OptionType : PrimType
         AddConversion(
             SyntaxKind.ImplicitKeyword,
             new FunctionType([new Parameter("x", UnderlyingType)], this));
+        AddConversion(
+            SyntaxKind.ExplicitKeyword,
+            new FunctionType([new Parameter("x", this)], UnderlyingType));
     }
 
     public PrimType UnderlyingType { get; init; }

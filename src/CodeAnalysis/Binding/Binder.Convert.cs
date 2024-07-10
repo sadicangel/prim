@@ -24,9 +24,9 @@ partial class Binder
                 return new BoundNeverExpression(expression.Syntax);
             }
 
-            var functionSymbol = FunctionSymbol.FromConversion(conversion);
+            var methodSymbol = MethodSymbol.FromConversion(conversion, TypeSymbol.FromType(conversion.ContainingType, containingSymbol: null));
 
-            return new BoundUnaryExpression(expression.Syntax, functionSymbol, expression);
+            return new BoundUnaryExpression(expression.Syntax, methodSymbol, expression);
         }
 
         context.Diagnostics.ReportInvalidExpressionType(expression.Syntax.Location, type.Name, expression.Type.Name);

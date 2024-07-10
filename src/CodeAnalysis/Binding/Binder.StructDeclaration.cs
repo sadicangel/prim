@@ -41,7 +41,7 @@ partial class Binder
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
 
-            var propertySymbol = new PropertySymbol(syntax, property, syntax.IsReadOnly, property.IsStatic);
+            var propertySymbol = PropertySymbol.FromProperty(property, structSymbol, syntax);
 
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }
@@ -52,11 +52,11 @@ partial class Binder
             var method = structSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'");
 
-            var functionSymbol = FunctionSymbol.FromMethod(method, structSymbol.Type, syntax);
+            var methodSymbol = MethodSymbol.FromMethod(method, structSymbol, syntax);
 
-            var body = BindFunctionBody(syntax.Body, functionSymbol, context);
+            var body = BindMethodBody(syntax.Body, methodSymbol, context);
 
-            return new BoundMethodDeclaration(syntax, functionSymbol, body);
+            return new BoundMethodDeclaration(syntax, methodSymbol, body);
         }
 
         static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
@@ -65,11 +65,11 @@ partial class Binder
             var @operator = structSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
-            var body = BindExpression(syntax.Body, context);
+            var methodSymbol = MethodSymbol.FromOperator(@operator, structSymbol, syntax);
 
-            var functionSymbol = FunctionSymbol.FromOperator(@operator, syntax);
+            var body = BindMethodBody(syntax.Body, methodSymbol, context);
 
-            return new BoundOperatorDeclaration(syntax, functionSymbol, body);
+            return new BoundOperatorDeclaration(syntax, methodSymbol, body);
         }
 
         static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, StructSymbol structSymbol, BinderContext context)
@@ -79,11 +79,11 @@ partial class Binder
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
             // TODO: Either here or when declaring, must ensure only 1 parameter.
-            var functionSymbol = FunctionSymbol.FromConversion(conversion, syntax);
+            var methodSymbol = MethodSymbol.FromConversion(conversion, structSymbol, syntax);
 
-            var body = BindFunctionBody(syntax.Body, functionSymbol, context);
+            var body = BindMethodBody(syntax.Body, methodSymbol, context);
 
-            return new BoundConversionDeclaration(syntax, functionSymbol, body);
+            return new BoundConversionDeclaration(syntax, methodSymbol, body);
         }
     }
 }

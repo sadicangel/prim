@@ -12,7 +12,7 @@ while (true)
 {
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
         a : ?i32 = 0;
-        a = if (true) 1
+        a = if (false) 1
         """));
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);

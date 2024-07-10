@@ -29,8 +29,8 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var functionSymbol = FunctionSymbol.FromOperator(@operator);
+        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(containingType, containingSymbol: null));
 
-        return new BoundBinaryExpression(syntax, left, functionSymbol, right);
+        return new BoundBinaryExpression(syntax, left, methodSymbol, right);
     }
 }

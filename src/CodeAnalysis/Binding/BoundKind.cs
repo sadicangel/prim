@@ -42,5 +42,7 @@ internal enum BoundKind
     FunctionSymbol,
     StructSymbol,
     PropertySymbol,
+    MethodSymbol,
     VariableSymbol,
+    TypeSymbol,
 }

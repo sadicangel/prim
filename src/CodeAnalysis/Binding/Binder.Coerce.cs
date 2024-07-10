@@ -14,9 +14,9 @@ partial class Binder
                 return expression;
             }
 
-            var functionSymbol = FunctionSymbol.FromConversion(conversion);
+            var methodSymbol = MethodSymbol.FromConversion(conversion, TypeSymbol.FromType(conversion.ContainingType, containingSymbol: null));
 
-            return new BoundUnaryExpression(expression.Syntax, functionSymbol, expression);
+            return new BoundUnaryExpression(expression.Syntax, methodSymbol, expression);
         }
 
         if (conversion?.IsExplicit is true)

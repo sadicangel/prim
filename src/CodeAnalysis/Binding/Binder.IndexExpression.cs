@@ -22,7 +22,7 @@ partial class Binder
 
         // TODO: Actually check where this should be readonly or not.
         // Maybe the indexer should be a property instead?
-        var functionSymbol = FunctionSymbol.FromOperator(@operator);
+        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(expression.Type, containingSymbol: null));
 
         var index = Coerce(BindExpression(syntax.Index, context), PredefinedTypes.I32, context);
         if (index.Type.IsNever)
@@ -32,6 +32,6 @@ partial class Binder
 
         // TODO: If index is const, check bounds.
 
-        return new BoundIndexReference(syntax, expression, functionSymbol, index);
+        return new BoundIndexReference(syntax, expression, methodSymbol, index);
     }
 }

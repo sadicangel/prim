@@ -15,15 +15,17 @@ partial class Binder
             return expression;
         }
 
+        var containingSymbol = new TypeSymbol(syntax, expression.Type, ContainingSymbol: null);
+
         // TODO: Support multiple member references (overloading).
         var symbol = expression.Type
             .GetMembers(syntax.Name.IdentifierToken.Text)
             .Select<Member, Symbol>(m => m switch
             {
-                Property property => new PropertySymbol(syntax.Name, property, property.IsReadOnly, property.IsStatic),
-                Method method => FunctionSymbol.FromMethod(method, expression.Type),
-                Operator @operator => FunctionSymbol.FromOperator(@operator),
-                Conversion conversion => FunctionSymbol.FromConversion(conversion),
+                Property property => PropertySymbol.FromProperty(property, containingSymbol, syntax.Name),
+                Method method => MethodSymbol.FromMethod(method, containingSymbol),
+                Operator @operator => MethodSymbol.FromOperator(@operator, containingSymbol),
+                Conversion conversion => MethodSymbol.FromConversion(conversion, containingSymbol),
                 _ => throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'"),
             })
             .SingleOrDefault() ?? throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'");

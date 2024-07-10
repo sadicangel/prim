@@ -24,7 +24,7 @@ partial class Binder
         var structName = syntax.IdentifierToken.Text.ToString();
         if (isTopLevel)
         {
-            var structSymbol = new StructSymbol(syntax, new StructType(structName));
+            var structSymbol = new StructSymbol(syntax, new StructType(structName), ContainingSymbol: null);
             if (!context.BoundScope.Declare(structSymbol))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             return structSymbol;
@@ -33,7 +33,7 @@ partial class Binder
         {
             if (context.BoundScope.Lookup(structName) is not StructSymbol structSymbol)
             {
-                structSymbol = new StructSymbol(syntax, new StructType(structName));
+                structSymbol = new StructSymbol(syntax, new StructType(structName), ContainingSymbol: null);
                 if (!context.BoundScope.Declare(structSymbol))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             }
@@ -105,7 +105,7 @@ partial class Binder
             if (!seenParameterNames.Add(parameterName))
                 context.Diagnostics.ReportSymbolRedeclaration(parameterSyntax.Location, parameterName);
             var parameterType = BindType(parameterSyntax.Type, context);
-            var parameterSymbol = new VariableSymbol(parameterSyntax, parameterName, parameterType, IsReadOnly: false);
+            var parameterSymbol = new VariableSymbol(parameterSyntax, parameterName, parameterType, ContainingSymbol: null, IsReadOnly: false);
             parameterSymbols.Add(parameterSymbol);
         }
         var functionName = syntax.IdentifierToken.Text.ToString();
@@ -115,9 +115,10 @@ partial class Binder
             syntax,
             functionName,
             functionType,
-            parameterSymbols.ToBoundList(),
+            ContainingSymbol: null,
             IsReadOnly: isTopLevel || syntax.IsReadOnly,
-            IsStatic: true);
+            IsStatic: true,
+            []);
 
         if (!context.BoundScope.Declare(functionSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, functionName);
@@ -129,7 +130,7 @@ partial class Binder
     {
         var variableName = syntax.IdentifierToken.Text.ToString();
         var variableType = syntax.Type is null ? PredefinedTypes.Unknown : BindType(syntax.Type, context);
-        var variableSymbol = new VariableSymbol(syntax, variableName, variableType, syntax.IsReadOnly);
+        var variableSymbol = new VariableSymbol(syntax, variableName, variableType, ContainingSymbol: null, syntax.IsReadOnly);
         if (!context.BoundScope.Declare(variableSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);
         return variableSymbol;

@@ -136,26 +136,26 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
             {
                 var symbol = g.Lookup(name) as StructSymbol
                     ?? throw new UnreachableException(DiagnosticMessage.UndefinedType(name));
-                m[symbol] = new StructValue(symbol.StructType);
+                m[symbol] = new StructValue(symbol);
                 // TODO: Create members for struct.
             }
             ((StructValue)m[g.Str])
-                .AddEqualityOperators<string>(g.Str)
+                .AddEqualityOperators<string>()
                 .AddMembers(s =>
                 {
                     var add = g.Str.Type.GetBinaryOperators(SyntaxKind.PlusToken, g.Str.Type, g.Str.Type, g.Str.Type).Single();
                     s.Set(
-                        FunctionSymbol.FromOperator(add),
+                        MethodSymbol.FromOperator(add, g.Str),
                         new FunctionValue(add.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, (string)a.Value + (string)b.Value)));
                     var addStr = g.Str.Type.GetBinaryOperators(SyntaxKind.PlusToken, g.Str.Type, PredefinedTypes.Any, g.Str.Type).Single();
                     s.Set(
-                        FunctionSymbol.FromOperator(addStr),
+                        MethodSymbol.FromOperator(addStr, g.Str),
                         new FunctionValue(addStr.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, (string)a.Value + b.Value)));
                     var addAny = g.Str.Type.GetBinaryOperators(SyntaxKind.PlusToken, PredefinedTypes.Any, g.Str.Type, g.Str.Type).Single();
                     s.Set(
-                        FunctionSymbol.FromOperator(addAny),
+                        MethodSymbol.FromOperator(addAny, g.Str),
                         new FunctionValue(addAny.Type, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, a.Value + (string)b.Value)));
                 });
@@ -163,118 +163,118 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
             R M<T>(StructSymbol s) => new((StructValue)m[s], typeof(T));
 
             ((StructValue)m[g.Bool])
-                .AddEqualityOperators<bool>(g.Bool)
-                .AddLogicalOperators(g.Bool);
+                .AddEqualityOperators<bool>()
+                .AddLogicalOperators();
             ((StructValue)m[g.I8])
-                .AddEqualityOperators<sbyte>(g.I8)
-                .AddComparisonOperators<sbyte>(g.I8)
-                .AddBitwiseOperators<sbyte>(g.I8)
-                .AddMathOperators<sbyte>(g.I8)
+                .AddEqualityOperators<sbyte>()
+                .AddComparisonOperators<sbyte>()
+                .AddBitwiseOperators<sbyte>()
+                .AddMathOperators<sbyte>()
                 .AddImplicitConversion<sbyte>(M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<sbyte>(M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I16])
-                .AddEqualityOperators<short>(g.I16)
-                .AddComparisonOperators<short>(g.I16)
-                .AddBitwiseOperators<short>(g.I16)
-                .AddMathOperators<short>(g.I16)
+                .AddEqualityOperators<short>()
+                .AddComparisonOperators<short>()
+                .AddBitwiseOperators<short>()
+                .AddMathOperators<short>()
                 .AddImplicitConversion<short>(M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<short>(M<sbyte>(g.I8), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I32])
-                .AddEqualityOperators<int>(g.I32)
-                .AddComparisonOperators<int>(g.I32)
-                .AddBitwiseOperators<int>(g.I32)
-                .AddMathOperators<int>(g.I32)
+                .AddEqualityOperators<int>()
+                .AddComparisonOperators<int>()
+                .AddBitwiseOperators<int>()
+                .AddMathOperators<int>()
                 .AddImplicitConversion<int>(M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<int>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I64])
-                .AddEqualityOperators<long>(g.I64)
-                .AddComparisonOperators<long>(g.I64)
-                .AddBitwiseOperators<long>(g.I64)
-                .AddMathOperators<long>(g.I64)
+                .AddEqualityOperators<long>()
+                .AddComparisonOperators<long>()
+                .AddBitwiseOperators<long>()
+                .AddMathOperators<long>()
                 .AddImplicitConversion<long>(M<BigInteger>(g.I128), M<nint>(g.ISize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<long>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I128])
-                .AddEqualityOperators<BigInteger>(g.I64)
-                .AddComparisonOperators<BigInteger>(g.I64)
-                .AddBitwiseOperators<BigInteger>(g.I64)
-                .AddMathOperators<BigInteger>(g.I64)
+                .AddEqualityOperators<BigInteger>()
+                .AddComparisonOperators<BigInteger>()
+                .AddBitwiseOperators<BigInteger>()
+                .AddMathOperators<BigInteger>()
                 .AddExplicitConversion<BigInteger>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.ISize])
-                .AddEqualityOperators<nint>(g.I64)
-                .AddComparisonOperators<nint>(g.I64)
-                .AddBitwiseOperators<nint>(g.I64)
-                .AddMathOperators<nint>(g.I64)
+                .AddEqualityOperators<nint>()
+                .AddComparisonOperators<nint>()
+                .AddBitwiseOperators<nint>()
+                .AddMathOperators<nint>()
                 .AddExplicitConversion<nint>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize))
                 .AddExplicitConversion<nint>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128));
             ((StructValue)m[g.U8])
-                .AddEqualityOperators<byte>(g.U8)
-                .AddComparisonOperators<byte>(g.U8)
-                .AddBitwiseOperators<byte>(g.U8)
-                .AddMathOperators<byte>(g.U8)
+                .AddEqualityOperators<byte>()
+                .AddComparisonOperators<byte>()
+                .AddBitwiseOperators<byte>()
+                .AddMathOperators<byte>()
                 .AddImplicitConversion<byte>(M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<byte>(M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize));
             ((StructValue)m[g.U16])
-                .AddEqualityOperators<ushort>(g.U16)
-                .AddComparisonOperators<ushort>(g.U16)
-                .AddBitwiseOperators<ushort>(g.U16)
-                .AddMathOperators<ushort>(g.U16)
+                .AddEqualityOperators<ushort>()
+                .AddComparisonOperators<ushort>()
+                .AddBitwiseOperators<ushort>()
+                .AddMathOperators<ushort>()
                 .AddImplicitConversion<ushort>(M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<ushort>(M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8));
             ((StructValue)m[g.U32])
-                .AddEqualityOperators<uint>(g.U32)
-                .AddComparisonOperators<uint>(g.U32)
-                .AddBitwiseOperators<uint>(g.U32)
-                .AddMathOperators<uint>(g.U32)
+                .AddEqualityOperators<uint>()
+                .AddComparisonOperators<uint>()
+                .AddBitwiseOperators<uint>()
+                .AddMathOperators<uint>()
                 .AddImplicitConversion<uint>(M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<uint>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16));
             ((StructValue)m[g.U64])
-                .AddEqualityOperators<ulong>(g.U64)
-                .AddComparisonOperators<ulong>(g.U64)
-                .AddBitwiseOperators<ulong>(g.U64)
-                .AddMathOperators<ulong>(g.U64)
+                .AddEqualityOperators<ulong>()
+                .AddComparisonOperators<ulong>()
+                .AddBitwiseOperators<ulong>()
+                .AddMathOperators<ulong>()
                 .AddImplicitConversion<ulong>(M<BigInteger>(g.U128), M<nuint>(g.USize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<ulong>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32));
             ((StructValue)m[g.U128])
-                .AddEqualityOperators<BigInteger>(g.U64)
-                .AddComparisonOperators<BigInteger>(g.U64)
-                .AddBitwiseOperators<BigInteger>(g.U64)
-                .AddMathOperators<BigInteger>(g.U64)
+                .AddEqualityOperators<BigInteger>()
+                .AddComparisonOperators<BigInteger>()
+                .AddBitwiseOperators<BigInteger>()
+                .AddMathOperators<BigInteger>()
                 .AddExplicitConversion<BigInteger>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64));
             ((StructValue)m[g.USize])
-                .AddEqualityOperators<nuint>(g.U64)
-                .AddComparisonOperators<nuint>(g.U64)
-                .AddBitwiseOperators<nuint>(g.U64)
-                .AddMathOperators<nuint>(g.U64)
+                .AddEqualityOperators<nuint>()
+                .AddComparisonOperators<nuint>()
+                .AddBitwiseOperators<nuint>()
+                .AddMathOperators<nuint>()
                 .AddExplicitConversion<nuint>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.F16])
-                .AddEqualityOperators<Half>(g.F16)
-                .AddComparisonOperators<Half>(g.F16)
-                .AddMathOperators<Half>(g.F16)
+                .AddEqualityOperators<Half>()
+                .AddComparisonOperators<Half>()
+                .AddMathOperators<Half>()
                 .AddImplicitConversion<Half>(M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<Half>(M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             ((StructValue)m[g.F32])
-                .AddEqualityOperators<float>(g.F32)
-                .AddComparisonOperators<float>(g.F32)
-                .AddMathOperators<float>(g.F32)
+                .AddEqualityOperators<float>()
+                .AddComparisonOperators<float>()
+                .AddMathOperators<float>()
                 .AddImplicitConversion<float>(M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<float>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             ((StructValue)m[g.F64])
-                .AddEqualityOperators<double>(g.F64)
-                .AddComparisonOperators<double>(g.F64)
-                .AddMathOperators<double>(g.F64)
+                .AddEqualityOperators<double>()
+                .AddComparisonOperators<double>()
+                .AddMathOperators<double>()
                 .AddImplicitConversion<double>(M<double>(g.F80), M<double>(g.F128))
                 .AddExplicitConversion<double>(M<Half>(g.F16), M<float>(g.F32), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             // TODO: Fix these types using double.
             ((StructValue)m[g.F80])
-                .AddEqualityOperators<double>(g.F80)
-                .AddComparisonOperators<double>(g.F80)
-                .AddMathOperators<double>(g.F80)
+                .AddEqualityOperators<double>()
+                .AddComparisonOperators<double>()
+                .AddMathOperators<double>()
                 .AddImplicitConversion<double>(M<double>(g.F128))
                 .AddExplicitConversion<double>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             ((StructValue)m[g.F128])
-                .AddEqualityOperators<double>(g.F128)
-                .AddComparisonOperators<double>(g.F128)
-                .AddMathOperators<double>(g.F128)
+                .AddEqualityOperators<double>()
+                .AddComparisonOperators<double>()
+                .AddMathOperators<double>()
                 .AddExplicitConversion<double>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             return m;
         }
@@ -316,137 +316,137 @@ file static class StructValueExtensions
         return s;
     }
 
-    public static StructValue AddMathOperators<T>(this StructValue s, StructSymbol symbol) where T : INumber<T>
+    public static StructValue AddMathOperators<T>(this StructValue s) where T : INumber<T>
     {
-        var unaryPlus = symbol.Type.GetUnaryOperators(SyntaxKind.PlusToken, symbol.Type, symbol.Type).Single();
+        var unaryPlus = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.PlusToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(unaryPlus),
+            MethodSymbol.FromOperator(unaryPlus, s.StructSymbol),
             new FunctionValue(unaryPlus.Type, (PrimValue a) => new LiteralValue(s, a.Type, +(T)a.Value)));
-        var unaryMinus = symbol.Type.GetUnaryOperators(SyntaxKind.MinusToken, symbol.Type, symbol.Type).Single();
+        var unaryMinus = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.MinusToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(unaryMinus),
+            MethodSymbol.FromOperator(unaryMinus, s.StructSymbol),
             new FunctionValue(unaryMinus.Type, (PrimValue a) => new LiteralValue(s, a.Type, -(T)a.Value)));
-        var add = symbol.Type.GetBinaryOperators(SyntaxKind.PlusToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var add = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PlusToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(add),
+            MethodSymbol.FromOperator(add, s.StructSymbol),
             new FunctionValue(add.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value + (T)b.Value)));
-        var subtract = symbol.Type.GetBinaryOperators(SyntaxKind.MinusToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var subtract = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.MinusToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(subtract),
+            MethodSymbol.FromOperator(subtract, s.StructSymbol),
             new FunctionValue(subtract.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value - (T)b.Value)));
-        var multiply = symbol.Type.GetBinaryOperators(SyntaxKind.StarToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var multiply = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.StarToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(multiply),
+            MethodSymbol.FromOperator(multiply, s.StructSymbol),
             new FunctionValue(multiply.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value * (T)b.Value)));
-        var divide = symbol.Type.GetBinaryOperators(SyntaxKind.SlashToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var divide = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.SlashToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(divide),
+            MethodSymbol.FromOperator(divide, s.StructSymbol),
             new FunctionValue(divide.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value / (T)b.Value)));
-        var modulo = symbol.Type.GetBinaryOperators(SyntaxKind.PercentToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var modulo = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PercentToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(modulo),
+            MethodSymbol.FromOperator(modulo, s.StructSymbol),
             new FunctionValue(modulo.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value % (T)b.Value)));
-        var power = symbol.Type.GetBinaryOperators(SyntaxKind.StarStarToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var power = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.StarStarToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(power),
+            MethodSymbol.FromOperator(power, s.StructSymbol),
             new FunctionValue(power.Type, (PrimValue a, PrimValue b) => T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value)))));
         return s;
     }
 
-    public static StructValue AddBitwiseOperators<T>(this StructValue s, StructSymbol symbol) where T : IBinaryInteger<T>, IShiftOperators<T, int, T>
+    public static StructValue AddBitwiseOperators<T>(this StructValue s) where T : IBinaryInteger<T>, IShiftOperators<T, int, T>
     {
-        var onesComplement = symbol.Type.GetUnaryOperators(SyntaxKind.TildeToken, symbol.Type, symbol.Type).Single();
+        var onesComplement = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.TildeToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(onesComplement),
+            MethodSymbol.FromOperator(onesComplement, s.StructSymbol),
             new FunctionValue(onesComplement.Type, (PrimValue a) => new LiteralValue(s, a.Type, ~(T)a.Value)));
-        var bitwiseAnd = symbol.Type.GetBinaryOperators(SyntaxKind.AmpersandToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var bitwiseAnd = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.AmpersandToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(bitwiseAnd),
+            MethodSymbol.FromOperator(bitwiseAnd, s.StructSymbol),
             new FunctionValue(bitwiseAnd.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value & (T)b.Value)));
-        var bitwiseOr = symbol.Type.GetBinaryOperators(SyntaxKind.PipeToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var bitwiseOr = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PipeToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(bitwiseOr),
+            MethodSymbol.FromOperator(bitwiseOr, s.StructSymbol),
             new FunctionValue(bitwiseOr.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value | (T)b.Value)));
-        var exclusiveOr = symbol.Type.GetBinaryOperators(SyntaxKind.HatToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var exclusiveOr = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.HatToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(exclusiveOr),
+            MethodSymbol.FromOperator(exclusiveOr, s.StructSymbol),
             new FunctionValue(exclusiveOr.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value ^ (T)b.Value)));
-        var leftShift = symbol.Type.GetBinaryOperators(SyntaxKind.LessThanLessThanToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var leftShift = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanLessThanToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(leftShift),
+            MethodSymbol.FromOperator(leftShift, s.StructSymbol),
             new FunctionValue(leftShift.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value << int.CreateTruncating((T)b.Value))));
-        var rightShift = symbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanGreaterThanToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var rightShift = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanGreaterThanToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(rightShift),
+            MethodSymbol.FromOperator(rightShift, s.StructSymbol),
             new FunctionValue(rightShift.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, a.Type, (T)a.Value >> int.CreateTruncating((T)b.Value))));
         return s;
     }
 
-    public static StructValue AddEqualityOperators<T>(this StructValue s, StructSymbol symbol)
+    public static StructValue AddEqualityOperators<T>(this StructValue s)
     {
-        var equals = symbol.Type.GetBinaryOperators(SyntaxKind.EqualsEqualsToken, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
+        var equals = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.EqualsEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            FunctionSymbol.FromOperator(equals),
+            MethodSymbol.FromOperator(equals, s.StructSymbol),
             new FunctionValue(equals.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, ((T)a.Value).Equals(b.Value))));
-        var notEquals = symbol.Type.GetBinaryOperators(SyntaxKind.BangEqualsToken, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
+        var notEquals = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.BangEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            FunctionSymbol.FromOperator(notEquals),
+            MethodSymbol.FromOperator(notEquals, s.StructSymbol),
             new FunctionValue(notEquals.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, !((T)a.Value).Equals(b.Value))));
         return s;
     }
 
-    public static StructValue AddComparisonOperators<T>(this StructValue s, StructSymbol symbol) where T : IComparisonOperators<T, T, bool>
+    public static StructValue AddComparisonOperators<T>(this StructValue s) where T : IComparisonOperators<T, T, bool>
     {
-        var lessThan = symbol.Type.GetBinaryOperators(SyntaxKind.LessThanToken, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
+        var lessThan = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            FunctionSymbol.FromOperator(lessThan),
+            MethodSymbol.FromOperator(lessThan, s.StructSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value < (T)b.Value)));
-        var lessThanOrEqual = symbol.Type.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
+        var lessThanOrEqual = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            FunctionSymbol.FromOperator(lessThanOrEqual),
+            MethodSymbol.FromOperator(lessThanOrEqual, s.StructSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value <= (T)b.Value)));
-        var greaterThan = symbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanToken, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
+        var greaterThan = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            FunctionSymbol.FromOperator(greaterThan),
+            MethodSymbol.FromOperator(greaterThan, s.StructSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value > (T)b.Value)));
-        var greaterThanOrEqual = symbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, symbol.Type, symbol.Type, PredefinedTypes.Bool).Single();
+        var greaterThanOrEqual = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, s.StructSymbol.Type, s.StructSymbol.Type, PredefinedTypes.Bool).Single();
         s.Set(
-            FunctionSymbol.FromOperator(greaterThanOrEqual),
+            MethodSymbol.FromOperator(greaterThanOrEqual, s.StructSymbol),
             new FunctionValue(lessThan.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value >= (T)b.Value)));
         return s;
     }
 
-    public static StructValue AddLogicalOperators(this StructValue s, StructSymbol symbol)
+    public static StructValue AddLogicalOperators(this StructValue s)
     {
-        var not = symbol.Type.GetUnaryOperators(SyntaxKind.BangToken, symbol.Type, symbol.Type).Single();
+        var not = s.StructSymbol.Type.GetUnaryOperators(SyntaxKind.BangToken, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(not),
+            MethodSymbol.FromOperator(not, s.StructSymbol),
             new FunctionValue(not.Type, (PrimValue a) =>
                 new LiteralValue(s, PredefinedTypes.Bool, !(bool)a.Value)));
-        var logicalAnd = symbol.Type.GetBinaryOperators(SyntaxKind.AmpersandAmpersandToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var logicalAnd = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.AmpersandAmpersandToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(logicalAnd),
+            MethodSymbol.FromOperator(logicalAnd, s.StructSymbol),
             new FunctionValue(logicalAnd.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value && (bool)b.Value)));
-        var logicalOr = symbol.Type.GetBinaryOperators(SyntaxKind.PipePipeToken, symbol.Type, symbol.Type, symbol.Type).Single();
+        var logicalOr = s.StructSymbol.Type.GetBinaryOperators(SyntaxKind.PipePipeToken, s.StructSymbol.Type, s.StructSymbol.Type, s.StructSymbol.Type).Single();
         s.Set(
-            FunctionSymbol.FromOperator(logicalOr),
+            MethodSymbol.FromOperator(logicalOr, s.StructSymbol),
             new FunctionValue(logicalOr.Type, (PrimValue a, PrimValue b) =>
                 new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value || (bool)b.Value)));
         return s;
@@ -456,12 +456,12 @@ file static class StructValueExtensions
     {
         foreach (var (targetStruct, targetTypeCLR) in targetTypes)
         {
-            var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
-                ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
+            var conversion = s.StructSymbol.Type.GetConversion(s.StructSymbol.Type, targetStruct.StructSymbol.Type)
+                ?? throw new UnreachableException($"Missing conversion from {s.StructSymbol.Type} to {targetStruct.StructSymbol.Type}");
             s.Set(
-                FunctionSymbol.FromConversion(conversion),
+                MethodSymbol.FromConversion(conversion, s.StructSymbol),
                 new FunctionValue(conversion.Type, (PrimValue x) =>
-                    new LiteralValue(targetStruct, targetStruct.StructType, Convert.ChangeType(x.Value, targetTypeCLR))));
+                    new LiteralValue(targetStruct, targetStruct.StructSymbol.Type, Convert.ChangeType(x.Value, targetTypeCLR))));
         }
         return s;
     }
@@ -470,12 +470,12 @@ file static class StructValueExtensions
     {
         foreach (var (targetStruct, targetTypeCLR) in targetTypes)
         {
-            var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
-                ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
+            var conversion = s.StructSymbol.Type.GetConversion(s.StructSymbol.Type, targetStruct.StructSymbol.Type)
+                ?? throw new UnreachableException($"Missing conversion from {s.StructSymbol.Type} to {targetStruct.StructSymbol.Type}");
             s.Set(
-                FunctionSymbol.FromConversion(conversion),
+                MethodSymbol.FromConversion(conversion, s.StructSymbol),
                 new FunctionValue(conversion.Type, (PrimValue x) =>
-                    new LiteralValue(targetStruct, targetStruct.StructType, Convert.ChangeType(x.Value, targetTypeCLR))));
+                    new LiteralValue(targetStruct, targetStruct.StructSymbol.Type, Convert.ChangeType(x.Value, targetTypeCLR))));
         }
         return s;
     }

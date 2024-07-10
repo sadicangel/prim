@@ -5,14 +5,14 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundInvocationExpression(
     SyntaxNode Syntax,
     BoundExpression Expression,
-    FunctionSymbol FunctionSymbol,
+    MethodSymbol MethodSymbol,
     BoundList<BoundExpression> Arguments)
-    : BoundExpression(BoundKind.InvocationExpression, Syntax, FunctionSymbol.ReturnType)
+    : BoundExpression(BoundKind.InvocationExpression, Syntax, MethodSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {
         yield return Expression;
-        yield return FunctionSymbol;
+        yield return MethodSymbol;
         foreach (var argument in Arguments)
             yield return argument;
     }

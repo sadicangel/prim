@@ -9,7 +9,7 @@ partial class Interpreter
 {
     private static StructValue EvaluateStructDeclaration(BoundStructDeclaration node, InterpreterContext context)
     {
-        var structValue = new StructValue(node.StructSymbol.StructType);
+        var structValue = new StructValue(node.StructSymbol);
         context.EvaluatedScope.Declare(node.StructSymbol, structValue);
         foreach (var member in node.Members)
         {
@@ -38,8 +38,8 @@ partial class Interpreter
 
         static object EvaluateMethodDeclaration(BoundMethodDeclaration member, StructValue structValue, InterpreterContext context)
         {
-            var functionValue = new FunctionValue(member.FunctionSymbol.FunctionType, FuncFactory.Create(member.FunctionSymbol, member.Body, context));
-            structValue.Set(member.FunctionSymbol, functionValue);
+            var functionValue = new FunctionValue(member.MethodSymbol.FunctionType, FuncFactory.Create(member.MethodSymbol, member.Body, context));
+            structValue.Set(member.MethodSymbol, functionValue);
             return 0;
         }
 
@@ -53,8 +53,8 @@ partial class Interpreter
 
         static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, InterpreterContext context)
         {
-            var functionValue = new FunctionValue(member.FunctionSymbol.FunctionType, FuncFactory.Create(member.FunctionSymbol, member.Body, context));
-            structValue.Set(member.FunctionSymbol, functionValue);
+            var functionValue = new FunctionValue(member.MethodSymbol.FunctionType, FuncFactory.Create(member.MethodSymbol, member.Body, context));
+            structValue.Set(member.MethodSymbol, functionValue);
             return 0;
         }
     }

@@ -30,11 +30,7 @@ partial class Binder
                 continue;
             }
 
-            var propertySymbol = new PropertySymbol(
-                syntax,
-                property,
-                property.IsReadOnly,
-                property.IsStatic);
+            var propertySymbol = PropertySymbol.FromProperty(property, structSymbol, syntax);
             var expression = BindPropertyInitExpression(propertySyntax, propertySymbol, context);
             properties.Add(expression);
         }

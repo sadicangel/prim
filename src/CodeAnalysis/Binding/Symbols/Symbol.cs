@@ -7,6 +7,7 @@ internal abstract record class Symbol(
     SyntaxNode Syntax,
     string Name,
     PrimType Type,
+    Symbol? ContainingSymbol,
     bool IsReadOnly,
     bool IsStatic)
     : BoundNode(BoundKind, Syntax)
