@@ -197,7 +197,8 @@ public static class SyntaxFacts
 
             SyntaxKind.AssignmentExpression => null,
 
-            SyntaxKind.IfElseExpression => null,
+            SyntaxKind.IfExpression => null,
+            SyntaxKind.ElseClauseExpression => null,
             SyntaxKind.WhileExpression => null,
 
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")

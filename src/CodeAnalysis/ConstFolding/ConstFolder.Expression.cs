@@ -16,8 +16,8 @@ partial class ConstFolder
                 FoldUnaryExpression((BoundUnaryExpression)node),
             BoundKind.BinaryExpression =>
                 FoldBinaryExpression((BoundBinaryExpression)node),
-            BoundKind.IfElseExpression =>
-                FoldIfElseExpression((BoundIfElseExpression)node),
+            BoundKind.IfExpression =>
+                FoldIfElseExpression((BoundIfExpression)node),
             BoundKind.VariableDeclaration or
             BoundKind.LocalReference => null,
             _ =>

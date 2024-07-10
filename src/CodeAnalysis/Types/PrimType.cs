@@ -11,6 +11,7 @@ public abstract record class PrimType(string Name)
 
     public bool IsAny { get => this == PredefinedTypes.Any; }
     public bool IsNever { get => this == PredefinedTypes.Never; }
+    public bool IsOption { get => this is OptionType; }
     public bool IsUnknown { get => this == PredefinedTypes.Unknown; }
     public bool IsPredefined { get => PredefinedTypeNames.All.Contains(Name); }
 

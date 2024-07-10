@@ -4,7 +4,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static PrimValue EvaluateIfElseExpression(BoundIfElseExpression node, InterpreterContext context)
+    public static PrimValue EvaluateIfElseExpression(BoundIfExpression node, InterpreterContext context)
     {
         var condition = EvaluateExpression(node.Condition, context);
         var value = (bool)condition.Value

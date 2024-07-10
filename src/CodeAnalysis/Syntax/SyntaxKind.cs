@@ -196,6 +196,7 @@ public enum SyntaxKind
 
     AssignmentExpression,
 
-    IfElseExpression,
+    IfExpression,
+    ElseClauseExpression,
     WhileExpression,
 }

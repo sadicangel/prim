@@ -3,7 +3,7 @@
 namespace CodeAnalysis.ConstFolding;
 partial class ConstFolder
 {
-    private static object? FoldIfElseExpression(BoundIfElseExpression node)
+    private static object? FoldIfElseExpression(BoundIfExpression node)
     {
         if (node.Condition.ConstValue is not bool isTrue)
         {

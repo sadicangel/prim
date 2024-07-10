@@ -36,7 +36,7 @@ internal enum BoundKind
     UnaryExpression,
     BinaryExpression,
 
-    IfElseExpression,
+    IfExpression,
     WhileExpression,
 
     FunctionSymbol,

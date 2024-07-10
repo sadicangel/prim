@@ -45,8 +45,8 @@ partial class Interpreter
                 EvaluateUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression =>
                 EvaluateBinaryExpression((BoundBinaryExpression)node, context),
-            BoundKind.IfElseExpression =>
-                EvaluateIfElseExpression((BoundIfElseExpression)node, context),
+            BoundKind.IfExpression =>
+                EvaluateIfElseExpression((BoundIfExpression)node, context),
             BoundKind.WhileExpression =>
                 EvaluateWhileExpression((BoundWhileExpression)node, context),
             _ =>

@@ -11,15 +11,8 @@ var previousEvaluation = default(Evaluation);
 while (true)
 {
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
-        Value: struct = {
-            i: i32 = 0;
-            get_i: () -> i32 = this.i;
-        }
-
-        v:: Value { .i = 10 }
-        a:= v.get_i();
-        a = v.get_i()
-        a
+        a : ?i32 = 0;
+        a = if (true) 1
         """));
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);

@@ -1,15 +1,14 @@
 ﻿
 namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class IfElseExpressionSyntax(
+public sealed record class IfExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IfKeyword,
     SyntaxToken ParenthesisOpenToken,
     ExpressionSyntax Condition,
     SyntaxToken ParenthesisCloseToken,
     ExpressionSyntax Then,
-    SyntaxToken ElseKeyword,
-    ExpressionSyntax Else)
-    : ExpressionSyntax(SyntaxKind.IfElseExpression, SyntaxTree)
+    ElseClauseExpressionSyntax? ElseClause)
+    : ExpressionSyntax(SyntaxKind.IfExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
@@ -18,7 +17,7 @@ public sealed record class IfElseExpressionSyntax(
         yield return Condition;
         yield return ParenthesisCloseToken;
         yield return Then;
-        yield return ElseKeyword;
-        yield return Else;
+        if (ElseClause is not null)
+            yield return ElseClause;
     }
 }

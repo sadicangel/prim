@@ -78,8 +78,8 @@ partial class Binder
             SyntaxKind.GreaterThanOrEqualExpression or
             SyntaxKind.CoalesceExpression =>
                 BindBinaryExpression((BinaryExpressionSyntax)syntax, context),
-            SyntaxKind.IfElseExpression =>
-                BindIfElseExpression((IfElseExpressionSyntax)syntax, context),
+            SyntaxKind.IfExpression =>
+                BindIfElseExpression((IfExpressionSyntax)syntax, context),
             SyntaxKind.WhileExpression =>
                 BindWhileExpression((WhileExpressionSyntax)syntax, context),
             _ =>
