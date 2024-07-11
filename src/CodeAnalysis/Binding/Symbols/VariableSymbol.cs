@@ -7,7 +7,8 @@ internal sealed record class VariableSymbol(
     SyntaxNode Syntax,
     string Name,
     PrimType Type,
-    Symbol? ContainingSymbol,
+    Symbol ContainingSymbol,
+    NamespaceSymbol NamespaceSymbol,
     bool IsReadOnly)
     : Symbol(
         BoundKind.VariableSymbol,
@@ -15,6 +16,7 @@ internal sealed record class VariableSymbol(
         Name,
         Type,
         ContainingSymbol,
+        NamespaceSymbol,
         IsReadOnly,
         IsStatic: true)
 {
@@ -23,5 +25,6 @@ internal sealed record class VariableSymbol(
         "this",
         type,
         containingSymbol,
+        containingSymbol.ContainingNamespace,
         IsReadOnly: true);
 }

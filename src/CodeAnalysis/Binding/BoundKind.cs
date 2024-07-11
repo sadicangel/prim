@@ -43,5 +43,6 @@ internal enum BoundKind
     PropertySymbol,
     MethodSymbol,
     VariableSymbol,
+    NamespaceSymbol,
     TypeSymbol,
 }

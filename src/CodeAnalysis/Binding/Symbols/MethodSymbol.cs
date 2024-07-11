@@ -8,7 +8,8 @@ internal sealed record class MethodSymbol(
     SyntaxNode Syntax,
     string Name,
     FunctionType FunctionType,
-    Symbol? ContainingSymbol,
+    Symbol ContainingSymbol,
+    NamespaceSymbol NamespaceSymbol,
     bool IsReadOnly,
     bool IsStatic,
     BoundList<VariableSymbol> Parameters)
@@ -18,6 +19,7 @@ internal sealed record class MethodSymbol(
         Name,
         FunctionType,
         ContainingSymbol,
+        NamespaceSymbol,
         IsReadOnly,
         IsStatic)
 {
@@ -33,6 +35,7 @@ internal sealed record class MethodSymbol(
             conversion.Name,
             conversion.Type,
             containingSymbol,
+            containingSymbol.ContainingNamespace,
             IsReadOnly: true,
             IsStatic: true,
             []);
@@ -44,6 +47,7 @@ internal sealed record class MethodSymbol(
             parameter.Name,
             parameter.Type,
             methodSymbol,
+            methodSymbol.ContainingNamespace,
             IsReadOnly: false);
 
         return methodSymbol with { Parameters = [parameterSymbol] };
@@ -60,6 +64,7 @@ internal sealed record class MethodSymbol(
             method.Name,
             method.Type,
             containingSymbol,
+            containingSymbol.ContainingNamespace,
             method.IsReadOnly,
             method.IsStatic,
             []);
@@ -75,6 +80,7 @@ internal sealed record class MethodSymbol(
                 p.Name,
                 p.Type,
                 methodSymbol,
+                methodSymbol.ContainingNamespace,
                 IsReadOnly: true)))
         {
             parameters.Add(parameter);
@@ -93,6 +99,7 @@ internal sealed record class MethodSymbol(
             @operator.Name,
             @operator.Type,
             containingSymbol,
+            containingSymbol.ContainingNamespace,
             @operator.IsReadOnly,
             @operator.IsStatic,
             []);
@@ -102,6 +109,7 @@ internal sealed record class MethodSymbol(
             p.Name,
             p.Type,
             methodSymbol,
+            methodSymbol.ContainingNamespace,
             IsReadOnly: true));
 
         return methodSymbol with { Parameters = [.. parameters] };

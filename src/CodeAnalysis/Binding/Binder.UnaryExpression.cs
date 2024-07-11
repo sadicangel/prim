@@ -25,7 +25,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(operand.Type, containingSymbol: null));
+        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(operand.Type, NamespaceSymbol.Global));
 
         return new BoundUnaryExpression(syntax, methodSymbol, operand);
     }

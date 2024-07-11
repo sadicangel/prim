@@ -24,7 +24,11 @@ partial class Binder
         var structName = syntax.IdentifierToken.Text.ToString();
         if (isTopLevel)
         {
-            var typeSymbol = new TypeSymbol(syntax, new StructType(structName), ContainingSymbol: null);
+            var typeSymbol = new TypeSymbol(
+                syntax,
+                new StructType(structName),
+                NamespaceSymbol.Global,
+                NamespaceSymbol.Global);
             if (!context.BoundScope.Declare(typeSymbol))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             return typeSymbol;
@@ -33,7 +37,11 @@ partial class Binder
         {
             if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
             {
-                typeSymbol = new TypeSymbol(syntax, new StructType(structName), ContainingSymbol: null);
+                typeSymbol = new TypeSymbol(
+                    syntax,
+                    new StructType(structName),
+                    NamespaceSymbol.Global,
+                    NamespaceSymbol.Global);
                 if (!context.BoundScope.Declare(typeSymbol))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             }
@@ -105,7 +113,13 @@ partial class Binder
             if (!seenParameterNames.Add(parameterName))
                 context.Diagnostics.ReportSymbolRedeclaration(parameterSyntax.Location, parameterName);
             var parameterType = BindType(parameterSyntax.Type, context);
-            var parameterSymbol = new VariableSymbol(parameterSyntax, parameterName, parameterType, ContainingSymbol: null, IsReadOnly: false);
+            var parameterSymbol = new VariableSymbol(
+                parameterSyntax,
+                parameterName,
+                parameterType,
+                NamespaceSymbol.Global,
+                NamespaceSymbol.Global,
+                IsReadOnly: false);
             parameterSymbols.Add(parameterSymbol);
         }
         var functionName = syntax.IdentifierToken.Text.ToString();
@@ -115,7 +129,8 @@ partial class Binder
             syntax,
             functionName,
             functionType,
-            ContainingSymbol: null,
+            NamespaceSymbol.Global,
+            NamespaceSymbol.Global,
             IsReadOnly: isTopLevel || syntax.IsReadOnly,
             IsStatic: true,
             []);
@@ -130,7 +145,13 @@ partial class Binder
     {
         var variableName = syntax.IdentifierToken.Text.ToString();
         var variableType = syntax.Type is null ? PredefinedTypes.Unknown : BindType(syntax.Type, context);
-        var variableSymbol = new VariableSymbol(syntax, variableName, variableType, ContainingSymbol: null, syntax.IsReadOnly);
+        var variableSymbol = new VariableSymbol(
+            syntax,
+            variableName,
+            variableType,
+            NamespaceSymbol.Global,
+            NamespaceSymbol.Global,
+            syntax.IsReadOnly);
         if (!context.BoundScope.Declare(variableSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);
         return variableSymbol;

@@ -22,7 +22,7 @@ partial class Binder
 
         // TODO: Actually check where this should be readonly or not.
         // Maybe the indexer should be a property instead?
-        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(expression.Type, containingSymbol: null));
+        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(expression.Type, NamespaceSymbol.Global));
 
         var index = Coerce(BindExpression(syntax.Index, context), PredefinedTypes.I32, context);
         if (index.Type.IsNever)

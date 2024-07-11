@@ -11,6 +11,7 @@ public sealed class Compilation
         Func<SourceText, SyntaxTree> parseFunc = isScript ? SyntaxTree.ParseScript : SyntaxTree.Parse;
         SyntaxTrees = new(sourceTexts.Select(parseFunc));
         Previous = previous;
+        ;
         BoundScope = new BoundScope(Previous?.BoundScope);
         BoundTrees = new ReadOnlyList<BoundTree>(SyntaxTrees
             .Select(tree => BoundTree.Bind(tree, BoundScope)));

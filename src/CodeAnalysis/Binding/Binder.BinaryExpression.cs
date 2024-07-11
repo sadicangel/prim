@@ -29,7 +29,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(containingType, containingSymbol: null));
+        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(containingType, NamespaceSymbol.Global));
 
         return new BoundBinaryExpression(syntax, left, methodSymbol, right);
     }

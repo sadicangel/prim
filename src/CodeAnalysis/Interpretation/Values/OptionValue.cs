@@ -16,7 +16,7 @@ internal sealed record class OptionValue : PrimValue
     {
         _value = value;
 
-        var containingSymbol = TypeSymbol.FromType(optionType, containingSymbol: null);
+        var containingSymbol = TypeSymbol.FromType(optionType, NamespaceSymbol.Global);
 
         var coalesce1 = optionType.GetOperator(
             SyntaxKind.HookHookToken,

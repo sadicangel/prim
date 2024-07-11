@@ -15,7 +15,11 @@ partial class Binder
             return expression;
         }
 
-        var containingSymbol = new TypeSymbol(syntax, expression.Type, ContainingSymbol: null);
+        var containingSymbol = new TypeSymbol(
+            syntax,
+            expression.Type,
+            NamespaceSymbol.Global,
+            NamespaceSymbol.Global);
 
         // TODO: Support multiple member references (overloading).
         var symbol = expression.Type

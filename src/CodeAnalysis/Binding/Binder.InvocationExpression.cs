@@ -48,7 +48,7 @@ partial class Binder
             }
         }
 
-        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(expression.Type, containingSymbol: null));
+        var methodSymbol = MethodSymbol.FromOperator(@operator, TypeSymbol.FromType(expression.Type, NamespaceSymbol.Global));
 
         return new BoundInvocationExpression(syntax, expression, methodSymbol, arguments);
 
