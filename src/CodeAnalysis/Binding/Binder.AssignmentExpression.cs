@@ -11,8 +11,8 @@ partial class Binder
 
         if (left is not BoundReference @ref)
         {
-            // TODO: Is this a valid error?
-            throw new NotSupportedException($"Unexpected left hand side of {nameof(AssignmentExpressionSyntax)} '{syntax.Left.SyntaxKind}'");
+            context.Diagnostics.ReportInvalidAssignment(syntax.Location);
+            return new BoundNeverExpression(syntax);
         }
 
         if (@ref.Type.IsNever)

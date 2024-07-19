@@ -115,8 +115,8 @@ internal static class RenderExtensions
 
         console.MarkupInterpolated($"""
             [{colour}]{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): {diagnostic.Message}[/]
-            {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
-            {underline}
+                {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
+                {underline}
             """);
     }
 

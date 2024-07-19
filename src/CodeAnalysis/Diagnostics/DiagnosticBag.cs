@@ -83,6 +83,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.InvalidArgumentListLength(listLength));
     internal void ReportInvalidArrayLength(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidArrayLength());
+    internal void ReportInvalidAssignment(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidAssignment());
     internal void ReportInvalidConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidConversion(sourceTypeName, targetTypeName));
     internal void ReportInvalidExpressionType(SourceLocation location, string expectedTypeName, string actualTypeName) =>

@@ -38,6 +38,8 @@ internal static class DiagnosticMessage
         $"Expression does not contain an overload that expects {listLength} arguments";
     public static string InvalidArrayLength() =>
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
+    internal static string InvalidAssignment() =>
+        "Invalid left-hand side of assignment. Expected a reference (variable, property or indexer)";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";
     public static string InvalidExpressionType(string expectedTypeName, string actualTypeName) =>
@@ -70,7 +72,6 @@ internal static class DiagnosticMessage
         $"Unary operator '{@operator.Text}' is not defined for type '{operandTypeName}'";
     public static string UnreachableCode() =>
         "Unreachable code detected";
-
 
 
 
