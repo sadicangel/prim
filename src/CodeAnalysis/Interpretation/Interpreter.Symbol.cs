@@ -5,21 +5,19 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static PrimValue EvaluateSymbol(Symbol? symbol, InterpreterContext context)
+    public static PrimValue EvaluateSymbol(Symbol symbol, InterpreterContext context)
     {
-        ArgumentNullException.ThrowIfNull(symbol);
-
-        // TODO: Maybe have a bool prop that stores if symbol was defined in code?
-        if (context.EvaluatedScope.TryLookup(symbol, out var value))
-            return value;
-
-        if (symbol is not TypeSymbol { Type: TypeSymbol type })
+        if (symbol is not TypeSymbol type)
             throw new UnreachableException($"Unexpected symbol '{symbol}'");
-
 
         return type switch
         {
-            _ => throw new UnreachableException($"Unexpected type {type}")
+            ArrayTypeSymbol => throw new NotImplementedException(type.GetType().Name),
+            LambdaTypeSymbol => throw new NotImplementedException(type.GetType().Name),
+            OptionTypeSymbol optionType => new OptionValue(optionType),
+            StructTypeSymbol structType => context.EvaluatedScope.Lookup(structType),
+            UnionTypeSymbol => throw new NotImplementedException(type.GetType().Name),
+            _ => throw new UnreachableException($"Unexpected type '{type}'")
         };
     }
 }

@@ -85,6 +85,7 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             name,
             type,
+            ContainingSymbol: this,
             isReadOnly,
             isStatic);
         _members.Add(propertySymbol);
@@ -121,6 +122,7 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             GetMethodName(name, type),
             type,
+            ContainingSymbol: this,
             isReadOnly,
             isStatic);
         _members.Add(methodSymbol);
@@ -146,6 +148,7 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(operatorKind),
             GetMethodName(operatorKind, type),
             type,
+            ContainingSymbol: this,
             isReadOnly,
             isStatic);
         _members.Add(methodSymbol);
@@ -234,6 +237,7 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(conversionKind),
             GetMethodName(conversionKind, type),
             type,
+            ContainingSymbol: this,
             isReadOnly,
             isStatic);
         _members.Add(methodSymbol);

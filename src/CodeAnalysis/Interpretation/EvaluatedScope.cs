@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Symbols;
@@ -45,30 +44,23 @@ internal class EvaluatedScope(EvaluatedScope? parent = null) : IEnumerable<PrimV
         throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
     }
 
-    public bool TryLookup(Symbol symbol, [MaybeNullWhen(false)] out PrimValue value)
+    public PrimValue Lookup(Symbol symbol)
     {
         var scope = this;
-        value = scope.Values?.GetValueOrDefault(symbol);
+        var value = scope.Values?.GetValueOrDefault(symbol);
         if (value is not null)
-            return true;
+            return value;
 
         do
         {
             scope = scope.Parent;
             value = scope.Values?.GetValueOrDefault(symbol);
             if (value is not null)
-                return true;
+                return value;
         }
         while (scope != scope.Parent);
 
-        return false;
-    }
-
-    public PrimValue Lookup(Symbol symbol)
-    {
-        if (!TryLookup(symbol, out var value))
-            throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
-        return value;
+        throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
     }
 
     public IEnumerator<PrimValue> GetEnumerator()

@@ -62,6 +62,9 @@ internal static class RenderExtensions
             case ReferenceValue reference:
                 console.Write(reference.ReferencedValue, indent);
                 break;
+            case OptionValue option:
+                console.MarkupInterpolated($"[grey66]{option.Value.Value}[/] [green i]{option.Type.Name}[/]");
+                break;
             default:
                 throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");
         }

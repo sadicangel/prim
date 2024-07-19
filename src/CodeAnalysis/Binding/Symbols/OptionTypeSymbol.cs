@@ -22,6 +22,9 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
             SyntaxKind.ImplicitKeyword,
             new LambdaTypeSymbol([new Parameter("x", UnderlyingType)], this));
         AddConversion(
+            SyntaxKind.ImplicitKeyword,
+            new LambdaTypeSymbol([new Parameter("x", PredefinedTypes.Unit)], this));
+        AddConversion(
             SyntaxKind.ExplicitKeyword,
             new LambdaTypeSymbol([new Parameter("x", this)], UnderlyingType));
     }

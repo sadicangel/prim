@@ -28,11 +28,16 @@ internal sealed record class OptionValue : PrimValue
         Set(
             coalesce2,
             new LambdaValue(coalesce2.LambdaType, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
-        var @implicit = optionType.GetConversion(optionType.UnderlyingType, optionType)
+        var implicit1 = optionType.GetConversion(optionType.UnderlyingType, optionType)
             ?? throw new UnreachableException($"Missing conversion from {optionType.UnderlyingType} to {optionType}");
         Set(
-            @implicit,
-            new LambdaValue(@implicit.LambdaType, (PrimValue x) => new OptionValue(x)));
+            implicit1,
+            new LambdaValue(implicit1.LambdaType, (PrimValue x) => new OptionValue(x)));
+        var implicit2 = optionType.GetConversion(PredefinedTypes.Unit, optionType)
+            ?? throw new UnreachableException($"Missing conversion from {PredefinedTypes.Unit} to {optionType}");
+        Set(
+            implicit2,
+            new LambdaValue(implicit2.LambdaType, (PrimValue x) => new OptionValue(optionType)));
         var @explicit = optionType.GetConversion(optionType, optionType.UnderlyingType)
             ?? throw new UnreachableException($"Missing conversion from {optionType} to {optionType.UnderlyingType}");
         Set(
