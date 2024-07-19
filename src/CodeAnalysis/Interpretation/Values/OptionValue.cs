@@ -16,31 +16,31 @@ internal sealed record class OptionValue : PrimValue
     {
         _value = value;
 
-        var containingSymbol = TypeSymbol.FromType(optionType, NamespaceSymbol.Global);
+        var containingSymbol = TypeSymbol.FromType(optionType);
 
         var coalesce1 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
             new FunctionType([new Parameter("x", optionType), new Parameter("y", optionType)], optionType))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
         Set(
-            MethodSymbol.FromOperator(coalesce1, containingSymbol),
+            MethodSymbol.FromOperator(coalesce1),
             new FunctionValue(coalesce1.Type, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
         var coalesce2 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
             new FunctionType([new Parameter("x", optionType), new Parameter("y", optionType.UnderlyingType)], optionType.UnderlyingType))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
         Set(
-            MethodSymbol.FromOperator(coalesce2, containingSymbol),
+            MethodSymbol.FromOperator(coalesce2),
             new FunctionValue(coalesce2.Type, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
         var @implicit = optionType.GetConversion(optionType.UnderlyingType, optionType)
             ?? throw new UnreachableException($"Missing conversion from {optionType.UnderlyingType} to {optionType}");
         Set(
-            MethodSymbol.FromConversion(@implicit, containingSymbol),
+            MethodSymbol.FromConversion(@implicit),
             new FunctionValue(@implicit.Type, (PrimValue x) => new OptionValue(x)));
         var @explicit = optionType.GetConversion(optionType, optionType.UnderlyingType)
             ?? throw new UnreachableException($"Missing conversion from {optionType} to {optionType.UnderlyingType}");
         Set(
-            MethodSymbol.FromConversion(@explicit, containingSymbol),
+            MethodSymbol.FromConversion(@explicit),
             new FunctionValue(@explicit.Type, (PrimValue x) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : throw new InvalidOperationException("Invalid cast")));
     }
 

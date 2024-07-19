@@ -8,8 +8,6 @@ internal sealed record class MethodSymbol(
     SyntaxNode Syntax,
     string Name,
     FunctionType FunctionType,
-    Symbol ContainingSymbol,
-    NamespaceSymbol NamespaceSymbol,
     bool IsReadOnly,
     bool IsStatic,
     BoundList<VariableSymbol> Parameters)
@@ -18,8 +16,6 @@ internal sealed record class MethodSymbol(
         Syntax,
         Name,
         FunctionType,
-        ContainingSymbol,
-        NamespaceSymbol,
         IsReadOnly,
         IsStatic)
 {
@@ -27,15 +23,12 @@ internal sealed record class MethodSymbol(
 
     public static MethodSymbol FromConversion(
         Conversion conversion,
-        Symbol containingSymbol,
         ConversionDeclarationSyntax? syntax = null)
     {
         var methodSymbol = new MethodSymbol(
             syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             conversion.Name,
             conversion.Type,
-            containingSymbol,
-            containingSymbol.ContainingNamespace,
             IsReadOnly: true,
             IsStatic: true,
             []);
@@ -46,8 +39,6 @@ internal sealed record class MethodSymbol(
             syntax?.Type.Parameters[0] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             parameter.Name,
             parameter.Type,
-            methodSymbol,
-            methodSymbol.ContainingNamespace,
             IsReadOnly: false);
 
         return methodSymbol with { Parameters = [parameterSymbol] };
@@ -55,7 +46,7 @@ internal sealed record class MethodSymbol(
 
     public static MethodSymbol FromMethod(
         Method method,
-        Symbol containingSymbol,
+        PrimType containingType,
         MethodDeclarationSyntax? syntax = null)
     {
         // TODO: Allow not having to use `this`?
@@ -63,8 +54,6 @@ internal sealed record class MethodSymbol(
             syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             method.Name,
             method.Type,
-            containingSymbol,
-            containingSymbol.ContainingNamespace,
             method.IsReadOnly,
             method.IsStatic,
             []);
@@ -72,15 +61,13 @@ internal sealed record class MethodSymbol(
         var parameters = new BoundList<VariableSymbol>.Builder(method.Type.Parameters.Count + 1);
         if (!method.IsStatic)
         {
-            parameters.Add(VariableSymbol.This(containingSymbol.Type, methodSymbol));
+            parameters.Add(VariableSymbol.This(containingType));
         }
         foreach (var parameter in method.Type.Parameters.Select((p, i) =>
             new VariableSymbol(
                 syntax?.Type.Parameters[i] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
                 p.Name,
                 p.Type,
-                methodSymbol,
-                methodSymbol.ContainingNamespace,
                 IsReadOnly: true)))
         {
             parameters.Add(parameter);
@@ -91,15 +78,12 @@ internal sealed record class MethodSymbol(
 
     public static MethodSymbol FromOperator(
         Operator @operator,
-        Symbol containingSymbol,
         OperatorDeclarationSyntax? syntax = null)
     {
         var methodSymbol = new MethodSymbol(
             syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(@operator.OperatorKind),
             @operator.Name,
             @operator.Type,
-            containingSymbol,
-            containingSymbol.ContainingNamespace,
             @operator.IsReadOnly,
             @operator.IsStatic,
             []);
@@ -108,8 +92,6 @@ internal sealed record class MethodSymbol(
             syntax?.Type.Parameters[i] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             p.Name,
             p.Type,
-            methodSymbol,
-            methodSymbol.ContainingNamespace,
             IsReadOnly: true));
 
         return methodSymbol with { Parameters = [.. parameters] };

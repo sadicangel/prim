@@ -8,8 +8,6 @@ internal sealed record class PropertySymbol(
     SyntaxNode Syntax,
     string Name,
     PrimType Type,
-    Symbol ContainingSymbol,
-    NamespaceSymbol NamespaceSymbol,
     bool IsReadOnly,
     bool IsStatic)
     : Symbol(
@@ -17,19 +15,15 @@ internal sealed record class PropertySymbol(
         Syntax,
         Name,
         Type,
-        ContainingSymbol,
-        NamespaceSymbol,
         IsReadOnly,
         IsStatic)
 {
-    public static PropertySymbol FromProperty(Property property, Symbol containingSymbol, SyntaxNode syntax)
+    public static PropertySymbol FromProperty(Property property, SyntaxNode syntax)
     {
         return new PropertySymbol(
             syntax,
             property.Name,
             property.Type,
-            containingSymbol,
-            containingSymbol.ContainingNamespace,
             property.IsReadOnly,
             property.IsStatic);
     }

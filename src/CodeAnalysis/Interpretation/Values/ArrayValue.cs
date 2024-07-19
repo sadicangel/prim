@@ -13,7 +13,7 @@ internal sealed record class ArrayValue
         Elements = elements;
         var index = arrayType.GetOperators(SyntaxKind.BracketOpenBracketCloseToken).Single();
         Set(
-            MethodSymbol.FromOperator(index, TypeSymbol.FromType(arrayType, NamespaceSymbol.Global)),
+            MethodSymbol.FromOperator(index),
             new FunctionValue(
                 index.Type,
                 GetValue));

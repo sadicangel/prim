@@ -26,9 +26,7 @@ partial class Binder
         {
             var typeSymbol = new TypeSymbol(
                 syntax,
-                new StructType(structName),
-                NamespaceSymbol.Global,
-                NamespaceSymbol.Global);
+                new StructType(structName));
             if (!context.BoundScope.Declare(typeSymbol))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             return typeSymbol;
@@ -39,9 +37,7 @@ partial class Binder
             {
                 typeSymbol = new TypeSymbol(
                     syntax,
-                    new StructType(structName),
-                    NamespaceSymbol.Global,
-                    NamespaceSymbol.Global);
+                    new StructType(structName));
                 if (!context.BoundScope.Declare(typeSymbol))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             }
@@ -117,8 +113,6 @@ partial class Binder
                 parameterSyntax,
                 parameterName,
                 parameterType,
-                NamespaceSymbol.Global,
-                NamespaceSymbol.Global,
                 IsReadOnly: false);
             parameterSymbols.Add(parameterSymbol);
         }
@@ -129,8 +123,6 @@ partial class Binder
             syntax,
             functionName,
             functionType,
-            NamespaceSymbol.Global,
-            NamespaceSymbol.Global,
             IsReadOnly: isTopLevel || syntax.IsReadOnly,
             IsStatic: true,
             []);
@@ -149,8 +141,6 @@ partial class Binder
             syntax,
             variableName,
             variableType,
-            NamespaceSymbol.Global,
-            NamespaceSymbol.Global,
             syntax.IsReadOnly);
         if (!context.BoundScope.Declare(variableSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);

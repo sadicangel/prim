@@ -7,8 +7,6 @@ internal sealed record class FunctionSymbol(
     SyntaxNode Syntax,
     string Name,
     FunctionType FunctionType,
-    Symbol ContainingSymbol,
-    NamespaceSymbol NamespaceSymbol,
     bool IsReadOnly,
     bool IsStatic,
     BoundList<VariableSymbol> Parameters)
@@ -17,8 +15,6 @@ internal sealed record class FunctionSymbol(
         Syntax,
         Name,
         FunctionType,
-        ContainingSymbol,
-        NamespaceSymbol,
         IsReadOnly,
         IsStatic)
 {

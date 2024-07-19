@@ -41,7 +41,7 @@ partial class Binder
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
 
-            var propertySymbol = PropertySymbol.FromProperty(property, typeSymbol, syntax);
+            var propertySymbol = PropertySymbol.FromProperty(property, syntax);
 
             return new BoundPropertyDeclaration(syntax, propertySymbol, init);
         }
@@ -52,7 +52,7 @@ partial class Binder
             var method = typeSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'");
 
-            var methodSymbol = MethodSymbol.FromMethod(method, typeSymbol, syntax);
+            var methodSymbol = MethodSymbol.FromMethod(method, typeSymbol.Type, syntax);
 
             var body = BindMethodBody(syntax.Body, methodSymbol, context);
 
@@ -65,7 +65,7 @@ partial class Binder
             var @operator = typeSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
-            var methodSymbol = MethodSymbol.FromOperator(@operator, typeSymbol, syntax);
+            var methodSymbol = MethodSymbol.FromOperator(@operator, syntax);
 
             var body = BindMethodBody(syntax.Body, methodSymbol, context);
 
@@ -79,7 +79,7 @@ partial class Binder
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
             // TODO: Either here or when declaring, must ensure only 1 parameter.
-            var methodSymbol = MethodSymbol.FromConversion(conversion, typeSymbol, syntax);
+            var methodSymbol = MethodSymbol.FromConversion(conversion, syntax);
 
             var body = BindMethodBody(syntax.Body, methodSymbol, context);
 
