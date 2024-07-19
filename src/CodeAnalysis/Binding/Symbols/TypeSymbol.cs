@@ -22,6 +22,10 @@ internal abstract record class TypeSymbol(
     public bool IsUnknown { get => this == PredefinedTypes.Unknown; }
     public bool IsPredefined { get => PredefinedTypeNames.All.Contains(Name); }
 
+    public virtual bool Equals(TypeSymbol? other) => base.Equals(other);
+
+    public override int GetHashCode() => base.GetHashCode();
+
     internal static string GetMethodName(ReadOnlySpan<char> name, LambdaTypeSymbol type) =>
         $"{name}<{string.Join(',', type.Parameters.Select(p => p.Type.Name))}>";
 

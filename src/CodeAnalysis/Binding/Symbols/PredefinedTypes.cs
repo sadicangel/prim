@@ -143,7 +143,7 @@ internal static class PredefinedTypes
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddExplicitConversion(I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize, F16, F32, F64, F80, F128);
+            .AddExplicitConversion(I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, F16, F32, F64, F80, F128);
 
         F16
             .AddEqualityOperators()
