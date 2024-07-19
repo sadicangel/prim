@@ -6,10 +6,10 @@ partial class Parser
 {
     private static StructDeclarationSyntax ParseStructDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var name = ParseIdentifierNameExpression(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var structToken = iterator.Match(SyntaxKind.StructKeyword);
-        var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+        var colonOrEquals = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
         var members = ParseSyntaxList(
             syntaxTree,
@@ -20,10 +20,10 @@ partial class Parser
 
         return new StructDeclarationSyntax(
             syntaxTree,
-            identifierToken,
+            name,
             colonToken,
             structToken,
-            operatorToken,
+            colonOrEquals,
             braceOpenToken,
             members,
             braceCloseToken);

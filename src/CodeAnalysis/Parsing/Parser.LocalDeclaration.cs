@@ -11,7 +11,7 @@ partial class Parser
         if (!syntaxTree.IsScript && declaration is StructDeclarationSyntax structDeclaration)
         {
             syntaxTree.Diagnostics.ReportInvalidLocationForTypeDefinition(
-                new SourceLocation(syntaxTree.SourceText, structDeclaration.IdentifierToken.Range));
+                new SourceLocation(syntaxTree.SourceText, structDeclaration.Name.Range));
         }
         return new LocalDeclarationSyntax(syntaxTree, declaration);
     }

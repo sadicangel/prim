@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class VariableDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken IdentifierToken,
+    IdentifierNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax? Type,
     SyntaxToken ColonOrEqualsToken,
@@ -14,7 +14,7 @@ public sealed record class VariableDeclarationSyntax(
 
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return IdentifierToken;
+        yield return Name;
         yield return ColonToken;
         if (Type is not null)
             yield return Type;

@@ -9,7 +9,7 @@ partial class Binder
 {
     private static BoundFunctionDeclaration BindFunctionDeclaration(FunctionDeclarationSyntax syntax, BinderContext context)
     {
-        var symbolName = syntax.IdentifierToken.Text.ToString();
+        var symbolName = syntax.Name.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not FunctionSymbol functionSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(FunctionDeclarationSyntax)}'");
 

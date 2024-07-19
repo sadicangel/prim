@@ -7,22 +7,22 @@ partial class Parser
 {
     private static VariableDeclarationSyntax ParseVariableDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var name = ParseIdentifierNameExpression(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var type = default(TypeSyntax);
-        if (!iterator.TryMatch(out var operatorToken, SyntaxKind.EqualsToken, SyntaxKind.ColonToken))
+        if (!iterator.TryMatch(out var colonOrEqualsToken, SyntaxKind.EqualsToken, SyntaxKind.ColonToken))
         {
             type = ParseType(syntaxTree, iterator); ;
-            operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+            colonOrEqualsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         }
         var expression = ParseTerminatedExpression(syntaxTree, iterator);
 
         return new VariableDeclarationSyntax(
             syntaxTree,
-            identifierToken,
+            name,
             colonToken,
             type,
-            operatorToken,
+            colonOrEqualsToken,
             expression);
     }
 }

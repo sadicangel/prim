@@ -8,7 +8,7 @@ partial class Binder
 {
     private static BoundVariableDeclaration BindVariableDeclaration(VariableDeclarationSyntax syntax, BinderContext context)
     {
-        var symbolName = syntax.IdentifierToken.Text.ToString();
+        var symbolName = syntax.Name.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(VariableDeclarationSyntax)}'");
 

@@ -10,7 +10,7 @@ partial class Binder
 {
     private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BinderContext context)
     {
-        var symbolName = syntax.IdentifierToken.Text.ToString();
+        var symbolName = syntax.Name.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not TypeSymbol typeSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(StructDeclarationSyntax)}'");
 
@@ -34,8 +34,8 @@ partial class Binder
 
         static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {
-            var property = typeSymbol.GetProperty(syntax.IdentifierToken.Text)
-                ?? throw new UnreachableException($"Unexpected property '{syntax.IdentifierToken.Text}'");
+            var property = typeSymbol.GetProperty(syntax.Name.Text)
+                ?? throw new UnreachableException($"Unexpected property '{syntax.Name.Text}'");
 
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
@@ -46,8 +46,8 @@ partial class Binder
         static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {
             var type = BindLambdaType(syntax.Type, context);
-            var method = typeSymbol.GetMethod(syntax.IdentifierToken.Text, type)
-                ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'");
+            var method = typeSymbol.GetMethod(syntax.Name.Text, type)
+                ?? throw new UnreachableException($"Unexpected method '{syntax.Name.Text}'");
 
             var body = BindMethodBody(syntax.Body, method, context);
 

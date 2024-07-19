@@ -6,7 +6,7 @@ internal sealed record class BoundStructInitExpression(
      SyntaxNode Syntax,
      TypeSymbol TypeSymbol,
      BoundList<BoundPropertyInitExpression> Properties)
-    : BoundExpression(BoundKind.StructInitExpression, Syntax, TypeSymbol.Type)
+    : BoundExpression(BoundKind.StructInitExpression, Syntax, TypeSymbol)
 {
     public override IEnumerable<BoundNode> Children()
     {

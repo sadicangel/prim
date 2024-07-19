@@ -5,7 +5,7 @@ namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class ObjectValue
     : PrimValue, IEnumerable<KeyValuePair<PropertySymbol, PrimValue>>
 {
-    public ObjectValue(StructValue @struct) : base(@struct.TypeSymbol.Type)
+    public ObjectValue(StructValue @struct) : base(@struct.TypeSymbol)
     {
         Struct = @struct;
         foreach (var (memberSymbol, memberValue) in Struct.Members)

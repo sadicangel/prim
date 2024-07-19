@@ -4,7 +4,7 @@ namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class MethodDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken IdentifierToken,
+    IdentifierNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
     SyntaxToken ColonOrEqualsToken,
@@ -15,7 +15,7 @@ public sealed record class MethodDeclarationSyntax(
 
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return IdentifierToken;
+        yield return Name;
         yield return ColonToken;
         yield return Type;
         yield return ColonOrEqualsToken;

@@ -6,7 +6,7 @@ internal sealed record class BoundStructDeclaration(
     SyntaxNode Syntax,
     TypeSymbol TypeSymbol,
     BoundList<BoundMemberDeclaration> Members)
-    : BoundDeclaration(BoundKind.StructDeclaration, Syntax, TypeSymbol.Type)
+    : BoundDeclaration(BoundKind.StructDeclaration, Syntax, TypeSymbol)
 {
     public override IEnumerable<BoundNode> Children()
     {

@@ -6,121 +6,143 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static Symbol Declare(DeclarationSyntax syntax, BinderContext context, bool isTopLevel)
+    private static IEnumerable<(DeclarationSyntax, SyntaxKind)> GetDeclarations(SyntaxNode syntax) =>
+        syntax.Children().OfType<DeclarationSyntax>().Select(s => (s, s.SyntaxKind));
+
+    public static void Declare_StepOne(CompilationUnitSyntax syntax, BinderContext context)
     {
-        return syntax.SyntaxKind switch
+        var queue = new PriorityQueue<DeclarationSyntax, SyntaxKind>(GetDeclarations(syntax));
+        while (queue.Count > 0)
         {
-            SyntaxKind.VariableDeclaration => DeclareVariable((VariableDeclarationSyntax)syntax, context),
-            SyntaxKind.FunctionDeclaration => DeclareFunction((FunctionDeclarationSyntax)syntax, context, isTopLevel),
-            SyntaxKind.StructDeclaration => DeclareStruct((StructDeclarationSyntax)syntax, context, isTopLevel),
-            _ => throw new UnreachableException($"Unexpected {nameof(DeclarationSyntax)} '{syntax.GetType().Name}'")
-        };
+            var declaration = queue.Dequeue();
+            Declare_StepOne(declaration, context);
+        }
     }
 
-    private static TypeSymbol DeclareStruct(StructDeclarationSyntax syntax, BinderContext context, bool isTopLevel)
+    public static void Declare_StepTwo(CompilationUnitSyntax syntax, BinderContext context)
     {
-        var structName = syntax.IdentifierToken.Text.ToString();
-        if (isTopLevel)
+        var queue = new PriorityQueue<DeclarationSyntax, SyntaxKind>(GetDeclarations(syntax));
+        while (queue.Count > 0)
         {
-            var typeSymbol = new StructTypeSymbol(syntax, structName);
-            if (!context.BoundScope.Declare(typeSymbol))
-                context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
-            return typeSymbol;
+            var declaration = queue.Dequeue();
+            Declare_StepTwo(declaration, context);
         }
-        else
-        {
-            if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
-            {
-                typeSymbol = new StructTypeSymbol(syntax, structName);
-                if (!context.BoundScope.Declare(typeSymbol))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
-            }
+    }
 
-            foreach (var memberSyntax in syntax.Members)
-            {
-                _ = memberSyntax.SyntaxKind switch
+    private static void Declare_StepOne(DeclarationSyntax declaration, BinderContext context)
+    {
+        switch (declaration.SyntaxKind)
+        {
+            case SyntaxKind.StructDeclaration:
                 {
-                    SyntaxKind.PropertyDeclaration => BindProperty((PropertyDeclarationSyntax)memberSyntax, typeSymbol, context),
-                    SyntaxKind.MethodDeclaration => BindMethod((MethodDeclarationSyntax)memberSyntax, typeSymbol, context),
-                    SyntaxKind.OperatorDeclaration => BindOperator((OperatorDeclarationSyntax)memberSyntax, typeSymbol, context),
-                    SyntaxKind.ConversionDeclaration => BindConversion((ConversionDeclarationSyntax)memberSyntax, typeSymbol, context),
-                    _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{memberSyntax.SyntaxKind}'")
-                };
-            }
+                    var structDeclaration = (StructDeclarationSyntax)declaration;
+                    var structName = structDeclaration.Name.Text.ToString();
+                    var typeSymbol = new StructTypeSymbol(structDeclaration, structName);
+                    if (!context.BoundScope.Declare(typeSymbol))
+                        context.Diagnostics.ReportSymbolRedeclaration(structDeclaration.Location, structName);
+                }
+                break;
+            case SyntaxKind.FunctionDeclaration:
+                {
+                    var functionDeclaration = (FunctionDeclarationSyntax)declaration;
+                    if (!functionDeclaration.IsReadOnly)
+                        context.Diagnostics.ReportMutableGlobalDeclaration(functionDeclaration.Location, "function");
+                    var functionName = functionDeclaration.Name.Text.ToString();
+                    var functionType = BindLambdaType(functionDeclaration.Type, context);
+                    var functionSymbol = new FunctionSymbol(
+                       functionDeclaration,
+                       functionName,
+                       functionType,
+                       IsReadOnly: functionDeclaration.IsReadOnly,
+                       IsStatic: true);
+                    if (!context.BoundScope.Declare(functionSymbol))
+                        context.Diagnostics.ReportSymbolRedeclaration(functionDeclaration.Location, functionName);
+                }
+                break;
+            case SyntaxKind.VariableDeclaration:
+                {
+                    var variableDeclaration = (VariableDeclarationSyntax)declaration;
+                    var variableName = variableDeclaration.Name.Text.ToString();
+                    var variableType = variableDeclaration.Type is null
+                        ? PredefinedTypes.Unknown
+                        : BindType(variableDeclaration.Type, context);
+                    var variableSymbol = new VariableSymbol(
+                        variableDeclaration,
+                        variableName,
+                        variableType,
+                        variableDeclaration.IsReadOnly);
 
-            return typeSymbol;
-
-
-            static int BindProperty(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
-            {
-                var name = syntax.IdentifierToken.Text.ToString();
-                var type = BindType(syntax.Type, context);
-                if (!typeSymbol.AddProperty(name, type, syntax))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
-
-                return 0;
-            }
-
-            static int BindMethod(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
-            {
-                var name = syntax.IdentifierToken.Text.ToString();
-                var type = BindLambdaType(syntax.Type, context);
-                if (!typeSymbol.AddMethod(name, type, syntax))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
-                return 0;
-            }
-
-            static int BindOperator(OperatorDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
-            {
-                var type = BindLambdaType(syntax.Type, context);
-                if (!typeSymbol.AddOperator(type, syntax))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.OperatorToken.Text.ToString());
-                return 0;
-            }
-
-            static int BindConversion(ConversionDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
-            {
-                var type = BindLambdaType(syntax.Type, context);
-                if (!typeSymbol.AddConversion(type, syntax))
-                    context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.ConversionKeyword.Text.ToString());
-                return 0;
-            }
+                    if (!context.BoundScope.Declare(variableSymbol))
+                        context.Diagnostics.ReportSymbolRedeclaration(variableDeclaration.Location, variableName);
+                }
+                break;
+            default:
+                throw new UnreachableException($"Unexpected declaration '{declaration.SyntaxKind}'");
         }
     }
 
-    private static FunctionSymbol DeclareFunction(FunctionDeclarationSyntax syntax, BinderContext context, bool isTopLevel)
+    private static void Declare_StepTwo(DeclarationSyntax declaration, BinderContext context)
     {
-        if (isTopLevel && !syntax.IsReadOnly)
-            context.Diagnostics.ReportMutableGlobalDeclaration(syntax.Location, "function");
-
-        var functionName = syntax.IdentifierToken.Text.ToString();
-        var functionType = BindLambdaType(syntax.Type, context);
-        var functionSymbol = new FunctionSymbol(
-           syntax,
-           functionName,
-           functionType,
-           IsReadOnly: isTopLevel || syntax.IsReadOnly,
-           IsStatic: true);
-
-        if (!context.BoundScope.Declare(functionSymbol))
-            context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, functionName);
-
-        return functionSymbol;
-    }
-
-    private static VariableSymbol DeclareVariable(VariableDeclarationSyntax syntax, BinderContext context)
-    {
-        var variableName = syntax.IdentifierToken.Text.ToString();
-        var variableType = syntax.Type is null ? PredefinedTypes.Unknown : BindType(syntax.Type, context);
-        var variableSymbol = new VariableSymbol(
-            syntax,
-            variableName,
-            variableType,
-            syntax.IsReadOnly);
-
-        if (!context.BoundScope.Declare(variableSymbol))
-            context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);
-
-        return variableSymbol;
+        switch (declaration.SyntaxKind)
+        {
+            case SyntaxKind.StructDeclaration:
+                {
+                    var structDeclaration = (StructDeclarationSyntax)declaration;
+                    var structName = structDeclaration.Name.Text.ToString();
+                    if (context.BoundScope.Lookup(structName) is not StructTypeSymbol structType)
+                        throw new UnreachableException($"Unexpected declaration '{declaration}'");
+                    foreach (var member in structDeclaration.Members)
+                    {
+                        switch (member.SyntaxKind)
+                        {
+                            case SyntaxKind.PropertyDeclaration:
+                                {
+                                    var propertyDeclaration = (PropertyDeclarationSyntax)member;
+                                    var name = propertyDeclaration.Name.Text.ToString();
+                                    var type = BindType(propertyDeclaration.Type, context);
+                                    if (!structType.AddProperty(name, type, propertyDeclaration))
+                                        context.Diagnostics.ReportSymbolRedeclaration(propertyDeclaration.Location, name);
+                                }
+                                break;
+                            case SyntaxKind.MethodDeclaration:
+                                {
+                                    var methodDeclaration = (MethodDeclarationSyntax)member;
+                                    var name = methodDeclaration.Name.Text.ToString();
+                                    var type = BindLambdaType(methodDeclaration.Type, context);
+                                    if (!structType.AddMethod(name, type, methodDeclaration))
+                                        context.Diagnostics.ReportSymbolRedeclaration(methodDeclaration.Location, name);
+                                }
+                                break;
+                            case SyntaxKind.OperatorDeclaration:
+                                {
+                                    var operatorDeclaration = (OperatorDeclarationSyntax)member;
+                                    var name = SyntaxFacts.GetText(operatorDeclaration.OperatorToken.SyntaxKind)
+                                        ?? throw new UnreachableException($"Unexpected operator '{operatorDeclaration.OperatorToken}'");
+                                    var type = BindLambdaType(operatorDeclaration.Type, context);
+                                    if (!structType.AddOperator(type, operatorDeclaration))
+                                        context.Diagnostics.ReportSymbolRedeclaration(operatorDeclaration.Location, name);
+                                }
+                                break;
+                            case SyntaxKind.ConversionDeclaration:
+                                {
+                                    var conversionDeclaration = (ConversionDeclarationSyntax)member;
+                                    var name = SyntaxFacts.GetText(conversionDeclaration.ConversionKeyword.SyntaxKind)
+                                        ?? throw new UnreachableException($"Unexpected operator '{conversionDeclaration.ConversionKeyword}'");
+                                    var type = BindLambdaType(conversionDeclaration.Type, context);
+                                    if (!structType.AddConversion(type, conversionDeclaration))
+                                        context.Diagnostics.ReportSymbolRedeclaration(conversionDeclaration.Location, name);
+                                }
+                                break;
+                        }
+                    }
+                }
+                break;
+            case SyntaxKind.FunctionDeclaration:
+                break;
+            case SyntaxKind.VariableDeclaration:
+                break;
+            default:
+                throw new UnreachableException($"Unexpected declaration '{declaration.SyntaxKind}'");
+        }
     }
 }

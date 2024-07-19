@@ -18,4 +18,36 @@ public abstract record class SyntaxNode(SyntaxKind SyntaxKind, SyntaxTree Syntax
         SyntaxTree.SourceText[Range] is var sourceText and { Length: > 0 } ? $"{SyntaxKind} {sourceText}" : SyntaxKind.ToString();
 
     public abstract IEnumerable<SyntaxNode> Children();
+
+    public IEnumerable<SyntaxNode> SelfAndDescendants()
+    {
+        yield return this;
+
+        var queue = new Queue<SyntaxNode>();
+        queue.Enqueue(this);
+
+        while (queue.Count > 0)
+        {
+            var node = queue.Dequeue();
+            foreach (var child in node.Children())
+            {
+                yield return child;
+                queue.Enqueue(child);
+            }
+        }
+    }
+
+    public IEnumerable<SyntaxNode> Descendants() => SelfAndDescendants().Skip(1);
+
+    public IEnumerable<SyntaxNode> SelfAndAncestors()
+    {
+        var node = this;
+        while (node is not null)
+        {
+            yield return node;
+            node = node.Parent;
+        }
+    }
+
+    public IEnumerable<SyntaxNode> Ancestors() => SelfAndAncestors().Skip(1);
 }

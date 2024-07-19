@@ -59,7 +59,7 @@ partial class Parser
 
         static MethodDeclarationSyntax ParseMethodDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
-            var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+            var name = ParseIdentifierNameExpression(syntaxTree, iterator);
             var colonToken = iterator.Match(SyntaxKind.ColonToken);
             var type = ParseType(syntaxTree, iterator);
             if (type is not LambdaTypeSyntax functionType)
@@ -69,7 +69,7 @@ partial class Parser
 
             return new MethodDeclarationSyntax(
                 syntaxTree,
-                identifierToken,
+                name,
                 colonToken,
                 functionType,
                 operatorToken,
@@ -78,7 +78,7 @@ partial class Parser
 
         static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
         {
-            var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+            var name = ParseIdentifierNameExpression(syntaxTree, iterator);
             var colonToken = iterator.Match(SyntaxKind.ColonToken);
             var type = ParseType(syntaxTree, iterator);
             var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
@@ -86,7 +86,7 @@ partial class Parser
 
             return new PropertyDeclarationSyntax(
                 syntaxTree,
-                identifierToken,
+                name,
                 colonToken,
                 type,
                 operatorToken,

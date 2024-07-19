@@ -7,20 +7,20 @@ partial class Parser
 {
     private static FunctionDeclarationSyntax ParseFunctionDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var name = ParseIdentifierNameExpression(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var type = ParseType(syntaxTree, iterator);
         if (type is not LambdaTypeSyntax functionType)
             throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(LambdaTypeSyntax)}'");
-        var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+        var colonOrEqualsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         var body = ParseTerminatedExpression(syntaxTree, iterator);
 
         return new FunctionDeclarationSyntax(
             syntaxTree,
-            identifierToken,
+            name,
             colonToken,
             functionType,
-            operatorToken,
+            colonOrEqualsToken,
             body);
     }
 }

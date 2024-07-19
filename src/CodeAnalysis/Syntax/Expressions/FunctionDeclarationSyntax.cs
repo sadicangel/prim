@@ -3,21 +3,21 @@
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class FunctionDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken IdentifierToken,
+    IdentifierNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
-    SyntaxToken OperatorToken,
+    SyntaxToken ColonOrEqualsToken,
     ExpressionSyntax Body)
     : DeclarationSyntax(SyntaxKind.FunctionDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => OperatorToken.SyntaxKind is SyntaxKind.ColonToken; }
+    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
 
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return IdentifierToken;
+        yield return Name;
         yield return ColonToken;
         yield return Type;
-        yield return OperatorToken;
+        yield return ColonOrEqualsToken;
         yield return Body;
     }
 }

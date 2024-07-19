@@ -1,12 +1,7 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
-
-namespace CodeAnalysis.Binding;
+﻿namespace CodeAnalysis.Binding;
 
 internal static partial class Binder
 {
-    private static readonly List<DeclarationSyntax> s_emptyDeclarationList = [];
-
     public static BoundCompilationUnit Bind(BoundTree boundTree, BoundScope boundScope)
     {
         var compilationUnit = boundTree.SyntaxTree.CompilationUnit;
@@ -18,23 +13,11 @@ internal static partial class Binder
 
         var context = new BinderContext(boundTree, boundScope);
 
-        var declarations = compilationUnit.SyntaxNodes
-            .OfType<DeclarationSyntax>()
-            .GroupBy(d => d.SyntaxKind)
-            .ToDictionary(g => g.Key, g => g.ToList());
-
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, s_emptyDeclarationList))
-            DeclareStruct((StructDeclarationSyntax)declaration, context, isTopLevel: true);
-
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.FunctionDeclaration, s_emptyDeclarationList))
-            DeclareFunction((FunctionDeclarationSyntax)declaration, context, isTopLevel: true);
-
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.VariableDeclaration, s_emptyDeclarationList))
-            DeclareVariable((VariableDeclarationSyntax)declaration, context);
-
-        foreach (var declaration in declarations.GetValueOrDefault(SyntaxKind.StructDeclaration, s_emptyDeclarationList))
-            DeclareStruct((StructDeclarationSyntax)declaration, context, isTopLevel: false);
-
+        // TODO: Do this for all syntax trees first..
+        Declare_StepOne(compilationUnit, context);
+        // ..then this..
+        Declare_StepTwo(compilationUnit, context);
+        // ..and finally, the only thing that should be here.
         return BindCompilationUnit(compilationUnit, context);
     }
 }
