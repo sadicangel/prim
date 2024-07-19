@@ -29,6 +29,6 @@ partial class Binder
 
         // TODO: If index is const, check bounds.
 
-        return new BoundIndexReference(syntax, expression, @operator, index);
+        return new BoundIndexReference(syntax, expression, @operator, index, @operator.ReturnType);
     }
 }

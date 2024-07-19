@@ -15,10 +15,8 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
         Length = length;
         AddOperator(
             SyntaxKind.BracketOpenBracketCloseToken,
-            new LambdaTypeSymbol([new("index", PredefinedTypes.I32)], ElementType));
-        //AddOperator(
-        //    SyntaxKind.IndexOperator,
-        //    new FunctionType([new("index", PredefinedTypes.I32), new("value", ElementType)], PredefinedTypes.Unit));
+            new LambdaTypeSymbol([new("index", PredefinedTypes.I32)], ElementType),
+            isReadOnly: false);
     }
 
     public TypeSymbol ElementType { get; init; }

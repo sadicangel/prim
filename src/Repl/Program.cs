@@ -10,10 +10,7 @@ var previousEvaluation = default(Evaluation);
 
 while (true)
 {
-    var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
-        a : ?i32 = 0;
-        a = if (false) 1
-        """));
+    var code = console.Prompt(new TextPrompt<string>(">"));
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
 

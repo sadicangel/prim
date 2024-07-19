@@ -74,9 +74,9 @@ internal abstract record class TypeSymbol(
     }
 
     internal bool AddProperty(string name, TypeSymbol type, PropertyDeclarationSyntax syntax) =>
-        AddProperty(name, type, syntax.IsReadOnly, isStatic: false, syntax);
+        AddProperty(name, type, isStatic: false, syntax.IsReadOnly, syntax);
 
-    internal bool AddProperty(string name, TypeSymbol type, bool isReadOnly, bool isStatic, SyntaxNode? syntax = null)
+    internal bool AddProperty(string name, TypeSymbol type, bool isStatic, bool isReadOnly, SyntaxNode? syntax = null)
     {
         if (GetProperty(name) is not null) return false;
 
@@ -86,8 +86,8 @@ internal abstract record class TypeSymbol(
             name,
             type,
             ContainingSymbol: this,
-            isReadOnly,
-            isStatic);
+            isStatic,
+            isReadOnly);
         _members.Add(propertySymbol);
 
         return true;
@@ -104,9 +104,9 @@ internal abstract record class TypeSymbol(
     }
 
     internal bool AddMethod(string name, LambdaTypeSymbol type, MethodDeclarationSyntax syntax) =>
-        AddMethod(name, type, syntax.IsReadOnly, isStatic: true, syntax);
+        AddMethod(name, type, isStatic: true, syntax.IsReadOnly, syntax);
 
-    internal bool AddMethod(string name, LambdaTypeSymbol type, bool isReadOnly = true, bool isStatic = true, SyntaxNode? syntax = null)
+    internal bool AddMethod(string name, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {
         if (GetMethod(name, type) is not null) return false;
 
@@ -123,8 +123,8 @@ internal abstract record class TypeSymbol(
             GetMethodName(name, type),
             type,
             ContainingSymbol: this,
-            isReadOnly,
-            isStatic);
+            isStatic,
+            isReadOnly);
         _members.Add(methodSymbol);
 
         return true;
@@ -137,9 +137,9 @@ internal abstract record class TypeSymbol(
         _members.OfType<MethodSymbol>().SingleOrDefault(m => m.Name == name);
 
     internal bool AddOperator(LambdaTypeSymbol type, OperatorDeclarationSyntax syntax) =>
-        AddOperator(syntax.OperatorToken.SyntaxKind, type, syntax.IsReadOnly, isStatic: true, syntax);
+        AddOperator(syntax.OperatorToken.SyntaxKind, type, isStatic: true, syntax.IsReadOnly, syntax);
 
-    internal bool AddOperator(SyntaxKind operatorKind, LambdaTypeSymbol type, bool isReadOnly = true, bool isStatic = true, SyntaxNode? syntax = null)
+    internal bool AddOperator(SyntaxKind operatorKind, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {
         if (GetOperator(operatorKind, type) is not null) return false;
 
@@ -149,8 +149,8 @@ internal abstract record class TypeSymbol(
             GetMethodName(operatorKind, type),
             type,
             ContainingSymbol: this,
-            isReadOnly,
-            isStatic);
+            isStatic,
+            isReadOnly);
         _members.Add(methodSymbol);
 
         return true;
@@ -226,9 +226,9 @@ internal abstract record class TypeSymbol(
     }
 
     internal bool AddConversion(LambdaTypeSymbol type, ConversionDeclarationSyntax syntax) =>
-        AddOperator(syntax.ConversionKeyword.SyntaxKind, type, syntax.IsReadOnly, isStatic: true, syntax);
+        AddConversion(syntax.ConversionKeyword.SyntaxKind, type, isStatic: true, syntax.IsReadOnly, syntax);
 
-    internal bool AddConversion(SyntaxKind conversionKind, LambdaTypeSymbol type, bool isReadOnly = true, bool isStatic = true, SyntaxNode? syntax = null)
+    internal bool AddConversion(SyntaxKind conversionKind, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {
         if (GetConversion(type) is not null) return false;
 
@@ -238,8 +238,8 @@ internal abstract record class TypeSymbol(
             GetMethodName(conversionKind, type),
             type,
             ContainingSymbol: this,
-            isReadOnly,
-            isStatic);
+            isStatic,
+            isReadOnly);
         _members.Add(methodSymbol);
 
         return true;

@@ -18,6 +18,6 @@ partial class Binder
             .GetSymbols(syntax.Name.IdentifierToken.Text)
             .SingleOrDefault() ?? throw new UnreachableException($"Unexpected member '{syntax.Name.IdentifierToken.Text}'");
 
-        return new BoundMemberReference(syntax.Name, expression, symbol);
+        return new BoundMemberReference(syntax.Name, expression, symbol, symbol.Type);
     }
 }
