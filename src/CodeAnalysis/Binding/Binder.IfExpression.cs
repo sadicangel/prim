@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -33,7 +33,7 @@ partial class Binder
         }
 
         BoundExpression @else;
-        PrimType type;
+        TypeSymbol type;
 
         if (syntax.ElseClause is not null)
         {
@@ -43,7 +43,7 @@ partial class Binder
                 return @else;
             }
 
-            type = then.Type == @else.Type ? then.Type : new UnionType([then.Type, @else.Type]);
+            type = then.Type == @else.Type ? then.Type : new UnionTypeSymbol(syntax, [then.Type, @else.Type]);
         }
         else
         {
@@ -54,7 +54,7 @@ partial class Binder
                     SyntaxFactory.SyntheticToken(SyntaxKind.NullKeyword),
                     Unit.Value),
                 context);
-            type = then.Type.IsOption ? then.Type : new OptionType(then.Type);
+            type = then.Type.IsOption ? then.Type : new OptionTypeSymbol(syntax, then.Type);
         }
 
         return new BoundIfExpression(syntax, condition, then, @else, type);

@@ -7,7 +7,7 @@ partial class Interpreter
     public static PrimValue EvaluateBinaryExpression(BoundBinaryExpression node, InterpreterContext context)
     {
         var left = EvaluateExpression(node.Left, context);
-        var function = left.Get<FunctionValue>(node.MethodSymbol);
+        var function = left.Get<LambdaValue>(node.MethodSymbol);
         var right = EvaluateExpression(node.Right, context);
         return function.Invoke(left, right);
     }

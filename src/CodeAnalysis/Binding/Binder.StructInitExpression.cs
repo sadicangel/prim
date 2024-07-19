@@ -1,7 +1,6 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -18,7 +17,7 @@ partial class Binder
         var properties = new BoundList<BoundPropertyInitExpression>.Builder(syntax.Properties.Count);
         foreach (var propertySyntax in syntax.Properties)
         {
-            if (typeSymbol.Type.GetProperty(propertySyntax.IdentifierToken.Text) is not Property property)
+            if (typeSymbol.GetProperty(propertySyntax.IdentifierToken.Text) is not PropertySymbol property)
             {
                 context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.IdentifierToken.Text.ToString());
                 continue;
@@ -30,8 +29,7 @@ partial class Binder
                 continue;
             }
 
-            var propertySymbol = PropertySymbol.FromProperty(property, syntax);
-            var expression = BindPropertyInitExpression(propertySyntax, propertySymbol, context);
+            var expression = BindPropertyInitExpression(propertySyntax, property, context);
             properties.Add(expression);
         }
 

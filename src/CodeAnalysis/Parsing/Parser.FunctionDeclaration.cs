@@ -10,8 +10,8 @@ partial class Parser
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var type = ParseType(syntaxTree, iterator);
-        if (type is not FunctionTypeSyntax functionType)
-            throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(FunctionTypeSyntax)}'");
+        if (type is not LambdaTypeSyntax functionType)
+            throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(LambdaTypeSyntax)}'");
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         var body = ParseTerminatedExpression(syntaxTree, iterator);
 

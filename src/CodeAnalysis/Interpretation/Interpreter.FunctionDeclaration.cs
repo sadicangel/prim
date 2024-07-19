@@ -4,11 +4,13 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static FunctionValue EvaluateFunctionDeclaration(BoundFunctionDeclaration node, InterpreterContext context)
+    public static LambdaValue EvaluateFunctionDeclaration(BoundFunctionDeclaration node, InterpreterContext context)
     {
         // TODO: Can we merge Function and Variable values?
-        var functionValue = new FunctionValue(node.FunctionSymbol.FunctionType, FuncFactory.Create(node.FunctionSymbol, node.Body, context));
-        context.EvaluatedScope.Declare(node.FunctionSymbol, functionValue);
-        return functionValue;
+        var lambda = new LambdaValue(
+            node.FunctionSymbol.LambdaType,
+            FuncFactory.Create(node.FunctionSymbol.LambdaType, node.Body, context));
+        context.EvaluatedScope.Declare(node.FunctionSymbol, lambda);
+        return lambda;
     }
 }

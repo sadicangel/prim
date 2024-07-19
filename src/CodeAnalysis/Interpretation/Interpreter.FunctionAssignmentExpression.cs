@@ -4,10 +4,12 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static FunctionValue EvaluateFunctionAssignmentExpression(BoundFunctionAssignmentExpression node, InterpreterContext context)
+    public static LambdaValue EvaluateFunctionAssignmentExpression(BoundFunctionAssignmentExpression node, InterpreterContext context)
     {
-        var functionValue = new FunctionValue(node.FunctionSymbol.FunctionType, FuncFactory.Create(node.FunctionSymbol, node, context));
-        context.EvaluatedScope.Replace(node.FunctionSymbol, functionValue);
-        return functionValue;
+        var lambda = new LambdaValue(
+            node.FunctionSymbol.LambdaType,
+            FuncFactory.Create(node.FunctionSymbol.LambdaType, node, context));
+        context.EvaluatedScope.Replace(node.FunctionSymbol, lambda);
+        return lambda;
     }
 }

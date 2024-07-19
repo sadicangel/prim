@@ -2,7 +2,6 @@
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -22,8 +21,6 @@ partial class Binder
 
         // TODO: Actually check where this should be readonly or not.
         // Maybe the indexer should be a property instead?
-        var methodSymbol = MethodSymbol.FromOperator(@operator);
-
         var index = Coerce(BindExpression(syntax.Index, context), PredefinedTypes.I32, context);
         if (index.Type.IsNever)
         {
@@ -32,6 +29,6 @@ partial class Binder
 
         // TODO: If index is const, check bounds.
 
-        return new BoundIndexReference(syntax, expression, methodSymbol, index);
+        return new BoundIndexReference(syntax, expression, @operator, index);
     }
 }

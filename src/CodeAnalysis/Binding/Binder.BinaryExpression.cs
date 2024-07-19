@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Binding.Expressions;
-using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Binding;
@@ -29,8 +28,6 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var methodSymbol = MethodSymbol.FromOperator(@operator);
-
-        return new BoundBinaryExpression(syntax, left, methodSymbol, right);
+        return new BoundBinaryExpression(syntax, left, @operator, right);
     }
 }

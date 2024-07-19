@@ -1,33 +1,35 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types.Metadata;
+﻿using System.Reflection;
+using CodeAnalysis.Syntax;
 
-namespace CodeAnalysis.Types;
+namespace CodeAnalysis.Binding.Symbols;
+
+// TODO: Merge this into global scope.
 internal static class PredefinedTypes
 {
-    public static readonly StructType Any = new(PredefinedTypeNames.Any);
-    public static readonly StructType Unknown = new(PredefinedTypeNames.Unknown);
-    public static readonly StructType Never = new(PredefinedTypeNames.Never);
-    public static readonly StructType Unit = new(PredefinedTypeNames.Unit);
-    public static readonly StructType Type = new(PredefinedTypeNames.Type);
-    public static readonly StructType Str = new(PredefinedTypeNames.Str);
-    public static readonly StructType Bool = new(PredefinedTypeNames.Bool);
-    public static readonly StructType I8 = new(PredefinedTypeNames.I8);
-    public static readonly StructType I16 = new(PredefinedTypeNames.I16);
-    public static readonly StructType I32 = new(PredefinedTypeNames.I32);
-    public static readonly StructType I64 = new(PredefinedTypeNames.I64);
-    public static readonly StructType I128 = new(PredefinedTypeNames.I128);
-    public static readonly StructType ISize = new(PredefinedTypeNames.ISize);
-    public static readonly StructType U8 = new(PredefinedTypeNames.U8);
-    public static readonly StructType U16 = new(PredefinedTypeNames.U16);
-    public static readonly StructType U32 = new(PredefinedTypeNames.U32);
-    public static readonly StructType U64 = new(PredefinedTypeNames.U64);
-    public static readonly StructType U128 = new(PredefinedTypeNames.U128);
-    public static readonly StructType USize = new(PredefinedTypeNames.USize);
-    public static readonly StructType F16 = new(PredefinedTypeNames.F16);
-    public static readonly StructType F32 = new(PredefinedTypeNames.F32);
-    public static readonly StructType F64 = new(PredefinedTypeNames.F64);
-    public static readonly StructType F80 = new(PredefinedTypeNames.F80);
-    public static readonly StructType F128 = new(PredefinedTypeNames.F128);
+    public static readonly StructTypeSymbol Any = new(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedTypeNames.Any);
+    public static readonly StructTypeSymbol Unknown = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedTypeNames.Unknown);
+    public static readonly StructTypeSymbol Never = new(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedTypeNames.Never);
+    public static readonly StructTypeSymbol Unit = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedTypeNames.Unit);
+    public static readonly StructTypeSymbol Str = new(SyntaxFactory.SyntheticToken(SyntaxKind.StrKeyword), PredefinedTypeNames.Str);
+    public static readonly StructTypeSymbol Bool = new(SyntaxFactory.SyntheticToken(SyntaxKind.BoolKeyword), PredefinedTypeNames.Bool);
+    public static readonly StructTypeSymbol I8 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I8Keyword), PredefinedTypeNames.I8);
+    public static readonly StructTypeSymbol I16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedTypeNames.I16);
+    public static readonly StructTypeSymbol I32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedTypeNames.I32);
+    public static readonly StructTypeSymbol I64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedTypeNames.I64);
+    public static readonly StructTypeSymbol I128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I128Keyword), PredefinedTypeNames.I128);
+    public static readonly StructTypeSymbol ISize = new(SyntaxFactory.SyntheticToken(SyntaxKind.ISizeKeyword), PredefinedTypeNames.ISize);
+    public static readonly StructTypeSymbol U8 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedTypeNames.U8);
+    public static readonly StructTypeSymbol U16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedTypeNames.U16);
+    public static readonly StructTypeSymbol U32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedTypeNames.U32);
+    public static readonly StructTypeSymbol U64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedTypeNames.U64);
+    public static readonly StructTypeSymbol U128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U128Keyword), PredefinedTypeNames.U128);
+    public static readonly StructTypeSymbol USize = new(SyntaxFactory.SyntheticToken(SyntaxKind.USizeKeyword), PredefinedTypeNames.USize);
+    public static readonly StructTypeSymbol F16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedTypeNames.F16);
+    public static readonly StructTypeSymbol F32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedTypeNames.F32);
+    public static readonly StructTypeSymbol F64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedTypeNames.F64);
+    public static readonly StructTypeSymbol F80 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F80Keyword), PredefinedTypeNames.F80);
+    public static readonly StructTypeSymbol F128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedTypeNames.F128);
+    public static readonly StructTypeSymbol Type = StructTypeSymbol.RuntimeType;
 
     static PredefinedTypes()
     {
@@ -37,13 +39,13 @@ internal static class PredefinedTypes
             {
                 type.AddOperator(
                     SyntaxKind.PlusToken,
-                    new FunctionType([new Parameter("x", Str), new Parameter("y", Str)], Str));
+                    new LambdaTypeSymbol([new Parameter("x", Str), new Parameter("y", Str)], Str));
                 type.AddOperator(
                     SyntaxKind.PlusToken,
-                    new FunctionType([new Parameter("x", Str), new Parameter("y", Any)], Str));
+                    new LambdaTypeSymbol([new Parameter("x", Str), new Parameter("y", Any)], Str));
                 type.AddOperator(
                     SyntaxKind.PlusToken,
-                    new FunctionType([new Parameter("x", Any), new Parameter("y", Str)], Str));
+                    new LambdaTypeSymbol([new Parameter("x", Any), new Parameter("y", Str)], Str));
             });
 
         Bool
@@ -178,117 +180,121 @@ internal static class PredefinedTypes
             .AddExplicitConversion(F16, F32, F64, F80, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
     }
 
-    private static PrimType AddMembers(this PrimType type, Action<PrimType> add)
+    public static IEnumerable<Symbol> All() => typeof(PredefinedTypes)
+        .GetFields(BindingFlags.Public | BindingFlags.Static)
+        .Select(f => (Symbol)f.GetValue(null)!);
+
+    private static TypeSymbol AddMembers(this TypeSymbol type, Action<TypeSymbol> add)
     {
         add(type);
         return type;
     }
 
-    private static PrimType AddMathOperators(this PrimType type)
+    private static TypeSymbol AddMathOperators(this TypeSymbol type)
     {
         type.AddOperator(
             SyntaxKind.PlusToken,
-            new FunctionType([new("x", type)], type));
+            new LambdaTypeSymbol([new("x", type)], type));
         type.AddOperator(
             SyntaxKind.MinusToken,
-            new FunctionType([new("x", type)], type));
+            new LambdaTypeSymbol([new("x", type)], type));
         type.AddOperator(
             SyntaxKind.PlusToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.MinusToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.StarToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.SlashToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.PercentToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.StarStarToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         return type;
     }
 
-    private static PrimType AddBitwiseOperators(this PrimType type)
+    private static TypeSymbol AddBitwiseOperators(this TypeSymbol type)
     {
         type.AddOperator(
             SyntaxKind.TildeToken,
-            new FunctionType([new("x", type)], type));
+            new LambdaTypeSymbol([new("x", type)], type));
         type.AddOperator(
             SyntaxKind.AmpersandToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.PipeToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.HatToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.LessThanLessThanToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         type.AddOperator(
             SyntaxKind.GreaterThanGreaterThanToken,
-            new FunctionType([new("x", type), new("y", type)], type));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], type));
         return type;
     }
 
-    private static PrimType AddEqualityOperators(this PrimType type)
+    private static TypeSymbol AddEqualityOperators(this TypeSymbol type)
     {
         type.AddOperator(
             SyntaxKind.EqualsEqualsToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         type.AddOperator(
             SyntaxKind.BangEqualsToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         return type;
     }
 
-    private static PrimType AddComparisonOperators(this PrimType type)
+    private static TypeSymbol AddComparisonOperators(this TypeSymbol type)
     {
         type.AddOperator(
             SyntaxKind.LessThanToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         type.AddOperator(
             SyntaxKind.LessThanEqualsToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         type.AddOperator(
             SyntaxKind.GreaterThanToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         type.AddOperator(
             SyntaxKind.GreaterThanEqualsToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         return type;
     }
 
-    private static PrimType AddLogicalOperators(this PrimType type)
+    private static TypeSymbol AddLogicalOperators(this TypeSymbol type)
     {
         type.AddOperator(
             SyntaxKind.BangToken,
-            new FunctionType([new("x", type)], Bool));
+            new LambdaTypeSymbol([new("x", type)], Bool));
         type.AddOperator(
             SyntaxKind.AmpersandAmpersandToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         type.AddOperator(
             SyntaxKind.PipePipeToken,
-            new FunctionType([new("x", type), new("y", type)], Bool));
+            new LambdaTypeSymbol([new("x", type), new("y", type)], Bool));
         return type;
     }
 
-    private static PrimType AddImplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targetTypes)
+    private static TypeSymbol AddImplicitConversion(this TypeSymbol type, params ReadOnlySpan<TypeSymbol> targetTypes)
     {
         foreach (var targetType in targetTypes)
-            type.AddConversion(SyntaxKind.ImplicitKeyword, new FunctionType([new Parameter("x", type)], targetType));
+            type.AddConversion(SyntaxKind.ImplicitKeyword, new LambdaTypeSymbol([new Parameter("x", type)], targetType));
         return type;
     }
 
-    private static PrimType AddExplicitConversion(this PrimType type, params ReadOnlySpan<PrimType> targetTypes)
+    private static TypeSymbol AddExplicitConversion(this TypeSymbol type, params ReadOnlySpan<TypeSymbol> targetTypes)
     {
         foreach (var targetType in targetTypes)
-            type.AddConversion(SyntaxKind.ExplicitKeyword, new FunctionType([new Parameter("x", type)], targetType));
+            type.AddConversion(SyntaxKind.ExplicitKeyword, new LambdaTypeSymbol([new Parameter("x", type)], targetType));
         return type;
     }
 }

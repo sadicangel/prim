@@ -38,8 +38,10 @@ partial class Interpreter
 
         static object EvaluateMethodDeclaration(BoundMethodDeclaration member, StructValue structValue, InterpreterContext context)
         {
-            var functionValue = new FunctionValue(member.MethodSymbol.FunctionType, FuncFactory.Create(member.MethodSymbol, member.Body, context));
-            structValue.Set(member.MethodSymbol, functionValue);
+            var lambda = new LambdaValue(
+                member.MethodSymbol.LambdaType,
+                FuncFactory.Create(member.MethodSymbol.LambdaType, member.Body, context));
+            structValue.Set(member.MethodSymbol, lambda);
             return 0;
         }
 
@@ -53,8 +55,10 @@ partial class Interpreter
 
         static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, InterpreterContext context)
         {
-            var functionValue = new FunctionValue(member.MethodSymbol.FunctionType, FuncFactory.Create(member.MethodSymbol, member.Body, context));
-            structValue.Set(member.MethodSymbol, functionValue);
+            var lambda = new LambdaValue(
+                member.MethodSymbol.LambdaType,
+                FuncFactory.Create(member.MethodSymbol.LambdaType, member.Body, context));
+            structValue.Set(member.MethodSymbol, lambda);
             return 0;
         }
     }

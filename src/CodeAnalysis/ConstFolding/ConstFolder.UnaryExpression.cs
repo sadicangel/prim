@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation;
 

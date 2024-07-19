@@ -2,8 +2,6 @@
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
-using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -24,9 +22,7 @@ partial class Binder
         var structName = syntax.IdentifierToken.Text.ToString();
         if (isTopLevel)
         {
-            var typeSymbol = new TypeSymbol(
-                syntax,
-                new StructType(structName));
+            var typeSymbol = new StructTypeSymbol(syntax, structName);
             if (!context.BoundScope.Declare(typeSymbol))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             return typeSymbol;
@@ -35,9 +31,7 @@ partial class Binder
         {
             if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
             {
-                typeSymbol = new TypeSymbol(
-                    syntax,
-                    new StructType(structName));
+                typeSymbol = new StructTypeSymbol(syntax, structName);
                 if (!context.BoundScope.Declare(typeSymbol))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, structName);
             }
@@ -61,7 +55,7 @@ partial class Binder
             {
                 var name = syntax.IdentifierToken.Text.ToString();
                 var type = BindType(syntax.Type, context);
-                if (!typeSymbol.Type.AddProperty(name, type, syntax.IsReadOnly))
+                if (!typeSymbol.AddProperty(name, type, syntax))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
 
                 return 0;
@@ -70,26 +64,24 @@ partial class Binder
             static int BindMethod(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
                 var name = syntax.IdentifierToken.Text.ToString();
-                var type = (FunctionType)BindType(syntax.Type, context);
-                if (!typeSymbol.Type.AddMethod(name, type))
+                var type = BindLambdaType(syntax.Type, context);
+                if (!typeSymbol.AddMethod(name, type, syntax))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, name);
                 return 0;
             }
 
             static int BindOperator(OperatorDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
-                var type = (FunctionType)BindType(syntax.Type, context);
-                var kind = syntax.OperatorToken.SyntaxKind;
-                if (!typeSymbol.Type.AddOperator(kind, type))
+                var type = BindLambdaType(syntax.Type, context);
+                if (!typeSymbol.AddOperator(type, syntax))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.OperatorToken.Text.ToString());
                 return 0;
             }
 
             static int BindConversion(ConversionDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
             {
-                var type = (FunctionType)BindType(syntax.Type, context);
-                var kind = syntax.ConversionKeyword.SyntaxKind;
-                if (!typeSymbol.Type.AddConversion(kind, type))
+                var type = BindLambdaType(syntax.Type, context);
+                if (!typeSymbol.AddConversion(type, syntax))
                     context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, syntax.ConversionKeyword.Text.ToString());
                 return 0;
             }
@@ -101,31 +93,14 @@ partial class Binder
         if (isTopLevel && !syntax.IsReadOnly)
             context.Diagnostics.ReportMutableGlobalDeclaration(syntax.Location, "function");
 
-        var parameterSymbols = new BoundList<VariableSymbol>.Builder();
-        var seenParameterNames = new HashSet<string>();
-        foreach (var parameterSyntax in syntax.Type.Parameters)
-        {
-            var parameterName = parameterSyntax.IdentifierToken.Text.ToString();
-            if (!seenParameterNames.Add(parameterName))
-                context.Diagnostics.ReportSymbolRedeclaration(parameterSyntax.Location, parameterName);
-            var parameterType = BindType(parameterSyntax.Type, context);
-            var parameterSymbol = new VariableSymbol(
-                parameterSyntax,
-                parameterName,
-                parameterType,
-                IsReadOnly: false);
-            parameterSymbols.Add(parameterSymbol);
-        }
         var functionName = syntax.IdentifierToken.Text.ToString();
-        var functionReturnType = BindType(syntax.Type.ReturnType, context);
-        var functionType = new FunctionType([.. parameterSymbols.Select(p => new Parameter(p.Name, p.Type))], functionReturnType);
+        var functionType = BindLambdaType(syntax.Type, context);
         var functionSymbol = new FunctionSymbol(
-            syntax,
-            functionName,
-            functionType,
-            IsReadOnly: isTopLevel || syntax.IsReadOnly,
-            IsStatic: true,
-            []);
+           syntax,
+           functionName,
+           functionType,
+           IsReadOnly: isTopLevel || syntax.IsReadOnly,
+           IsStatic: true);
 
         if (!context.BoundScope.Declare(functionSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, functionName);
@@ -142,8 +117,10 @@ partial class Binder
             variableName,
             variableType,
             syntax.IsReadOnly);
+
         if (!context.BoundScope.Declare(variableSymbol))
             context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, variableName);
+
         return variableSymbol;
     }
 }

@@ -2,7 +2,6 @@
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -18,7 +17,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        operators.RemoveAll(o => o.Type.Parameters.Count != syntax.Arguments.Count);
+        operators.RemoveAll(o => o.Parameters.Count != syntax.Arguments.Count);
 
         if (operators is [])
         {
@@ -48,9 +47,7 @@ partial class Binder
             }
         }
 
-        var methodSymbol = MethodSymbol.FromOperator(@operator);
-
-        return new BoundInvocationExpression(syntax, expression, methodSymbol, arguments);
+        return new BoundInvocationExpression(syntax, expression, @operator, arguments);
 
         static BoundExpression BindArgument(ArgumentSyntax syntax, BinderContext context)
         {
@@ -58,17 +55,17 @@ partial class Binder
             return expression;
         }
 
-        static List<Operator> MatchOperators(List<Operator> operators, BoundList<BoundExpression> arguments, out Operator? exactMatch)
+        static List<MethodSymbol> MatchOperators(List<MethodSymbol> operators, BoundList<BoundExpression> arguments, out MethodSymbol? exactMatch)
         {
             exactMatch = null;
-            var matchingOperators = new List<Operator>();
+            var matchingOperators = new List<MethodSymbol>();
             foreach (var @operator in operators)
             {
                 var allArgsCoercible = true;
                 var allArgsExactType = true;
-                for (var i = 0; i < @operator.Type.Parameters.Count; ++i)
+                for (var i = 0; i < @operator.Parameters.Count; ++i)
                 {
-                    var parameter = @operator.Type.Parameters[i];
+                    var parameter = @operator.Parameters[i];
                     var argument = arguments[i];
                     allArgsExactType &= parameter.Type == argument.Type;
                     if (!argument.Type.IsCoercibleTo(parameter.Type))

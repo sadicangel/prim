@@ -2,8 +2,6 @@
 using System.Diagnostics;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 
@@ -93,57 +91,31 @@ internal sealed class GlobalBoundScope : BoundScope
 
     private GlobalBoundScope() : base()
     {
-        Symbols = new Dictionary<string, Symbol>()
-        {
-            [PredefinedTypeNames.Any] = Any = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedTypes.Any),
-            [PredefinedTypeNames.Unknown] = Unknown = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedTypes.Unknown),
-            [PredefinedTypeNames.Never] = Never = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedTypes.Never),
-            [PredefinedTypeNames.Unit] = Unit = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedTypes.Unit),
-            [PredefinedTypeNames.Type] = Type = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.TypeKeyword), PredefinedTypes.Type),
-            [PredefinedTypeNames.Str] = Str = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.StrKeyword), PredefinedTypes.Str),
-            [PredefinedTypeNames.Bool] = Bool = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.BoolKeyword), PredefinedTypes.Bool),
-            [PredefinedTypeNames.I8] = I8 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I8Keyword), PredefinedTypes.I8),
-            [PredefinedTypeNames.I16] = I16 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedTypes.I16),
-            [PredefinedTypeNames.I32] = I32 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedTypes.I32),
-            [PredefinedTypeNames.I64] = I64 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedTypes.I64),
-            [PredefinedTypeNames.I128] = I128 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I128Keyword), PredefinedTypes.I128),
-            [PredefinedTypeNames.ISize] = ISize = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.ISizeKeyword), PredefinedTypes.ISize),
-            [PredefinedTypeNames.U8] = U8 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedTypes.U8),
-            [PredefinedTypeNames.U16] = U16 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedTypes.U16),
-            [PredefinedTypeNames.U32] = U32 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedTypes.U32),
-            [PredefinedTypeNames.U64] = U64 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedTypes.U64),
-            [PredefinedTypeNames.U128] = U128 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U128Keyword), PredefinedTypes.U128),
-            [PredefinedTypeNames.USize] = USize = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.USizeKeyword), PredefinedTypes.USize),
-            [PredefinedTypeNames.F16] = F16 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedTypes.F16),
-            [PredefinedTypeNames.F32] = F32 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedTypes.F32),
-            [PredefinedTypeNames.F64] = F64 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedTypes.F64),
-            [PredefinedTypeNames.F80] = F80 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F80Keyword), PredefinedTypes.F80),
-            [PredefinedTypeNames.F128] = F128 = new TypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedTypes.F128),
-        };
+        Symbols = PredefinedTypes.All().ToDictionary(s => s.Name, s => s);
     }
 
-    public TypeSymbol Any { get; }
-    public TypeSymbol Unknown { get; }
-    public TypeSymbol Never { get; }
-    public TypeSymbol Unit { get; }
-    public TypeSymbol Type { get; }
-    public TypeSymbol Str { get; }
-    public TypeSymbol Bool { get; }
-    public TypeSymbol I8 { get; }
-    public TypeSymbol I16 { get; }
-    public TypeSymbol I32 { get; }
-    public TypeSymbol I64 { get; }
-    public TypeSymbol I128 { get; }
-    public TypeSymbol ISize { get; }
-    public TypeSymbol U8 { get; }
-    public TypeSymbol U16 { get; }
-    public TypeSymbol U32 { get; }
-    public TypeSymbol U64 { get; }
-    public TypeSymbol U128 { get; }
-    public TypeSymbol USize { get; }
-    public TypeSymbol F16 { get; }
-    public TypeSymbol F32 { get; }
-    public TypeSymbol F64 { get; }
-    public TypeSymbol F80 { get; }
-    public TypeSymbol F128 { get; }
+    public TypeSymbol Any { get => (TypeSymbol)Symbols![PredefinedTypeNames.Any]; }
+    public TypeSymbol Unknown { get => (TypeSymbol)Symbols![PredefinedTypeNames.Unknown]; }
+    public TypeSymbol Never { get => (TypeSymbol)Symbols![PredefinedTypeNames.Never]; }
+    public TypeSymbol Unit { get => (TypeSymbol)Symbols![PredefinedTypeNames.Unit]; }
+    public TypeSymbol Type { get => (TypeSymbol)Symbols![PredefinedTypeNames.Type]; }
+    public TypeSymbol Str { get => (TypeSymbol)Symbols![PredefinedTypeNames.Str]; }
+    public TypeSymbol Bool { get => (TypeSymbol)Symbols![PredefinedTypeNames.Bool]; }
+    public TypeSymbol I8 { get => (TypeSymbol)Symbols![PredefinedTypeNames.I8]; }
+    public TypeSymbol I16 { get => (TypeSymbol)Symbols![PredefinedTypeNames.I16]; }
+    public TypeSymbol I32 { get => (TypeSymbol)Symbols![PredefinedTypeNames.I32]; }
+    public TypeSymbol I64 { get => (TypeSymbol)Symbols![PredefinedTypeNames.I64]; }
+    public TypeSymbol I128 { get => (TypeSymbol)Symbols![PredefinedTypeNames.I128]; }
+    public TypeSymbol ISize { get => (TypeSymbol)Symbols![PredefinedTypeNames.ISize]; }
+    public TypeSymbol U8 { get => (TypeSymbol)Symbols![PredefinedTypeNames.U8]; }
+    public TypeSymbol U16 { get => (TypeSymbol)Symbols![PredefinedTypeNames.U16]; }
+    public TypeSymbol U32 { get => (TypeSymbol)Symbols![PredefinedTypeNames.U32]; }
+    public TypeSymbol U64 { get => (TypeSymbol)Symbols![PredefinedTypeNames.U64]; }
+    public TypeSymbol U128 { get => (TypeSymbol)Symbols![PredefinedTypeNames.U128]; }
+    public TypeSymbol USize { get => (TypeSymbol)Symbols![PredefinedTypeNames.USize]; }
+    public TypeSymbol F16 { get => (TypeSymbol)Symbols![PredefinedTypeNames.F16]; }
+    public TypeSymbol F32 { get => (TypeSymbol)Symbols![PredefinedTypeNames.F32]; }
+    public TypeSymbol F64 { get => (TypeSymbol)Symbols![PredefinedTypeNames.F64]; }
+    public TypeSymbol F80 { get => (TypeSymbol)Symbols![PredefinedTypeNames.F80]; }
+    public TypeSymbol F128 { get => (TypeSymbol)Symbols![PredefinedTypeNames.F128]; }
 }

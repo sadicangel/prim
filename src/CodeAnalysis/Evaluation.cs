@@ -1,5 +1,4 @@
-﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Interpretation;
+﻿using CodeAnalysis.Interpretation;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis;
@@ -16,7 +15,7 @@ public sealed class Evaluation
     public Compilation Compilation { get; }
     public Evaluation? Previous { get; }
     internal EvaluatedScope? EvaluatedScope { get; }
-    public ReadOnlyList<PrimValue> Values { get; }
+    internal ReadOnlyList<PrimValue> Values { get; }
 
     public static Evaluation Evaluate(Compilation compilation, Evaluation? previous = null) => new(compilation, previous);
 }

@@ -36,8 +36,8 @@ internal static class RenderExtensions
                 console.MarkupInterpolated($"[grey66]{"]"}[/] ");
                 console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
                 break;
-            case FunctionValue function:
-                console.MarkupInterpolated($"[grey66]{function.Type}[/] [green i]{value.Type.Name}[/]");
+            case LambdaValue lambda:
+                console.MarkupInterpolated($"[grey66]{lambda.Type}[/] [green i]{value.Type.Name}[/]");
                 break;
             case LiteralValue literal:
                 console.MarkupInterpolated($"[grey66]{literal.Value}[/] [green i]{value.Type.Name}[/]");
@@ -57,7 +57,7 @@ internal static class RenderExtensions
                 console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
                 break;
             case StructValue @struct:
-                console.MarkupInterpolated($"[grey66]{@struct.Value.Name}[/] [green i]{value.Type.Name}[/]");
+                console.MarkupInterpolated($"[grey66]{@struct.TypeSymbol.Name}[/] [green i]{@struct.TypeSymbol.Type.Name}[/]");
                 break;
             case ReferenceValue reference:
                 console.Write(reference.ReferencedValue, indent);
@@ -214,7 +214,7 @@ internal static class RenderExtensions
                     //    break;
 
                     case BoundExpression expression:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{expression.Type}[/]"));
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{expression.Type.Name}[/]"));
                         break;
 
                     default:

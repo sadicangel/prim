@@ -123,7 +123,7 @@ public enum SyntaxKind
     NamedType,
     OptionType,
     ArrayType,
-    FunctionType,
+    LambdaType,
     UnionType,
     Parameter,
     Argument,

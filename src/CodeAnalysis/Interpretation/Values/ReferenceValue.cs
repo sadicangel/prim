@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class ReferenceValue : PrimValue
@@ -8,7 +7,7 @@ internal sealed record class ReferenceValue : PrimValue
     private readonly Action<PrimValue> _setReferencedValue;
 
     public ReferenceValue(
-        PrimType type,
+        TypeSymbol type,
         Func<PrimValue> getReferencedValue,
         Action<PrimValue> setReferencedValue) : base(type)
     {

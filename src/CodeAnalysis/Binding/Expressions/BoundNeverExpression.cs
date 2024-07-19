@@ -1,5 +1,5 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundNeverExpression(SyntaxNode Syntax)

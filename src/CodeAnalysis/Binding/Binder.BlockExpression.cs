@@ -1,13 +1,13 @@
 ﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
     private static BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax, BinderContext context)
     {
-        PrimType type = PredefinedTypes.Unit;
+        TypeSymbol type = PredefinedTypes.Unit;
         var expressions = new BoundList<BoundExpression>.Builder(syntax.Expressions.Count);
         foreach (var expressionSyntax in syntax.Expressions)
         {

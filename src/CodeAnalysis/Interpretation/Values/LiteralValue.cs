@@ -1,11 +1,10 @@
 ﻿using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Interpretation.Values;
 
 internal sealed record class LiteralValue : PrimValue
 {
-    public LiteralValue(StructValue @struct, PrimType type, object value) : base(type)
+    public LiteralValue(StructValue @struct, TypeSymbol type, object value) : base(type)
     {
         Struct = @struct;
         Value = value;

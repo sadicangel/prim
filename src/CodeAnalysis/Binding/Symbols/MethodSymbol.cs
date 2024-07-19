@@ -1,99 +1,29 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
-using CodeAnalysis.Types.Metadata;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class MethodSymbol(
+    SyntaxKind MethodKind,
     SyntaxNode Syntax,
     string Name,
-    FunctionType FunctionType,
-    bool IsReadOnly,
+    LambdaTypeSymbol LambdaType,
     bool IsStatic,
-    BoundList<VariableSymbol> Parameters)
+    bool IsReadOnly)
     : Symbol(
         BoundKind.MethodSymbol,
         Syntax,
         Name,
-        FunctionType,
-        IsReadOnly,
-        IsStatic)
+        LambdaType,
+        IsStatic,
+        IsReadOnly)
 {
-    public PrimType ReturnType { get => FunctionType.ReturnType; }
+    public BoundList<VariableSymbol> Parameters { get => LambdaType.Parameters; }
+    public TypeSymbol ReturnType { get => LambdaType.ReturnType; }
 
-    public static MethodSymbol FromConversion(
-        Conversion conversion,
-        ConversionDeclarationSyntax? syntax = null)
-    {
-        var methodSymbol = new MethodSymbol(
-            syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-            conversion.Name,
-            conversion.Type,
-            IsReadOnly: true,
-            IsStatic: true,
-            []);
+    public bool IsOperator { get => SyntaxFacts.IsOperator(MethodKind); }
+    public bool IsUnaryOperator { get => IsOperator && Parameters.Count == 1; }
+    public bool IsBinaryOperator { get => IsOperator && Parameters.Count == 2; }
 
-
-        var parameter = conversion.Type.Parameters[0];
-        var parameterSymbol = new VariableSymbol(
-            syntax?.Type.Parameters[0] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-            parameter.Name,
-            parameter.Type,
-            IsReadOnly: false);
-
-        return methodSymbol with { Parameters = [parameterSymbol] };
-    }
-
-    public static MethodSymbol FromMethod(
-        Method method,
-        PrimType containingType,
-        MethodDeclarationSyntax? syntax = null)
-    {
-        // TODO: Allow not having to use `this`?
-        var methodSymbol = new MethodSymbol(
-            syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-            method.Name,
-            method.Type,
-            method.IsReadOnly,
-            method.IsStatic,
-            []);
-
-        var parameters = new BoundList<VariableSymbol>.Builder(method.Type.Parameters.Count + 1);
-        if (!method.IsStatic)
-        {
-            parameters.Add(VariableSymbol.This(containingType));
-        }
-        foreach (var parameter in method.Type.Parameters.Select((p, i) =>
-            new VariableSymbol(
-                syntax?.Type.Parameters[i] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-                p.Name,
-                p.Type,
-                IsReadOnly: true)))
-        {
-            parameters.Add(parameter);
-        }
-
-        return methodSymbol with { Parameters = parameters.ToBoundList() };
-    }
-
-    public static MethodSymbol FromOperator(
-        Operator @operator,
-        OperatorDeclarationSyntax? syntax = null)
-    {
-        var methodSymbol = new MethodSymbol(
-            syntax as SyntaxNode ?? SyntaxFactory.SyntheticToken(@operator.OperatorKind),
-            @operator.Name,
-            @operator.Type,
-            @operator.IsReadOnly,
-            @operator.IsStatic,
-            []);
-
-        var parameters = @operator.Type.Parameters.Select((p, i) => new VariableSymbol(
-            syntax?.Type.Parameters[i] as SyntaxNode ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-            p.Name,
-            p.Type,
-            IsReadOnly: true));
-
-        return methodSymbol with { Parameters = [.. parameters] };
-    }
+    public bool IsConversion { get => IsImplicitConversion || IsExplicitConversion; }
+    public bool IsImplicitConversion { get => MethodKind is SyntaxKind.ImplicitKeyword; }
+    public bool IsExplicitConversion { get => MethodKind is SyntaxKind.ExplicitKeyword; }
 }

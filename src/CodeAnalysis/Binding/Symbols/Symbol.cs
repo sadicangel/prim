@@ -1,14 +1,13 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Symbols;
 internal abstract record class Symbol(
     BoundKind BoundKind,
     SyntaxNode Syntax,
     string Name,
-    PrimType Type,
-    bool IsReadOnly,
-    bool IsStatic)
+    TypeSymbol Type,
+    bool IsStatic,
+    bool IsReadOnly)
     : BoundNode(BoundKind, Syntax)
 {
     public override IEnumerable<BoundNode> Children() => [];
@@ -17,5 +16,5 @@ internal abstract record class Symbol(
 
     public override int GetHashCode() => HashCode.Combine(BoundKind, Name);
 
-    public sealed override string ToString() => $"{Name}: {Type}";
+    public sealed override string ToString() => $"{Name}: {Type.Name}";
 }

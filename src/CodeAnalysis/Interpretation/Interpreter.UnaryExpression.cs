@@ -9,7 +9,7 @@ partial class Interpreter
         var operand = EvaluateExpression(node.Operand, context);
         // TODO: This can't be done on the expression type.
         //var symbol = EvaluateSymbol(node.MethodSymbol.ContainingSymbol, context);
-        var function = operand.Get<FunctionValue>(node.MethodSymbol);
+        var function = operand.Get<LambdaValue>(node.MethodSymbol);
         var value = function.Invoke(operand);
         return value;
     }

@@ -1,12 +1,12 @@
 ﻿namespace CodeAnalysis.Syntax.Types;
-public sealed record class FunctionTypeSyntax(
+public sealed record class LambdaTypeSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken ParenthesisOpenToken,
     SeparatedSyntaxList<ParameterSyntax> Parameters,
     SyntaxToken ParenthesisCloseToken,
     SyntaxToken ArrowToken,
     TypeSyntax ReturnType)
-    : TypeSyntax(SyntaxKind.FunctionType, SyntaxTree)
+    : TypeSyntax(SyntaxKind.LambdaType, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

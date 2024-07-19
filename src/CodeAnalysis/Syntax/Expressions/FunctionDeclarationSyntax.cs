@@ -5,7 +5,7 @@ public sealed record class FunctionDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken,
     SyntaxToken ColonToken,
-    FunctionTypeSyntax Type,
+    LambdaTypeSyntax Type,
     SyntaxToken OperatorToken,
     ExpressionSyntax Body)
     : DeclarationSyntax(SyntaxKind.FunctionDeclaration, SyntaxTree)

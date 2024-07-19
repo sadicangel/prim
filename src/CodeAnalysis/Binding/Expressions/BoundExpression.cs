@@ -1,12 +1,12 @@
-﻿using CodeAnalysis.ConstFolding;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.ConstFolding;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Expressions;
 internal abstract record class BoundExpression(
     BoundKind BoundKind,
     SyntaxNode Syntax,
-    PrimType Type)
+    TypeSymbol Type)
     : BoundNode(BoundKind, Syntax)
 {
     private object? _constValue;

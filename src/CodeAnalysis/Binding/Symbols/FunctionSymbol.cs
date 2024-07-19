@@ -1,22 +1,21 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class FunctionSymbol(
     SyntaxNode Syntax,
     string Name,
-    FunctionType FunctionType,
-    bool IsReadOnly,
+    LambdaTypeSymbol LambdaType,
     bool IsStatic,
-    BoundList<VariableSymbol> Parameters)
+    bool IsReadOnly)
     : Symbol(
         BoundKind.FunctionSymbol,
         Syntax,
         Name,
-        FunctionType,
-        IsReadOnly,
-        IsStatic)
+        LambdaType,
+        IsStatic,
+        IsReadOnly)
 {
-    public PrimType ReturnType { get => FunctionType.ReturnType; }
+    public BoundList<VariableSymbol> Parameters { get => LambdaType.Parameters; }
+    public TypeSymbol ReturnType { get => LambdaType.ReturnType; }
 }

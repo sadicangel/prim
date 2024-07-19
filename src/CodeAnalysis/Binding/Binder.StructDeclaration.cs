@@ -3,7 +3,6 @@ using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 
@@ -35,55 +34,48 @@ partial class Binder
 
         static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {
-            var property = typeSymbol.Type.GetProperty(syntax.IdentifierToken.Text)
+            var property = typeSymbol.GetProperty(syntax.IdentifierToken.Text)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.IdentifierToken.Text}'");
 
             // TODO: Allow init expression to be optional, if property is optional.
             var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
 
-            var propertySymbol = PropertySymbol.FromProperty(property, syntax);
-
-            return new BoundPropertyDeclaration(syntax, propertySymbol, init);
+            return new BoundPropertyDeclaration(syntax, property, init);
         }
 
         static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {
-            var type = (FunctionType)BindType(syntax.Type, context);
-            var method = typeSymbol.Type.GetMethod(syntax.IdentifierToken.Text, type)
+            var type = BindLambdaType(syntax.Type, context);
+            var method = typeSymbol.GetMethod(syntax.IdentifierToken.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.IdentifierToken.Text}'");
 
-            var methodSymbol = MethodSymbol.FromMethod(method, typeSymbol.Type, syntax);
+            var body = BindMethodBody(syntax.Body, method, context);
 
-            var body = BindMethodBody(syntax.Body, methodSymbol, context);
-
-            return new BoundMethodDeclaration(syntax, methodSymbol, body);
+            return new BoundMethodDeclaration(syntax, method, body);
         }
 
         static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {
-            var type = (FunctionType)BindType(syntax.Type, context);
+            var type = BindLambdaType(syntax.Type, context);
             var @operator = typeSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
-            var methodSymbol = MethodSymbol.FromOperator(@operator, syntax);
+            // TODO: Either here or when declaring, must ensure only 1 or 2 parameters.
+            var body = BindMethodBody(syntax.Body, @operator, context);
 
-            var body = BindMethodBody(syntax.Body, methodSymbol, context);
-
-            return new BoundOperatorDeclaration(syntax, methodSymbol, body);
+            return new BoundOperatorDeclaration(syntax, @operator, body);
         }
 
         static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {
-            var type = (FunctionType)BindType(syntax.Type, context);
-            var conversion = typeSymbol.Type.GetConversion(type)
+            var type = BindLambdaType(syntax.Type, context);
+            var conversion = typeSymbol.GetConversion(type)
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
             // TODO: Either here or when declaring, must ensure only 1 parameter.
-            var methodSymbol = MethodSymbol.FromConversion(conversion, syntax);
+            var body = BindMethodBody(syntax.Body, conversion, context);
 
-            var body = BindMethodBody(syntax.Body, methodSymbol, context);
-
-            return new BoundConversionDeclaration(syntax, methodSymbol, body);
+            return new BoundConversionDeclaration(syntax, conversion, body);
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Symbols;
 
 namespace CodeAnalysis.Interpretation.Values;
-public abstract record class PrimValue(PrimType Type)
+internal abstract record class PrimValue(TypeSymbol Type)
 {
     internal static LiteralValue Unit { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Unit, PredefinedTypes.Unit, CodeAnalysis.Unit.Value);
     internal static LiteralValue True { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, PredefinedTypes.Bool, true);

@@ -1,29 +1,24 @@
 ﻿using System.Collections;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class ArrayValue
     : PrimValue, IEnumerable<PrimValue>
 {
-    public ArrayValue(ArrayType arrayType, PrimValue[] elements) : base(arrayType)
+    public ArrayValue(ArrayTypeSymbol arrayType, PrimValue[] elements) : base(arrayType)
     {
         ArrayType = arrayType;
         Elements = elements;
         var index = arrayType.GetOperators(SyntaxKind.BracketOpenBracketCloseToken).Single();
-        Set(
-            MethodSymbol.FromOperator(index),
-            new FunctionValue(
-                index.Type,
-                GetValue));
+        Set(index, new LambdaValue(index.LambdaType, GetValue));
     }
 
     public override PrimValue[] Value => Elements;
 
     public int Length => ArrayType.Length;
 
-    public ArrayType ArrayType { get; init; }
+    public ArrayTypeSymbol ArrayType { get; init; }
 
     public PrimValue[] Elements { get; init; }
 

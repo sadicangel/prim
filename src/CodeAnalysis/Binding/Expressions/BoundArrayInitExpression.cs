@@ -1,10 +1,10 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundArrayInitExpression(
     SyntaxNode Syntax,
-    PrimType Type,
+    TypeSymbol Type,
     BoundList<BoundExpression> Elements)
     : BoundExpression(BoundKind.ArrayInitExpression, Syntax, Type)
 {

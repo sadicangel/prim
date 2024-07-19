@@ -1,14 +1,14 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Interpretation.Values;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
     private static ArrayValue EvaluateArrayInitExpression(BoundArrayInitExpression node, InterpreterContext context)
     {
-        if (node.Type is not ArrayType arrayType)
+        if (node.Type is not ArrayTypeSymbol arrayType)
             throw new UnreachableException($"Unexpected array type '{node.Type.Name}'");
 
         var elements = new PrimValue[node.Elements.Count];

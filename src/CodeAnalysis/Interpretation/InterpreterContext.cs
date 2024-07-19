@@ -1,6 +1,4 @@
-﻿using CodeAnalysis.Binding;
-
-namespace CodeAnalysis.Interpretation;
+﻿namespace CodeAnalysis.Interpretation;
 
 internal readonly record struct InterpreterContext(EvaluatedScope EvaluatedScope)
 {

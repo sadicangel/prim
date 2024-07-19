@@ -5,12 +5,12 @@ public sealed record class OperatorDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken OperatorToken,
     SyntaxToken ColonToken,
-    FunctionTypeSyntax Type,
+    LambdaTypeSyntax Type,
     SyntaxToken ColonOrEqualsToken,
     ExpressionSyntax Body)
     : MemberDeclarationSyntax(SyntaxKind.OperatorDeclaration, SyntaxTree)
 {
-    public bool IsMutable { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.EqualsToken; }
+    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
 
     public override IEnumerable<SyntaxNode> Children()
     {

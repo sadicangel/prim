@@ -1,10 +1,10 @@
 ﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Types;
+using CodeAnalysis.Binding.Symbols;
 
 namespace CodeAnalysis.Tests.Binding;
 public partial class BinderTests
 {
-    private static readonly PrimType[] s_numberTypes = [
+    private static readonly TypeSymbol[] s_numberTypes = [
         PredefinedTypes.I8,
         PredefinedTypes.I16,
         PredefinedTypes.I32,

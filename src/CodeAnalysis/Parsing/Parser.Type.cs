@@ -12,7 +12,7 @@ partial class Parser
         // option       : '?' type 
         // union        : type '|' type
         // array        : '[' type ':' expr ']'
-        // function     : '(' parameters? ')' '->' type
+        // lambda       : '(' parameters? ')' '->' type
         // parameters   : parameter [',' parameter]
         // parameter    : identifier ':' type
 
@@ -50,7 +50,7 @@ partial class Parser
                 SyntaxKind.BracketOpenToken =>
                     ParseArrayType(syntaxTree, iterator),
                 SyntaxKind.ParenthesisOpenToken =>
-                    ParseFunctionType(syntaxTree, iterator),
+                    ParseLambdaType(syntaxTree, iterator),
                 _ =>
                     ReportInvalidType(syntaxTree, iterator),
             };
@@ -84,7 +84,7 @@ partial class Parser
                 return new ArrayTypeSyntax(syntaxTree, bracketOpenToken, elementType, colonToken, length, bracketCloseToken);
             }
 
-            static FunctionTypeSyntax ParseFunctionType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+            static LambdaTypeSyntax ParseLambdaType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
                 var parameters = ParseSeparatedSyntaxList(
@@ -102,7 +102,7 @@ partial class Parser
                 var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
                 var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
                 var returnType = ParseTypeSingle(syntaxTree, iterator);
-                return new FunctionTypeSyntax(syntaxTree, parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
+                return new LambdaTypeSyntax(syntaxTree, parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
             }
         }
     }

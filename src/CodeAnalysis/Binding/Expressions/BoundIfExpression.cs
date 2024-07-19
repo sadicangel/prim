@@ -1,5 +1,5 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 
@@ -8,7 +8,7 @@ internal sealed record class BoundIfExpression(
     BoundExpression Condition,
     BoundExpression Then,
     BoundExpression Else,
-    PrimType Type)
+    TypeSymbol Type)
     : BoundExpression(BoundKind.IfExpression, Syntax, Type)
 {
     public override IEnumerable<BoundNode> Children()

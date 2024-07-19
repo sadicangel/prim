@@ -1,9 +1,9 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
 internal abstract record class BoundDeclaration(
     BoundKind BoundKind,
     SyntaxNode Syntax,
-    PrimType Type)
+    TypeSymbol Type)
     : BoundExpression(BoundKind, Syntax, Type);

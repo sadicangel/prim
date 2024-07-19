@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Syntax;
 
@@ -128,7 +127,7 @@ public static class SyntaxFacts
             SyntaxKind.NamedType => null,
             SyntaxKind.OptionType => null,
             SyntaxKind.ArrayType => null,
-            SyntaxKind.FunctionType => null,
+            SyntaxKind.LambdaType => null,
             SyntaxKind.UnionType => null,
             SyntaxKind.Parameter => null,
             SyntaxKind.Argument => null,
@@ -257,33 +256,36 @@ public static class SyntaxFacts
         };
     }
 
-    public static string GetMethodName(ReadOnlySpan<char> name, FunctionType type) =>
-        $"{name}<{string.Join(',', type.Parameters.Select(p => p.Type.Name))}>";
-
-    public static string GetMethodName(SyntaxKind syntaxKind, FunctionType type) =>
-        GetMethodName(GetText(syntaxKind) ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntaxKind}'"), type);
-
 
     public static bool IsOperator(SyntaxKind syntaxKind) => syntaxKind
-        is SyntaxKind.PlusToken
-        or SyntaxKind.MinusToken
-        or SyntaxKind.TildeToken
+        is SyntaxKind.AmpersandToken
+        or SyntaxKind.AmpersandAmpersandToken
         or SyntaxKind.BangToken
-        or SyntaxKind.StarToken
-        or SyntaxKind.SlashToken
-        or SyntaxKind.PercentToken
-        or SyntaxKind.StarStarToken
-        or SyntaxKind.LessThanLessThanToken
-        or SyntaxKind.GreaterThanGreaterThanToken
-        or SyntaxKind.PipeToken
-        or SyntaxKind.AmpersandToken
-        or SyntaxKind.EqualsEqualsToken
         or SyntaxKind.BangEqualsToken
-        or SyntaxKind.LessThanToken
-        or SyntaxKind.LessThanEqualsToken
+        or SyntaxKind.BracketOpenBracketCloseToken
+        or SyntaxKind.DotDotToken
+        or SyntaxKind.EqualsEqualsToken
+        or SyntaxKind.MinusGreaterThanToken
         or SyntaxKind.GreaterThanToken
         or SyntaxKind.GreaterThanEqualsToken
-        or SyntaxKind.EqualsToken;
+        or SyntaxKind.GreaterThanGreaterThanToken
+        or SyntaxKind.GreaterThanGreaterThanEqualsToken
+        or SyntaxKind.HatToken
+        or SyntaxKind.HookHookToken
+        or SyntaxKind.LessThanToken
+        or SyntaxKind.LessThanEqualsToken
+        or SyntaxKind.LessThanLessThanToken
+        or SyntaxKind.LessThanLessThanEqualsToken
+        or SyntaxKind.MinusToken
+        or SyntaxKind.ParenthesisOpenParenthesisCloseToken
+        or SyntaxKind.PercentToken
+        or SyntaxKind.PipeToken
+        or SyntaxKind.PipePipeToken
+        or SyntaxKind.PlusToken
+        or SyntaxKind.SlashToken
+        or SyntaxKind.StarToken
+        or SyntaxKind.StarStarToken
+        or SyntaxKind.TildeToken;
 
     public static bool IsKeyword(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.NullKeyword;

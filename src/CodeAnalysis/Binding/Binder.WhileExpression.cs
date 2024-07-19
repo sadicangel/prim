@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
 
 namespace CodeAnalysis.Binding;
 partial class Binder

@@ -1,5 +1,5 @@
-﻿using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Types;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Tests.Parsing;
 partial class ParserTests
@@ -64,6 +64,6 @@ partial class ParserTests
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
         var decl = Assert.IsType<FunctionDeclarationSyntax>(node);
-        Assert.Equal(SyntaxKind.FunctionType, decl.Type?.SyntaxKind);
+        Assert.Equal(SyntaxKind.LambdaType, decl.Type?.SyntaxKind);
     }
 }
