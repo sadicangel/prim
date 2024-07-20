@@ -4,34 +4,37 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Symbols;
 
 // TODO: Merge this into global scope.
-internal static class PredefinedTypes
+internal static class PredefinedSymbols
 {
-    public static readonly StructTypeSymbol Any = new(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedTypeNames.Any);
-    public static readonly StructTypeSymbol Unknown = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedTypeNames.Unknown);
-    public static readonly StructTypeSymbol Never = new(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedTypeNames.Never);
-    public static readonly StructTypeSymbol Unit = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedTypeNames.Unit);
-    public static readonly StructTypeSymbol Str = new(SyntaxFactory.SyntheticToken(SyntaxKind.StrKeyword), PredefinedTypeNames.Str);
-    public static readonly StructTypeSymbol Bool = new(SyntaxFactory.SyntheticToken(SyntaxKind.BoolKeyword), PredefinedTypeNames.Bool);
-    public static readonly StructTypeSymbol I8 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I8Keyword), PredefinedTypeNames.I8);
-    public static readonly StructTypeSymbol I16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedTypeNames.I16);
-    public static readonly StructTypeSymbol I32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedTypeNames.I32);
-    public static readonly StructTypeSymbol I64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedTypeNames.I64);
-    public static readonly StructTypeSymbol I128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I128Keyword), PredefinedTypeNames.I128);
-    public static readonly StructTypeSymbol ISize = new(SyntaxFactory.SyntheticToken(SyntaxKind.ISizeKeyword), PredefinedTypeNames.ISize);
-    public static readonly StructTypeSymbol U8 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedTypeNames.U8);
-    public static readonly StructTypeSymbol U16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedTypeNames.U16);
-    public static readonly StructTypeSymbol U32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedTypeNames.U32);
-    public static readonly StructTypeSymbol U64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedTypeNames.U64);
-    public static readonly StructTypeSymbol U128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U128Keyword), PredefinedTypeNames.U128);
-    public static readonly StructTypeSymbol USize = new(SyntaxFactory.SyntheticToken(SyntaxKind.USizeKeyword), PredefinedTypeNames.USize);
-    public static readonly StructTypeSymbol F16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedTypeNames.F16);
-    public static readonly StructTypeSymbol F32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedTypeNames.F32);
-    public static readonly StructTypeSymbol F64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedTypeNames.F64);
-    public static readonly StructTypeSymbol F80 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F80Keyword), PredefinedTypeNames.F80);
-    public static readonly StructTypeSymbol F128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedTypeNames.F128);
+    public static readonly StructTypeSymbol Any = new(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedSymbolNames.Any);
+    public static readonly StructTypeSymbol Unknown = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedSymbolNames.Unknown);
+    public static readonly StructTypeSymbol Never = new(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedSymbolNames.Never);
+    public static readonly StructTypeSymbol Unit = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedSymbolNames.Unit);
+    public static readonly StructTypeSymbol Str = new(SyntaxFactory.SyntheticToken(SyntaxKind.StrKeyword), PredefinedSymbolNames.Str);
+    public static readonly StructTypeSymbol Bool = new(SyntaxFactory.SyntheticToken(SyntaxKind.BoolKeyword), PredefinedSymbolNames.Bool);
+    public static readonly StructTypeSymbol I8 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I8Keyword), PredefinedSymbolNames.I8);
+    public static readonly StructTypeSymbol I16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedSymbolNames.I16);
+    public static readonly StructTypeSymbol I32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedSymbolNames.I32);
+    public static readonly StructTypeSymbol I64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedSymbolNames.I64);
+    public static readonly StructTypeSymbol I128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.I128Keyword), PredefinedSymbolNames.I128);
+    public static readonly StructTypeSymbol ISize = new(SyntaxFactory.SyntheticToken(SyntaxKind.ISizeKeyword), PredefinedSymbolNames.ISize);
+    public static readonly StructTypeSymbol U8 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedSymbolNames.U8);
+    public static readonly StructTypeSymbol U16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedSymbolNames.U16);
+    public static readonly StructTypeSymbol U32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedSymbolNames.U32);
+    public static readonly StructTypeSymbol U64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedSymbolNames.U64);
+    public static readonly StructTypeSymbol U128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.U128Keyword), PredefinedSymbolNames.U128);
+    public static readonly StructTypeSymbol USize = new(SyntaxFactory.SyntheticToken(SyntaxKind.USizeKeyword), PredefinedSymbolNames.USize);
+    public static readonly StructTypeSymbol F16 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedSymbolNames.F16);
+    public static readonly StructTypeSymbol F32 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedSymbolNames.F32);
+    public static readonly StructTypeSymbol F64 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedSymbolNames.F64);
+    public static readonly StructTypeSymbol F80 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F80Keyword), PredefinedSymbolNames.F80);
+    public static readonly StructTypeSymbol F128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedSymbolNames.F128);
     public static readonly StructTypeSymbol Type = StructTypeSymbol.RuntimeType;
 
-    static PredefinedTypes()
+    public static readonly FunctionSymbol Print = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "print", new LambdaTypeSymbol([new Parameter("obj", Any)], Unit), IsStatic: true, IsReadOnly: true);
+    public static readonly FunctionSymbol Scan = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "scan", new LambdaTypeSymbol([], Str), IsStatic: true, IsReadOnly: true);
+
+    static PredefinedSymbols()
     {
         Str
             .AddEqualityOperators()
@@ -180,7 +183,7 @@ internal static class PredefinedTypes
             .AddExplicitConversion(F16, F32, F64, F80, I8, I16, I32, I64, I128, ISize, U8, U16, U32, U64, U128, USize);
     }
 
-    public static IEnumerable<Symbol> All() => typeof(PredefinedTypes)
+    public static IEnumerable<Symbol> All() => typeof(PredefinedSymbols)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
         .Select(f => (Symbol)f.GetValue(null)!);
 

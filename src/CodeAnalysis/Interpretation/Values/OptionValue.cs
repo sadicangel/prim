@@ -33,8 +33,8 @@ internal sealed record class OptionValue : PrimValue
         Set(
             implicit1,
             new LambdaValue(implicit1.LambdaType, (PrimValue x) => new OptionValue(x)));
-        var implicit2 = optionType.GetConversion(PredefinedTypes.Unit, optionType)
-            ?? throw new UnreachableException($"Missing conversion from {PredefinedTypes.Unit} to {optionType}");
+        var implicit2 = optionType.GetConversion(PredefinedSymbols.Unit, optionType)
+            ?? throw new UnreachableException($"Missing conversion from {PredefinedSymbols.Unit} to {optionType}");
         Set(
             implicit2,
             new LambdaValue(implicit2.LambdaType, (PrimValue x) => new OptionValue(optionType)));

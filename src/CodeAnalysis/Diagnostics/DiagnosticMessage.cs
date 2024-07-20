@@ -38,7 +38,7 @@ internal static class DiagnosticMessage
         $"Expression does not contain an overload that expects {listLength} arguments";
     public static string InvalidArrayLength() =>
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
-    internal static string InvalidAssignment() =>
+    public static string InvalidAssignment() =>
         "Invalid left-hand side of assignment. Expected a reference (variable, property or indexer)";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";

@@ -8,7 +8,7 @@ internal sealed record class UnionTypeSymbol(SyntaxNode Syntax, BoundList<TypeSy
         BoundKind.UnionTypeSymbol,
         Syntax,
         string.Join(" | ", Types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)),
-        PredefinedTypes.Type)
+        PredefinedSymbols.Type)
 {
     public bool Equals(UnionTypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();

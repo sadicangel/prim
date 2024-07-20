@@ -18,9 +18,9 @@ partial class Binder
 
         var elementType = types switch
         {
-            { Count: 0 } => PredefinedTypes.Unknown,
+            { Count: 0 } => PredefinedSymbols.Unknown,
             { Count: 1 } => types.Single(),
-            _ when types.Contains(PredefinedTypes.Never) => PredefinedTypes.Never,
+            _ when types.Contains(PredefinedSymbols.Never) => PredefinedSymbols.Never,
             _ => new UnionTypeSymbol(syntax, [.. types]),
         };
 

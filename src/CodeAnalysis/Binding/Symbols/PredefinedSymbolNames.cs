@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Binding.Symbols;
 
-internal static class PredefinedTypeNames
+internal static class PredefinedSymbolNames
 {
     public const string Any = "any";
     public const string Unknown = "unknown";
@@ -29,7 +29,7 @@ internal static class PredefinedTypeNames
     public const string F80 = "f80";
     public const string F128 = "f128";
 
-    public static ReadOnlyList<string> All { get; } = new(typeof(PredefinedTypeNames)
+    public static ReadOnlyList<string> All { get; } = new(typeof(PredefinedSymbolNames)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
         .Where(f => f.IsLiteral)
         .Select(f => (string)f.GetValue(null)!)

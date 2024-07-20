@@ -13,14 +13,14 @@ internal abstract record class TypeSymbol(
 {
     private readonly List<Symbol> _members = [];
 
-    public bool IsAny { get => this == PredefinedTypes.Any; }
+    public bool IsAny { get => this == PredefinedSymbols.Any; }
     public bool IsArray { get => this is ArrayTypeSymbol; }
     public bool IsLambda { get => this is LambdaTypeSymbol; }
     public abstract bool IsNever { get; }
     public bool IsOption { get => this is OptionTypeSymbol; }
     public bool IsUnion { get => this is UnionTypeSymbol; }
-    public bool IsUnknown { get => this == PredefinedTypes.Unknown; }
-    public bool IsPredefined { get => PredefinedTypeNames.All.Contains(Name); }
+    public bool IsUnknown { get => this == PredefinedSymbols.Unknown; }
+    public bool IsPredefined { get => PredefinedSymbolNames.All.Contains(Name); }
 
     public virtual bool Equals(TypeSymbol? other) => base.Equals(other);
 

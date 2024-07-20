@@ -101,30 +101,33 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
     {
         var values = MapPredefinedTypes();
 
-        Any = (StructValue)values[GlobalBoundScope.Instance.Any];
-        Unknown = (StructValue)values[GlobalBoundScope.Instance.Unknown];
-        Never = (StructValue)values[GlobalBoundScope.Instance.Never];
-        Unit = (StructValue)values[GlobalBoundScope.Instance.Unit];
-        Type = (StructValue)values[GlobalBoundScope.Instance.Type];
-        Str = (StructValue)values[GlobalBoundScope.Instance.Str];
-        Bool = (StructValue)values[GlobalBoundScope.Instance.Bool];
-        I8 = (StructValue)values[GlobalBoundScope.Instance.I8];
-        I16 = (StructValue)values[GlobalBoundScope.Instance.I16];
-        I32 = (StructValue)values[GlobalBoundScope.Instance.I32];
-        I64 = (StructValue)values[GlobalBoundScope.Instance.I64];
-        I128 = (StructValue)values[GlobalBoundScope.Instance.I128];
-        ISize = (StructValue)values[GlobalBoundScope.Instance.ISize];
-        U8 = (StructValue)values[GlobalBoundScope.Instance.U8];
-        U16 = (StructValue)values[GlobalBoundScope.Instance.U16];
-        U32 = (StructValue)values[GlobalBoundScope.Instance.U32];
-        U64 = (StructValue)values[GlobalBoundScope.Instance.U64];
-        U128 = (StructValue)values[GlobalBoundScope.Instance.U128];
-        USize = (StructValue)values[GlobalBoundScope.Instance.USize];
-        F16 = (StructValue)values[GlobalBoundScope.Instance.F16];
-        F32 = (StructValue)values[GlobalBoundScope.Instance.F32];
-        F64 = (StructValue)values[GlobalBoundScope.Instance.F64];
-        F80 = (StructValue)values[GlobalBoundScope.Instance.F80];
-        F128 = (StructValue)values[GlobalBoundScope.Instance.F128];
+        Any = (StructValue)values[PredefinedSymbols.Any];
+        Unknown = (StructValue)values[PredefinedSymbols.Unknown];
+        Never = (StructValue)values[PredefinedSymbols.Never];
+        Unit = (StructValue)values[PredefinedSymbols.Unit];
+        Type = (StructValue)values[PredefinedSymbols.Type];
+        Str = (StructValue)values[PredefinedSymbols.Str];
+        Bool = (StructValue)values[PredefinedSymbols.Bool];
+        I8 = (StructValue)values[PredefinedSymbols.I8];
+        I16 = (StructValue)values[PredefinedSymbols.I16];
+        I32 = (StructValue)values[PredefinedSymbols.I32];
+        I64 = (StructValue)values[PredefinedSymbols.I64];
+        I128 = (StructValue)values[PredefinedSymbols.I128];
+        ISize = (StructValue)values[PredefinedSymbols.ISize];
+        U8 = (StructValue)values[PredefinedSymbols.U8];
+        U16 = (StructValue)values[PredefinedSymbols.U16];
+        U32 = (StructValue)values[PredefinedSymbols.U32];
+        U64 = (StructValue)values[PredefinedSymbols.U64];
+        U128 = (StructValue)values[PredefinedSymbols.U128];
+        USize = (StructValue)values[PredefinedSymbols.USize];
+        F16 = (StructValue)values[PredefinedSymbols.F16];
+        F32 = (StructValue)values[PredefinedSymbols.F32];
+        F64 = (StructValue)values[PredefinedSymbols.F64];
+        F80 = (StructValue)values[PredefinedSymbols.F80];
+        F128 = (StructValue)values[PredefinedSymbols.F128];
+
+        values[PredefinedSymbols.Print] = new LambdaValue(PredefinedSymbols.Print.LambdaType, (PrimValue x) => { Console.WriteLine(x.Value); return PrimValue.Unit; });
+        values[PredefinedSymbols.Scan] = new LambdaValue(PredefinedSymbols.Scan.LambdaType, () => new LiteralValue(Str, PredefinedSymbols.Str, Console.ReadLine() ?? ""));
 
         Values = values;
 
@@ -132,7 +135,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
         {
             var g = GlobalBoundScope.Instance;
             var m = new Dictionary<Symbol, PrimValue>();
-            foreach (var name in PredefinedTypeNames.All)
+            foreach (var name in PredefinedSymbolNames.All)
             {
                 var symbol = g.Lookup(name) as TypeSymbol
                     ?? throw new UnreachableException(DiagnosticMessage.UndefinedType(name));
@@ -148,12 +151,12 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                         add,
                         new LambdaValue(add.LambdaType, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, (string)a.Value + (string)b.Value)));
-                    var addStr = g.Str.GetBinaryOperators(SyntaxKind.PlusToken, g.Str, PredefinedTypes.Any, g.Str).Single();
+                    var addStr = g.Str.GetBinaryOperators(SyntaxKind.PlusToken, g.Str, PredefinedSymbols.Any, g.Str).Single();
                     s.Set(
                         addStr,
                         new LambdaValue(addStr.LambdaType, (PrimValue a, PrimValue b) =>
                             new LiteralValue(s, a.Type, (string)a.Value + b.Value)));
-                    var addAny = g.Str.GetBinaryOperators(SyntaxKind.PlusToken, PredefinedTypes.Any, g.Str, g.Str).Single();
+                    var addAny = g.Str.GetBinaryOperators(SyntaxKind.PlusToken, PredefinedSymbols.Any, g.Str, g.Str).Single();
                     s.Set(
                         addAny,
                         new LambdaValue(addAny.LambdaType, (PrimValue a, PrimValue b) =>
@@ -394,41 +397,41 @@ file static class StructValueExtensions
 
     public static StructValue AddEqualityOperators<T>(this StructValue s)
     {
-        var equals = s.TypeSymbol.GetBinaryOperators(SyntaxKind.EqualsEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedTypes.Bool).Single();
+        var equals = s.TypeSymbol.GetBinaryOperators(SyntaxKind.EqualsEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedSymbols.Bool).Single();
         s.Set(
             equals,
             new LambdaValue(equals.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, ((T)a.Value).Equals(b.Value))));
-        var notEquals = s.TypeSymbol.GetBinaryOperators(SyntaxKind.BangEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedTypes.Bool).Single();
+                new LiteralValue(s, PredefinedSymbols.Bool, ((T)a.Value).Equals(b.Value))));
+        var notEquals = s.TypeSymbol.GetBinaryOperators(SyntaxKind.BangEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedSymbols.Bool).Single();
         s.Set(
             notEquals,
             new LambdaValue(notEquals.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, !((T)a.Value).Equals(b.Value))));
+                new LiteralValue(s, PredefinedSymbols.Bool, !((T)a.Value).Equals(b.Value))));
         return s;
     }
 
     public static StructValue AddComparisonOperators<T>(this StructValue s) where T : IComparisonOperators<T, T, bool>
     {
-        var lessThan = s.TypeSymbol.GetBinaryOperators(SyntaxKind.LessThanToken, s.TypeSymbol, s.TypeSymbol, PredefinedTypes.Bool).Single();
+        var lessThan = s.TypeSymbol.GetBinaryOperators(SyntaxKind.LessThanToken, s.TypeSymbol, s.TypeSymbol, PredefinedSymbols.Bool).Single();
         s.Set(
             lessThan,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value < (T)b.Value)));
-        var lessThanOrEqual = s.TypeSymbol.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedTypes.Bool).Single();
+                new LiteralValue(s, PredefinedSymbols.Bool, (T)a.Value < (T)b.Value)));
+        var lessThanOrEqual = s.TypeSymbol.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedSymbols.Bool).Single();
         s.Set(
             lessThanOrEqual,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value <= (T)b.Value)));
-        var greaterThan = s.TypeSymbol.GetBinaryOperators(SyntaxKind.GreaterThanToken, s.TypeSymbol, s.TypeSymbol, PredefinedTypes.Bool).Single();
+                new LiteralValue(s, PredefinedSymbols.Bool, (T)a.Value <= (T)b.Value)));
+        var greaterThan = s.TypeSymbol.GetBinaryOperators(SyntaxKind.GreaterThanToken, s.TypeSymbol, s.TypeSymbol, PredefinedSymbols.Bool).Single();
         s.Set(
             greaterThan,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value > (T)b.Value)));
-        var greaterThanOrEqual = s.TypeSymbol.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedTypes.Bool).Single();
+                new LiteralValue(s, PredefinedSymbols.Bool, (T)a.Value > (T)b.Value)));
+        var greaterThanOrEqual = s.TypeSymbol.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, s.TypeSymbol, s.TypeSymbol, PredefinedSymbols.Bool).Single();
         s.Set(
             greaterThanOrEqual,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, (T)a.Value >= (T)b.Value)));
+                new LiteralValue(s, PredefinedSymbols.Bool, (T)a.Value >= (T)b.Value)));
         return s;
     }
 
@@ -438,17 +441,17 @@ file static class StructValueExtensions
         s.Set(
             not,
             new LambdaValue(not.LambdaType, (PrimValue a) =>
-                new LiteralValue(s, PredefinedTypes.Bool, !(bool)a.Value)));
+                new LiteralValue(s, PredefinedSymbols.Bool, !(bool)a.Value)));
         var logicalAnd = s.TypeSymbol.GetBinaryOperators(SyntaxKind.AmpersandAmpersandToken, s.TypeSymbol, s.TypeSymbol, s.TypeSymbol).Single();
         s.Set(
             logicalAnd,
             new LambdaValue(logicalAnd.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value && (bool)b.Value)));
+                new LiteralValue(s, PredefinedSymbols.Bool, (bool)a.Value && (bool)b.Value)));
         var logicalOr = s.TypeSymbol.GetBinaryOperators(SyntaxKind.PipePipeToken, s.TypeSymbol, s.TypeSymbol, s.TypeSymbol).Single();
         s.Set(
             logicalOr,
             new LambdaValue(logicalOr.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, PredefinedTypes.Bool, (bool)a.Value || (bool)b.Value)));
+                new LiteralValue(s, PredefinedSymbols.Bool, (bool)a.Value || (bool)b.Value)));
         return s;
     }
 

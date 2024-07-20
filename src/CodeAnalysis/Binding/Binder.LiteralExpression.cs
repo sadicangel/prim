@@ -12,16 +12,16 @@ partial class Binder
         _ = context;
         var type = syntax.SyntaxKind switch
         {
-            SyntaxKind.I32LiteralExpression => PredefinedTypes.I32,
-            SyntaxKind.U32LiteralExpression => PredefinedTypes.U32,
-            SyntaxKind.I64LiteralExpression => PredefinedTypes.I64,
-            SyntaxKind.U64LiteralExpression => PredefinedTypes.U64,
-            SyntaxKind.F32LiteralExpression => PredefinedTypes.F32,
-            SyntaxKind.F64LiteralExpression => PredefinedTypes.F64,
-            SyntaxKind.StrLiteralExpression => PredefinedTypes.Str,
-            SyntaxKind.TrueLiteralExpression => PredefinedTypes.Bool,
-            SyntaxKind.FalseLiteralExpression => PredefinedTypes.Bool,
-            SyntaxKind.NullLiteralExpression => PredefinedTypes.Unit,
+            SyntaxKind.I32LiteralExpression => PredefinedSymbols.I32,
+            SyntaxKind.U32LiteralExpression => PredefinedSymbols.U32,
+            SyntaxKind.I64LiteralExpression => PredefinedSymbols.I64,
+            SyntaxKind.U64LiteralExpression => PredefinedSymbols.U64,
+            SyntaxKind.F32LiteralExpression => PredefinedSymbols.F32,
+            SyntaxKind.F64LiteralExpression => PredefinedSymbols.F64,
+            SyntaxKind.StrLiteralExpression => PredefinedSymbols.Str,
+            SyntaxKind.TrueLiteralExpression => PredefinedSymbols.Bool,
+            SyntaxKind.FalseLiteralExpression => PredefinedSymbols.Bool,
+            SyntaxKind.NullLiteralExpression => PredefinedSymbols.Unit,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 

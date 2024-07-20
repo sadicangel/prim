@@ -9,7 +9,7 @@ internal sealed record class LambdaTypeSymbol : TypeSymbol
             BoundKind.LambdaTypeSymbol,
             syntax,
             $"({string.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}",
-            PredefinedTypes.Type)
+            PredefinedSymbols.Type)
     {
         Parameters = [.. parameters.Select(p => new VariableSymbol(p.Syntax, p.Name, p.Type, IsReadOnly: false))];
         ReturnType = returnType;

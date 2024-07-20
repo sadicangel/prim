@@ -9,7 +9,7 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
             BoundKind.OptionTypeSymbol,
             syntax,
             $"?{underlyingType.Name}",
-            PredefinedTypes.Type)
+            PredefinedSymbols.Type)
     {
         UnderlyingType = underlyingType;
         AddOperator(
@@ -23,7 +23,7 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
             new LambdaTypeSymbol([new Parameter("x", UnderlyingType)], this));
         AddConversion(
             SyntaxKind.ImplicitKeyword,
-            new LambdaTypeSymbol([new Parameter("x", PredefinedTypes.Unit)], this));
+            new LambdaTypeSymbol([new Parameter("x", PredefinedSymbols.Unit)], this));
         AddConversion(
             SyntaxKind.ExplicitKeyword,
             new LambdaTypeSymbol([new Parameter("x", this)], UnderlyingType));

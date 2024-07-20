@@ -64,7 +64,7 @@ partial class Binder
                     var variableDeclaration = (VariableDeclarationSyntax)declaration;
                     var variableName = variableDeclaration.Name.Text.ToString();
                     var variableType = variableDeclaration.Type is null
-                        ? PredefinedTypes.Unknown
+                        ? PredefinedSymbols.Unknown
                         : BindType(variableDeclaration.Type, context);
                     var variableSymbol = new VariableSymbol(
                         variableDeclaration,

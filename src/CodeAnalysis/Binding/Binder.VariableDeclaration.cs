@@ -19,7 +19,7 @@ partial class Binder
             if (expression.Type.IsUnknown)
             {
                 context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
-                variableSymbol = variableSymbol with { Type = PredefinedTypes.Never };
+                variableSymbol = variableSymbol with { Type = PredefinedSymbols.Never };
             }
             else
             {

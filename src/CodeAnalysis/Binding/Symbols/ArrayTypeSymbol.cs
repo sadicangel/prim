@@ -9,13 +9,13 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
             BoundKind.ArrayTypeSymbol,
             syntax,
             $"[{elementType.Name}: {length}]",
-            PredefinedTypes.Type)
+            PredefinedSymbols.Type)
     {
         ElementType = elementType;
         Length = length;
         AddOperator(
             SyntaxKind.BracketOpenBracketCloseToken,
-            new LambdaTypeSymbol([new("index", PredefinedTypes.I32)], ElementType),
+            new LambdaTypeSymbol([new("index", PredefinedSymbols.I32)], ElementType),
             isReadOnly: false);
     }
 

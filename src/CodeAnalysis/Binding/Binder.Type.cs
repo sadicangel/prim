@@ -27,30 +27,30 @@ partial class Binder
         _ = context;
         return syntax.PredefinedTypeToken.SyntaxKind switch
         {
-            SyntaxKind.AnyKeyword => PredefinedTypes.Any,
-            SyntaxKind.UnknownKeyword => PredefinedTypes.Unknown,
-            SyntaxKind.NeverKeyword => PredefinedTypes.Never,
-            SyntaxKind.UnitKeyword => PredefinedTypes.Unit,
-            SyntaxKind.TypeKeyword => PredefinedTypes.Type,
-            SyntaxKind.StrKeyword => PredefinedTypes.Str,
-            SyntaxKind.BoolKeyword => PredefinedTypes.Bool,
-            SyntaxKind.I8Keyword => PredefinedTypes.I8,
-            SyntaxKind.I16Keyword => PredefinedTypes.I16,
-            SyntaxKind.I32Keyword => PredefinedTypes.I32,
-            SyntaxKind.I64Keyword => PredefinedTypes.I64,
-            SyntaxKind.I128Keyword => PredefinedTypes.I128,
-            SyntaxKind.ISizeKeyword => PredefinedTypes.ISize,
-            SyntaxKind.U8Keyword => PredefinedTypes.U8,
-            SyntaxKind.U16Keyword => PredefinedTypes.U16,
-            SyntaxKind.U32Keyword => PredefinedTypes.U32,
-            SyntaxKind.U64Keyword => PredefinedTypes.U64,
-            SyntaxKind.U128Keyword => PredefinedTypes.U128,
-            SyntaxKind.USizeKeyword => PredefinedTypes.USize,
-            SyntaxKind.F16Keyword => PredefinedTypes.F16,
-            SyntaxKind.F32Keyword => PredefinedTypes.F32,
-            SyntaxKind.F64Keyword => PredefinedTypes.F64,
-            SyntaxKind.F80Keyword => PredefinedTypes.F80,
-            SyntaxKind.F128Keyword => PredefinedTypes.F128,
+            SyntaxKind.AnyKeyword => PredefinedSymbols.Any,
+            SyntaxKind.UnknownKeyword => PredefinedSymbols.Unknown,
+            SyntaxKind.NeverKeyword => PredefinedSymbols.Never,
+            SyntaxKind.UnitKeyword => PredefinedSymbols.Unit,
+            SyntaxKind.TypeKeyword => PredefinedSymbols.Type,
+            SyntaxKind.StrKeyword => PredefinedSymbols.Str,
+            SyntaxKind.BoolKeyword => PredefinedSymbols.Bool,
+            SyntaxKind.I8Keyword => PredefinedSymbols.I8,
+            SyntaxKind.I16Keyword => PredefinedSymbols.I16,
+            SyntaxKind.I32Keyword => PredefinedSymbols.I32,
+            SyntaxKind.I64Keyword => PredefinedSymbols.I64,
+            SyntaxKind.I128Keyword => PredefinedSymbols.I128,
+            SyntaxKind.ISizeKeyword => PredefinedSymbols.ISize,
+            SyntaxKind.U8Keyword => PredefinedSymbols.U8,
+            SyntaxKind.U16Keyword => PredefinedSymbols.U16,
+            SyntaxKind.U32Keyword => PredefinedSymbols.U32,
+            SyntaxKind.U64Keyword => PredefinedSymbols.U64,
+            SyntaxKind.U128Keyword => PredefinedSymbols.U128,
+            SyntaxKind.USizeKeyword => PredefinedSymbols.USize,
+            SyntaxKind.F16Keyword => PredefinedSymbols.F16,
+            SyntaxKind.F32Keyword => PredefinedSymbols.F32,
+            SyntaxKind.F64Keyword => PredefinedSymbols.F64,
+            SyntaxKind.F80Keyword => PredefinedSymbols.F80,
+            SyntaxKind.F128Keyword => PredefinedSymbols.F128,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
         };
     }
@@ -61,7 +61,7 @@ partial class Binder
         if (context.BoundScope.Lookup(structName) is not StructTypeSymbol typeSymbol)
         {
             context.Diagnostics.ReportUndefinedType(syntax.IdentifierToken.Location, structName);
-            return PredefinedTypes.Never;
+            return PredefinedSymbols.Never;
         }
         return typeSymbol;
     }
@@ -85,7 +85,7 @@ partial class Binder
         }
 
         context.Diagnostics.ReportInvalidArrayLength(syntax.Length.Location);
-        return new ArrayTypeSymbol(syntax, PredefinedTypes.Never, length: 0);
+        return new ArrayTypeSymbol(syntax, PredefinedSymbols.Never, length: 0);
     }
 
     static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, BinderContext context)

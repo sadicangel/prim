@@ -10,12 +10,12 @@ internal sealed record class StructTypeSymbol : TypeSymbol
     }
 
     private StructTypeSymbol()
-        : base(BoundKind.StructTypeSymbol, SyntaxFactory.SyntheticToken(SyntaxKind.TypeKeyword), PredefinedTypeNames.Type, null!)
+        : base(BoundKind.StructTypeSymbol, SyntaxFactory.SyntheticToken(SyntaxKind.TypeKeyword), PredefinedSymbolNames.Type, null!)
     {
         Type = this;
     }
 
     public static StructTypeSymbol RuntimeType { get; } = new StructTypeSymbol();
 
-    public override bool IsNever => Name == PredefinedTypeNames.Never;
+    public override bool IsNever => Name == PredefinedSymbolNames.Never;
 }

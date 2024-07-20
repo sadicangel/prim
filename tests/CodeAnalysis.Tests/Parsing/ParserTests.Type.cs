@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Tests.Parsing;
 partial class ParserTests
 {
-    public static TheoryData<string> GetPredefinedTypeNames() => new(PredefinedTypeNames.All);
+    public static TheoryData<string> GetPredefinedTypeNames() => new(PredefinedSymbolNames.All);
 
     [Theory]
     [MemberData(nameof(GetPredefinedTypeNames))]

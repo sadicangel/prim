@@ -43,12 +43,11 @@ internal enum BoundKind
     PropertySymbol,
     MethodSymbol,
     VariableSymbol,
-    NamespaceSymbol,
 
     ArrayTypeSymbol,
     LambdaTypeSymbol,
     OptionTypeSymbol,
     StructTypeSymbol,
     UnionTypeSymbol,
-    RuntimeTypeSymbol
+    RuntimeTypeSymbol,
 }

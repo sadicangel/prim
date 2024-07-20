@@ -3,9 +3,9 @@
 namespace CodeAnalysis.Interpretation.Values;
 internal abstract record class PrimValue(TypeSymbol Type)
 {
-    internal static LiteralValue Unit { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Unit, PredefinedTypes.Unit, CodeAnalysis.Unit.Value);
-    internal static LiteralValue True { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, PredefinedTypes.Bool, true);
-    internal static LiteralValue False { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, PredefinedTypes.Bool, false);
+    internal static LiteralValue Unit { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Unit, PredefinedSymbols.Unit, CodeAnalysis.Unit.Value);
+    internal static LiteralValue True { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, PredefinedSymbols.Bool, true);
+    internal static LiteralValue False { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, PredefinedSymbols.Bool, false);
 
     internal Dictionary<Symbol, PrimValue> Members { get; } = [];
 
