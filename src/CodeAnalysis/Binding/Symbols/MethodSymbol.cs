@@ -27,4 +27,7 @@ internal sealed record class MethodSymbol(
     public bool IsConversion { get => IsImplicitConversion || IsExplicitConversion; }
     public bool IsImplicitConversion { get => MethodKind is SyntaxKind.ImplicitKeyword; }
     public bool IsExplicitConversion { get => MethodKind is SyntaxKind.ExplicitKeyword; }
+
+    public bool Equals(MethodSymbol? other) => base.Equals(other);
+    public override int GetHashCode() => base.GetHashCode();
 }

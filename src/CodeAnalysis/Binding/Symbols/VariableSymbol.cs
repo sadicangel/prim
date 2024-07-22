@@ -16,6 +16,9 @@ internal sealed record class VariableSymbol(
         IsStatic,
         IsReadOnly)
 {
+    public bool Equals(VariableSymbol? other) => base.Equals(other);
+    public override int GetHashCode() => base.GetHashCode();
+
     public static VariableSymbol This(TypeSymbol type, SyntaxNode? syntax = null) => new(
         syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.ThisKeyword),
         "this",

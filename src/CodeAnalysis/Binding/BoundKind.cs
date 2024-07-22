@@ -20,7 +20,9 @@ internal enum BoundKind
     ConversionDeclaration,
 
     LocalReference,
-    MemberReference,
+    PropertyReference,
+    MethodReference,
+    MethodGroup,
     IndexReference,
 
     BlockExpression,

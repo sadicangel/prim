@@ -29,8 +29,12 @@ partial class Interpreter
                 EvaluateBlockExpression((BoundBlockExpression)node, context),
             BoundKind.ArrayInitExpression =>
                 EvaluateArrayInitExpression((BoundArrayInitExpression)node, context),
-            BoundKind.MemberReference =>
-                EvaluateMemberReference((BoundMemberReference)node, context),
+            BoundKind.PropertyReference =>
+                EvaluatePropertyReference((BoundPropertyReference)node, context),
+            BoundKind.MethodReference =>
+                EvaluateMethodReference((BoundMethodReference)node, context),
+            BoundKind.MethodGroup =>
+                EvaluateMethodGroup((BoundMethodGroup)node, context),
             BoundKind.IndexReference =>
                 EvaluateIndexReference((BoundIndexReference)node, context),
             BoundKind.InvocationExpression =>

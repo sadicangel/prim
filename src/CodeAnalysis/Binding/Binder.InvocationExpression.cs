@@ -9,7 +9,10 @@ partial class Binder
     private static BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax, BinderContext context)
     {
         var expression = BindExpression(syntax.Expression, context);
-        var operators = expression.Type.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken);
+        var methodGroup = expression as BoundMethodGroup;
+
+        var operators = methodGroup?.MethodSymbols.SelectMany(s => s.Type.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken)).ToList()
+            ?? expression.Type.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken);
 
         if (operators is [])
         {
@@ -45,6 +48,15 @@ partial class Binder
                     @operator = matchingOperators.Single();
                     break;
             }
+        }
+
+        if (methodGroup is not null)
+        {
+            // Because we have bound to a specific method, we need to use that reference.
+            expression = new BoundMethodReference(
+                methodGroup.Syntax,
+                methodGroup.Expression,
+                methodGroup.GetMethod(@operator.LambdaType));
         }
 
         return new BoundInvocationExpression(syntax, expression, @operator, arguments);

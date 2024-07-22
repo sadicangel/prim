@@ -108,14 +108,8 @@ internal abstract record class TypeSymbol(
 
     internal bool AddMethod(string name, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {
+        if (GetProperty(name) is not null) return false;
         if (GetMethod(name, type) is not null) return false;
-
-        // TODO: Allow static methods.
-        // TODO: Allow not having to use `this`?
-        type = type with
-        {
-            Parameters = [.. type.Parameters.Prepend(VariableSymbol.This(this))]
-        };
 
         var methodSymbol = new MethodSymbol(
             SyntaxKind.IdentifierToken,

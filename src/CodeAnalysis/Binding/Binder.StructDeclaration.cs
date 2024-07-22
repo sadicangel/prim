@@ -49,7 +49,7 @@ partial class Binder
             var method = typeSymbol.GetMethod(syntax.Name.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.Name.Text}'");
 
-            var body = BindMethodBody(syntax.Body, method, context);
+            var body = BindMethodBody(method, syntax.Body, context);
 
             return new BoundMethodDeclaration(syntax, method, body);
         }
@@ -61,7 +61,7 @@ partial class Binder
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
             // TODO: Either here or when declaring, must ensure only 1 or 2 parameters.
-            var body = BindMethodBody(syntax.Body, @operator, context);
+            var body = BindMethodBody(@operator, syntax.Body, context);
 
             return new BoundOperatorDeclaration(syntax, @operator, body);
         }
@@ -73,9 +73,35 @@ partial class Binder
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
             // TODO: Either here or when declaring, must ensure only 1 parameter.
-            var body = BindMethodBody(syntax.Body, conversion, context);
+            var body = BindMethodBody(conversion, syntax.Body, context);
 
             return new BoundConversionDeclaration(syntax, conversion, body);
+        }
+
+        static BoundExpression BindMethodBody(
+            MethodSymbol methodSymbol,
+            ExpressionSyntax syntax,
+            BinderContext context)
+        {
+            using (context.PushScope())
+            {
+                if (!methodSymbol.IsStatic)
+                {
+                    _ = context.BoundScope.Declare(VariableSymbol.This((TypeSymbol)methodSymbol.ContainingSymbol));
+                }
+
+                foreach (var parameterSymbol in methodSymbol.Parameters)
+                {
+                    // We've already reported redeclarations.
+                    _ = context.BoundScope.Declare(parameterSymbol);
+                }
+
+                // TODO: Check for unused parameters.
+                var body = Coerce(BindExpression(syntax, context), methodSymbol.ReturnType, context);
+
+                return body;
+
+            }
         }
     }
 }
