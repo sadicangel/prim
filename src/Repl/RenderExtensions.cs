@@ -68,6 +68,12 @@ internal static class RenderExtensions
                 console.Write(" ] ");
                 console.MarkupInterpolated($"[green i]{option.Type.Name}[/]");
                 break;
+            case UnionValue union:
+                console.Write("[ ");
+                console.Write(union.Value);
+                console.Write(" ] ");
+                console.MarkupInterpolated($"[green i]{union.Type.Name}[/]");
+                break;
             default:
                 throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");
         }

@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class OptionValue : PrimValue
 {
-    private PrimValue? _value;
+    private readonly PrimValue? _value;
 
     public OptionValue(PrimValue value) : this(new OptionTypeSymbol(value.Type.Syntax, value.Type), value) { }
 
@@ -48,8 +48,6 @@ internal sealed record class OptionValue : PrimValue
 
     public bool HasValue => _value is not null;
 
-    public bool Equals(OptionValue? other) => other is not null && (HasValue ? (other.HasValue && Value.Equals(other.Value)) : !other.HasValue);
-    public override int GetHashCode() => HashCode.Combine(HasValue, Value);
-
-    public void SetValue(PrimValue value) => _value = value;
+    public bool Equals(OptionValue? other) => Type == other?.Type && (HasValue ? (other.HasValue && Value.Equals(other.Value)) : !other.HasValue);
+    public override int GetHashCode() => HashCode.Combine(Type, HasValue, Value);
 }
