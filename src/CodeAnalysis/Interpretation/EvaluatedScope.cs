@@ -360,7 +360,8 @@ file static class StructValueExtensions
         var power = s.StructType.GetBinaryOperators(SyntaxKind.StarStarToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             power,
-            new LambdaValue(power.LambdaType, (PrimValue a, PrimValue b) => T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value)))));
+            new LambdaValue(power.LambdaType, (PrimValue a, PrimValue b) =>
+                new LiteralValue(s, T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value))))));
         return s;
     }
 
