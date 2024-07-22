@@ -19,12 +19,8 @@ partial class Interpreter
                 EvaluateAssignmentExpression((BoundAssignmentExpression)node, context),
             BoundKind.VariableDeclaration =>
                 EvaluateVariableDeclaration((BoundVariableDeclaration)node, context),
-            BoundKind.FunctionDeclaration =>
-                EvaluateFunctionDeclaration((BoundFunctionDeclaration)node, context),
             BoundKind.StructDeclaration =>
                 EvaluateStructDeclaration((BoundStructDeclaration)node, context),
-            BoundKind.FunctionBodyExpression =>
-                EvaluateFunctionAssignmentExpression((BoundFunctionAssignmentExpression)node, context),
             //BoundKind.EmptyExpression =>
             //    EvaluateEmptyExpression((BoundEmptyExpression)node, context),
             //BoundKind.StatementExpression =>

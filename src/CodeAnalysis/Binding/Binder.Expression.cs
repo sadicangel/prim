@@ -28,8 +28,6 @@ partial class Binder
                 BindAssignmentExpression((AssignmentExpressionSyntax)syntax, context),
             SyntaxKind.VariableDeclaration =>
                 BindVariableDeclaration((VariableDeclarationSyntax)syntax, context),
-            SyntaxKind.FunctionDeclaration =>
-                BindFunctionDeclaration((FunctionDeclarationSyntax)syntax, context),
             SyntaxKind.StructDeclaration =>
                 BindStructDeclaration((StructDeclarationSyntax)syntax, context),
             SyntaxKind.LocalDeclaration =>

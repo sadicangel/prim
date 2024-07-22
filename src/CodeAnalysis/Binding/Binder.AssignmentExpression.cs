@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Diagnostics;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -26,11 +27,22 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var right = @ref.Symbol is FunctionSymbol func
-            ? BindFunctionAssignmentExpression(syntax.Right, func, context)
-            : BindExpression(syntax.Right, context);
-
-        right = Coerce(right, @ref.Type, context);
+        // TODO: Make this better. Maybe use ContainedSymbols instead?
+        BoundExpression right;
+        if (@ref.Symbol.Type is LambdaTypeSymbol lambdaType)
+        {
+            using (context.PushScope())
+            {
+                foreach (var parameter in lambdaType.Parameters)
+                    if (!context.BoundScope.Declare(parameter))
+                        throw new UnreachableException($"Failed to declare parameter '{parameter}'");
+                right = Coerce(BindExpression(syntax.Right, context), lambdaType.ReturnType, context);
+            }
+        }
+        else
+        {
+            right = Coerce(BindExpression(syntax.Right, context), @ref.Type, context);
+        }
 
         if (right.Type.IsNever)
         {

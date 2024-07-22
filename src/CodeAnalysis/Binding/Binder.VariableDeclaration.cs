@@ -12,25 +12,42 @@ partial class Binder
         if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(VariableDeclarationSyntax)}'");
 
-        var expression = BindExpression(syntax.Expression, context);
-
-        if (variableSymbol.Type.IsUnknown)
+        BoundExpression expression;
+        if (variableSymbol.Type is LambdaTypeSymbol lambdaType)
         {
-            if (expression.Type.IsUnknown)
+            using (context.PushScope())
             {
-                context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
-                variableSymbol = variableSymbol with { Type = PredefinedSymbols.Never };
+                foreach (var parameter in lambdaType.Parameters)
+                    if (!context.BoundScope.Declare(parameter))
+                        throw new UnreachableException($"Failed to declare parameter '{parameter}'");
+
+                expression = BindExpression(syntax.Expression, context);
+                expression = Coerce(expression, lambdaType.ReturnType, context);
             }
-            else
-            {
-                variableSymbol = variableSymbol with { Type = expression.Type };
-            }
-            context.BoundScope.Replace(variableSymbol);
         }
         else
         {
-            expression = Coerce(expression, variableSymbol.Type, context);
+            expression = BindExpression(syntax.Expression, context);
+
+            if (variableSymbol.Type.IsUnknown)
+            {
+                if (expression.Type.IsUnknown)
+                {
+                    context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
+                    variableSymbol = variableSymbol with { Type = PredefinedSymbols.Never };
+                }
+                else
+                {
+                    variableSymbol = variableSymbol with { Type = expression.Type };
+                }
+                context.BoundScope.Replace(variableSymbol);
+            }
+            else
+            {
+                expression = Coerce(expression, variableSymbol.Type, context);
+            }
         }
+
         return new BoundVariableDeclaration(syntax, variableSymbol, expression);
     }
 }

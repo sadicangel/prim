@@ -148,7 +148,6 @@ public enum SyntaxKind
     GroupExpression,
 
     StructDeclaration,
-    FunctionDeclaration,
     VariableDeclaration,
     PropertyDeclaration,
     MethodDeclaration,

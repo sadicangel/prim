@@ -57,13 +57,16 @@ internal static class RenderExtensions
                 console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
                 break;
             case StructValue @struct:
-                console.MarkupInterpolated($"[grey66]{@struct.TypeSymbol.Name}[/] [green i]{@struct.TypeSymbol.Type.Name}[/]");
+                console.MarkupInterpolated($"[grey66]{@struct.Name}[/] [green i]{@struct.Type.Name}[/]");
                 break;
             case ReferenceValue reference:
                 console.Write(reference.ReferencedValue, indent);
                 break;
             case OptionValue option:
-                console.MarkupInterpolated($"[grey66]{option.Value.Value}[/] [green i]{option.Type.Name}[/]");
+                console.Write("[ ");
+                console.Write(option.Value);
+                console.Write(" ] ");
+                console.MarkupInterpolated($"[green i]{option.Type.Name}[/]");
                 break;
             default:
                 throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");

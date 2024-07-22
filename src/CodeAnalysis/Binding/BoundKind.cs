@@ -13,7 +13,6 @@ internal enum BoundKind
     AssignmentExpression,
 
     VariableDeclaration,
-    FunctionDeclaration,
     StructDeclaration,
     PropertyDeclaration,
     MethodDeclaration,
@@ -23,9 +22,6 @@ internal enum BoundKind
     LocalReference,
     MemberReference,
     IndexReference,
-
-    FunctionBodyExpression,
-    MethodBodyExpression,
 
     BlockExpression,
     ArrayInitExpression,
@@ -39,7 +35,6 @@ internal enum BoundKind
     IfExpression,
     WhileExpression,
 
-    FunctionSymbol,
     PropertySymbol,
     MethodSymbol,
     VariableSymbol,
@@ -49,5 +44,4 @@ internal enum BoundKind
     OptionTypeSymbol,
     StructTypeSymbol,
     UnionTypeSymbol,
-    RuntimeTypeSymbol,
 }

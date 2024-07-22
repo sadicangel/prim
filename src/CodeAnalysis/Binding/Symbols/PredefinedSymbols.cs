@@ -31,8 +31,8 @@ internal static class PredefinedSymbols
     public static readonly StructTypeSymbol F128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedSymbolNames.F128);
     public static readonly StructTypeSymbol Type = StructTypeSymbol.RuntimeType;
 
-    public static readonly FunctionSymbol Print = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "print", new LambdaTypeSymbol([new Parameter("obj", Any)], Unit), IsStatic: true, IsReadOnly: true);
-    public static readonly FunctionSymbol Scan = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "scan", new LambdaTypeSymbol([], Str), IsStatic: true, IsReadOnly: true);
+    public static readonly VariableSymbol Print = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "print", new LambdaTypeSymbol([new Parameter("obj", Any)], Unit), IsStatic: true, IsReadOnly: true);
+    public static readonly VariableSymbol Scan = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "scan", new LambdaTypeSymbol([], Str), IsStatic: true, IsReadOnly: true);
 
     static PredefinedSymbols()
     {

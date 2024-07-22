@@ -2,7 +2,11 @@
 
 namespace CodeAnalysis.Interpretation.Values;
 
-internal sealed record class StructValue(TypeSymbol TypeSymbol) : PrimValue(PredefinedSymbols.Type)
+internal sealed record class StructValue(StructTypeSymbol StructType) : PrimValue(PredefinedSymbols.Type)
 {
-    public override TypeSymbol Value => TypeSymbol;
+    public string Name { get => StructType.Name; }
+    public override StructTypeSymbol Value => StructType;
+
+    public bool Equals(StructValue? other) => Name == other?.Name;
+    public override int GetHashCode() => Name.GetHashCode();
 }

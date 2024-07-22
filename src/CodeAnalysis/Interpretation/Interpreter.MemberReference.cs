@@ -8,7 +8,7 @@ partial class Interpreter
     private static ReferenceValue EvaluateMemberReference(BoundMemberReference node, InterpreterContext context)
     {
         var expression = EvaluateExpression(node.Expression, context);
-        context.EvaluatedScope.Declare(VariableSymbol.This(expression.Type), expression, @throw: false);
+        context.EvaluatedScope.Declare(VariableSymbol.This(expression.Type), expression);
         var memberReference = new ReferenceValue(
             node.Symbol.Type,
             () => expression.Get(node.Symbol),

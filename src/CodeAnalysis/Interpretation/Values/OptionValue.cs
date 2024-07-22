@@ -7,10 +7,9 @@ internal sealed record class OptionValue : PrimValue
 {
     private PrimValue? _value;
 
-    public OptionValue(OptionTypeSymbol optionType) : this(optionType, null) { }
     public OptionValue(PrimValue value) : this(new OptionTypeSymbol(value.Type.Syntax, value.Type), value) { }
 
-    private OptionValue(OptionTypeSymbol optionType, PrimValue? value = null) : base(optionType)
+    public OptionValue(OptionTypeSymbol optionType, PrimValue? value = null) : base(optionType)
     {
         _value = value;
 
@@ -48,6 +47,9 @@ internal sealed record class OptionValue : PrimValue
     public override PrimValue Value { get => _value ?? Unit; }
 
     public bool HasValue => _value is not null;
+
+    public bool Equals(OptionValue? other) => other is not null && (HasValue ? (other.HasValue && Value.Equals(other.Value)) : !other.HasValue);
+    public override int GetHashCode() => HashCode.Combine(HasValue, Value);
 
     public void SetValue(PrimValue value) => _value = value;
 }

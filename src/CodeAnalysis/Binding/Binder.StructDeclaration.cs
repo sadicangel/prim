@@ -11,7 +11,7 @@ partial class Binder
     private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BinderContext context)
     {
         var symbolName = syntax.Name.Text.ToString();
-        if (context.BoundScope.Lookup(symbolName) is not TypeSymbol typeSymbol)
+        if (context.BoundScope.Lookup(symbolName) is not StructTypeSymbol structTypeSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(StructDeclarationSyntax)}'");
 
         var members = new BoundList<BoundMemberDeclaration>.Builder(syntax.Members.Count);
@@ -20,17 +20,17 @@ partial class Binder
             members.Add(member.SyntaxKind switch
             {
                 SyntaxKind.PropertyDeclaration =>
-                    BindPropertyDeclaration((PropertyDeclarationSyntax)member, typeSymbol, context),
+                    BindPropertyDeclaration((PropertyDeclarationSyntax)member, structTypeSymbol, context),
                 SyntaxKind.MethodDeclaration =>
-                    BindMethodDeclaration((MethodDeclarationSyntax)member, typeSymbol, context),
+                    BindMethodDeclaration((MethodDeclarationSyntax)member, structTypeSymbol, context),
                 SyntaxKind.OperatorDeclaration =>
-                    BindOperatorDeclaration((OperatorDeclarationSyntax)member, typeSymbol, context),
+                    BindOperatorDeclaration((OperatorDeclarationSyntax)member, structTypeSymbol, context),
                 SyntaxKind.ConversionDeclaration =>
-                    BindConversionDeclaration((ConversionDeclarationSyntax)member, typeSymbol, context),
+                    BindConversionDeclaration((ConversionDeclarationSyntax)member, structTypeSymbol, context),
                 _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{member.SyntaxKind}'")
             });
         }
-        return new BoundStructDeclaration(syntax, typeSymbol, members.ToBoundList());
+        return new BoundStructDeclaration(syntax, structTypeSymbol, members.ToBoundList());
 
         static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
         {

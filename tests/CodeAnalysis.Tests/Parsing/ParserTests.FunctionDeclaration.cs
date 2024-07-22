@@ -7,7 +7,7 @@ partial class ParserTests
         var tree = SyntaxTree.Parse(new SourceText("f: () -> unit = {}"));
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
-        Assert.Equal(SyntaxKind.FunctionDeclaration, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.VariableDeclaration, node.SyntaxKind);
     }
 
     [Fact]
@@ -16,7 +16,7 @@ partial class ParserTests
         var tree = SyntaxTree.Parse(new SourceText("f: (x: i32) -> i32 = x;"));
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
-        Assert.Equal(SyntaxKind.FunctionDeclaration, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.VariableDeclaration, node.SyntaxKind);
     }
 
     [Fact]
@@ -25,6 +25,6 @@ partial class ParserTests
         var tree = SyntaxTree.Parse(new SourceText("f: (x: i32, y: i32) -> i32 = x + y;"));
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
-        Assert.Equal(SyntaxKind.FunctionDeclaration, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.VariableDeclaration, node.SyntaxKind);
     }
 }

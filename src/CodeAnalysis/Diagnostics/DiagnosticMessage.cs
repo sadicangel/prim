@@ -48,8 +48,6 @@ internal static class DiagnosticMessage
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
     public static string InvalidImplicitType(string typeName) =>
         $"Invalid implicit type '{typeName}'";
-    public static string MutableGlobalDeclaration(string declarationKind) =>
-        $"Invalid global '{declarationKind}' declaration. Must be readonly";
     public static string ReadOnlyAssignment(string symbolName) =>
         $"Invalid assignment of '{symbolName}'. It is read-only";
     public static string RedundantConversion() =>

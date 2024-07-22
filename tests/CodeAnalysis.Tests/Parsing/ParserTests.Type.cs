@@ -63,7 +63,7 @@ partial class ParserTests
         var tree = SyntaxTree.Parse(new SourceText("a: (i: u8) -> i32: i;"));
         var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
         Assert.Empty(tree.Diagnostics);
-        var decl = Assert.IsType<FunctionDeclarationSyntax>(node);
+        var decl = Assert.IsType<VariableDeclarationSyntax>(node);
         Assert.Equal(SyntaxKind.LambdaType, decl.Type?.SyntaxKind);
     }
 }

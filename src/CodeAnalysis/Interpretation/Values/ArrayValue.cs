@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.CompilerServices;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 
@@ -23,6 +24,9 @@ internal sealed record class ArrayValue
     public PrimValue[] Elements { get; init; }
 
     public PrimValue this[PrimValue index] { get => GetValue(index); set => SetValue(index, value); }
+
+    public bool Equals(ArrayValue? other) => ReferenceEquals(this, other);
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 
     private PrimValue GetValue(PrimValue index) => Elements[(int)index.Value];
     private PrimValue SetValue(PrimValue index, PrimValue value) => Elements[(int)index.Value] = value;

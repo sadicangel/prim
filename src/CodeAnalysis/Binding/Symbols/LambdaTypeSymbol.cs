@@ -11,7 +11,7 @@ internal sealed record class LambdaTypeSymbol : TypeSymbol
             $"({string.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}",
             PredefinedSymbols.Type)
     {
-        Parameters = [.. parameters.Select(p => new VariableSymbol(p.Syntax, p.Name, p.Type, IsReadOnly: false))];
+        Parameters = [.. parameters.Select(p => new VariableSymbol(p.Syntax, p.Name, p.Type, IsStatic: false, IsReadOnly: false))];
         ReturnType = returnType;
         AddOperator(SyntaxKind.ParenthesisOpenParenthesisCloseToken, this);
     }

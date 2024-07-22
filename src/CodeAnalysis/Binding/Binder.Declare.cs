@@ -42,23 +42,6 @@ partial class Binder
                         context.Diagnostics.ReportSymbolRedeclaration(structDeclaration.Location, structName);
                 }
                 break;
-            case SyntaxKind.FunctionDeclaration:
-                {
-                    var functionDeclaration = (FunctionDeclarationSyntax)declaration;
-                    if (!functionDeclaration.IsReadOnly)
-                        context.Diagnostics.ReportMutableGlobalDeclaration(functionDeclaration.Location, "function");
-                    var functionName = functionDeclaration.Name.Text.ToString();
-                    var functionType = BindLambdaType(functionDeclaration.Type, context);
-                    var functionSymbol = new FunctionSymbol(
-                       functionDeclaration,
-                       functionName,
-                       functionType,
-                       IsReadOnly: functionDeclaration.IsReadOnly,
-                       IsStatic: true);
-                    if (!context.BoundScope.Declare(functionSymbol))
-                        context.Diagnostics.ReportSymbolRedeclaration(functionDeclaration.Location, functionName);
-                }
-                break;
             case SyntaxKind.VariableDeclaration:
                 {
                     var variableDeclaration = (VariableDeclarationSyntax)declaration;
@@ -70,6 +53,7 @@ partial class Binder
                         variableDeclaration,
                         variableName,
                         variableType,
+                        IsStatic: true,
                         variableDeclaration.IsReadOnly);
 
                     if (!context.BoundScope.Declare(variableSymbol))
@@ -136,8 +120,6 @@ partial class Binder
                         }
                     }
                 }
-                break;
-            case SyntaxKind.FunctionDeclaration:
                 break;
             case SyntaxKind.VariableDeclaration:
                 break;
