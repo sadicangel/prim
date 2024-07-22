@@ -8,6 +8,6 @@ partial class Interpreter
     {
         _ = node;
         _ = context;
-        return LiteralValue.Unit;
+        return PrimValue.Unit;
     }
 }
