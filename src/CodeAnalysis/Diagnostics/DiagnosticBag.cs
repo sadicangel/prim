@@ -112,6 +112,10 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.UndefinedSymbol(symbolName));
     internal void ReportUndefinedUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.UndefinedUnaryOperator(@operator, operandTypeName));
+    internal void ReportUninitializedProperty(SourceLocation location, string propertyName) =>
+        ReportError(location, DiagnosticMessage.UninitializedProperty(propertyName));
+    internal void ReportUninitializedVariable(SourceLocation location, string variableName) =>
+        ReportError(location, DiagnosticMessage.UninitializedVariable(variableName));
     internal void ReportUnreachableCode(SourceLocation location) =>
         ReportWarning(location, DiagnosticMessage.UnreachableCode());
 

@@ -6,11 +6,11 @@ public sealed record class VariableDeclarationSyntax(
     IdentifierNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax? Type,
-    SyntaxToken ColonOrEqualsToken,
-    ExpressionSyntax Expression)
+    InitValueExpressionSyntax? InitValue,
+    SyntaxToken? SemicolonToken)
     : DeclarationSyntax(SyntaxKind.VariableDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
+    public bool IsReadOnly { get => InitValue?.IsReadOnly ?? false; }
 
     public override IEnumerable<SyntaxNode> Children()
     {
@@ -18,7 +18,9 @@ public sealed record class VariableDeclarationSyntax(
         yield return ColonToken;
         if (Type is not null)
             yield return Type;
-        yield return ColonOrEqualsToken;
-        yield return Expression;
+        if (InitValue is not null)
+            yield return InitValue;
+        if (SemicolonToken is not null)
+            yield return SemicolonToken;
     }
 }

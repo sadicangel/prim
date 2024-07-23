@@ -1,5 +1,4 @@
-﻿
-using CodeAnalysis.Syntax.Types;
+﻿using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class PropertyDeclarationSyntax(
@@ -7,18 +6,20 @@ public sealed record class PropertyDeclarationSyntax(
     IdentifierNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax Type,
-    SyntaxToken ColonOrEqualsToken,
-    ExpressionSyntax Init)
+    InitValueExpressionSyntax? InitValue,
+    SyntaxToken? SemicolonToken)
     : MemberDeclarationSyntax(SyntaxKind.PropertyDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
+    public bool IsReadOnly { get => InitValue?.IsReadOnly ?? false; }
 
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;
         yield return ColonToken;
         yield return Type;
-        yield return ColonOrEqualsToken;
-        yield return Init;
+        if (InitValue is not null)
+            yield return InitValue;
+        if (SemicolonToken is not null)
+            yield return SemicolonToken;
     }
 }

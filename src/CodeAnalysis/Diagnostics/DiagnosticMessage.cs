@@ -68,6 +68,10 @@ internal static class DiagnosticMessage
         $"Undefined symbol '{symbolName}'";
     public static string UndefinedUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         $"Unary operator '{@operator.Text}' is not defined for type '{operandTypeName}'";
+    public static string UninitializedProperty(string propertyName) =>
+        $"Non-optional property '{propertyName}' is uninitialized";
+    public static string UninitializedVariable(string variableName) =>
+        $"Non-optional variable '{variableName}' is uninitialized";
     public static string UnreachableCode() =>
         "Unreachable code detected";
 

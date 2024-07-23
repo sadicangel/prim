@@ -23,6 +23,7 @@ internal sealed record class LambdaTypeSymbol : TypeSymbol
 
     public BoundList<VariableSymbol> Parameters { get; init; }
     public TypeSymbol ReturnType { get; init; }
+    public override IEnumerable<Symbol> DeclaredSymbols => Parameters;
 
     public override bool IsNever => ReturnType.IsNever || Parameters.Any(p => p.Type.IsNever);
 }

@@ -26,6 +26,8 @@ partial class Binder
                 BindGroupExpression((GroupExpressionSyntax)syntax, context),
             SyntaxKind.AssignmentExpression =>
                 BindAssignmentExpression((AssignmentExpressionSyntax)syntax, context),
+            SyntaxKind.InitValueExpression =>
+                BindInitValueExpression((InitValueExpressionSyntax)syntax, context),
             SyntaxKind.VariableDeclaration =>
                 BindVariableDeclaration((VariableDeclarationSyntax)syntax, context),
             SyntaxKind.StructDeclaration =>

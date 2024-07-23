@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Tests.Interpretation;
 public partial class InterpreterTests
@@ -8,7 +9,6 @@ public partial class InterpreterTests
     {
         var value = """
         a: [i32: 2]: [0, 0];
-        a
         """.Evaluate();
         Assert.True(value.Type is ArrayTypeSymbol);
     }
@@ -18,7 +18,6 @@ public partial class InterpreterTests
     {
         var value = """
         a: (x: i32, y: i32) -> i32: x + y;
-        a
         """.Evaluate();
         Assert.True(value.Type is LambdaTypeSymbol);
     }
@@ -28,7 +27,6 @@ public partial class InterpreterTests
     {
         var value = """
         a: ?i32: null;
-        a
         """.Evaluate();
         Assert.True(value.Type is OptionTypeSymbol);
     }
@@ -38,7 +36,6 @@ public partial class InterpreterTests
     {
         var value = """
         a: i32: 0;
-        a
         """.Evaluate();
         Assert.True(value.Type is StructTypeSymbol);
     }
@@ -48,8 +45,26 @@ public partial class InterpreterTests
     {
         var value = """
         a: i32 | str: "";
-        a
         """.Evaluate();
         Assert.True(value.Type is UnionTypeSymbol);
+    }
+
+    [Fact]
+    public void Evaluates_VariableDeclaration_with_implicit_type()
+    {
+        var value = """
+        a:: "";
+        """.Evaluate();
+        Assert.Equal(PredefinedSymbols.Str, value.Type);
+    }
+
+    [Fact]
+    public void Evaluates_VariableDeclaration_with_optional_value()
+    {
+        var value = """
+        a: ?i32;
+        """.Evaluate();
+        Assert.Equal(new OptionTypeSymbol(PredefinedSymbols.I32), value.Type);
+        Assert.Equal(PrimValue.Unit, value.Value);
     }
 }

@@ -194,6 +194,7 @@ public static class SyntaxFacts
             SyntaxKind.CoalesceExpression => null,
 
             SyntaxKind.AssignmentExpression => null,
+            SyntaxKind.InitValueExpression => null,
 
             SyntaxKind.IfExpression => null,
             SyntaxKind.ElseClauseExpression => null,

@@ -12,13 +12,8 @@ while (true)
 {
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
         S: struct = {
-            print: () -> unit = print("Hello world");
-            print: (obj: any) -> unit = print("Hello " + obj);
+            x: ?i32;
         }
-
-        s:: S {};
-        s.print();
-        s.print("Johnny");
         """));
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);

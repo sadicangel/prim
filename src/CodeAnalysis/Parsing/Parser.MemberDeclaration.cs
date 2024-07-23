@@ -81,16 +81,23 @@ partial class Parser
             var name = ParseIdentifierNameExpression(syntaxTree, iterator);
             var colonToken = iterator.Match(SyntaxKind.ColonToken);
             var type = ParseType(syntaxTree, iterator);
-            var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
-            var expression = ParseTerminatedExpression(syntaxTree, iterator);
+            var initValue = default(InitValueExpressionSyntax);
+            var semicolonToken = default(SyntaxToken);
+            if (iterator.TryMatch(out var colonOrEqualsToken, SyntaxKind.EqualsToken, SyntaxKind.ColonToken))
+            {
+                var expression = ParseExpression(syntaxTree, iterator);
+                initValue = new InitValueExpressionSyntax(syntaxTree, colonOrEqualsToken, expression);
+            }
+            if (initValue?.IsTerminated is not true)
+                semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
 
             return new PropertyDeclarationSyntax(
                 syntaxTree,
                 name,
                 colonToken,
                 type,
-                operatorToken,
-                expression);
+                initValue,
+                semicolonToken);
         }
     }
 }

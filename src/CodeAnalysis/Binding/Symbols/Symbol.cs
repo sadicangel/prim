@@ -10,10 +10,9 @@ internal abstract record class Symbol(
     bool IsReadOnly)
     : BoundNode(BoundKind, Syntax)
 {
-    public override IEnumerable<BoundNode> Children() => [];
+    public sealed override IEnumerable<Symbol> Children() => [];
 
     public virtual bool Equals(Symbol? other) => other is not null && BoundKind == other.BoundKind && Name == other.Name;
-
     public override int GetHashCode() => HashCode.Combine(BoundKind, Name);
 
     public sealed override string ToString() => $"{Name}: {Type.Name}";

@@ -12,27 +12,21 @@ partial class Binder
         if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(VariableDeclarationSyntax)}'");
 
-        BoundExpression expression;
-        if (variableSymbol.Type is LambdaTypeSymbol lambdaType)
+        using (context.PushScope())
         {
-            using (context.PushScope())
-            {
-                foreach (var parameter in lambdaType.Parameters)
-                    if (!context.BoundScope.Declare(parameter))
-                        throw new UnreachableException($"Failed to declare parameter '{parameter}'");
+            foreach (var symbol in variableSymbol.Type.DeclaredSymbols)
+                if (!context.BoundScope.Declare(symbol))
+                    throw new UnreachableException($"Failed to declare symbol '{symbol}'");
 
-                expression = BindExpression(syntax.Expression, context);
-                expression = Coerce(expression, lambdaType.ReturnType, context);
-            }
-        }
-        else
-        {
-            expression = BindExpression(syntax.Expression, context);
+            var expression = syntax.InitValue is not null
+                ? BindExpression(syntax.InitValue, context)
+                : null;
 
             if (variableSymbol.Type.IsUnknown)
             {
-                if (expression.Type.IsUnknown)
+                if (expression is null || expression.Type.IsUnknown)
                 {
+                    expression ??= new BoundNeverExpression(syntax);
                     context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
                     variableSymbol = variableSymbol with { Type = PredefinedSymbols.Never };
                 }
@@ -44,10 +38,22 @@ partial class Binder
             }
             else
             {
+                if (expression is null)
+                {
+                    if (!variableSymbol.Type.IsOption)
+                    {
+                        context.Diagnostics.ReportUninitializedVariable(syntax.Location, variableSymbol.Name);
+                        expression = new BoundNeverExpression(syntax);
+                    }
+                    else
+                    {
+                        expression = BoundLiteralExpression.Unit;
+                    }
+                }
                 expression = Coerce(expression, variableSymbol.Type, context);
             }
-        }
 
-        return new BoundVariableDeclaration(syntax, variableSymbol, expression);
+            return new BoundVariableDeclaration(syntax, variableSymbol, expression);
+        }
     }
 }

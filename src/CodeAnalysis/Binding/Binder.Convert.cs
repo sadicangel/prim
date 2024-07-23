@@ -6,6 +6,11 @@ partial class Binder
 {
     private static BoundExpression Convert(BoundExpression expression, TypeSymbol type, bool isExplicit, BinderContext context)
     {
+        if (expression.Type.IsNever)
+        {
+            return expression;
+        }
+
         if (expression.Type.IsConvertibleTo(type, out var conversion))
         {
             if (conversion is null)

@@ -6,6 +6,11 @@ partial class Binder
 {
     private static BoundExpression Coerce(BoundExpression expression, TypeSymbol type, BinderContext context)
     {
+        if (expression.Type.IsNever)
+        {
+            return expression;
+        }
+
         if (expression.Type.IsCoercibleTo(type, out var conversion))
         {
             if (conversion is null)

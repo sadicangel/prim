@@ -37,8 +37,20 @@ partial class Binder
             var property = typeSymbol.GetProperty(syntax.Name.Text)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.Name.Text}'");
 
-            // TODO: Allow init expression to be optional, if property is optional.
-            var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
+            BoundExpression init;
+            if (syntax.InitValue is not null)
+            {
+                init = Coerce(BindExpression(syntax.InitValue, context), property.Type, context);
+            }
+            else if (property.Type.IsOption)
+            {
+                init = Coerce(BoundLiteralExpression.Unit, property.Type, context);
+            }
+            else
+            {
+                context.Diagnostics.ReportUninitializedProperty(syntax.Location, property.Name);
+                init = new BoundNeverExpression(syntax);
+            }
 
             return new BoundPropertyDeclaration(syntax, property, init);
         }

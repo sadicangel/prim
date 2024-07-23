@@ -28,8 +28,8 @@ internal sealed record class UnionTypeSymbol : TypeSymbol
 
     public BoundList<TypeSymbol> Types { get; }
 
+    public override bool IsNever => Types.Any(t => t.IsNever);
+
     public bool Equals(UnionTypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
-
-    public override bool IsNever => Types.Any(t => t.IsNever);
 }

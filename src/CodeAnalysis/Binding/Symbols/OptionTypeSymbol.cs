@@ -4,6 +4,11 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class OptionTypeSymbol : TypeSymbol
 {
+    public OptionTypeSymbol(TypeSymbol underlyingType)
+        : this(SyntaxFactory.SyntheticToken(SyntaxKind.OptionType), underlyingType)
+    {
+    }
+
     public OptionTypeSymbol(SyntaxNode syntax, TypeSymbol underlyingType)
         : base(
             BoundKind.OptionTypeSymbol,
