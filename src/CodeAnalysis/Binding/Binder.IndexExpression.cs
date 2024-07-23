@@ -27,7 +27,15 @@ partial class Binder
             return index;
         }
 
-        // TODO: If index is const, check bounds.
+        if (index.ConstValue is not null && expression.Type is ArrayTypeSymbol arrayType)
+        {
+            var indexValue = (int)index.ConstValue;
+            if (indexValue < 0 || indexValue >= arrayType.Length)
+            {
+                context.Diagnostics.ReportIndexOutOfRange(syntax.Location, arrayType.Length);
+                return new BoundNeverExpression(syntax);
+            }
+        }
 
         return new BoundIndexReference(syntax, expression, @operator, index, @operator.ReturnType);
     }

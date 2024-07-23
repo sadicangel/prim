@@ -79,6 +79,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.AmbiguousInvocationOperator(typeNames));
     internal void ReportAmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         ReportError(@operator.Location, DiagnosticMessage.AmbiguousUnaryOperator(@operator, operandTypeName));
+    internal void ReportIndexOutOfRange(SourceLocation location, int arrayLength) =>
+        ReportError(location, DiagnosticMessage.IndexOutOfRange(arrayLength));
     internal void ReportInvalidArgumentListLength(SourceLocation location, int listLength) =>
         ReportError(location, DiagnosticMessage.InvalidArgumentListLength(listLength));
     internal void ReportInvalidArrayLength(SourceLocation location) =>

@@ -34,6 +34,8 @@ internal static class DiagnosticMessage
         $"Invocation operator is ambiguous for argument list '({string.Join(", ", typeNames.ToArray())})'";
     public static string AmbiguousUnaryOperator(SyntaxToken @operator, string operandTypeName) =>
         $"Unary operator '{@operator.Text}' is ambiguous on operand of type '{operandTypeName}'";
+    public static string IndexOutOfRange(int arrayLength) =>
+        $"Index is out of range. Must be non-negative and less than {arrayLength}";
     public static string InvalidArgumentListLength(int listLength) =>
         $"Expression does not contain an overload that expects {listLength} arguments";
     public static string InvalidArrayLength() =>

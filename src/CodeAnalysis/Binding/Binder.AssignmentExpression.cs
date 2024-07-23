@@ -10,15 +10,15 @@ partial class Binder
     {
         var left = BindExpression(syntax.Left, context);
 
+        if (left.Type.IsNever)
+        {
+            return left;
+        }
+
         if (left is not BoundReference @ref)
         {
             context.Diagnostics.ReportInvalidAssignment(syntax.Location);
             return new BoundNeverExpression(syntax);
-        }
-
-        if (@ref.Type.IsNever)
-        {
-            return @ref;
         }
 
         if (@ref.Symbol.IsReadOnly)
