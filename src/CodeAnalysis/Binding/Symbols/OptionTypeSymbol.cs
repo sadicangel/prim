@@ -13,7 +13,7 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
         : base(
             BoundKind.OptionTypeSymbol,
             syntax,
-            $"?{underlyingType.Name}",
+            underlyingType.IsUnion ? $"?({underlyingType.Name})" : $"?{underlyingType.Name}",
             PredefinedSymbols.Type)
     {
         UnderlyingType = underlyingType;

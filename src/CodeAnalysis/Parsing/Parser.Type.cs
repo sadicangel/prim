@@ -70,14 +70,26 @@ partial class Parser
             static OptionTypeSyntax ParseOptionType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var hookToken = iterator.Match(SyntaxKind.HookToken);
-                var underlyingType = ParseTypeSingle(syntaxTree, iterator);
-                return new OptionTypeSyntax(syntaxTree, hookToken, underlyingType);
+                var parenthesisOpenToken = default(SyntaxToken);
+                var underlyingType = default(TypeSyntax);
+                var parenthesisCloseToken = default(SyntaxToken);
+                if (iterator.TryMatch(out parenthesisOpenToken, SyntaxKind.ParenthesisOpenToken))
+                {
+                    underlyingType = ParseType(syntaxTree, iterator);
+                    parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
+                }
+                else
+                {
+                    underlyingType = ParseTypeSingle(syntaxTree, iterator);
+                }
+
+                return new OptionTypeSyntax(syntaxTree, hookToken, parenthesisOpenToken, underlyingType, parenthesisCloseToken);
             }
 
             static ArrayTypeSyntax ParseArrayType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
-                var elementType = ParseTypeSingle(syntaxTree, iterator);
+                var elementType = ParseType(syntaxTree, iterator);
                 var colonToken = iterator.Match(SyntaxKind.ColonToken);
                 var length = ParseExpression(syntaxTree, iterator);
                 var bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
@@ -96,12 +108,12 @@ partial class Parser
                     {
                         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
                         var colonToken = iterator.Match(SyntaxKind.ColonToken);
-                        var type = ParseTypeSingle(syntaxTree, iterator);
+                        var type = ParseType(syntaxTree, iterator);
                         return new ParameterSyntax(syntaxTree, identifierToken, colonToken, type);
                     });
                 var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
                 var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
-                var returnType = ParseTypeSingle(syntaxTree, iterator);
+                var returnType = ParseType(syntaxTree, iterator);
                 return new LambdaTypeSyntax(syntaxTree, parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
             }
         }
