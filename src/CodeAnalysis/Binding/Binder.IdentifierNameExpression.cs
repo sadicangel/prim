@@ -7,7 +7,7 @@ partial class Binder
 {
     private static BoundExpression BindIdentifierNameExpression(IdentifierNameExpressionSyntax syntax, BinderContext context)
     {
-        if (syntax.IdentifierToken.IsArtificial)
+        if (syntax.IdentifierToken.IsSynthetic)
         {
             // Diagnostic already reported since identifier was not parsed.
             return new BoundNeverExpression(syntax);

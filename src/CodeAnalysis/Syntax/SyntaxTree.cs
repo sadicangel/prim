@@ -12,7 +12,7 @@ public sealed class SyntaxTree
     {
         SourceText = new SourceText("");
         IsScript = false;
-        CompilationUnit = new CompilationUnitSyntax(this, [], SyntaxFactory.Token(SyntaxKind.EofToken, this));
+        CompilationUnit = new CompilationUnitSyntax(this, [], SyntaxFactory.SyntheticToken(SyntaxKind.EofToken, this));
     }
 
     private SyntaxTree(SourceText sourceText, bool isScript)

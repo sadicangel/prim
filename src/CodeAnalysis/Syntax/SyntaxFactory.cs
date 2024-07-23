@@ -10,8 +10,11 @@ public static class SyntaxFactory
         new(syntaxTree.SourceText.Length, syntaxTree.SourceText.Length);
 
     public static SyntaxToken SyntheticToken(SyntaxKind syntaxKind) =>
-        new(syntaxKind, SyntaxTree.Empty, EmptyRange(SyntaxTree.Empty), s_emptySyntaxTrivia, s_emptySyntaxTrivia, SyntaxFacts.GetText(syntaxKind));
+        SyntheticToken(syntaxKind, SyntaxTree.Empty);
 
-    public static SyntaxToken Token(SyntaxKind syntaxKind, SyntaxTree syntaxTree, string? text = null) =>
-        new(syntaxKind, syntaxTree, EmptyRange(syntaxTree), s_emptySyntaxTrivia, s_emptySyntaxTrivia, text ?? SyntaxFacts.GetText(syntaxKind));
+    public static SyntaxToken SyntheticToken(SyntaxKind syntaxKind, SyntaxTree syntaxTree) =>
+        SyntheticToken(syntaxKind, syntaxTree, EmptyRange(syntaxTree));
+
+    public static SyntaxToken SyntheticToken(SyntaxKind syntaxKind, SyntaxTree syntaxTree, Range range) =>
+        new(syntaxKind, syntaxTree, range, s_emptySyntaxTrivia, s_emptySyntaxTrivia, Value: null);
 }

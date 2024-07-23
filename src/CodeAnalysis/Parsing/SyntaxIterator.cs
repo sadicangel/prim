@@ -63,14 +63,15 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
         }
 
         if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
+        {
             Current.SyntaxTree.Diagnostics.ReportUnexpectedToken(syntaxKinds[0], Current);
+        }
 
-        return new SyntaxToken(
-            syntaxKinds[0],
-            Current.SyntaxTree,
-            Current.Range,
-            SyntaxFactory.EmptyTrivia(),
-            SyntaxFactory.EmptyTrivia(),
-            string.Empty);
+        var syntheticToken = SyntaxFactory.SyntheticToken(syntaxKinds[0], Current.SyntaxTree);
+
+        // Avoid overflowing the stack.
+        ++Index;
+
+        return syntheticToken;
     }
 }

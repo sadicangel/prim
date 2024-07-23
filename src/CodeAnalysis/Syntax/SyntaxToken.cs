@@ -8,7 +8,7 @@ public sealed record class SyntaxToken(
     object? Value)
     : SyntaxNode(SyntaxKind, SyntaxTree)
 {
-    public bool IsArtificial { get => SyntaxTree.SourceText[Range].Length == 0; }
+    public bool IsSynthetic { get => SyntaxTree.SourceText[Range].Length == 0; }
 
     public override Range Range { get; } = Range;
 
