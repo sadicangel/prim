@@ -72,7 +72,6 @@ partial class Binder
             var @operator = typeSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
-            // TODO: Either here or when declaring, must ensure only 1 or 2 parameters.
             var body = BindMethodBody(@operator, syntax.Body, context);
 
             return new BoundOperatorDeclaration(syntax, @operator, body);
@@ -84,7 +83,6 @@ partial class Binder
             var conversion = typeSymbol.GetConversion(type)
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
-            // TODO: Either here or when declaring, must ensure only 1 parameter.
             var body = BindMethodBody(conversion, syntax.Body, context);
 
             return new BoundConversionDeclaration(syntax, conversion, body);

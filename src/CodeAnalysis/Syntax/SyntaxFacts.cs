@@ -256,36 +256,9 @@ public static class SyntaxFacts
         };
     }
 
-
-    public static bool IsOperator(SyntaxKind syntaxKind) => syntaxKind
-        is SyntaxKind.AmpersandToken
-        or SyntaxKind.AmpersandAmpersandToken
-        or SyntaxKind.BangToken
-        or SyntaxKind.BangEqualsToken
-        or SyntaxKind.BracketOpenBracketCloseToken
-        or SyntaxKind.DotDotToken
-        or SyntaxKind.EqualsEqualsToken
-        or SyntaxKind.MinusGreaterThanToken
-        or SyntaxKind.GreaterThanToken
-        or SyntaxKind.GreaterThanEqualsToken
-        or SyntaxKind.GreaterThanGreaterThanToken
-        or SyntaxKind.GreaterThanGreaterThanEqualsToken
-        or SyntaxKind.HatToken
-        or SyntaxKind.HookHookToken
-        or SyntaxKind.LessThanToken
-        or SyntaxKind.LessThanEqualsToken
-        or SyntaxKind.LessThanLessThanToken
-        or SyntaxKind.LessThanLessThanEqualsToken
-        or SyntaxKind.MinusToken
-        or SyntaxKind.ParenthesisOpenParenthesisCloseToken
-        or SyntaxKind.PercentToken
-        or SyntaxKind.PipeToken
-        or SyntaxKind.PipePipeToken
-        or SyntaxKind.PlusToken
-        or SyntaxKind.SlashToken
-        or SyntaxKind.StarToken
-        or SyntaxKind.StarStarToken
-        or SyntaxKind.TildeToken;
+    public static bool IsOperator(SyntaxKind syntaxKind) => IsUnaryOperator(syntaxKind) || IsBinaryOperator(syntaxKind);
+    public static bool IsUnaryOperator(SyntaxKind syntaxKind) => GetUnaryOperatorPrecedence(syntaxKind) > 0;
+    public static bool IsBinaryOperator(SyntaxKind syntaxKind) => GetBinaryOperatorPrecedence(syntaxKind) > 0;
 
     public static bool IsKeyword(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.NullKeyword;

@@ -44,12 +44,16 @@ internal static class DiagnosticMessage
         "Invalid left-hand side of assignment. Expected a reference (variable, property or indexer)";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";
+    public static string InvalidConversionDeclaration() =>
+        "Invalid conversion declaration. Must have 1 parameter and definition must include containing type";
     public static string InvalidExpressionType(string expectedTypeName, string actualTypeName) =>
         $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
     public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
         $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
     public static string InvalidImplicitType(string typeName) =>
         $"Invalid implicit type '{typeName}'";
+    public static string InvalidOperatorDeclaration(string operatorKind, string operationParameterCount) =>
+        $"Invalid {operatorKind} declaration. Must have {operationParameterCount} parameters";
     public static string ReadOnlyAssignment(string symbolName) =>
         $"Invalid assignment of '{symbolName}'. It is read-only";
     public static string RedundantConversion() =>

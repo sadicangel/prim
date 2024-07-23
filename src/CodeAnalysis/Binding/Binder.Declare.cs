@@ -103,6 +103,18 @@ partial class Binder
                                     var name = SyntaxFacts.GetText(operatorDeclaration.OperatorToken.SyntaxKind)
                                         ?? throw new UnreachableException($"Unexpected operator '{operatorDeclaration.OperatorToken}'");
                                     var type = BindLambdaType(operatorDeclaration.Type, context);
+                                    switch (type.Parameters.Count)
+                                    {
+                                        case 1 when !SyntaxFacts.IsUnaryOperator(operatorDeclaration.OperatorToken.SyntaxKind):
+                                            context.Diagnostics.ReportInvalidOperatorDeclaration(operatorDeclaration.Location, "unary", "1");
+                                            break;
+                                        case 2 when !SyntaxFacts.IsBinaryOperator(operatorDeclaration.OperatorToken.SyntaxKind):
+                                            context.Diagnostics.ReportInvalidOperatorDeclaration(operatorDeclaration.Location, "binary", "2");
+                                            break;
+                                        default:
+                                            context.Diagnostics.ReportInvalidOperatorDeclaration(operatorDeclaration.Location, "unary or binary", "1 or 2");
+                                            break;
+                                    }
                                     if (!structType.AddOperator(type, operatorDeclaration))
                                         context.Diagnostics.ReportSymbolRedeclaration(operatorDeclaration.Location, name);
                                 }
@@ -113,6 +125,10 @@ partial class Binder
                                     var name = SyntaxFacts.GetText(conversionDeclaration.ConversionKeyword.SyntaxKind)
                                         ?? throw new UnreachableException($"Unexpected operator '{conversionDeclaration.ConversionKeyword}'");
                                     var type = BindLambdaType(conversionDeclaration.Type, context);
+                                    if (type.Parameters.Count is not 1 || (type.Parameters[0].Type != structType && type.ReturnType != structType))
+                                    {
+                                        context.Diagnostics.ReportInvalidConversionDeclaration(conversionDeclaration.Location);
+                                    }
                                     if (!structType.AddConversion(type, conversionDeclaration))
                                         context.Diagnostics.ReportSymbolRedeclaration(conversionDeclaration.Location, name);
                                 }
