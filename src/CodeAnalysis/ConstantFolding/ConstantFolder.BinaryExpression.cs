@@ -2,13 +2,13 @@
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation;
 
-namespace CodeAnalysis.ConstFolding;
-partial class ConstFolder
+namespace CodeAnalysis.ConstantFolding;
+partial class ConstantFolder
 {
     private static object? FoldBinaryExpression(BoundBinaryExpression node)
     {
-        var left = node.Left.ConstValue;
-        var right = node.Right.ConstValue;
+        var left = node.Left.ConstantValue;
+        var right = node.Right.ConstantValue;
 
         if (left is null || right is null)
         {

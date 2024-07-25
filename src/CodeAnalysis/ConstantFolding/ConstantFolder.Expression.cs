@@ -1,8 +1,8 @@
 ﻿using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Expressions;
 
-namespace CodeAnalysis.ConstFolding;
-partial class ConstFolder
+namespace CodeAnalysis.ConstantFolding;
+partial class ConstantFolder
 {
     public static object? FoldExpression(BoundExpression node)
     {

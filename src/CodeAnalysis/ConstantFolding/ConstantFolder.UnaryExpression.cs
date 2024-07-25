@@ -2,12 +2,12 @@
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation;
 
-namespace CodeAnalysis.ConstFolding;
-partial class ConstFolder
+namespace CodeAnalysis.ConstantFolding;
+partial class ConstantFolder
 {
     private static object? FoldUnaryExpression(BoundUnaryExpression node)
     {
-        var operand = node.Operand.ConstValue;
+        var operand = node.Operand.ConstantValue;
         if (operand is null)
         {
             return null;

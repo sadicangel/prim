@@ -1,5 +1,5 @@
 ﻿using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.ConstFolding;
+using CodeAnalysis.ConstantFolding;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
@@ -10,5 +10,5 @@ internal abstract record class BoundExpression(
     : BoundNode(BoundKind, Syntax)
 {
     private object? _constValue;
-    public object? ConstValue { get => _constValue ??= ConstFolder.FoldExpression(this); }
+    public object? ConstantValue { get => _constValue ??= ConstantFolder.FoldExpression(this); }
 }

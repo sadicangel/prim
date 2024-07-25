@@ -1,14 +1,14 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 
-namespace CodeAnalysis.ConstFolding;
-partial class ConstFolder
+namespace CodeAnalysis.ConstantFolding;
+partial class ConstantFolder
 {
     private static object? FoldBlockExpression(BoundBlockExpression node)
     {
         return node.Expressions switch
         {
         [] => Unit.Value,
-        [var single] => single.ConstValue,
+        [var single] => single.ConstantValue,
             _ => null
         };
     }
