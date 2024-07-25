@@ -1,36 +1,36 @@
-﻿using CodeAnalysis.Diagnostics;
+﻿using System.Runtime.CompilerServices;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Parsing;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
 
-public sealed class SyntaxTree
+public sealed record class SyntaxTree(
+    SourceText SourceText,
+    bool IsScript,
+    CompilationUnitSyntax CompilationUnit,
+    DiagnosticBag Diagnostics)
+    : IEquatable<SyntaxTree>
 {
     private Dictionary<SyntaxNode, SyntaxNode?>? _nodeParents;
 
     private SyntaxTree()
+        : this(new SourceText(""), IsScript: false, CompilationUnit: null!, Diagnostics: [])
     {
-        SourceText = new SourceText("");
-        IsScript = false;
         CompilationUnit = new CompilationUnitSyntax(this, [], SyntaxFactory.SyntheticToken(SyntaxKind.EofToken, this));
     }
 
     private SyntaxTree(SourceText sourceText, bool isScript)
+        : this(sourceText, isScript, CompilationUnit: null!, Diagnostics: [])
     {
-        SourceText = sourceText;
-        IsScript = isScript;
         // TODO: Make this lazy evaluated?
         CompilationUnit = Parser.Parse(this);
     }
 
     internal static SyntaxTree Empty { get; } = new();
 
-    public SourceText SourceText { get; }
-    public bool IsScript { get; }
-    public CompilationUnitSyntax CompilationUnit { get; }
-    public DiagnosticBag Diagnostics { get; init; } = [];
-
-    public override string ToString() => $"SyntaxTree {{ CompilationUnit = {CompilationUnit} }}";
+    public bool Equals(SyntaxTree? other) => ReferenceEquals(this, other);
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 
     internal SyntaxNode? GetParent(SyntaxNode node)
     {

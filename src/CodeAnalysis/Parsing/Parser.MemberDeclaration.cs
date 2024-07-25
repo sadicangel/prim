@@ -25,8 +25,6 @@ partial class Parser
             var equalsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
             var body = ParseTerminatedExpression(syntaxTree, iterator);
 
-            // TODO: Validate that function only has 1 parameter.
-
             return new ConversionDeclarationSyntax(
                 syntaxTree,
                 conversionKeyword,
@@ -45,8 +43,6 @@ partial class Parser
                 throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(LambdaTypeSyntax)}'");
             var equalsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
             var body = ParseTerminatedExpression(syntaxTree, iterator);
-
-            // TODO: Validate that function only has 1 or 2 parameters.
 
             return new OperatorDeclarationSyntax(
                 syntaxTree,

@@ -7,6 +7,7 @@ partial class Parser
     private static AssignmentExpressionSyntax ParseAssignmentExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         // TODO: Allow non identifier expressions here.
+        // TODO: Do we have reach this method?
         var left = ParseIdentifierNameExpression(syntaxTree, iterator);
         var operatorToken = iterator.Match(SyntaxKind.EqualsToken);
         var right = ParseExpression(syntaxTree, iterator);
