@@ -9,7 +9,7 @@ partial class Binder
     private static IEnumerable<(DeclarationSyntax, SyntaxKind)> GetDeclarations(SyntaxNode syntax) =>
         syntax.Children().OfType<DeclarationSyntax>().Select(s => (s, s.SyntaxKind));
 
-    public static void Declare_StepOne(CompilationUnitSyntax syntax, BinderContext context)
+    public static void Declare_StepOne(CompilationUnitSyntax syntax, Context context)
     {
         var queue = new PriorityQueue<DeclarationSyntax, SyntaxKind>(GetDeclarations(syntax));
         while (queue.Count > 0)
@@ -19,7 +19,7 @@ partial class Binder
         }
     }
 
-    public static void Declare_StepTwo(CompilationUnitSyntax syntax, BinderContext context)
+    public static void Declare_StepTwo(CompilationUnitSyntax syntax, Context context)
     {
         var queue = new PriorityQueue<DeclarationSyntax, SyntaxKind>(GetDeclarations(syntax));
         while (queue.Count > 0)
@@ -29,7 +29,7 @@ partial class Binder
         }
     }
 
-    private static void Declare_StepOne(DeclarationSyntax declaration, BinderContext context)
+    private static void Declare_StepOne(DeclarationSyntax declaration, Context context)
     {
         switch (declaration.SyntaxKind)
         {
@@ -65,7 +65,7 @@ partial class Binder
         }
     }
 
-    private static void Declare_StepTwo(DeclarationSyntax declaration, BinderContext context)
+    private static void Declare_StepTwo(DeclarationSyntax declaration, Context context)
     {
         switch (declaration.SyntaxKind)
         {

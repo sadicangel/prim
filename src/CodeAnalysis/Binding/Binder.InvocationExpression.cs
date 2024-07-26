@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax, Context context)
     {
         var expression = BindExpression(syntax.Expression, context);
         var methodGroup = expression as BoundMethodGroup;
@@ -61,7 +61,7 @@ partial class Binder
 
         return new BoundInvocationExpression(syntax, expression, @operator, arguments);
 
-        static BoundExpression BindArgument(ArgumentSyntax syntax, BinderContext context)
+        static BoundExpression BindArgument(ArgumentSyntax syntax, Context context)
         {
             var expression = BindExpression(syntax.Expression, context);
             return expression;

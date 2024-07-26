@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindWhileExpression(WhileExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindWhileExpression(WhileExpressionSyntax syntax, Context context)
     {
         var condition = Coerce(BindExpression(syntax.Condition, context), PredefinedSymbols.Bool, context);
         if (condition.Type.IsNever)

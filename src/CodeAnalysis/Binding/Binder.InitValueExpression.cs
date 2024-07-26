@@ -5,7 +5,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static BoundExpression BindInitValueExpression(InitValueExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindInitValueExpression(InitValueExpressionSyntax syntax, Context context)
     {
         var expression = BindExpression(syntax.Expression, context);
         return expression;

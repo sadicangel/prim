@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundCompilationUnit BindCompilationUnit(CompilationUnitSyntax syntax, BinderContext context)
+    private static BoundCompilationUnit BindCompilationUnit(CompilationUnitSyntax syntax, Context context)
     {
         var nodes = new BoundList<BoundNode>.Builder(syntax.SyntaxNodes.Count);
         foreach (var node in syntax.SyntaxNodes)

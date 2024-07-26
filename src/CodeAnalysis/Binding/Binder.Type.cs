@@ -8,7 +8,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static TypeSymbol BindType(TypeSyntax syntax, BinderContext context)
+    private static TypeSymbol BindType(TypeSyntax syntax, Context context)
     {
         return syntax.SyntaxKind switch
         {
@@ -22,7 +22,7 @@ partial class Binder
         };
     }
 
-    static TypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax, BinderContext context)
+    static TypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax, Context context)
     {
         _ = context;
         return syntax.PredefinedTypeToken.SyntaxKind switch
@@ -55,7 +55,7 @@ partial class Binder
         };
     }
 
-    static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, BinderContext context)
+    static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, Context context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not StructTypeSymbol typeSymbol)
@@ -66,13 +66,13 @@ partial class Binder
         return typeSymbol;
     }
 
-    static OptionTypeSymbol BindOptionType(OptionTypeSyntax syntax, BinderContext context)
+    static OptionTypeSymbol BindOptionType(OptionTypeSyntax syntax, Context context)
     {
         var underlyingType = BindType(syntax.UnderlyingType, context);
         return new OptionTypeSymbol(syntax, underlyingType);
     }
 
-    static ArrayTypeSymbol BindArrayType(ArrayTypeSyntax syntax, BinderContext context)
+    static ArrayTypeSymbol BindArrayType(ArrayTypeSyntax syntax, Context context)
     {
         var elementType = BindType(syntax.ElementType, context);
 
@@ -88,7 +88,7 @@ partial class Binder
         return new ArrayTypeSymbol(syntax, PredefinedSymbols.Never, length: 0);
     }
 
-    static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, BinderContext context)
+    static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, Context context)
     {
         var returnType = BindType(syntax.ReturnType, context);
 
@@ -108,7 +108,7 @@ partial class Binder
         return new LambdaTypeSymbol(syntax, parameters, returnType);
     }
 
-    static UnionTypeSymbol BindUnionType(UnionTypeSyntax syntax, BinderContext context)
+    static UnionTypeSymbol BindUnionType(UnionTypeSyntax syntax, Context context)
     {
         var types = new BoundList<TypeSymbol>.Builder(syntax.Types.Count);
         foreach (var typeSyntax in syntax.Types)

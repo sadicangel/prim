@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindBreakExpression(BreakExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindBreakExpression(BreakExpressionSyntax syntax, Context context)
     {
         if (context.LoopScope?.BreakLabel is not LabelSymbol breakLabel)
         {

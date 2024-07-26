@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundArrayInitExpression BindArrayInitExpression(ArrayInitExpressionSyntax syntax, BinderContext context)
+    private static BoundArrayInitExpression BindArrayInitExpression(ArrayInitExpressionSyntax syntax, Context context)
     {
         var types = new HashSet<TypeSymbol>();
         var elements = new BoundList<BoundExpression>.Builder(syntax.Elements.Count);

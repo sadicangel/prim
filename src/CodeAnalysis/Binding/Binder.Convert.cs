@@ -4,7 +4,7 @@ using CodeAnalysis.Binding.Symbols;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression Convert(BoundExpression expression, TypeSymbol type, bool isExplicit, BinderContext context)
+    private static BoundExpression Convert(BoundExpression expression, TypeSymbol type, bool isExplicit, Context context)
     {
         if (expression.Type.IsNever)
         {

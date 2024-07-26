@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindContinueExpression(ContinueExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindContinueExpression(ContinueExpressionSyntax syntax, Context context)
     {
         if (context.LoopScope?.ContinueLabel is not LabelSymbol continueLabel)
         {

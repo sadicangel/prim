@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindIdentifierNameExpression(IdentifierNameExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindIdentifierNameExpression(IdentifierNameExpressionSyntax syntax, Context context)
     {
         if (syntax.IdentifierToken.IsSynthetic)
         {

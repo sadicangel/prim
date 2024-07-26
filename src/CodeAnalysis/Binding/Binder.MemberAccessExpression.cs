@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax, Context context)
     {
         var expression = BindExpression(syntax.Expression, context);
         if (expression.Type.IsNever)

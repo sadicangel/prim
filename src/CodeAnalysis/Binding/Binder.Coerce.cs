@@ -4,7 +4,7 @@ using CodeAnalysis.Binding.Symbols;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression Coerce(BoundExpression expression, TypeSymbol type, BinderContext context)
+    private static BoundExpression Coerce(BoundExpression expression, TypeSymbol type, Context context)
     {
         if (expression.Type.IsNever)
         {

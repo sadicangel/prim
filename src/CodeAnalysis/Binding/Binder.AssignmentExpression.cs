@@ -6,7 +6,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax, Context context)
     {
         var left = BindExpression(syntax.Left, context);
 

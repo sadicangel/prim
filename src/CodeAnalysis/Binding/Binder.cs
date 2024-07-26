@@ -11,7 +11,7 @@ internal static partial class Binder
             return new BoundCompilationUnit(compilationUnit, []);
         }
 
-        var context = new BinderContext(boundTree, boundScope);
+        var context = new Context(boundTree, boundScope);
 
         // TODO: Do this for all syntax trees first..
         Declare_StepOne(compilationUnit, context);

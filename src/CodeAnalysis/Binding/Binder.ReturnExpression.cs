@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindReturnExpression(ReturnExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindReturnExpression(ReturnExpressionSyntax syntax, Context context)
     {
         if (context.Lambda is null)
         {

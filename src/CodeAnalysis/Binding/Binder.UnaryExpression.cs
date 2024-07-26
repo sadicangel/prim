@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax, Context context)
     {
         var operand = BindExpression(syntax.Operand, context);
         if (operand.Type.IsNever)

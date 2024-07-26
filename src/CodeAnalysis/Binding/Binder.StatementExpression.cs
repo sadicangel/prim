@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindStatementExpression(StatementExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindStatementExpression(StatementExpressionSyntax syntax, Context context)
     {
         var expression = BindExpression(syntax.Expression, context);
         // We can just bind the actual expression because StatementExpressionSyntax

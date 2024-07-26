@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindStructInitExpression(StructInitExpressionSyntax syntax, BinderContext context)
+    private static BoundExpression BindStructInitExpression(StructInitExpressionSyntax syntax, Context context)
     {
         var structName = syntax.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
@@ -39,7 +39,7 @@ partial class Binder
         static BoundPropertyInitExpression BindPropertyInitExpression(
             PropertyInitExpressionSyntax syntax,
             PropertySymbol property,
-            BinderContext context)
+            Context context)
         {
             var init = Coerce(BindExpression(syntax.Init, context), property.Type, context);
             var expression = new BoundPropertyInitExpression(

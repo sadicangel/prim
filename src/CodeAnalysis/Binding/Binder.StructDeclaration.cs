@@ -8,7 +8,7 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, BinderContext context)
+    private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, Context context)
     {
         var symbolName = syntax.Name.Text.ToString();
         if (context.BoundScope.Lookup(symbolName) is not StructTypeSymbol structTypeSymbol)
@@ -32,7 +32,7 @@ partial class Binder
         }
         return new BoundStructDeclaration(syntax, structTypeSymbol, members.ToBoundList());
 
-        static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
+        static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, Context context)
         {
             var property = typeSymbol.GetProperty(syntax.Name.Text)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.Name.Text}'");
@@ -55,7 +55,7 @@ partial class Binder
             return new BoundPropertyDeclaration(syntax, property, init);
         }
 
-        static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
+        static BoundMethodDeclaration BindMethodDeclaration(MethodDeclarationSyntax syntax, TypeSymbol typeSymbol, Context context)
         {
             var type = BindLambdaType(syntax.Type, context);
             var method = typeSymbol.GetMethod(syntax.Name.Text, type)
@@ -66,7 +66,7 @@ partial class Binder
             return new BoundMethodDeclaration(syntax, method, body);
         }
 
-        static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
+        static BoundOperatorDeclaration BindOperatorDeclaration(OperatorDeclarationSyntax syntax, TypeSymbol typeSymbol, Context context)
         {
             var type = BindLambdaType(syntax.Type, context);
             var @operator = typeSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
@@ -77,7 +77,7 @@ partial class Binder
             return new BoundOperatorDeclaration(syntax, @operator, body);
         }
 
-        static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, TypeSymbol typeSymbol, BinderContext context)
+        static BoundConversionDeclaration BindConversionDeclaration(ConversionDeclarationSyntax syntax, TypeSymbol typeSymbol, Context context)
         {
             var type = BindLambdaType(syntax.Type, context);
             var conversion = typeSymbol.GetConversion(type)
@@ -91,7 +91,7 @@ partial class Binder
         static BoundExpression BindMethodBody(
             MethodSymbol methodSymbol,
             ExpressionSyntax syntax,
-            BinderContext context)
+            Context context)
         {
             using (context.PushBoundScope())
             {
