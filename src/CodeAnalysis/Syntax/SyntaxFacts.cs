@@ -200,6 +200,10 @@ public static class SyntaxFacts
             SyntaxKind.ElseClauseExpression => null,
             SyntaxKind.WhileExpression => null,
 
+            SyntaxKind.ContinueExpression => null,
+            SyntaxKind.BreakExpression => null,
+            SyntaxKind.ReturnExpression => null,
+
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };
     }

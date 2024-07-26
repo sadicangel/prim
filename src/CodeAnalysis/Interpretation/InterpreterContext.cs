@@ -13,7 +13,7 @@ internal sealed record class InterpreterContext(EvaluatedScope EvaluatedScope, D
 
     public IDisposable PushScope() => Disposable.EvaluatedScope(this, new EvaluatedScope(EvaluatedScope));
 
-    internal readonly struct Disposable : IDisposable
+    private readonly struct Disposable : IDisposable
     {
         private readonly Action _pop;
         private Disposable(Action push, Action pop)
