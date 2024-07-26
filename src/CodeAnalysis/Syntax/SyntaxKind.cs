@@ -122,9 +122,12 @@ public enum SyntaxKind
     PredefinedType,
     NamedType,
     OptionType,
+    ErrorType,
+    PointerType,
     ArrayType,
     LambdaType,
     UnionType,
+
     Parameter,
     Argument,
 

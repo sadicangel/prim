@@ -38,6 +38,26 @@ partial class ParserTests
     }
 
     [Fact]
+    public void Parse_ErrorType()
+    {
+        var tree = SyntaxTree.Parse(new SourceText("a: !i32: 0;"));
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
+        Assert.Empty(tree.Diagnostics);
+        var decl = Assert.IsType<VariableDeclarationSyntax>(node);
+        Assert.Equal(SyntaxKind.ErrorType, decl.Type?.SyntaxKind);
+    }
+
+    [Fact]
+    public void Parse_PointerType()
+    {
+        var tree = SyntaxTree.Parse(new SourceText("a: *i32: 0;"));
+        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
+        Assert.Empty(tree.Diagnostics);
+        var decl = Assert.IsType<VariableDeclarationSyntax>(node);
+        Assert.Equal(SyntaxKind.PointerType, decl.Type?.SyntaxKind);
+    }
+
+    [Fact]
     public void Parse_UnionType()
     {
         var tree = SyntaxTree.Parse(new SourceText("a: i32 | ?i64 | SomeType: undefined;"));

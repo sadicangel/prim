@@ -126,9 +126,12 @@ public static class SyntaxFacts
             SyntaxKind.PredefinedType => null,
             SyntaxKind.NamedType => null,
             SyntaxKind.OptionType => null,
+            SyntaxKind.ErrorType => null,
+            SyntaxKind.PointerType => null,
             SyntaxKind.ArrayType => null,
             SyntaxKind.LambdaType => null,
             SyntaxKind.UnionType => null,
+
             SyntaxKind.Parameter => null,
             SyntaxKind.Argument => null,
 

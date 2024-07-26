@@ -9,7 +9,9 @@ partial class Parser
         // type         : predefined | named | option | union | array | function
         // predefined   : identifier (predefined names)
         // named        : identifier
-        // option       : '?' type 
+        // option       : '?' type
+        // error        : '!' type
+        // pointer      : '*' type
         // union        : type '|' type
         // array        : '[' type ':' expr ']'
         // lambda       : '(' parameters? ')' '->' type
@@ -47,6 +49,10 @@ partial class Parser
                     ParseNamedType(syntaxTree, iterator),
                 SyntaxKind.HookToken =>
                     ParseOptionType(syntaxTree, iterator),
+                SyntaxKind.BangToken =>
+                    ParseErrorType(syntaxTree, iterator),
+                SyntaxKind.StarToken =>
+                    ParsePointerType(syntaxTree, iterator),
                 SyntaxKind.BracketOpenToken =>
                     ParseArrayType(syntaxTree, iterator),
                 SyntaxKind.ParenthesisOpenToken =>
@@ -67,23 +73,50 @@ partial class Parser
                 return new NamedTypeSyntax(syntaxTree, identifierToken);
             }
 
-            static OptionTypeSyntax ParseOptionType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+            static (SyntaxToken? ParenthesisOpenToken, TypeSyntax ElementType, SyntaxToken? ParenthesisCloseToken)
+                ParseParenthesisedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
-                var hookToken = iterator.Match(SyntaxKind.HookToken);
                 var parenthesisOpenToken = default(SyntaxToken);
-                var underlyingType = default(TypeSyntax);
+                var elementType = default(TypeSyntax);
                 var parenthesisCloseToken = default(SyntaxToken);
                 if (iterator.TryMatch(out parenthesisOpenToken, SyntaxKind.ParenthesisOpenToken))
                 {
-                    underlyingType = ParseType(syntaxTree, iterator);
+                    elementType = ParseType(syntaxTree, iterator);
                     parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
                 }
                 else
                 {
-                    underlyingType = ParseTypeSingle(syntaxTree, iterator);
+                    elementType = ParseTypeSingle(syntaxTree, iterator);
                 }
 
+                return (parenthesisOpenToken, elementType, parenthesisCloseToken);
+            }
+
+            static OptionTypeSyntax ParseOptionType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+            {
+                var hookToken = iterator.Match(SyntaxKind.HookToken);
+                var (parenthesisOpenToken, underlyingType, parenthesisCloseToken) =
+                    ParseParenthesisedType(syntaxTree, iterator);
+
                 return new OptionTypeSyntax(syntaxTree, hookToken, parenthesisOpenToken, underlyingType, parenthesisCloseToken);
+            }
+
+            static ErrorTypeSyntax ParseErrorType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+            {
+                var hookToken = iterator.Match(SyntaxKind.BangToken);
+                var (parenthesisOpenToken, elementType, parenthesisCloseToken) =
+                    ParseParenthesisedType(syntaxTree, iterator);
+
+                return new ErrorTypeSyntax(syntaxTree, hookToken, parenthesisOpenToken, elementType, parenthesisCloseToken);
+            }
+
+            static PointerTypeSyntax ParsePointerType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+            {
+                var hookToken = iterator.Match(SyntaxKind.StarToken);
+                var (parenthesisOpenToken, elementType, parenthesisCloseToken) =
+                    ParseParenthesisedType(syntaxTree, iterator);
+
+                return new PointerTypeSyntax(syntaxTree, hookToken, parenthesisOpenToken, elementType, parenthesisCloseToken);
             }
 
             static ArrayTypeSyntax ParseArrayType(SyntaxTree syntaxTree, SyntaxIterator iterator)
