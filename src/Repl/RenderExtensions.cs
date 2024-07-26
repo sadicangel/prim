@@ -62,6 +62,12 @@ internal static class RenderExtensions
             case ReferenceValue reference:
                 console.Write(reference.ReferencedValue, indent);
                 break;
+            case ErrorValue error:
+                if (error.IsError)
+                    console.MarkupInterpolated($"[maroon] err: [i]{error.ErrorMessage}[/][/]");
+                else
+                    console.Write(error.Value);
+                break;
             case OptionValue option:
                 console.Write("[ ");
                 console.Write(option.Value);

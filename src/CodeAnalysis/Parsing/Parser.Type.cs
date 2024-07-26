@@ -104,10 +104,10 @@ partial class Parser
             static ErrorTypeSyntax ParseErrorType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
                 var hookToken = iterator.Match(SyntaxKind.BangToken);
-                var (parenthesisOpenToken, elementType, parenthesisCloseToken) =
+                var (parenthesisOpenToken, valueType, parenthesisCloseToken) =
                     ParseParenthesisedType(syntaxTree, iterator);
 
-                return new ErrorTypeSyntax(syntaxTree, hookToken, parenthesisOpenToken, elementType, parenthesisCloseToken);
+                return new ErrorTypeSyntax(syntaxTree, hookToken, parenthesisOpenToken, valueType, parenthesisCloseToken);
             }
 
             static PointerTypeSyntax ParsePointerType(SyntaxTree syntaxTree, SyntaxIterator iterator)

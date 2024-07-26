@@ -83,6 +83,7 @@ public static class SyntaxFacts
             SyntaxKind.ReturnKeyword => "return",
 
             SyntaxKind.AnyKeyword => "any",
+            SyntaxKind.ErrKeyword => "err",
             SyntaxKind.UnknownKeyword => "unknown",
             SyntaxKind.NeverKeyword => "never",
             SyntaxKind.UnitKeyword => "unit",
@@ -227,6 +228,7 @@ public static class SyntaxFacts
             "return" => SyntaxKind.ReturnKeyword,
 
             "any" => SyntaxKind.AnyKeyword,
+            "err" => SyntaxKind.ErrKeyword,
             "unknown" => SyntaxKind.UnknownKeyword,
             "never" => SyntaxKind.NeverKeyword,
             "unit" => SyntaxKind.UnitKeyword,

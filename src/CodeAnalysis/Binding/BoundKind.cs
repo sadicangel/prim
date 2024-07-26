@@ -51,8 +51,10 @@ internal enum BoundKind
     LabelSymbol,
 
     ArrayTypeSymbol,
+    ErrorTypeSymbol,
     LambdaTypeSymbol,
     OptionTypeSymbol,
+    PointerTypeSymbol,
     StructTypeSymbol,
     UnionTypeSymbol,
 }

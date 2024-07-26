@@ -14,6 +14,7 @@ internal abstract record class TypeSymbol(
     private readonly List<Symbol> _members = [];
 
     public bool IsAny { get => this == PredefinedSymbols.Any; }
+    public bool IsErr { get => this == PredefinedSymbols.Err; }
     public bool IsArray { get => this is ArrayTypeSymbol; }
     public bool IsLambda { get => this is LambdaTypeSymbol; }
     public abstract bool IsNever { get; }

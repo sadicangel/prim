@@ -102,6 +102,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
         var values = MapPredefinedTypes();
 
         Any = (StructValue)values[PredefinedSymbols.Any];
+        Err = (StructValue)values[PredefinedSymbols.Err];
         Unknown = (StructValue)values[PredefinedSymbols.Unknown];
         Never = (StructValue)values[PredefinedSymbols.Never];
         Unit = (StructValue)values[PredefinedSymbols.Unit];
@@ -126,7 +127,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
         F80 = (StructValue)values[PredefinedSymbols.F80];
         F128 = (StructValue)values[PredefinedSymbols.F128];
 
-        values[PredefinedSymbols.Print] = new LambdaValue((LambdaTypeSymbol)PredefinedSymbols.Print.Type, (PrimValue x) => { Console.WriteLine(x.Value); return PrimValue.Unit; });
+        values[PredefinedSymbols.Print] = new LambdaValue((LambdaTypeSymbol)PredefinedSymbols.Print.Type, (PrimValue obj) => { Console.WriteLine(obj.Value); return PrimValue.Unit; });
         values[PredefinedSymbols.Scan] = new LambdaValue((LambdaTypeSymbol)PredefinedSymbols.Scan.Type, () => new LiteralValue(Str, Console.ReadLine() ?? ""));
 
         Values = values;
@@ -144,6 +145,11 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
             }
 
             var boolStruct = (StructValue)m[g.Bool];
+
+            ((StructValue)m[g.Err])
+                .Set(
+                    g.Err.GetProperty("msg") ?? throw new UnreachableException($"Expected property '{"msg"}'"),
+                    new LiteralValue(((StructValue)m[g.Str]), ""));
 
             ((StructValue)m[g.Str])
                 .AddEqualityOperators<string>(boolStruct)
@@ -288,6 +294,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
 
     public StructValue Any { get; }
     public StructValue Unknown { get; }
+    public StructValue Err { get; }
     public StructValue Never { get; }
     public StructValue Unit { get; }
     public StructValue Type { get; }

@@ -7,6 +7,7 @@ namespace CodeAnalysis.Binding.Symbols;
 internal static class PredefinedSymbols
 {
     public static readonly StructTypeSymbol Any = new(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedSymbolNames.Any);
+    public static readonly StructTypeSymbol Err = new(SyntaxFactory.SyntheticToken(SyntaxKind.ErrKeyword), PredefinedSymbolNames.Err);
     public static readonly StructTypeSymbol Unknown = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedSymbolNames.Unknown);
     public static readonly StructTypeSymbol Never = new(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedSymbolNames.Never);
     public static readonly StructTypeSymbol Unit = new(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedSymbolNames.Unit);
@@ -31,11 +32,16 @@ internal static class PredefinedSymbols
     public static readonly StructTypeSymbol F128 = new(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedSymbolNames.F128);
     public static readonly StructTypeSymbol Type = StructTypeSymbol.RuntimeType;
 
-    public static readonly VariableSymbol Print = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "print", new LambdaTypeSymbol([new Parameter("obj", Any)], Unit), IsStatic: true, IsReadOnly: true);
-    public static readonly VariableSymbol Scan = new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "scan", new LambdaTypeSymbol([], Str), IsStatic: true, IsReadOnly: true);
+    public static readonly VariableSymbol Print =
+        new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "print", new LambdaTypeSymbol([new Parameter("obj", Any)], Unit), IsStatic: true, IsReadOnly: true);
+    public static readonly VariableSymbol Scan =
+        new(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "scan", new LambdaTypeSymbol([], Str), IsStatic: true, IsReadOnly: true);
 
     static PredefinedSymbols()
     {
+        Err
+            .AddProperty("msg", Str, isStatic: false, isReadOnly: true);
+
         Str
             .AddEqualityOperators()
             .AddMembers(type =>

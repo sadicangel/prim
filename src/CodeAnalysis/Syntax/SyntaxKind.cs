@@ -79,6 +79,7 @@ public enum SyntaxKind
     ReturnKeyword,
 
     AnyKeyword,
+    ErrKeyword,
     UnknownKeyword,
     NeverKeyword,
     UnitKeyword,
@@ -119,13 +120,13 @@ public enum SyntaxKind
 
     // Other nodes
 
-    PredefinedType,
+    ArrayType,
+    ErrorType,
+    LambdaType,
     NamedType,
     OptionType,
-    ErrorType,
     PointerType,
-    ArrayType,
-    LambdaType,
+    PredefinedType,
     UnionType,
 
     Parameter,

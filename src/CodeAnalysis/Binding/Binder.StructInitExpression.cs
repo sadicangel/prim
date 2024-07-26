@@ -23,12 +23,6 @@ partial class Binder
                 continue;
             }
 
-            if (property.IsReadOnly)
-            {
-                context.Diagnostics.ReportReadOnlyAssignment(propertySyntax.Location, property.Name);
-                continue;
-            }
-
             var expression = BindPropertyInitExpression(propertySyntax, property, context);
             properties.Add(expression);
         }

@@ -95,6 +95,7 @@ internal sealed class GlobalBoundScope : BoundScope
     }
 
     public TypeSymbol Any { get => (TypeSymbol)Symbols![PredefinedSymbolNames.Any]; }
+    public TypeSymbol Err { get => (TypeSymbol)Symbols![PredefinedSymbolNames.Err]; }
     public TypeSymbol Unknown { get => (TypeSymbol)Symbols![PredefinedSymbolNames.Unknown]; }
     public TypeSymbol Never { get => (TypeSymbol)Symbols![PredefinedSymbolNames.Never]; }
     public TypeSymbol Unit { get => (TypeSymbol)Symbols![PredefinedSymbolNames.Unit]; }
