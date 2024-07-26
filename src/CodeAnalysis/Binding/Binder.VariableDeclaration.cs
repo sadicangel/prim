@@ -12,7 +12,7 @@ partial class Binder
         if (context.BoundScope.Lookup(symbolName) is not VariableSymbol variableSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(VariableDeclarationSyntax)}'");
 
-        using (context.PushScope())
+        using (context.PushBoundScope())
         {
             foreach (var symbol in variableSymbol.Type.DeclaredSymbols)
                 if (!context.BoundScope.Declare(symbol))

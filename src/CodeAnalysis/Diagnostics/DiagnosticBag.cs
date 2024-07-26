@@ -87,6 +87,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.InvalidArrayLength());
     internal void ReportInvalidAssignment(SourceLocation location) =>
         ReportError(location, DiagnosticMessage.InvalidAssignment());
+    internal void ReportInvalidBreakOrContinue(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidBreakOrContinue());
     internal void ReportInvalidConversion(SourceLocation location, string sourceTypeName, string targetTypeName) =>
         ReportError(location, DiagnosticMessage.InvalidConversion(sourceTypeName, targetTypeName));
     internal void ReportInvalidConversionDeclaration(SourceLocation location) =>
@@ -99,6 +101,8 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
         ReportError(location, DiagnosticMessage.InvalidImplicitType(typeName));
     internal void ReportInvalidOperatorDeclaration(SourceLocation location, string operatorKind, string operationParameterCount) =>
         ReportError(location, DiagnosticMessage.InvalidOperatorDeclaration(operatorKind, operationParameterCount));
+    internal void ReportInvalidReturn(SourceLocation location) =>
+        ReportError(location, DiagnosticMessage.InvalidReturn());
     internal void ReportReadOnlyAssignment(SourceLocation location, string symbolName) =>
         ReportError(location, DiagnosticMessage.ReadOnlyAssignment(symbolName));
     internal void ReportRedundantConversion(SourceLocation location) =>
@@ -125,11 +129,10 @@ public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
     internal void ReportUnreachableCode(SourceLocation location) =>
         ReportWarning(location, DiagnosticMessage.UnreachableCode());
 
+
     //internal void ReportInvalidArgumentType(SourceLocation location, Parameter parameter, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidArgumentType(parameter, actualType));
     //internal void ReportInvalidExpressionType(SourceLocation location, PrimType expectedType, PrimType actualType) => ReportError(location, DiagnosticMessage.InvalidExpressionType(expectedType, actualType));
     //internal void ReportInvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => ReportError(identifierToken.Location, DiagnosticMessage.InvalidSymbol(identifierToken, expectedKind, actualKind));
-    //internal void ReportInvalidBreakOrContinue(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidBreakOrContinue());
-    //internal void ReportInvalidReturn(SourceLocation location) => ReportError(location, DiagnosticMessage.InvalidReturn());
     //internal void ReportInvalidReturnExpression(SourceLocation location, string functionName) => ReportError(location, DiagnosticMessage.InvalidReturnExpression(functionName));
     //internal void ReportNotAllPathsReturn(SourceLocation location) => ReportError(location, DiagnosticMessage.NotAllPathsReturn());
 }

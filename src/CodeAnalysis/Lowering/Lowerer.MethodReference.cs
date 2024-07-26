@@ -3,9 +3,9 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundMethodReference LowerMethodReference(BoundMethodReference node)
+    private static BoundMethodReference LowerMethodReference(BoundMethodReference node, LowererContext context)
     {
-        var expression = LowerExpression(node.Expression);
+        var expression = LowerExpression(node.Expression, context);
         if (ReferenceEquals(expression, node.Expression))
             return node;
 

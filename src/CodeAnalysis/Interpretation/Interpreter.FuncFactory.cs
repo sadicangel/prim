@@ -19,7 +19,7 @@ partial class Interpreter
         {
             s_pushScopeMethodInfo = typeof(InterpreterContext).GetMethod(nameof(InterpreterContext.PushScope))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_pushScopeMethodInfo)}");
-            s_disposeScopeMethodInfo = typeof(InterpreterContext.TempScope).GetMethod(nameof(InterpreterContext.TempScope.Dispose))
+            s_disposeScopeMethodInfo = typeof(InterpreterContext.Disposable).GetMethod(nameof(InterpreterContext.Disposable.Dispose))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_disposeScopeMethodInfo)}");
             s_evaluatedScopePropertyInfo = typeof(InterpreterContext).GetProperty(nameof(InterpreterContext.EvaluatedScope))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluatedScopePropertyInfo)}");
@@ -31,7 +31,7 @@ partial class Interpreter
 
         public static Delegate Create(LambdaTypeSymbol lambdaType, BoundExpression body, InterpreterContext context)
         {
-            var disposableVar = Expression.Variable(typeof(InterpreterContext.TempScope), "<$>disposable");
+            var disposableVar = Expression.Variable(typeof(InterpreterContext.Disposable), "<$>disposable");
             var contextConst = Expression.Constant(context, typeof(InterpreterContext));
             var evaluatedScope = Expression.Property(contextConst, s_evaluatedScopePropertyInfo);
             var parameters = lambdaType.Parameters.Select(p => Expression.Parameter(typeof(PrimValue), p.Name)).ToArray();

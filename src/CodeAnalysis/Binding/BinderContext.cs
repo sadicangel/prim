@@ -1,23 +1,55 @@
-﻿using CodeAnalysis.Diagnostics;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Diagnostics;
 
 namespace CodeAnalysis.Binding;
 
-internal readonly record struct BinderContext(BoundTree BoundTree, BoundScope BoundScope)
+internal sealed record class BinderContext(BoundTree BoundTree, BoundScope BoundScope)
 {
     private readonly Stack<BoundScope> _scopes = new([BoundScope]);
+    private readonly Stack<LoopScope> _loops = [];
+    private readonly Stack<LambdaTypeSymbol> _lambdas = [];
+
+    private int _labelId = 0;
+
     public BoundScope BoundScope { get => _scopes.Peek(); }
+
+    public LoopScope? LoopScope { get => _loops.TryPeek(out var loopScope) ? loopScope : null; }
+
+    public LambdaTypeSymbol? Lambda { get => _lambdas.TryPeek(out var lambda) ? lambda : null; }
+
     public DiagnosticBag Diagnostics { get => BoundTree.Diagnostics; }
 
-    public TempScope PushScope() => new(this);
-
-    internal readonly ref struct TempScope
+    public IDisposable PushBoundScope() => Disposable.BoundScope(this, new BoundScope(BoundScope));
+    public IDisposable PushLoopScope()
     {
-        private readonly BinderContext _parent;
-        public TempScope(BinderContext parent)
+        var labelId = Interlocked.Increment(ref _labelId);
+        var continueLabel = new LabelSymbol($"continue<{labelId}>");
+        var breakLabel = new LabelSymbol($"break<{labelId}>");
+        return Disposable.LoopScope(this, new LoopScope(continueLabel, breakLabel));
+    }
+    public IDisposable PushLambdaScope(LambdaTypeSymbol lambda) => Disposable.LambdaScope(this, lambda);
+
+    private readonly struct Disposable : IDisposable
+    {
+        private readonly Action _pop;
+        private Disposable(Action push, Action pop)
         {
-            _parent = parent;
-            _parent._scopes.Push(new BoundScope(_parent.BoundScope));
+            push();
+            _pop = pop;
         }
-        public void Dispose() => _parent._scopes?.Pop();
+
+        public static Disposable BoundScope(BinderContext context, BoundScope boundScope) => new(
+            () => context._scopes.Push(boundScope),
+            () => context._scopes.Pop());
+
+        public static Disposable LoopScope(BinderContext context, LoopScope loopScope) => new(
+            () => context._loops.Push(loopScope),
+            () => context._loops.Pop());
+
+        public static Disposable LambdaScope(BinderContext context, LambdaTypeSymbol lambdaType) => new(
+            () => context._lambdas.Push(lambdaType),
+            () => context._lambdas.Pop());
+
+        public void Dispose() => _pop();
     }
 }

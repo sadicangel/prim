@@ -31,7 +31,7 @@ partial class Binder
         BoundExpression right;
         if (@ref.Symbol.Type is LambdaTypeSymbol lambdaType)
         {
-            using (context.PushScope())
+            using (context.PushBoundScope())
             {
                 foreach (var parameter in lambdaType.Parameters)
                     if (!context.BoundScope.Declare(parameter))

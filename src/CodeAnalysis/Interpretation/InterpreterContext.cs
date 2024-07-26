@@ -1,20 +1,31 @@
-﻿namespace CodeAnalysis.Interpretation;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Interpretation.Values;
 
-internal readonly record struct InterpreterContext(EvaluatedScope EvaluatedScope)
+namespace CodeAnalysis.Interpretation;
+
+internal sealed record class InterpreterContext(EvaluatedScope EvaluatedScope, Dictionary<LabelSymbol, int> LabelIndices)
 {
     private readonly Stack<EvaluatedScope> _scopes = new([EvaluatedScope]);
+
     public EvaluatedScope EvaluatedScope { get => _scopes.Peek(); }
+    public int InstructionIndex { get; set; }
+    public PrimValue LastValue { get; set; } = PrimValue.Unit;
 
-    public TempScope PushScope() => new(this);
+    public IDisposable PushScope() => Disposable.EvaluatedScope(this, new EvaluatedScope(EvaluatedScope));
 
-    internal readonly ref struct TempScope
+    internal readonly struct Disposable : IDisposable
     {
-        private readonly InterpreterContext _parent;
-        public TempScope(InterpreterContext parent)
+        private readonly Action _pop;
+        private Disposable(Action push, Action pop)
         {
-            _parent = parent;
-            _parent._scopes.Push(new EvaluatedScope(_parent.EvaluatedScope));
+            push();
+            _pop = pop;
         }
-        public void Dispose() => _parent._scopes?.Pop();
+
+        public static Disposable EvaluatedScope(InterpreterContext context, EvaluatedScope evaluatedScope) => new(
+            () => context._scopes.Push(evaluatedScope),
+            () => context._scopes.Pop());
+
+        public void Dispose() => _pop();
     }
 }

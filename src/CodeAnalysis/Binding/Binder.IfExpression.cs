@@ -1,6 +1,5 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Binding;
@@ -14,7 +13,7 @@ partial class Binder
             return condition;
         }
 
-        if (condition.ConstValue is bool isTrue)
+        if (condition.ConstantValue is bool isTrue)
         {
             if (!isTrue)
             {
@@ -47,13 +46,7 @@ partial class Binder
         }
         else
         {
-            @else = BindLiteralExpression(
-                new LiteralExpressionSyntax(
-                    SyntaxKind.NullLiteralExpression,
-                    syntax.SyntaxTree,
-                    SyntaxFactory.SyntheticToken(SyntaxKind.NullKeyword),
-                    Unit.Value),
-                context);
+            @else = BoundLiteralExpression.Unit;
             type = then.Type.IsOption ? then.Type : new OptionTypeSymbol(syntax, then.Type);
         }
 

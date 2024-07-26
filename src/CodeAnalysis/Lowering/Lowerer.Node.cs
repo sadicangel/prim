@@ -5,11 +5,11 @@ using CodeAnalysis.Binding.Expressions;
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundNode LowerNode(BoundNode node)
+    private static BoundNode LowerNode(BoundNode node, LowererContext context)
     {
         return node switch
         {
-            BoundExpression boundExpression => LowerExpression(boundExpression),
+            BoundExpression boundExpression => LowerExpression(boundExpression, context),
             _ => throw new UnreachableException($"Unexpected {nameof(BoundKind)} '{node.BoundKind}'"),
         };
     }

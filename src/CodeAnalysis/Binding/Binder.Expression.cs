@@ -82,6 +82,12 @@ partial class Binder
                 BindIfElseExpression((IfExpressionSyntax)syntax, context),
             SyntaxKind.WhileExpression =>
                 BindWhileExpression((WhileExpressionSyntax)syntax, context),
+            SyntaxKind.ContinueExpression =>
+                BindContinueExpression((ContinueExpressionSyntax)syntax, context),
+            SyntaxKind.BreakExpression =>
+                BindBreakExpression((BreakExpressionSyntax)syntax, context),
+            SyntaxKind.ReturnExpression =>
+                BindReturnExpression((ReturnExpressionSyntax)syntax, context),
             _ =>
                 throw new NotImplementedException(syntax.SyntaxKind.ToString()),
         };

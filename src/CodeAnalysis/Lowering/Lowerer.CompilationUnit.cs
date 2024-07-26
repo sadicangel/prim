@@ -3,9 +3,9 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundCompilationUnit LowerCompilationUnit(BoundCompilationUnit node)
+    private static BoundCompilationUnit LowerCompilationUnit(BoundCompilationUnit node, LowererContext context)
     {
-        var boundNodes = LowerList(node.BoundNodes, LowerNode);
+        var boundNodes = LowerList(node.BoundNodes, context, LowerNode);
         if (boundNodes is null)
             return node;
 

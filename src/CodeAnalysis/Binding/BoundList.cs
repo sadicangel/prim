@@ -77,7 +77,7 @@ internal readonly struct BoundList<T>(List<T> nodes) : IReadOnlyList<T>
                 yield return node;
         }
 
-        public IEnumerator GetEnumerator() => GetEnumerator();
+        public readonly IEnumerator GetEnumerator() => GetEnumerator();
     }
 }
 

@@ -7,14 +7,21 @@ partial class Binder
 {
     private static BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax, BinderContext context)
     {
-        TypeSymbol type = PredefinedSymbols.Unit;
+        var types = new HashSet<TypeSymbol>();
         var expressions = new BoundList<BoundExpression>.Builder(syntax.Expressions.Count);
         foreach (var expressionSyntax in syntax.Expressions)
         {
             var expression = BindExpression(expressionSyntax, context);
             expressions.Add(expression);
-            type = expression.Type;
+            if (expression.CanJump())
+                types.Add(expression.Type);
         }
+
+        if (expressions.Count > 0)
+            types.Add(expressions.Last().Type);
+
+        var type = TypeSymbol.FromSet(types);
+
         return new BoundBlockExpression(syntax, type, expressions.ToBoundList());
     }
 }

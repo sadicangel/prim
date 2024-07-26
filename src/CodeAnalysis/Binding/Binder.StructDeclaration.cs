@@ -93,7 +93,7 @@ partial class Binder
             ExpressionSyntax syntax,
             BinderContext context)
         {
-            using (context.PushScope())
+            using (context.PushBoundScope())
             {
                 if (!methodSymbol.IsStatic)
                 {

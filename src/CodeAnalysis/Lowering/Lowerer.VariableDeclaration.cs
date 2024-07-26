@@ -3,9 +3,9 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundVariableDeclaration LowerVariableDeclaration(BoundVariableDeclaration node)
+    private static BoundVariableDeclaration LowerVariableDeclaration(BoundVariableDeclaration node, LowererContext context)
     {
-        var expression = LowerExpression(node.Expression);
+        var expression = LowerExpression(node.Expression, context);
         if (ReferenceEquals(expression, node.Expression))
             return node;
 

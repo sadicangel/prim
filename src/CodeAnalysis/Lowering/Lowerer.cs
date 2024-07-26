@@ -1,33 +1,39 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Binding.Expressions;
 
 namespace CodeAnalysis.Lowering;
 internal static partial class Lowerer
 {
     public static BoundTree Lower(BoundTree boundTree)
     {
-        var compilationUnit = LowerCompilationUnit(boundTree.CompilationUnit);
-        if (ReferenceEquals(compilationUnit, boundTree.CompilationUnit))
-            return boundTree;
+        var context = new LowererContext();
+        var compilationUnit = LowerCompilationUnit(boundTree.CompilationUnit, context);
+        compilationUnit = Flatten(compilationUnit);
         return boundTree with { CompilationUnit = compilationUnit };
-    }
 
-
-    private static List<T>? LowerList<T>(BoundList<T> nodes, Func<T, T> lower) where T : BoundNode
-    {
-        List<T>? boundNodes = null;
-        for (var i = 0; i < nodes.Count; ++i)
+        static BoundCompilationUnit Flatten(BoundCompilationUnit compilationUnit)
         {
-            var oldNode = nodes[i];
-            var newNode = lower(oldNode);
-            if (!ReferenceEquals(newNode, oldNode) && boundNodes is null)
-            {
-                boundNodes = new List<T>(nodes.Count);
-                for (var j = 0; j < i; ++j)
-                    boundNodes.Add(nodes[j]);
-            }
-            boundNodes?.Add(newNode);
-        }
+            var nodes = new BoundList<BoundNode>.Builder();
+            var stack = new Stack<BoundNode>();
+            foreach (var node in compilationUnit.BoundNodes.Reverse())
+                stack.Push(node);
 
-        return boundNodes;
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+
+                if (current is BoundBlockExpression block)
+                {
+                    foreach (var expression in block.Expressions.Reverse())
+                        stack.Push(expression);
+                }
+                else
+                {
+                    nodes.Add(current);
+                }
+            }
+
+            return new BoundCompilationUnit(compilationUnit.Syntax, nodes.ToBoundList());
+        }
     }
 }

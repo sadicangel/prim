@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Diagnostics;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -13,12 +14,28 @@ partial class Binder
             return condition;
         }
 
-        var body = BindExpression(syntax.Body, context);
-        if (body.Type.IsNever)
+        if (condition.ConstantValue is false)
         {
-            return body;
+            context.Diagnostics.ReportUnreachableCode(syntax.Body.Location);
         }
 
-        return new BoundWhileExpression(syntax, condition, body);
+        using (context.PushLoopScope())
+        {
+            var body = BindExpression(syntax.Body, context);
+            if (body.Type.IsNever)
+            {
+                return body;
+            }
+
+            if (context.LoopScope is null)
+            {
+                throw new UnreachableException("Invalid loop body");
+            }
+
+            var continueLabel = context.LoopScope.ContinueLabel;
+            var breakLabel = context.LoopScope.BreakLabel;
+
+            return new BoundWhileExpression(syntax, continueLabel, condition, body, breakLabel);
+        }
     }
 }

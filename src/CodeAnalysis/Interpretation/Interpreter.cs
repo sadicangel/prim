@@ -1,4 +1,6 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Binding.Expressions;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Lowering;
 
@@ -9,12 +11,20 @@ internal static partial class Interpreter
     {
         boundTree = Lowerer.Lower(boundTree);
 
-        var context = new InterpreterContext(evaluatedScope);
-        var value = PrimValue.Unit as PrimValue;
+        var labelIndices = new Dictionary<LabelSymbol, int>();
+        for (var i = 0; i < boundTree.CompilationUnit.BoundNodes.Count; ++i)
+            if (boundTree.CompilationUnit.BoundNodes[i] is BoundLabelDeclaration labelStatement)
+                labelIndices[labelStatement.LabelSymbol] = i;
 
-        foreach (var node in boundTree.CompilationUnit.BoundNodes)
-            value = EvaluateNode(node, context);
+        var context = new InterpreterContext(evaluatedScope, labelIndices);
 
-        return value;
+        while (context.InstructionIndex < boundTree.CompilationUnit.BoundNodes.Count)
+        {
+            var node = boundTree.CompilationUnit.BoundNodes[context.InstructionIndex];
+            context.LastValue = EvaluateNode(node, context);
+            ++context.InstructionIndex;
+        }
+
+        return context.LastValue;
     }
 }

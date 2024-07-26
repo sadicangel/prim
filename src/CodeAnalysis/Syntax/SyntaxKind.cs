@@ -200,4 +200,8 @@ public enum SyntaxKind
     IfExpression,
     ElseClauseExpression,
     WhileExpression,
+
+    ContinueExpression,
+    BreakExpression,
+    ReturnExpression,
 }

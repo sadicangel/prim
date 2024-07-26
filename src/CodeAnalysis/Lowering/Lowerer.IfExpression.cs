@@ -3,21 +3,37 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundIfExpression LowerIfExpression(BoundIfExpression node)
+    private static BoundExpression LowerIfExpression(BoundIfExpression node, LowererContext context)
     {
-        var condition = LowerExpression(node.Condition);
-        var then = LowerExpression(node.Then);
-        var @else = LowerExpression(node.Else);
+        // source: if-expression
+        //  if (<condition>)
+        //      <then>
+        //  else
+        //      <else>
+        //
+        // target: block-expression
+        //  goto else<$> when <condition> is false
+        //  <then>
+        //  goto end<$>
+        //  else<$>:
+        //  <else>
+        //  end<$>:
 
-        // TODO: Actually lower this to GOTO expressions.
-        if (ReferenceEquals(condition, node.Condition) && ReferenceEquals(then, node.Then) && ReferenceEquals(@else, node.Else))
-            return node;
+        var elseLabel = context.CreateLabel("else");
+        var endLabel = context.CreateLabel("end");
 
-        return node with
-        {
-            Condition = condition,
-            Then = then,
-            Else = @else
-        };
+        var expression = new BoundBlockExpression(
+            node.Syntax,
+            node.Type,
+            [
+                new BoundConditionalGotoExpression(node.Condition.Syntax, elseLabel, node.Condition, new BoundNopExpression(node.Condition.Syntax), JumpTrue: false),
+                node.Then,
+                new BoundGotoExpression(endLabel.Syntax, endLabel, new BoundNopExpression(endLabel.Syntax)),
+                new BoundLabelDeclaration(elseLabel.Syntax, elseLabel),
+                node.Else,
+                new BoundLabelDeclaration(endLabel.Syntax, endLabel),
+            ]);
+
+        return LowerExpression(expression, context);
     }
 }

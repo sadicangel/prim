@@ -27,9 +27,9 @@ partial class Binder
             return index;
         }
 
-        if (index.ConstValue is not null && expression.Type is ArrayTypeSymbol arrayType)
+        if (index.ConstantValue is not null && expression.Type is ArrayTypeSymbol arrayType)
         {
-            var indexValue = (int)index.ConstValue;
+            var indexValue = (int)index.ConstantValue;
             if (indexValue < 0 || indexValue >= arrayType.Length)
             {
                 context.Diagnostics.ReportIndexOutOfRange(syntax.Location, arrayType.Length);

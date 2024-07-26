@@ -6,14 +6,16 @@ internal enum BoundKind
 
     CompilationUnit,
 
+    NopExpression,
     NeverExpression,
 
     LiteralExpression,
 
     AssignmentExpression,
 
-    VariableDeclaration,
+    LabelDeclaration,
     StructDeclaration,
+    VariableDeclaration,
     PropertyDeclaration,
     MethodDeclaration,
     OperatorDeclaration,
@@ -37,9 +39,16 @@ internal enum BoundKind
     IfExpression,
     WhileExpression,
 
+    BreakExpression,
+    ContinueExpression,
+    ReturnExpression,
+    GotoExpression,
+    ConditionalGotoExpression,
+
     PropertySymbol,
     MethodSymbol,
     VariableSymbol,
+    LabelSymbol,
 
     ArrayTypeSymbol,
     LambdaTypeSymbol,

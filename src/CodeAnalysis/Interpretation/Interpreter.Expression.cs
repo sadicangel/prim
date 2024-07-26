@@ -9,6 +9,8 @@ partial class Interpreter
     {
         return node.BoundKind switch
         {
+            BoundKind.NopExpression =>
+                EvaluateNopExpression((BoundNopExpression)node, context),
             BoundKind.NeverExpression =>
                 EvaluateNeverExpression((BoundNeverExpression)node, context),
             BoundKind.LocalReference =>
@@ -17,10 +19,12 @@ partial class Interpreter
                 EvaluateLiteralExpression((BoundLiteralExpression)node, context),
             BoundKind.AssignmentExpression =>
                 EvaluateAssignmentExpression((BoundAssignmentExpression)node, context),
-            BoundKind.VariableDeclaration =>
-                EvaluateVariableDeclaration((BoundVariableDeclaration)node, context),
+            BoundKind.LabelDeclaration =>
+                EvaluateLabelDeclaration((BoundLabelDeclaration)node, context),
             BoundKind.StructDeclaration =>
                 EvaluateStructDeclaration((BoundStructDeclaration)node, context),
+            BoundKind.VariableDeclaration =>
+                EvaluateVariableDeclaration((BoundVariableDeclaration)node, context),
             //BoundKind.EmptyExpression =>
             //    EvaluateEmptyExpression((BoundEmptyExpression)node, context),
             //BoundKind.StatementExpression =>
@@ -45,10 +49,12 @@ partial class Interpreter
                 EvaluateUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression =>
                 EvaluateBinaryExpression((BoundBinaryExpression)node, context),
-            BoundKind.IfExpression =>
-                EvaluateIfElseExpression((BoundIfExpression)node, context),
-            BoundKind.WhileExpression =>
-                EvaluateWhileExpression((BoundWhileExpression)node, context),
+            //BoundKind.ReturnExpression =>
+            //    EvaluateReturnExpression((BoundReturnExpression)node, context),
+            BoundKind.GotoExpression =>
+                EvaluateGotoExpression((BoundGotoExpression)node, context),
+            BoundKind.ConditionalGotoExpression =>
+                EvaluateConditionalGotoExpression((BoundConditionalGotoExpression)node, context),
             _ =>
                 throw new NotImplementedException(node.BoundKind.ToString()),
         };

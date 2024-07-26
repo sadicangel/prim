@@ -16,13 +16,7 @@ partial class Binder
             types.Add(element.Type);
         }
 
-        var elementType = types switch
-        {
-            { Count: 0 } => PredefinedSymbols.Unknown,
-            { Count: 1 } => types.Single(),
-            _ when types.Contains(PredefinedSymbols.Never) => PredefinedSymbols.Never,
-            _ => new UnionTypeSymbol(syntax, [.. types]),
-        };
+        var elementType = TypeSymbol.FromSet(types, syntax);
 
         var arrayType = new ArrayTypeSymbol(syntax, elementType, elements.Count);
 

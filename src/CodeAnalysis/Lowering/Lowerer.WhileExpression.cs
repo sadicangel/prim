@@ -3,13 +3,34 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundWhileExpression LowerWhileExpression(BoundWhileExpression node)
+    private static BoundExpression LowerWhileExpression(BoundWhileExpression node, LowererContext context)
     {
-        var condition = LowerExpression(node.Condition);
-        var body = LowerExpression(node.Body);
-        if (ReferenceEquals(condition, node.Condition) && ReferenceEquals(body, node.Body))
-            return node;
+        // source: while-expression
+        //  while (<condition>)
+        //      <body>
+        //
+        // target: block-expression
+        //  goto check<$>
+        //  continue<$>:
+        //  <body>
+        //  check<$>:
+        //  goto continue<$> when <condition> is true
+        //  break<$>:
 
-        return node with { Condition = condition, Body = body };
+        var checkLabel = context.CreateLabel("check");
+
+        var expression = new BoundBlockExpression(
+            node.Syntax,
+            node.Type,
+            [
+                new BoundGotoExpression(checkLabel.Syntax, checkLabel, new BoundNopExpression(checkLabel.Syntax)),
+                new BoundLabelDeclaration(node.ContinueLabel.Syntax, node.ContinueLabel),
+                node.Body,
+                new BoundLabelDeclaration(checkLabel.Syntax, checkLabel),
+                new BoundConditionalGotoExpression(node.ContinueLabel.Syntax, node.ContinueLabel, node.Condition, new BoundNopExpression(node.ContinueLabel.Syntax), JumpTrue: true),
+                new BoundLabelDeclaration(node.BreakLabel.Syntax, node.BreakLabel)
+            ]);
+
+        return LowerExpression(expression, context);
     }
 }

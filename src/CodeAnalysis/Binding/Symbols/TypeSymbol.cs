@@ -27,6 +27,14 @@ internal abstract record class TypeSymbol(
     public virtual bool Equals(TypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
 
+    public static TypeSymbol FromSet(HashSet<TypeSymbol> types, SyntaxNode? syntax = null) => types switch
+    {
+        { Count: 0 } => PredefinedSymbols.Unknown,
+        { Count: 1 } => types.Single(),
+        _ when types.Contains(PredefinedSymbols.Never) => PredefinedSymbols.Never,
+        _ => new UnionTypeSymbol(syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.UnionType), [.. types]),
+    };
+
     internal static string GetMethodName(ReadOnlySpan<char> name, LambdaTypeSymbol type) =>
         $"{name}<{string.Join(',', type.Parameters.Select(p => p.Type.Name))}>";
 

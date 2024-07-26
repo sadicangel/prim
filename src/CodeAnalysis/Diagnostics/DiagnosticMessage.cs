@@ -42,6 +42,8 @@ internal static class DiagnosticMessage
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
     public static string InvalidAssignment() =>
         "Invalid left-hand side of assignment. Expected a reference (variable, property or indexer)";
+    public static string InvalidBreakOrContinue() =>
+        "No enclosing loop out of which to break or continue";
     public static string InvalidConversion(string sourceTypeName, string targetTypeName) =>
         $"Invalid conversion from type '{sourceTypeName}' to '{targetTypeName}'";
     public static string InvalidConversionDeclaration() =>
@@ -54,6 +56,8 @@ internal static class DiagnosticMessage
         $"Invalid implicit type '{typeName}'";
     public static string InvalidOperatorDeclaration(string operatorKind, string operationParameterCount) =>
         $"Invalid {operatorKind} declaration. Must have {operationParameterCount} parameters";
+    public static string InvalidReturn() =>
+        "No enclosing function out of which to return";
     public static string ReadOnlyAssignment(string symbolName) =>
         $"Invalid assignment of '{symbolName}'. It is read-only";
     public static string RedundantConversion() =>
@@ -85,8 +89,6 @@ internal static class DiagnosticMessage
 
     //public static string InvalidExpressionType(PrimType actualType) => $"Invalid expression of type '{actualType}'";
     //public static string InvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
-    //public static string InvalidBreakOrContinue() => "No enclosing loop out of which to break or continue";
-    //public static string InvalidReturn() => "No enclosing function out of which to return";
     //public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
     //public static string NotAllPathsReturn() => "Not all code paths return a value";
 }
