@@ -17,11 +17,11 @@ partial class Interpreter
 
         static FuncFactory()
         {
-            s_pushScopeMethodInfo = typeof(InterpreterContext).GetMethod(nameof(InterpreterContext.PushScope))
+            s_pushScopeMethodInfo = typeof(Context).GetMethod(nameof(Context.PushScope))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_pushScopeMethodInfo)}");
             s_disposeScopeMethodInfo = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_disposeScopeMethodInfo)}");
-            s_evaluatedScopePropertyInfo = typeof(InterpreterContext).GetProperty(nameof(InterpreterContext.EvaluatedScope))
+            s_evaluatedScopePropertyInfo = typeof(Context).GetProperty(nameof(Context.EvaluatedScope))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluatedScopePropertyInfo)}");
             s_declareSymbolMethodInfo = typeof(EvaluatedScope).GetMethod(nameof(EvaluatedScope.Declare))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_declareSymbolMethodInfo)}");
@@ -29,10 +29,10 @@ partial class Interpreter
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluateNodeMethodInfo)}");
         }
 
-        public static Delegate Create(LambdaTypeSymbol lambdaType, BoundExpression body, InterpreterContext context)
+        public static Delegate Create(LambdaTypeSymbol lambdaType, BoundExpression body, Context context)
         {
             var disposableVar = Expression.Variable(typeof(IDisposable), "<$>disposable");
-            var contextConst = Expression.Constant(context, typeof(InterpreterContext));
+            var contextConst = Expression.Constant(context, typeof(Context));
             var evaluatedScope = Expression.Property(contextConst, s_evaluatedScopePropertyInfo);
             var parameters = lambdaType.Parameters.Select(p => Expression.Parameter(typeof(PrimValue), p.Name)).ToArray();
             var variables = lambdaType.Parameters.Select(p => Expression.Constant(p, typeof(VariableSymbol))).ToArray();

@@ -5,7 +5,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static PrimValue EvaluateAssignmentExpression(BoundAssignmentExpression node, InterpreterContext context)
+    public static PrimValue EvaluateAssignmentExpression(BoundAssignmentExpression node, Context context)
     {
         var left = EvaluateExpression(node.Left, context);
         if (left is not ReferenceValue @ref)

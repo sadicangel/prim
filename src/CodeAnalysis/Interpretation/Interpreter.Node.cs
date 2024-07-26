@@ -6,7 +6,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static PrimValue EvaluateNode(BoundNode node, InterpreterContext context)
+    public static PrimValue EvaluateNode(BoundNode node, Context context)
     {
         return node switch
         {

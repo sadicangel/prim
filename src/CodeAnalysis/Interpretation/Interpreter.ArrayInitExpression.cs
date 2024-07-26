@@ -6,7 +6,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static ArrayValue EvaluateArrayInitExpression(BoundArrayInitExpression node, InterpreterContext context)
+    private static ArrayValue EvaluateArrayInitExpression(BoundArrayInitExpression node, Context context)
     {
         if (node.Type is not ArrayTypeSymbol arrayType)
             throw new UnreachableException($"Unexpected array type '{node.Type.Name}'");

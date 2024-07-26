@@ -4,7 +4,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static LiteralValue EvaluateNeverExpression(BoundNeverExpression node, InterpreterContext context)
+    private static LiteralValue EvaluateNeverExpression(BoundNeverExpression node, Context context)
     {
         _ = node;
         _ = context;

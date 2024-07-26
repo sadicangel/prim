@@ -4,7 +4,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static ReferenceValue EvaluatePropertyReference(BoundPropertyReference node, InterpreterContext context)
+    private static ReferenceValue EvaluatePropertyReference(BoundPropertyReference node, Context context)
     {
         var expression = EvaluateExpression(node.Expression, context);
         var propertyReference = new ReferenceValue(

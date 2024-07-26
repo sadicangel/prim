@@ -4,7 +4,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static PrimValue EvaluateConditionalGotoExpression(BoundConditionalGotoExpression node, InterpreterContext context)
+    private static PrimValue EvaluateConditionalGotoExpression(BoundConditionalGotoExpression node, Context context)
     {
         var condition = EvaluateExpression(node.Condition, context);
         var value = EvaluateExpression(node.Expression, context);

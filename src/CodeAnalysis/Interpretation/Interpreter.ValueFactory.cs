@@ -8,7 +8,7 @@ partial class Interpreter
 {
     private static class ValueFactory
     {
-        public static PrimValue Create(TypeSymbol type, BoundExpression value, InterpreterContext context)
+        public static PrimValue Create(TypeSymbol type, BoundExpression value, Context context)
         {
             return type switch
             {

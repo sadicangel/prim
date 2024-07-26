@@ -7,7 +7,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static LiteralValue EvaluateLiteralExpression(BoundLiteralExpression node, InterpreterContext context)
+    private static LiteralValue EvaluateLiteralExpression(BoundLiteralExpression node, Context context)
     {
         _ = context;
         var scope = GlobalEvaluatedScope.Instance;

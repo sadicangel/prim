@@ -5,7 +5,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static ReferenceValue EvaluateMethodGroup(BoundMethodGroup node, InterpreterContext context)
+    private static ReferenceValue EvaluateMethodGroup(BoundMethodGroup node, Context context)
     {
         var expression = EvaluateExpression(node.Expression, context);
         context.EvaluatedScope.Declare(VariableSymbol.This(expression.Type), expression);

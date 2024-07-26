@@ -16,7 +16,7 @@ internal static partial class Interpreter
             if (boundTree.CompilationUnit.BoundNodes[i] is BoundLabelDeclaration labelStatement)
                 labelIndices[labelStatement.LabelSymbol] = i;
 
-        var context = new InterpreterContext(evaluatedScope, labelIndices);
+        var context = new Context(evaluatedScope, labelIndices);
 
         while (context.InstructionIndex < boundTree.CompilationUnit.BoundNodes.Count)
         {

@@ -5,7 +5,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static PrimValue EvaluateVariableDeclaration(BoundVariableDeclaration node, InterpreterContext context)
+    private static PrimValue EvaluateVariableDeclaration(BoundVariableDeclaration node, Context context)
     {
         var value = node.VariableSymbol.Type is LambdaTypeSymbol lambdaType
             ? new LambdaValue(lambdaType, FuncFactory.Create(lambdaType, node.Expression, context))

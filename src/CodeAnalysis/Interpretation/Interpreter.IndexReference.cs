@@ -5,7 +5,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static ReferenceValue EvaluateIndexReference(BoundIndexReference node, InterpreterContext context)
+    private static ReferenceValue EvaluateIndexReference(BoundIndexReference node, Context context)
     {
         var expression = EvaluateExpression(node.Expression, context);
         var index = EvaluateExpression(node.Index, context);

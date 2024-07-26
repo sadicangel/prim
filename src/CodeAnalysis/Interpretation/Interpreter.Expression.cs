@@ -5,7 +5,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static PrimValue EvaluateExpression(BoundExpression node, InterpreterContext context)
+    public static PrimValue EvaluateExpression(BoundExpression node, Context context)
     {
         return node.BoundKind switch
         {

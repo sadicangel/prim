@@ -4,7 +4,7 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    public static PrimValue EvaluateBinaryExpression(BoundBinaryExpression node, InterpreterContext context)
+    public static PrimValue EvaluateBinaryExpression(BoundBinaryExpression node, Context context)
     {
         var left = EvaluateExpression(node.Left, context);
         var right = EvaluateExpression(node.Right, context);
