@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundBlockExpression LowerBlockExpression(BoundBlockExpression node, LowererContext context)
+    private static BoundBlockExpression LowerBlockExpression(BoundBlockExpression node, Context context)
     {
         var expressions = LowerList(node.Expressions, context, LowerExpression);
         if (expressions is null)

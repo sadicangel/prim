@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundMethodGroup LowerMethodGroup(BoundMethodGroup node, LowererContext context)
+    private static BoundMethodGroup LowerMethodGroup(BoundMethodGroup node, Context context)
     {
         var expression = LowerExpression(node.Expression, context);
         if (ReferenceEquals(expression, node.Expression))

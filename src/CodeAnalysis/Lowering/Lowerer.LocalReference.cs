@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundLocalReference LowerLocalReference(BoundLocalReference node, LowererContext context)
+    private static BoundLocalReference LowerLocalReference(BoundLocalReference node, Context context)
     {
         _ = context;
         return node;

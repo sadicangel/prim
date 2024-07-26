@@ -5,7 +5,7 @@ using CodeAnalysis.Binding.Expressions;
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundExpression LowerExpression(BoundExpression node, LowererContext context)
+    private static BoundExpression LowerExpression(BoundExpression node, Context context)
     {
         return node.BoundKind switch
         {

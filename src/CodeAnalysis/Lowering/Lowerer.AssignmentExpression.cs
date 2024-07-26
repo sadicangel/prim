@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundAssignmentExpression LowerAssignmentExpression(BoundAssignmentExpression node, LowererContext context)
+    private static BoundAssignmentExpression LowerAssignmentExpression(BoundAssignmentExpression node, Context context)
     {
         var left = LowerExpression(node.Left, context);
         var right = LowerExpression(node.Right, context);

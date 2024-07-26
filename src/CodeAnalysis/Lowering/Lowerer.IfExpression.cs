@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundExpression LowerIfExpression(BoundIfExpression node, LowererContext context)
+    private static BoundExpression LowerIfExpression(BoundIfExpression node, Context context)
     {
         // source: if-expression
         //  if (<condition>)

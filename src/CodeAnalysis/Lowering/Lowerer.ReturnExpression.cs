@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundReturnExpression LowerReturnExpression(BoundReturnExpression node, LowererContext context)
+    private static BoundReturnExpression LowerReturnExpression(BoundReturnExpression node, Context context)
     {
         var expression = LowerExpression(node.Expression, context);
         if (ReferenceEquals(expression, node.Expression))

@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundNeverExpression LowerNeverExpression(BoundNeverExpression node, LowererContext context)
+    private static BoundNeverExpression LowerNeverExpression(BoundNeverExpression node, Context context)
     {
         _ = context;
         return node;

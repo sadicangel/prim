@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundInvocationExpression LowerInvocationExpression(BoundInvocationExpression node, LowererContext context)
+    private static BoundInvocationExpression LowerInvocationExpression(BoundInvocationExpression node, Context context)
     {
         var expression = LowerExpression(node.Expression, context);
         if (ReferenceEquals(expression, node.Expression))

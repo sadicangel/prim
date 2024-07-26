@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundExpression LowerWhileExpression(BoundWhileExpression node, LowererContext context)
+    private static BoundExpression LowerWhileExpression(BoundWhileExpression node, Context context)
     {
         // source: while-expression
         //  while (<condition>)

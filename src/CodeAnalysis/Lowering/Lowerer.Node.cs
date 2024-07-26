@@ -5,7 +5,7 @@ using CodeAnalysis.Binding.Expressions;
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundNode LowerNode(BoundNode node, LowererContext context)
+    private static BoundNode LowerNode(BoundNode node, Context context)
     {
         return node switch
         {

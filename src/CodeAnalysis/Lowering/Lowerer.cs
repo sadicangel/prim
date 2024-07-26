@@ -6,7 +6,7 @@ internal static partial class Lowerer
 {
     public static BoundTree Lower(BoundTree boundTree)
     {
-        var context = new LowererContext();
+        var context = new Context();
         var compilationUnit = LowerCompilationUnit(boundTree.CompilationUnit, context);
         compilationUnit = Flatten(compilationUnit);
         return boundTree with { CompilationUnit = compilationUnit };

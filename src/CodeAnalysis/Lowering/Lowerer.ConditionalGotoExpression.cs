@@ -4,7 +4,7 @@ using CodeAnalysis.Binding.Expressions;
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundExpression LowerConditionalGotoExpression(BoundConditionalGotoExpression node, LowererContext context)
+    private static BoundExpression LowerConditionalGotoExpression(BoundConditionalGotoExpression node, Context context)
     {
         if (node.Condition.ConstantValue is bool constantValue)
         {

@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundUnaryExpression LowerUnaryExpression(BoundUnaryExpression node, LowererContext context)
+    private static BoundUnaryExpression LowerUnaryExpression(BoundUnaryExpression node, Context context)
     {
         var operand = LowerExpression(node.Operand, context);
         if (ReferenceEquals(operand, node.Operand))

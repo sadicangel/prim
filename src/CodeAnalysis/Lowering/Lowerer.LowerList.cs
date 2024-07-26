@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static List<T>? LowerList<T>(BoundList<T> nodes, LowererContext context, Func<T, LowererContext, T> lower) where T : BoundNode
+    private static List<T>? LowerList<T>(BoundList<T> nodes, Context context, Func<T, Context, T> lower) where T : BoundNode
     {
         List<T>? boundNodes = null;
         for (var i = 0; i < nodes.Count; ++i)

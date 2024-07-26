@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundStructInitExpression LowerStructInitExpression(BoundStructInitExpression node, LowererContext context)
+    private static BoundStructInitExpression LowerStructInitExpression(BoundStructInitExpression node, Context context)
     {
         var properties = LowerList(node.Properties, context, LowerPropertyInitExpression);
         if (properties is null)
@@ -11,7 +11,7 @@ partial class Lowerer
 
         return node with { Properties = new(properties) };
 
-        static BoundPropertyInitExpression LowerPropertyInitExpression(BoundPropertyInitExpression node, LowererContext context)
+        static BoundPropertyInitExpression LowerPropertyInitExpression(BoundPropertyInitExpression node, Context context)
         {
             var expression = LowerExpression(node.Expression, context);
             if (ReferenceEquals(expression, node.Expression))

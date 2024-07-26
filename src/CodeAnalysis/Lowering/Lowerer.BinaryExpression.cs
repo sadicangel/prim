@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundBinaryExpression LowerBinaryExpression(BoundBinaryExpression node, LowererContext context)
+    private static BoundBinaryExpression LowerBinaryExpression(BoundBinaryExpression node, Context context)
     {
         var left = LowerExpression(node.Left, context);
         var right = LowerExpression(node.Right, context);

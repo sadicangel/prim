@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Lowering;
 partial class Lowerer
 {
-    private static BoundPropertyReference LowerPropertyReference(BoundPropertyReference node, LowererContext context)
+    private static BoundPropertyReference LowerPropertyReference(BoundPropertyReference node, Context context)
     {
         var expression = LowerExpression(node.Expression, context);
         if (ReferenceEquals(expression, node.Expression))
