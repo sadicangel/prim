@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis;
-using CodeAnalysis.Lowering;
 using CodeAnalysis.Text;
 using Repl;
 using Spectre.Console;
@@ -14,6 +13,7 @@ while (true)
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
         i:= 10;
         while (i >= 0) {
+            if (i < 5) { break "11"; }
             i = i - 1;
         }
         """));
@@ -29,10 +29,7 @@ while (true)
     }
 
     foreach (var boundTree in compilation.BoundTrees)
-    {
         console.WriteLine(boundTree);
-        console.WriteLine(Lowerer.Lower(boundTree));
-    }
 
     var evaluation = Evaluation.Evaluate(compilation, previousEvaluation);
 

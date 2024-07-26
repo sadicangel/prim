@@ -7,11 +7,12 @@ partial class Interpreter
     private static PrimValue EvaluateConditionalGotoExpression(BoundConditionalGotoExpression node, Context context)
     {
         var condition = EvaluateExpression(node.Condition, context);
-        var value = EvaluateExpression(node.Expression, context);
-        if (condition.Value is true)
+        if ((bool)condition.Value == node.JumpTrue)
         {
+            var value = EvaluateExpression(node.Expression, context);
             context.InstructionIndex = context.LabelIndices[node.LabelSymbol];
+            return value;
         }
-        return value;
+        return context.LastValue;
     }
 }
