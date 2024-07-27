@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Expressions;
 
 namespace CodeAnalysis.Lowering;
@@ -13,7 +14,7 @@ internal static partial class Lowerer
 
         static BoundCompilationUnit Flatten(BoundCompilationUnit compilationUnit)
         {
-            var nodes = new BoundList<BoundNode>.Builder();
+            var nodes = ImmutableArray.CreateBuilder<BoundNode>();
             var stack = new Stack<BoundNode>();
             foreach (var node in compilationUnit.BoundNodes.Reverse())
                 stack.Push(node);
@@ -33,7 +34,7 @@ internal static partial class Lowerer
                 }
             }
 
-            return new BoundCompilationUnit(compilationUnit.Syntax, nodes.ToBoundList());
+            return new BoundCompilationUnit(compilationUnit.Syntax, new BoundList<BoundNode>(nodes.ToImmutable()));
         }
     }
 }

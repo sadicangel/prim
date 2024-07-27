@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -8,20 +9,22 @@ partial class Binder
     private static BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax, Context context)
     {
         var types = new HashSet<TypeSymbol>();
-        var expressions = new BoundList<BoundExpression>.Builder(syntax.Expressions.Count);
+        var builder = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Expressions.Count);
         foreach (var expressionSyntax in syntax.Expressions)
         {
             var expression = BindExpression(expressionSyntax, context);
-            expressions.Add(expression);
+            builder.Add(expression);
             if (expression.CanJump())
                 types.Add(expression.Type);
         }
 
+        var expressions = new BoundList<BoundExpression>(builder.ToImmutable());
+
         if (expressions.Count > 0)
-            types.Add(expressions.Last().Type);
+            types.Add(expressions[^1].Type);
 
         var type = TypeSymbol.FromSet(types);
 
-        return new BoundBlockExpression(syntax, type, expressions.ToBoundList());
+        return new BoundBlockExpression(syntax, type, expressions);
     }
 }

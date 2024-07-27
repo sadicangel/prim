@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
@@ -28,7 +29,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var arguments = new BoundList<BoundExpression>(syntax.Arguments.Select(arg => BindArgument(arg, context)).ToList());
+        var arguments = new BoundList<BoundExpression>(syntax.Arguments.Select(arg => BindArgument(arg, context)).ToImmutableArray());
 
         var matchingOperators = MatchOperators(operators, arguments, out var @operator);
         if (@operator is null)

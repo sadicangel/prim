@@ -6,7 +6,7 @@ partial class Lowerer
     private static BoundCompilationUnit LowerCompilationUnit(BoundCompilationUnit node, Context context)
     {
         var boundNodes = LowerList(node.BoundNodes, context, LowerNode);
-        if (boundNodes is null)
+        if (boundNodes.IsDefault)
             return node;
 
         return node with { BoundNodes = new(boundNodes) };

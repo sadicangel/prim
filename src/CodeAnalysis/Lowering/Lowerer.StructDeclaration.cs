@@ -8,7 +8,7 @@ partial class Lowerer
     private static BoundStructDeclaration LowerStructDeclaration(BoundStructDeclaration node, Context context)
     {
         var members = LowerList(node.Members, context, LowerMemberDeclaration);
-        if (members is null)
+        if (members.IsDefault)
             return node;
 
         return node with { Members = new(members) };

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
@@ -14,10 +15,10 @@ partial class Binder
         if (context.BoundScope.Lookup(symbolName) is not StructTypeSymbol structTypeSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(StructDeclarationSyntax)}'");
 
-        var members = new BoundList<BoundMemberDeclaration>.Builder(syntax.Members.Count);
+        var builder = ImmutableArray.CreateBuilder<BoundMemberDeclaration>(syntax.Members.Count);
         foreach (var member in syntax.Members)
         {
-            members.Add(member.SyntaxKind switch
+            builder.Add(member.SyntaxKind switch
             {
                 SyntaxKind.PropertyDeclaration =>
                     BindPropertyDeclaration((PropertyDeclarationSyntax)member, structTypeSymbol, context),
@@ -30,7 +31,8 @@ partial class Binder
                 _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{member.SyntaxKind}'")
             });
         }
-        return new BoundStructDeclaration(syntax, structTypeSymbol, members.ToBoundList());
+        var members = new BoundList<BoundMemberDeclaration>(builder.ToImmutable());
+        return new BoundStructDeclaration(syntax, structTypeSymbol, members);
 
         static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, Context context)
         {

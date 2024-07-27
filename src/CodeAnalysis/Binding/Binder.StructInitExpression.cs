@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -14,7 +15,7 @@ partial class Binder
             return new BoundNeverExpression(syntax);
         }
 
-        var properties = new BoundList<BoundPropertyInitExpression>.Builder(syntax.Properties.Count);
+        var builder = ImmutableArray.CreateBuilder<BoundPropertyInitExpression>(syntax.Properties.Count);
         foreach (var propertySyntax in syntax.Properties)
         {
             if (typeSymbol.GetProperty(propertySyntax.IdentifierToken.Text) is not PropertySymbol property)
@@ -24,11 +25,12 @@ partial class Binder
             }
 
             var expression = BindPropertyInitExpression(propertySyntax, property, context);
-            properties.Add(expression);
+            builder.Add(expression);
         }
-
+        var properties = new BoundList<BoundPropertyInitExpression>(builder.ToImmutable());
         // TODO: Report un-initialized property members.
-        return new BoundStructInitExpression(syntax, typeSymbol, properties.ToBoundList());
+
+        return new BoundStructInitExpression(syntax, typeSymbol, properties);
 
         static BoundPropertyInitExpression BindPropertyInitExpression(
             PropertyInitExpressionSyntax syntax,

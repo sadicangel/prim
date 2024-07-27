@@ -1,19 +1,15 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
 
 namespace CodeAnalysis.Syntax;
 
-[DebuggerDisplay("Count = {Count}")]
-[DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-public readonly struct SeparatedSyntaxList<T>(SyntaxList<SyntaxNode> syntaxNodes)
+public readonly record struct SeparatedSyntaxList<T>(ImmutableArray<SyntaxNode> SyntaxNodes)
     : IEquatable<SeparatedSyntaxList<T>>, IReadOnlyList<T> where T : SyntaxNode
 {
-    public SyntaxList<SyntaxNode> SyntaxNodes { get; } = syntaxNodes;
-
-    public int Count { get => (SyntaxNodes.Count + 1) / 2; }
+    public int Count { get => (SyntaxNodes.Length + 1) / 2; }
 
     public T this[int index] => (T)SyntaxNodes[index * 2];
 
-    public SyntaxToken GetSeparator(Index index) => (SyntaxToken)SyntaxNodes[index.GetOffset(SyntaxNodes.Count) * 2 + 1];
+    public SyntaxToken GetSeparator(Index index) => (SyntaxToken)SyntaxNodes[index.GetOffset(SyntaxNodes.Length) * 2 + 1];
 
     public IEnumerator<T> GetEnumerator()
     {
@@ -23,9 +19,7 @@ public readonly struct SeparatedSyntaxList<T>(SyntaxList<SyntaxNode> syntaxNodes
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public bool Equals(SeparatedSyntaxList<T> other) => SyntaxNodes == other.SyntaxNodes;
-
-    public override bool Equals(object? obj) => obj is SeparatedSyntaxList<T> list && Equals(list);
+    public bool Equals(SeparatedSyntaxList<T> other) => SyntaxNodes.SequenceEqual(other.SyntaxNodes);
 
     public override int GetHashCode()
     {
@@ -34,8 +28,4 @@ public readonly struct SeparatedSyntaxList<T>(SyntaxList<SyntaxNode> syntaxNodes
             hash.Add(node);
         return hash.ToHashCode();
     }
-
-    public static bool operator ==(SeparatedSyntaxList<T> left, SeparatedSyntaxList<T> right) => left.Equals(right);
-
-    public static bool operator !=(SeparatedSyntaxList<T> left, SeparatedSyntaxList<T> right) => !(left == right);
 }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Immutable;
+using System.Globalization;
 using System.Text;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
@@ -384,7 +385,7 @@ internal static class Scanner
 
     private static int ScanTrivia(SyntaxTree syntaxTree, int position, bool leading, out SyntaxList<SyntaxTrivia> trivia)
     {
-        var builder = new SyntaxList<SyntaxTrivia>.Builder();
+        var builder = ImmutableArray.CreateBuilder<SyntaxTrivia>();
         var totalScan = 0;
         while (true)
         {
@@ -410,7 +411,7 @@ internal static class Scanner
             if (item.SyntaxKind == SyntaxKind.LineBreakTrivia && !leading)
                 break;
         }
-        trivia = builder.IsDefault ? SyntaxFactory.EmptyTrivia() : builder.ToSyntaxList();
+        trivia = new SyntaxList<SyntaxTrivia>(builder.ToImmutable());
         return totalScan;
     }
 

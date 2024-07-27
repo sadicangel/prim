@@ -6,7 +6,7 @@ partial class Lowerer
     private static BoundStructInitExpression LowerStructInitExpression(BoundStructInitExpression node, Context context)
     {
         var properties = LowerList(node.Properties, context, LowerPropertyInitExpression);
-        if (properties is null)
+        if (properties.IsDefault)
             return node;
 
         return node with { Properties = new(properties) };

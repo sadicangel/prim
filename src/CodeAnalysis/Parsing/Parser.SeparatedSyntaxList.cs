@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Syntax;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
@@ -11,7 +12,7 @@ partial class Parser
         ParseNode<TNode> parseNode)
         where TNode : SyntaxNode
     {
-        var nodes = new SyntaxList<SyntaxNode>.Builder();
+        var nodes = ImmutableArray.CreateBuilder<SyntaxNode>();
 
         var parseNext = true;
         while (parseNext && !endingKinds.Contains(iterator.Current.SyntaxKind))
@@ -32,7 +33,7 @@ partial class Parser
                 _ = iterator.Match();
         }
 
-        return new SeparatedSyntaxList<TNode>(nodes.ToSyntaxList());
+        return new SeparatedSyntaxList<TNode>(nodes.ToImmutable());
     }
 }
 

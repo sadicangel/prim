@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax;
@@ -125,9 +126,10 @@ partial class Binder
 
     static UnionTypeSymbol BindUnionType(UnionTypeSyntax syntax, Context context)
     {
-        var types = new BoundList<TypeSymbol>.Builder(syntax.Types.Count);
+        var builder = ImmutableArray.CreateBuilder<TypeSymbol>(syntax.Types.Count);
         foreach (var typeSyntax in syntax.Types)
-            types.Add(BindType(typeSyntax, context));
-        return new UnionTypeSymbol(syntax, types.ToBoundList());
+            builder.Add(BindType(typeSyntax, context));
+        var types = new BoundList<TypeSymbol>(builder.ToImmutable());
+        return new UnionTypeSymbol(syntax, types);
     }
 }

@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Binding.Expressions;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -8,18 +9,20 @@ partial class Binder
     private static BoundArrayInitExpression BindArrayInitExpression(ArrayInitExpressionSyntax syntax, Context context)
     {
         var types = new HashSet<TypeSymbol>();
-        var elements = new BoundList<BoundExpression>.Builder(syntax.Elements.Count);
+        var builder = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Elements.Count);
         foreach (var elementSyntax in syntax.Elements)
         {
             var element = BindExpression(elementSyntax, context);
-            elements.Add(element);
+            builder.Add(element);
             types.Add(element.Type);
         }
+
+        var elements = new BoundList<BoundExpression>(builder.ToImmutable());
 
         var elementType = TypeSymbol.FromSet(types, syntax);
 
         var arrayType = new ArrayTypeSymbol(syntax, elementType, elements.Count);
 
-        return new BoundArrayInitExpression(syntax, arrayType, elements.ToBoundList());
+        return new BoundArrayInitExpression(syntax, arrayType, elements);
     }
 }
