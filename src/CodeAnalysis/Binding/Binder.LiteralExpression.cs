@@ -12,10 +12,15 @@ partial class Binder
         _ = context;
         var type = syntax.SyntaxKind switch
         {
+            SyntaxKind.I8LiteralExpression => PredefinedSymbols.I8,
+            SyntaxKind.I16LiteralExpression => PredefinedSymbols.I16,
             SyntaxKind.I32LiteralExpression => PredefinedSymbols.I32,
-            SyntaxKind.U32LiteralExpression => PredefinedSymbols.U32,
             SyntaxKind.I64LiteralExpression => PredefinedSymbols.I64,
+            SyntaxKind.U8LiteralExpression => PredefinedSymbols.U8,
+            SyntaxKind.U16LiteralExpression => PredefinedSymbols.U16,
+            SyntaxKind.U32LiteralExpression => PredefinedSymbols.U32,
             SyntaxKind.U64LiteralExpression => PredefinedSymbols.U64,
+            SyntaxKind.F16LiteralExpression => PredefinedSymbols.F16,
             SyntaxKind.F32LiteralExpression => PredefinedSymbols.F32,
             SyntaxKind.F64LiteralExpression => PredefinedSymbols.F64,
             SyntaxKind.StrLiteralExpression => PredefinedSymbols.Str,

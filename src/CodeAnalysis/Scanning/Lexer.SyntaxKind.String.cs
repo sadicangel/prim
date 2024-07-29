@@ -5,6 +5,7 @@ using CodeAnalysis.Text;
 namespace CodeAnalysis.Scanning;
 partial class Lexer
 {
+    // TODO: Support raw strings.
     private static int ScanString(SyntaxTree syntaxTree, int position, out SyntaxKind kind, out Range range, out object? value)
     {
         var builder = new StringBuilder();

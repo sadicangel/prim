@@ -10,7 +10,7 @@ partial class Parser
         return current.SyntaxKind switch
         {
             >= SyntaxKind.TrueKeyword and <= SyntaxKind.NullKeyword => ParseLiteralExpression(syntaxTree, iterator),
-            >= SyntaxKind.I32LiteralToken and <= SyntaxKind.StrLiteralToken => ParseLiteralExpression(syntaxTree, iterator),
+            >= SyntaxKind.I8LiteralToken and <= SyntaxKind.StrLiteralToken => ParseLiteralExpression(syntaxTree, iterator),
             SyntaxKind.ParenthesisOpenToken => ParseGroupExpression(syntaxTree, iterator),
             _ => iterator.Peek(1).SyntaxKind switch
             {

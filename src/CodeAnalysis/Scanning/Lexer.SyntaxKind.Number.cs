@@ -12,7 +12,7 @@ partial class Lexer
         var isInvalid = false;
         var numberStyles = NumberStyles.Number;
 
-        // TODO: Actually handle this case.
+        // TODO: Handle negative number literals.
         if (syntaxTree.SourceText[position + read] is '-')
             read++;
 
@@ -80,25 +80,32 @@ partial class Lexer
 
             if (!isInvalid)
             {
-                switch (syntaxTree.SourceText[position + read])
+                switch (syntaxTree.SourceText[(position + read)..])
                 {
-                    case 'f' or 'F':
-                        read++;
+                    case ['f', '1', '6', ..]:
+                        read += 3;
+                        kind = SyntaxKind.F16LiteralToken;
+                        isInvalid = !Half.TryParse(syntaxTree.SourceText[position..(position + read - 3)], out var f16);
+                        value = f16;
+                        break;
+
+                    case ['f', '3', '2', ..]:
+                        read += 3;
                         kind = SyntaxKind.F32LiteralToken;
-                        isInvalid = !float.TryParse(syntaxTree.SourceText[position..(position + read - 1)], out var f32);
+                        isInvalid = !float.TryParse(syntaxTree.SourceText[position..(position + read - 3)], out var f32);
                         value = f32;
                         break;
 
-                    case 'd' or 'D':
-                        read++;
+                    case ['f', '6', '4', ..]:
+                        read += 3;
                         kind = SyntaxKind.F64LiteralToken;
-                        isInvalid = !double.TryParse(syntaxTree.SourceText[position..(position + read - 1)], out var f64);
+                        isInvalid = !double.TryParse(syntaxTree.SourceText[position..(position + read - 3)], out var f64);
                         value = f64;
                         break;
 
                     default:
                         kind = SyntaxKind.F64LiteralToken;
-                        isInvalid = !double.TryParse(syntaxTree.SourceText[position..(position + read - 1)], out var @float);
+                        isInvalid = !double.TryParse(syntaxTree.SourceText[position..(position + read)], out var @float);
                         value = @float;
                         break;
                 }
@@ -108,38 +115,80 @@ partial class Lexer
         {
             switch (syntaxTree.SourceText[(position + read)..])
             {
-                case ['l' or 'L', ..]:
-                    read++;
-                    kind = SyntaxKind.I64LiteralToken;
-                    isInvalid = !long.TryParse(syntaxTree.SourceText[position..(position + read - 1)], numberStyles, CultureInfo.InvariantCulture, out var i64);
-                    value = i64;
-                    break;
-
-                case ['u' or 'U', 'l' or 'L', ..]:
+                case ['i', '8', ..]:
                     read += 2;
-                    kind = SyntaxKind.U64LiteralToken;
-                    isInvalid = !ulong.TryParse(syntaxTree.SourceText[position..(position + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var u64);
-                    value = u64;
+                    kind = SyntaxKind.I8LiteralToken;
+                    isInvalid = !sbyte.TryParse(syntaxTree.SourceText[position..(position + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var i8);
+                    value = i8;
                     break;
 
-                case ['u' or 'U', ..]:
-                    read++;
+                case ['u', '8', ..]:
+                    read += 2;
+                    kind = SyntaxKind.U8LiteralToken;
+                    isInvalid = !byte.TryParse(syntaxTree.SourceText[position..(position + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var u8);
+                    value = u8;
+                    break;
+
+                case ['i', '1', '6', ..]:
+                    read += 3;
+                    kind = SyntaxKind.I16LiteralToken;
+                    isInvalid = !short.TryParse(syntaxTree.SourceText[position..(position + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i16);
+                    value = i16;
+                    break;
+
+                case ['u', '1', '6', ..]:
+                    read += 3;
+                    kind = SyntaxKind.U16LiteralToken;
+                    isInvalid = !ushort.TryParse(syntaxTree.SourceText[position..(position + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u16);
+                    value = u16;
+                    break;
+
+                case ['f', '1', '6', ..]:
+                    read += 3;
+                    kind = SyntaxKind.F16LiteralToken;
+                    isInvalid = !Half.TryParse(syntaxTree.SourceText[position..(position + read - 3)], CultureInfo.InvariantCulture, out var f16);
+                    value = f16;
+                    break;
+
+                case ['i', '3', '2', ..]:
+                    read += 3;
+                    kind = SyntaxKind.I32LiteralToken;
+                    isInvalid = !int.TryParse(syntaxTree.SourceText[position..(position + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i32);
+                    value = i32;
+                    break;
+
+                case ['u', '3', '2', ..]:
+                    read += 3;
                     kind = SyntaxKind.U32LiteralToken;
-                    isInvalid = !uint.TryParse(syntaxTree.SourceText[position..(position + read - 1)], numberStyles, CultureInfo.InvariantCulture, out var u32);
+                    isInvalid = !uint.TryParse(syntaxTree.SourceText[position..(position + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u32);
                     value = u32;
                     break;
 
-                case ['f' or 'F', ..]:
-                    read++;
+                case ['f', '3', '2', ..]:
+                    read += 3;
                     kind = SyntaxKind.F32LiteralToken;
-                    isInvalid = !float.TryParse(syntaxTree.SourceText[position..(position + read - 1)], CultureInfo.InvariantCulture, out var f32);
+                    isInvalid = !float.TryParse(syntaxTree.SourceText[position..(position + read - 3)], CultureInfo.InvariantCulture, out var f32);
                     value = f32;
                     break;
 
-                case ['d' or 'D', ..]:
-                    read++;
+                case ['i', '6', '4', ..]:
+                    read += 3;
+                    kind = SyntaxKind.I64LiteralToken;
+                    isInvalid = !long.TryParse(syntaxTree.SourceText[position..(position + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i64);
+                    value = i64;
+                    break;
+
+                case ['u', '6', '4', ..]:
+                    read += 3;
+                    kind = SyntaxKind.U64LiteralToken;
+                    isInvalid = !ulong.TryParse(syntaxTree.SourceText[position..(position + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u64);
+                    value = u64;
+                    break;
+
+                case ['f', '6', '4', ..]:
+                    read += 3;
                     kind = SyntaxKind.F64LiteralToken;
-                    isInvalid = !double.TryParse(syntaxTree.SourceText[position..(position + read - 1)], CultureInfo.InvariantCulture, out var f64);
+                    isInvalid = !double.TryParse(syntaxTree.SourceText[position..(position + read - 3)], CultureInfo.InvariantCulture, out var f64);
                     value = f64;
                     break;
 

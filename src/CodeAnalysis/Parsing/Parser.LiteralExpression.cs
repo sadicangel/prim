@@ -17,6 +17,14 @@ partial class Parser
                 new LiteralExpressionSyntax(SyntaxKind.FalseLiteralExpression, syntaxTree, literalToken, false),
             SyntaxKind.NullKeyword =>
                 new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, Unit.Value),
+            SyntaxKind.I8LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.I8LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
+            SyntaxKind.U8LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.U8LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
+            SyntaxKind.I16LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.I16LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
+            SyntaxKind.U16LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.U16LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.I32LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.I32LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.U32LiteralToken =>
@@ -25,6 +33,8 @@ partial class Parser
                 new LiteralExpressionSyntax(SyntaxKind.I64LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.U64LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.U64LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
+            SyntaxKind.F16LiteralToken =>
+                new LiteralExpressionSyntax(SyntaxKind.F16LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.F32LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.F32LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.F64LiteralToken =>

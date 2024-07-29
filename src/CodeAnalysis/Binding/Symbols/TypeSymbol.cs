@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -27,6 +28,31 @@ internal abstract record class TypeSymbol(
 
     public virtual bool Equals(TypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
+
+    public Type GetCrlType() => Name switch
+    {
+        PredefinedSymbolNames.Unit => typeof(Unit),
+        PredefinedSymbolNames.Str => typeof(string),
+        PredefinedSymbolNames.Bool => typeof(bool),
+        PredefinedSymbolNames.I8 => typeof(sbyte),
+        PredefinedSymbolNames.I16 => typeof(short),
+        PredefinedSymbolNames.I32 => typeof(int),
+        PredefinedSymbolNames.I64 => typeof(long),
+        PredefinedSymbolNames.I128 => typeof(BigInteger),
+        PredefinedSymbolNames.ISize => typeof(nint),
+        PredefinedSymbolNames.U8 => typeof(byte),
+        PredefinedSymbolNames.U16 => typeof(ushort),
+        PredefinedSymbolNames.U32 => typeof(uint),
+        PredefinedSymbolNames.U64 => typeof(ulong),
+        PredefinedSymbolNames.U128 => typeof(BigInteger),
+        PredefinedSymbolNames.USize => typeof(nuint),
+        PredefinedSymbolNames.F16 => typeof(Half),
+        PredefinedSymbolNames.F32 => typeof(float),
+        PredefinedSymbolNames.F64 => typeof(double),
+        PredefinedSymbolNames.F80 => typeof(double),
+        PredefinedSymbolNames.F128 => typeof(double),
+        _ => throw new UnreachableException($"Unexpected built-in {nameof(TypeSymbol)} '{Name}'"),
+    };
 
     public static TypeSymbol FromSet(HashSet<TypeSymbol> types, SyntaxNode? syntax = null) => types switch
     {

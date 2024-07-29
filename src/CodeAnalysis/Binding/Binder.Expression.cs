@@ -11,16 +11,7 @@ partial class Binder
         {
             SyntaxKind.IdentifierNameExpression =>
                 BindIdentifierNameExpression((IdentifierNameExpressionSyntax)syntax, context),
-            SyntaxKind.I32LiteralExpression or
-            SyntaxKind.U32LiteralExpression or
-            SyntaxKind.I64LiteralExpression or
-            SyntaxKind.U64LiteralExpression or
-            SyntaxKind.F32LiteralExpression or
-            SyntaxKind.F64LiteralExpression or
-            SyntaxKind.StrLiteralExpression or
-            SyntaxKind.TrueLiteralExpression or
-            SyntaxKind.FalseLiteralExpression or
-            SyntaxKind.NullLiteralExpression =>
+            >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression =>
                 BindLiteralExpression((LiteralExpressionSyntax)syntax, context),
             SyntaxKind.GroupExpression =>
                 BindGroupExpression((GroupExpressionSyntax)syntax, context),
