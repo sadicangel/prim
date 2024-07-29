@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Xunit.Abstractions;
 
-namespace CodeAnalysis.Tests.Parsing;
+namespace CodeAnalysis.Tests.Scanning;
 
 public readonly record struct TokenData(SyntaxKind SyntaxKind, string Text) : IXunitSerializable
 {

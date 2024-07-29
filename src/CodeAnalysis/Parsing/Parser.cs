@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Scanning;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
 internal static partial class Parser
@@ -9,7 +10,7 @@ internal static partial class Parser
     {
         ParseNode<SyntaxNode> parseNode = syntaxTree.IsScript ? ParseExpression : ParseDeclaration;
 
-        var tokens = Scanner.Scan(syntaxTree).ToArray();
+        var tokens = Lexer.Scan(syntaxTree).ToArray();
         if (tokens.Length == 0)
         {
             return new CompilationUnitSyntax(syntaxTree, [], SyntaxFactory.SyntheticToken(SyntaxKind.EofToken, syntaxTree));

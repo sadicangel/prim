@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Parsing;
+using CodeAnalysis.Scanning;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
@@ -59,7 +60,7 @@ public sealed record class SyntaxTree(
     public static SyntaxList<SyntaxToken> Scan(SourceText sourceText)
     {
         var syntaxTree = new SyntaxTree(sourceText, isScript: false);
-        var syntaxTokens = Scanner.Scan(syntaxTree);
+        var syntaxTokens = Lexer.Scan(syntaxTree);
         return [.. syntaxTokens];
     }
 

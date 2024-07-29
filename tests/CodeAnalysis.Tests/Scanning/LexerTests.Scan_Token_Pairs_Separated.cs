@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Tests.Parsing;
+﻿namespace CodeAnalysis.Tests.Scanning;
 
 #if !DEBUG
 public partial class ScannerTests

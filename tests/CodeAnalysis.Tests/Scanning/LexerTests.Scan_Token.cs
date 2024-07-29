@@ -1,5 +1,5 @@
-﻿namespace CodeAnalysis.Tests.Parsing;
-public partial class ScannerTests
+﻿namespace CodeAnalysis.Tests.Scanning;
+public partial class LexerTests
 {
     private static readonly TokenData[] s_literal_tokens = [
         new(SyntaxKind.IdentifierToken, "a"),
