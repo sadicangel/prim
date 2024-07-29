@@ -77,6 +77,7 @@ begin:
                 }
                 goto begin;
 
+            // TODO: Support match expressions.
             case SyntaxKind _ when TryParseBinaryOperator(syntaxTree, iterator, parentPrecedence, out var binaryOperator, out var binaryPrecedence):
                 {
                     var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(binaryOperator.SyntaxKind);
