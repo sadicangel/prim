@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using CodeAnalysis.Syntax;
 
@@ -14,14 +15,20 @@ internal static class Predefined
         {
             BoundKind = BoundKind.ModuleSymbol,
             Syntax = SyntaxFactory.SyntheticToken(SyntaxKind.ModuleKeyword),
-            Name = "module",
+            Name = "<global>",
             Type = null!,
             ContainingModule = null!,
             IsStatic = true,
             IsReadOnly = true,
         };
 
+        ref var symbols = ref GetSymbolsFieldRef(module);
+        symbols = [];
+
         return module;
+
+        [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_symbols")]
+        extern static ref Dictionary<string, Symbol> GetSymbolsFieldRef(ModuleSymbol module);
 
     }
     public static readonly ModuleSymbol GlobalModule = MakeGlobalModule();
@@ -77,12 +84,17 @@ internal static class Predefined
 
     static Predefined()
     {
+        // Type is it's own type. We need to avoid recursion.
+        SetType(Type, Type);
+
         // Global module is contained within itself. We need to avoid recursion.
         SetContainingModule(GlobalModule, GlobalModule);
         // Global module type `module` is contained within the global module. We need to avoid recursion.
         SetType(GlobalModule, Never);
-        // Type is it's own type. We need to avoid recursion.
-        SetType(Type, Type);
+        // All predefined symbols exist within the global module.
+        foreach (var symbol in All())
+            if (!GlobalModule.Declare(symbol))
+                throw new UnreachableException($"Failed to declare global symbol '{symbol}'");
 
         [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "set_ContainingModule")]
         extern static void SetContainingModule(Symbol symbol, ModuleSymbol containingModule);

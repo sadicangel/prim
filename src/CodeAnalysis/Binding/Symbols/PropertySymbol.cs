@@ -19,6 +19,9 @@ internal sealed record class PropertySymbol(
         IsReadOnly,
         IsStatic)
 {
+    public override IEnumerable<Symbol> DeclaredSymbols => [];
+
+
     public bool Equals(PropertySymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
 }

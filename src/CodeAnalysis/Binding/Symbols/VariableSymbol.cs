@@ -18,6 +18,8 @@ internal sealed record class VariableSymbol(
         IsStatic,
         IsReadOnly)
 {
+    public override IEnumerable<Symbol> DeclaredSymbols => [];
+
     public bool Equals(VariableSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
 

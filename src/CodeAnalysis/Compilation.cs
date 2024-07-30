@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Binding;
+using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
@@ -12,7 +13,7 @@ public sealed class Compilation
         SyntaxTrees = new(sourceTexts.Select(parseFunc));
         Previous = previous;
         ;
-        BoundScope = new BoundScope(Previous?.BoundScope);
+        BoundScope = new AnonymousScope(Previous?.BoundScope ?? Predefined.GlobalModule);
         BoundTrees = new ReadOnlyList<BoundTree>(SyntaxTrees
             .Select(tree => BoundTree.Bind(tree, BoundScope)));
         Diagnostics = new DiagnosticBag(SyntaxTrees
@@ -23,7 +24,7 @@ public sealed class Compilation
 
     public ReadOnlyList<SyntaxTree> SyntaxTrees { get; }
     public Compilation? Previous { get; }
-    internal BoundScope BoundScope { get; }
+    internal IBoundScope BoundScope { get; }
     internal ReadOnlyList<BoundTree> BoundTrees { get; }
     public DiagnosticBag Diagnostics { get; }
 

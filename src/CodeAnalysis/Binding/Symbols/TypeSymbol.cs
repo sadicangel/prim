@@ -26,7 +26,7 @@ internal abstract record class TypeSymbol(
     public bool IsUnknown { get => this == Predefined.Unknown; }
     public bool IsPredefined { get => Predefined.All().Any(s => s.Name == Name); }
 
-    public virtual IEnumerable<Symbol> DeclaredSymbols { get; } = [];
+    public override IEnumerable<Symbol> DeclaredSymbols => [];
 
     public virtual bool Equals(TypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();

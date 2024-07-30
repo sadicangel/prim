@@ -21,6 +21,7 @@ internal sealed record class MethodSymbol(
 {
     public BoundList<VariableSymbol> Parameters { get => LambdaType.Parameters; }
     public TypeSymbol ReturnType { get => LambdaType.ReturnType; }
+    public override IEnumerable<Symbol> DeclaredSymbols => Parameters;
 
     public bool IsOperator { get => SyntaxFacts.IsOperator(MethodKind); }
     public bool IsUnaryOperator { get => IsOperator && Parameters.Count == 1; }

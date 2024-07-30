@@ -5,18 +5,18 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    public sealed record class Context(BoundTree BoundTree, BoundScope BoundScope)
+    public sealed record class Context(BoundTree BoundTree, IBoundScope BoundScope)
     {
-        private readonly Stack<BoundScope> _scopes = new([BoundScope]);
+        private readonly Stack<IBoundScope> _scopes = new([BoundScope]);
         private readonly Stack<LoopScope> _loops = [];
         private readonly Stack<LambdaTypeSymbol> _lambdas = [];
 
         private int _labelId = 0;
 
         // TODO: Actually return current module.
-        public ModuleSymbol Module { get; set; } = Predefined.GlobalModule;
+        public ModuleSymbol Module { get => BoundScope.Module; }
 
-        public BoundScope BoundScope { get => _scopes.Peek(); }
+        public IBoundScope BoundScope { get => _scopes.Peek(); }
 
         public LoopScope? LoopScope { get => _loops.TryPeek(out var loopScope) ? loopScope : null; }
 
@@ -24,7 +24,7 @@ partial class Binder
 
         public DiagnosticBag Diagnostics { get => BoundTree.Diagnostics; }
 
-        public IDisposable PushBoundScope() => Disposable.BoundScope(this, new BoundScope(BoundScope));
+        public IDisposable PushBoundScope() => Disposable.BoundScope(this, new AnonymousScope(BoundScope));
         public IDisposable PushLoopScope()
         {
             var labelId = Interlocked.Increment(ref _labelId);
@@ -43,7 +43,7 @@ partial class Binder
                 _pop = pop;
             }
 
-            public static Disposable BoundScope(Context context, BoundScope boundScope) => new(
+            public static Disposable BoundScope(Context context, IBoundScope boundScope) => new(
                 () => context._scopes.Push(boundScope),
                 () => context._scopes.Pop());
 

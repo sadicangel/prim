@@ -11,6 +11,8 @@ internal abstract record class Symbol(
     bool IsReadOnly)
     : BoundNode(BoundKind, Syntax)
 {
+    public abstract IEnumerable<Symbol> DeclaredSymbols { get; }
+
     public sealed override IEnumerable<Symbol> Children() => [];
 
     public virtual bool Equals(Symbol? other) => other is not null && BoundKind == other.BoundKind && Name == other.Name;

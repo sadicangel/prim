@@ -16,7 +16,7 @@ partial class Binder
         var queue = new PriorityQueue<ScopedDeclaration, SyntaxKind>(GetDeclarations(syntax, Predefined.GlobalModule));
         while (queue.Count > 0)
         {
-            (var declaration, context.Module) = queue.Dequeue();
+            (var declaration, _) = queue.Dequeue();
             Declare_StepOne(declaration, context);
         }
     }
@@ -26,7 +26,7 @@ partial class Binder
         var queue = new PriorityQueue<ScopedDeclaration, SyntaxKind>(GetDeclarations(syntax, Predefined.GlobalModule));
         while (queue.Count > 0)
         {
-            (var declaration, context.Module) = queue.Dequeue();
+            (var declaration, _) = queue.Dequeue();
             Declare_StepTwo(declaration, context);
         }
     }

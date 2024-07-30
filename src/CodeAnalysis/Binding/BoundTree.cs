@@ -6,12 +6,12 @@ namespace CodeAnalysis.Binding;
 
 internal sealed record class BoundTree(
     SyntaxTree SyntaxTree,
-    BoundScope BoundScope,
+    IBoundScope BoundScope,
     BoundCompilationUnit CompilationUnit,
     DiagnosticBag Diagnostics)
     : IEquatable<BoundTree>
 {
-    private BoundTree(SyntaxTree syntaxTree, BoundScope boundScope)
+    private BoundTree(SyntaxTree syntaxTree, IBoundScope boundScope)
         : this(syntaxTree, boundScope, CompilationUnit: null!, Diagnostics: [])
     {
         CompilationUnit = Binder.Bind(this, BoundScope);
@@ -20,6 +20,6 @@ internal sealed record class BoundTree(
     public bool Equals(BoundTree? other) => ReferenceEquals(this, other);
     public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 
-    public static BoundTree Bind(SyntaxTree syntaxTree, BoundScope boundScope) =>
+    public static BoundTree Bind(SyntaxTree syntaxTree, IBoundScope boundScope) =>
         new(syntaxTree, boundScope);
 }

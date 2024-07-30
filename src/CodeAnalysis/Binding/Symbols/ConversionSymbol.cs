@@ -19,6 +19,7 @@ internal sealed record class ConversionSymbol(
 {
     public VariableSymbol Parameter { get => LambdaType.Parameters[0]; }
     public TypeSymbol ReturnType { get => LambdaType.ReturnType; }
+    public override IEnumerable<Symbol> DeclaredSymbols => LambdaType.Parameters;
 
     public bool IsImplicit { get => ConversionKind is SyntaxKind.ImplicitKeyword; }
     public bool IsExplicit { get => ConversionKind is SyntaxKind.ExplicitKeyword; }

@@ -10,6 +10,11 @@ partial class Binder
     private static BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax, Context context)
     {
         var expression = BindExpression(syntax.Expression, context);
+        if (expression.Type.IsNever)
+        {
+            return expression;
+        }
+
         var methodGroup = expression as BoundMethodGroup;
 
         var operators = methodGroup?.MethodSymbols.SelectMany(s => s.Type.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken)).ToList()

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Binding;
@@ -34,7 +35,10 @@ partial class Binder
                 {
                     variableSymbol = variableSymbol with { Type = expression.Type };
                 }
-                context.BoundScope.Replace(variableSymbol);
+                if (!context.BoundScope.Replace(variableSymbol))
+                {
+                    throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(variableSymbol.Name));
+                }
             }
             else
             {

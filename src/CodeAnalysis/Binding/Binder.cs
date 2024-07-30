@@ -2,7 +2,7 @@
 
 internal static partial class Binder
 {
-    public static BoundCompilationUnit Bind(BoundTree boundTree, BoundScope boundScope)
+    public static BoundCompilationUnit Bind(BoundTree boundTree, IBoundScope boundScope)
     {
         var compilationUnit = boundTree.SyntaxTree.CompilationUnit;
 

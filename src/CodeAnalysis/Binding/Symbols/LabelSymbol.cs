@@ -8,4 +8,6 @@ internal sealed record class LabelSymbol(SyntaxNode Syntax, string Name, ModuleS
         : this(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), name, containingModule)
     {
     }
+
+    public override IEnumerable<Symbol> DeclaredSymbols => [];
 }
