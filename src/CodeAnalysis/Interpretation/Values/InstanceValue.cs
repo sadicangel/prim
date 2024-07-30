@@ -2,12 +2,17 @@
 using CodeAnalysis.Binding.Symbols;
 
 namespace CodeAnalysis.Interpretation.Values;
-internal sealed record class ObjectValue
+internal sealed record class InstanceValue
     : PrimValue, IEnumerable<KeyValuePair<PropertySymbol, PrimValue>>
 {
-    public ObjectValue(StructValue @struct) : base(@struct.StructType)
+    private readonly object? _literalValue;
+
+    public InstanceValue(StructValue @struct) : this(@struct, literalValue: null!) { }
+
+    public InstanceValue(StructValue @struct, object literalValue) : base(@struct.StructType)
     {
         Struct = @struct;
+        _literalValue = literalValue;
         foreach (var (memberSymbol, memberValue) in Struct.Members)
         {
             if (!memberSymbol.IsStatic)
@@ -19,12 +24,14 @@ internal sealed record class ObjectValue
 
     public PrimValue this[PropertySymbol symbol] { get => Get(symbol); set => Set(symbol, value); }
 
-    public override object Value => Members;
+    public override object Value => _literalValue ?? Members;
+
+    public bool IsLiteral => _literalValue is not null;
 
     public int Count { get => Members.Count; }
 
-    public bool Equals(ObjectValue? other) => Struct == other?.Struct && Members.SequenceEqual(other.Members);
-    public override int GetHashCode() => HashCode.Combine(Struct, Members);
+    public bool Equals(InstanceValue? other) => Struct == other?.Struct && _literalValue == other._literalValue && Members.SequenceEqual(other.Members);
+    public override int GetHashCode() => HashCode.Combine(Struct, _literalValue, Members);
 
     internal override PrimValue Get(Symbol symbol) => symbol.IsStatic ? Struct.Get(symbol) : base.Get(symbol);
 

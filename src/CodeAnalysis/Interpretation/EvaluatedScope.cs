@@ -128,7 +128,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
         F128 = (StructValue)values[PredefinedSymbols.F128];
 
         values[PredefinedSymbols.Print] = new LambdaValue((LambdaTypeSymbol)PredefinedSymbols.Print.Type, (PrimValue obj) => { Console.WriteLine(obj.Value); return PrimValue.Unit; });
-        values[PredefinedSymbols.Scan] = new LambdaValue((LambdaTypeSymbol)PredefinedSymbols.Scan.Type, () => new LiteralValue(Str, Console.ReadLine() ?? ""));
+        values[PredefinedSymbols.Scan] = new LambdaValue((LambdaTypeSymbol)PredefinedSymbols.Scan.Type, () => new InstanceValue(Str, Console.ReadLine() ?? ""));
 
         Values = values;
 
@@ -149,7 +149,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
             ((StructValue)m[g.Err])
                 .Set(
                     g.Err.GetProperty("msg") ?? throw new UnreachableException($"Expected property '{"msg"}'"),
-                    new LiteralValue(((StructValue)m[g.Str]), ""));
+                    new InstanceValue(((StructValue)m[g.Str]), ""));
 
             ((StructValue)m[g.Str])
                 .AddEqualityOperators<string>(boolStruct)
@@ -159,17 +159,17 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                     s.Set(
                         add,
                         new LambdaValue(add.LambdaType, (PrimValue a, PrimValue b) =>
-                            new LiteralValue(s, (string)a.Value + (string)b.Value)));
+                            new InstanceValue(s, (string)a.Value + (string)b.Value)));
                     var addStr = g.Str.GetBinaryOperators(SyntaxKind.PlusToken, g.Str, PredefinedSymbols.Any, g.Str).Single();
                     s.Set(
                         addStr,
                         new LambdaValue(addStr.LambdaType, (PrimValue a, PrimValue b) =>
-                            new LiteralValue(s, (string)a.Value + b.Value)));
+                            new InstanceValue(s, (string)a.Value + b.Value)));
                     var addAny = g.Str.GetBinaryOperators(SyntaxKind.PlusToken, PredefinedSymbols.Any, g.Str, g.Str).Single();
                     s.Set(
                         addAny,
                         new LambdaValue(addAny.LambdaType, (PrimValue a, PrimValue b) =>
-                            new LiteralValue(s, a.Value + (string)b.Value)));
+                            new InstanceValue(s, a.Value + (string)b.Value)));
                 });
 
             R M<T>(TypeSymbol s) => new((StructValue)m[s], typeof(T));
@@ -183,28 +183,28 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                 .AddBitwiseOperators<sbyte>()
                 .AddMathOperators<sbyte>()
                 .AddImplicitConversion<sbyte>(M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
-                .AddExplicitConversion<sbyte>(M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+                .AddExplicitConversion<sbyte>(M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I16])
                 .AddEqualityOperators<short>(boolStruct)
                 .AddComparisonOperators<short>(boolStruct)
                 .AddBitwiseOperators<short>()
                 .AddMathOperators<short>()
                 .AddImplicitConversion<short>(M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
-                .AddExplicitConversion<short>(M<sbyte>(g.I8), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+                .AddExplicitConversion<short>(M<sbyte>(g.I8), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I32])
                 .AddEqualityOperators<int>(boolStruct)
                 .AddComparisonOperators<int>(boolStruct)
                 .AddBitwiseOperators<int>()
                 .AddMathOperators<int>()
                 .AddImplicitConversion<int>(M<long>(g.I64), M<BigInteger>(g.I128), M<nint>(g.ISize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
-                .AddExplicitConversion<int>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+                .AddExplicitConversion<int>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I64])
                 .AddEqualityOperators<long>(boolStruct)
                 .AddComparisonOperators<long>(boolStruct)
                 .AddBitwiseOperators<long>()
                 .AddMathOperators<long>()
                 .AddImplicitConversion<long>(M<BigInteger>(g.I128), M<nint>(g.ISize), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128))
-                .AddExplicitConversion<long>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<nint>(g.ISize), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
+                .AddExplicitConversion<long>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128));
             ((StructValue)m[g.I128])
                 .AddEqualityOperators<BigInteger>(boolStruct)
                 .AddComparisonOperators<BigInteger>(boolStruct)
@@ -216,8 +216,7 @@ internal sealed class GlobalEvaluatedScope : EvaluatedScope
                 .AddComparisonOperators<nint>(boolStruct)
                 .AddBitwiseOperators<nint>()
                 .AddMathOperators<nint>()
-                .AddExplicitConversion<nint>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize))
-                .AddExplicitConversion<nint>(M<Half>(g.F16), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128));
+                .AddExplicitConversion<nint>(M<Half>(g.F16), M<float>(g.F32), M<double>(g.F64), M<double>(g.F80), M<double>(g.F128), M<sbyte>(g.I8), M<short>(g.I16), M<int>(g.I32), M<long>(g.I64), M<BigInteger>(g.I128), M<byte>(g.U8), M<ushort>(g.U16), M<uint>(g.U32), M<ulong>(g.U64), M<BigInteger>(g.U128), M<nuint>(g.USize));
             ((StructValue)m[g.U8])
                 .AddEqualityOperators<byte>(boolStruct)
                 .AddComparisonOperators<byte>(boolStruct)
@@ -334,41 +333,41 @@ file static class StructValueExtensions
         var unaryPlus = s.StructType.GetUnaryOperators(SyntaxKind.PlusToken, s.StructType, s.StructType).Single();
         s.Set(
             unaryPlus,
-            new LambdaValue(unaryPlus.LambdaType, (PrimValue a) => new LiteralValue(s, +(T)a.Value)));
+            new LambdaValue(unaryPlus.LambdaType, (PrimValue a) => new InstanceValue(s, +(T)a.Value)));
         var unaryMinus = s.StructType.GetUnaryOperators(SyntaxKind.MinusToken, s.StructType, s.StructType).Single();
         s.Set(
             unaryMinus,
-            new LambdaValue(unaryMinus.LambdaType, (PrimValue a) => new LiteralValue(s, -(T)a.Value)));
+            new LambdaValue(unaryMinus.LambdaType, (PrimValue a) => new InstanceValue(s, -(T)a.Value)));
         var add = s.StructType.GetBinaryOperators(SyntaxKind.PlusToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             add,
             new LambdaValue(add.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value + (T)b.Value)));
+                new InstanceValue(s, (T)a.Value + (T)b.Value)));
         var subtract = s.StructType.GetBinaryOperators(SyntaxKind.MinusToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             subtract,
             new LambdaValue(subtract.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value - (T)b.Value)));
+                new InstanceValue(s, (T)a.Value - (T)b.Value)));
         var multiply = s.StructType.GetBinaryOperators(SyntaxKind.StarToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             multiply,
             new LambdaValue(multiply.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value * (T)b.Value)));
+                new InstanceValue(s, (T)a.Value * (T)b.Value)));
         var divide = s.StructType.GetBinaryOperators(SyntaxKind.SlashToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             divide,
             new LambdaValue(divide.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value / (T)b.Value)));
+                new InstanceValue(s, (T)a.Value / (T)b.Value)));
         var modulo = s.StructType.GetBinaryOperators(SyntaxKind.PercentToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             modulo,
             new LambdaValue(modulo.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value % (T)b.Value)));
+                new InstanceValue(s, (T)a.Value % (T)b.Value)));
         var power = s.StructType.GetBinaryOperators(SyntaxKind.StarStarToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             power,
             new LambdaValue(power.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value))))));
+                new InstanceValue(s, T.CreateTruncating(Math.Pow(double.CreateTruncating((T)a.Value), double.CreateTruncating((T)b.Value))))));
         return s;
     }
 
@@ -377,32 +376,32 @@ file static class StructValueExtensions
         var onesComplement = s.StructType.GetUnaryOperators(SyntaxKind.TildeToken, s.StructType, s.StructType).Single();
         s.Set(
             onesComplement,
-            new LambdaValue(onesComplement.LambdaType, (PrimValue a) => new LiteralValue(s, ~(T)a.Value)));
+            new LambdaValue(onesComplement.LambdaType, (PrimValue a) => new InstanceValue(s, ~(T)a.Value)));
         var bitwiseAnd = s.StructType.GetBinaryOperators(SyntaxKind.AmpersandToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             bitwiseAnd,
             new LambdaValue(bitwiseAnd.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value & (T)b.Value)));
+                new InstanceValue(s, (T)a.Value & (T)b.Value)));
         var bitwiseOr = s.StructType.GetBinaryOperators(SyntaxKind.PipeToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             bitwiseOr,
             new LambdaValue(bitwiseOr.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value | (T)b.Value)));
+                new InstanceValue(s, (T)a.Value | (T)b.Value)));
         var exclusiveOr = s.StructType.GetBinaryOperators(SyntaxKind.HatToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             exclusiveOr,
             new LambdaValue(exclusiveOr.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value ^ (T)b.Value)));
+                new InstanceValue(s, (T)a.Value ^ (T)b.Value)));
         var leftShift = s.StructType.GetBinaryOperators(SyntaxKind.LessThanLessThanToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             leftShift,
             new LambdaValue(leftShift.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value << int.CreateTruncating((T)b.Value))));
+                new InstanceValue(s, (T)a.Value << int.CreateTruncating((T)b.Value))));
         var rightShift = s.StructType.GetBinaryOperators(SyntaxKind.GreaterThanGreaterThanToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             rightShift,
             new LambdaValue(rightShift.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(s, (T)a.Value >> int.CreateTruncating((T)b.Value))));
+                new InstanceValue(s, (T)a.Value >> int.CreateTruncating((T)b.Value))));
         return s;
     }
 
@@ -412,12 +411,12 @@ file static class StructValueExtensions
         s.Set(
             equals,
             new LambdaValue(equals.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, ((T)a.Value).Equals(b.Value))));
+                new InstanceValue(boolStruct, ((T)a.Value).Equals(b.Value))));
         var notEquals = s.StructType.GetBinaryOperators(SyntaxKind.BangEqualsToken, s.StructType, s.StructType, PredefinedSymbols.Bool).Single();
         s.Set(
             notEquals,
             new LambdaValue(notEquals.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, !((T)a.Value).Equals(b.Value))));
+                new InstanceValue(boolStruct, !((T)a.Value).Equals(b.Value))));
         return s;
     }
 
@@ -427,22 +426,22 @@ file static class StructValueExtensions
         s.Set(
             lessThan,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, (T)a.Value < (T)b.Value)));
+                new InstanceValue(boolStruct, (T)a.Value < (T)b.Value)));
         var lessThanOrEqual = s.StructType.GetBinaryOperators(SyntaxKind.LessThanEqualsToken, s.StructType, s.StructType, PredefinedSymbols.Bool).Single();
         s.Set(
             lessThanOrEqual,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, (T)a.Value <= (T)b.Value)));
+                new InstanceValue(boolStruct, (T)a.Value <= (T)b.Value)));
         var greaterThan = s.StructType.GetBinaryOperators(SyntaxKind.GreaterThanToken, s.StructType, s.StructType, PredefinedSymbols.Bool).Single();
         s.Set(
             greaterThan,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, (T)a.Value > (T)b.Value)));
+                new InstanceValue(boolStruct, (T)a.Value > (T)b.Value)));
         var greaterThanOrEqual = s.StructType.GetBinaryOperators(SyntaxKind.GreaterThanEqualsToken, s.StructType, s.StructType, PredefinedSymbols.Bool).Single();
         s.Set(
             greaterThanOrEqual,
             new LambdaValue(lessThan.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, (T)a.Value >= (T)b.Value)));
+                new InstanceValue(boolStruct, (T)a.Value >= (T)b.Value)));
         return s;
     }
 
@@ -452,17 +451,17 @@ file static class StructValueExtensions
         s.Set(
             not,
             new LambdaValue(not.LambdaType, (PrimValue a) =>
-                new LiteralValue(boolStruct, !(bool)a.Value)));
+                new InstanceValue(boolStruct, !(bool)a.Value)));
         var logicalAnd = s.StructType.GetBinaryOperators(SyntaxKind.AmpersandAmpersandToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             logicalAnd,
             new LambdaValue(logicalAnd.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, (bool)a.Value && (bool)b.Value)));
+                new InstanceValue(boolStruct, (bool)a.Value && (bool)b.Value)));
         var logicalOr = s.StructType.GetBinaryOperators(SyntaxKind.PipePipeToken, s.StructType, s.StructType, s.StructType).Single();
         s.Set(
             logicalOr,
             new LambdaValue(logicalOr.LambdaType, (PrimValue a, PrimValue b) =>
-                new LiteralValue(boolStruct, (bool)a.Value || (bool)b.Value)));
+                new InstanceValue(boolStruct, (bool)a.Value || (bool)b.Value)));
         return s;
     }
 
@@ -472,10 +471,11 @@ file static class StructValueExtensions
         {
             var conversion = s.StructType.GetConversion(s.StructType, targetStruct.StructType)
                 ?? throw new UnreachableException($"Missing conversion from {s.StructType} to {targetStruct.StructType}");
+            Debug.WriteLine(conversion);
             s.Set(
                 conversion,
                 new LambdaValue(conversion.LambdaType, (PrimValue x) =>
-                    new LiteralValue(targetStruct, Convert.ChangeType(x.Value, targetTypeCLR))));
+                    new InstanceValue(targetStruct, Convert.ChangeType(x.Value, targetTypeCLR))));
         }
         return s;
     }
@@ -489,7 +489,7 @@ file static class StructValueExtensions
             s.Set(
                 conversion,
                 new LambdaValue(conversion.LambdaType, (PrimValue x) =>
-                    new LiteralValue(targetStruct, Convert.ChangeType(x.Value, targetTypeCLR))));
+                    new InstanceValue(targetStruct, Convert.ChangeType(x.Value, targetTypeCLR))));
         }
         return s;
     }

@@ -18,71 +18,105 @@ internal static class RenderExtensions
             console.Write(indentString);
     }
 
-    public static void Write(this IAnsiConsole console, PrimValue value, int indent = 0)
+    private static void WriteType(this IAnsiConsole console, TypeSymbol type)
     {
-        Indent(console, indent);
+        console.MarkupInterpolated($"[green i]{type.Name}[/]");
+    }
+
+    private static void WriteValue(this IAnsiConsole console, object value, int indent = 0)
+    {
         switch (value)
         {
             case ArrayValue array:
-
-                console.MarkupInterpolated($"[grey66]{"["}[/]");
-                var first = true;
-                foreach (var element in array)
-                {
-                    if (first) first = false;
-                    else console.Write(", ");
-                    console.Write(element);
-                }
-                console.MarkupInterpolated($"[grey66]{"]"}[/] ");
-                console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
-                break;
-            case LambdaValue lambda:
-                console.MarkupInterpolated($"[grey66]{lambda.Type}[/] [green i]{value.Type.Name}[/]");
-                break;
-            case LiteralValue literal:
-                console.MarkupInterpolated($"[grey66]{literal.Value}[/] [green i]{value.Type.Name}[/]");
-                break;
-            case ObjectValue @object:
-                console.MarkupLineInterpolated($"[grey66]{"{"}[/]");
-                ++indent;
-                foreach (var (ps, pv) in @object)
                 {
                     Indent(console, indent);
-                    console.MarkupInterpolated($"[grey66]{ps.Name}: [/]");
-                    console.WriteLine(pv);
+                    console.MarkupInterpolated($"[grey66]{"["}[/]");
+                    var first = true;
+                    foreach (var element in array)
+                    {
+                        if (first) first = false;
+                        else console.Write(", ");
+                        console.WriteValue(element, indent);
+                    }
+                    console.MarkupInterpolated($"[grey66]{"]"}[/]");
                 }
-                --indent;
-                Indent(console, indent);
-                console.MarkupInterpolated($"[grey66]{"}"}[/] ");
-                console.MarkupInterpolated($"[green i]{value.Type.Name}[/]");
-                break;
-            case StructValue @struct:
-                console.MarkupInterpolated($"[grey66]{@struct.Name}[/] [green i]{@struct.Type.Name}[/]");
-                break;
-            case ReferenceValue reference:
-                console.Write(reference.ReferencedValue, indent);
                 break;
             case ErrorValue error:
-                if (error.IsError)
-                    console.MarkupInterpolated($"[maroon] err: [i]{error.ErrorMessage}[/][/]");
-                else
-                    console.Write(error.Value);
+                {
+                    Indent(console, indent);
+                    if (error.IsError)
+                        console.MarkupInterpolated($"[maroon]err: [i]{error.ErrorMessage}[/][/]");
+                    else
+                        console.WriteValue(error.Value);
+                }
+                break;
+            case InstanceValue instance:
+                {
+                    if (instance.IsLiteral)
+                    {
+                        console.WriteValue(instance.Value, indent);
+                    }
+                    else
+                    {
+                        Indent(console, indent);
+                        console.MarkupLineInterpolated($"[grey66]{"{"}[/]");
+                        ++indent;
+                        foreach (var (ps, pv) in instance)
+                        {
+                            Indent(console, indent);
+                            console.MarkupInterpolated($"[grey66]{ps.Name}: [/]");
+                            console.WriteLine(pv);
+                        }
+                        --indent;
+                        Indent(console, indent);
+                        console.MarkupInterpolated($"[grey66]{"}"}[/]");
+                    }
+                }
+                break;
+            case LambdaValue lambda:
+                {
+                    Indent(console, indent);
+                    console.MarkupInterpolated($"[grey66]{lambda.Type}[/][/]");
+                }
                 break;
             case OptionValue option:
-                console.Write("[ ");
-                console.Write(option.Value);
-                console.Write(" ] ");
-                console.MarkupInterpolated($"[green i]{option.Type.Name}[/]");
+                {
+                    Indent(console, indent);
+                    console.Write("[ ");
+                    console.WriteValue(option.Value);
+                    console.Write(" ] ");
+                }
+                break;
+            case ReferenceValue reference:
+                {
+                    console.WriteValue(reference.ReferencedValue, indent);
+                }
+                break;
+            case StructValue @struct:
+                {
+                    Indent(console, indent);
+                    console.MarkupInterpolated($"[grey66]{@struct.Name}[/]");
+                }
                 break;
             case UnionValue union:
-                console.Write("[ ");
-                console.Write(union.Value);
-                console.Write(" ] ");
-                console.MarkupInterpolated($"[green i]{union.Type.Name}[/]");
+                {
+                    Indent(console, indent);
+                    console.Write("[ ");
+                    console.Write(union.Value);
+                    console.Write(" ] ");
+                }
                 break;
             default:
-                throw new UnreachableException($"Unexpected value '{value.GetType().Name}'");
+                console.MarkupInterpolated($"[grey66]{value}[/]");
+                break;
         }
+    }
+
+    public static void Write(this IAnsiConsole console, PrimValue value, int indent = 0)
+    {
+        console.WriteValue(value, indent);
+        console.Write(" ");
+        console.WriteType(value.Type);
     }
 
     public static void WriteLine(this IAnsiConsole console, PrimValue value)
@@ -162,13 +196,13 @@ internal static class RenderExtensions
                         if (token.Value is not null)
                             treeNode.AddNode($"[green3]{token.SyntaxKind}[/] {FormatLiteral(token)}");
                         else
-                            treeNode.AddNode($"[green3]{token.SyntaxKind}[/] [darkseagreen2 i]{token.Text}[/]");
+                            treeNode.AddNode($"[green3]{token.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(token.Text.ToString())}[/]");
                         foreach (var trivia in token.TrailingTrivia)
                             treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
                         break;
 
                     case TypeSyntax type:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{type.Text}[/]"));
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(type.Text.ToString())}[/]"));
                         // $"{base.Name}: {Type.Name}"
                         break;
 
@@ -186,14 +220,8 @@ internal static class RenderExtensions
         {
             return token.SyntaxKind switch
             {
-
-                SyntaxKind.I32LiteralToken or
-                SyntaxKind.U32LiteralToken or
-                SyntaxKind.I64LiteralToken or
-                SyntaxKind.U64LiteralToken or
-                SyntaxKind.F32LiteralToken or
-                SyntaxKind.F64LiteralToken => $"[gold3]{token.Value}[/]",
-                SyntaxKind.StrLiteralToken => $"[darkorange3]\"{token.Value}\"[/]",
+                >= SyntaxKind.I8LiteralToken and <= SyntaxKind.F64LiteralToken => $"[gold3]{token.Value}[/]",
+                SyntaxKind.StrLiteralToken => $"[darkorange3]\"{Markup.Escape(token.Value?.ToString() ?? "")}\"[/]",
                 SyntaxKind.TrueKeyword or
                 SyntaxKind.FalseKeyword or
                 SyntaxKind.NullKeyword => $"[blue3_1]{token.Value}[/]",

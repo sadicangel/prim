@@ -18,4 +18,17 @@ internal sealed record class StructTypeSymbol : TypeSymbol
     public static StructTypeSymbol RuntimeType { get; } = new StructTypeSymbol();
 
     public override bool IsNever => Name == PredefinedSymbolNames.Never;
+
+    internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
+    {
+        conversion = null;
+        if (IsAny || type == this)
+        {
+            return true;
+        }
+
+        conversion = GetConversion(type, this) ?? type.GetConversion(type, this);
+
+        return conversion is not null;
+    }
 }

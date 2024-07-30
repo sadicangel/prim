@@ -5,12 +5,12 @@ using CodeAnalysis.Interpretation.Values;
 namespace CodeAnalysis.Interpretation;
 partial class Interpreter
 {
-    private static ObjectValue EvaluateStructInitExpression(BoundStructInitExpression node, Context context)
+    private static InstanceValue EvaluateStructInitExpression(BoundStructInitExpression node, Context context)
     {
         var structValue = context.EvaluatedScope.Lookup(node.TypeSymbol) as StructValue
             ?? throw new UnreachableException($"Unexpected struct value '{context.EvaluatedScope.Lookup(node.TypeSymbol)}'");
 
-        var objectValue = new ObjectValue(structValue);
+        var objectValue = new InstanceValue(structValue);
 
         foreach (var property in node.Properties)
         {

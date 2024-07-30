@@ -7,6 +7,8 @@ namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class ArrayValue
     : PrimValue, IEnumerable<PrimValue>
 {
+    public ArrayValue(ArrayTypeSymbol arrayType, ArrayValue other) : this(arrayType, other.Elements) { }
+
     public ArrayValue(ArrayTypeSymbol arrayType, PrimValue[] elements) : base(arrayType)
     {
         ArrayType = arrayType;

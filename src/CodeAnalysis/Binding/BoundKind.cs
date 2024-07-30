@@ -33,6 +33,8 @@ internal enum BoundKind
     PropertyInitExpression,
     InvocationExpression,
 
+    ConversionExpression,
+
     UnaryExpression,
     BinaryExpression,
 
@@ -47,6 +49,7 @@ internal enum BoundKind
 
     PropertySymbol,
     MethodSymbol,
+    ConversionSymbol,
     VariableSymbol,
     LabelSymbol,
 

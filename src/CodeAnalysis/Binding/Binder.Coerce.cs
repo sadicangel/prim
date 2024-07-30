@@ -18,10 +18,10 @@ partial class Binder
                 return expression;
             }
 
-            return new BoundUnaryExpression(expression.Syntax, conversion, expression);
+            return new BoundConversionExpression(expression.Syntax, conversion, expression);
         }
 
-        if (conversion?.IsExplicitConversion is true)
+        if (conversion?.IsExplicit is true)
         {
             context.Diagnostics.ReportInvalidImplicitConversion(expression.Syntax.Location, expression.Type.Name, type.Name);
             return new BoundNeverExpression(expression.Syntax);

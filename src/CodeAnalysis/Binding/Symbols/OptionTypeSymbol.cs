@@ -37,4 +37,17 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
     public TypeSymbol UnderlyingType { get; init; }
 
     public override bool IsNever => UnderlyingType.IsNever;
+
+    internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
+    {
+        conversion = null;
+        if (type == this)
+        {
+            return true;
+        }
+
+        conversion = GetConversion(type, this) ?? type.GetConversion(type, this);
+
+        return conversion is not null;
+    }
 }

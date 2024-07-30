@@ -23,4 +23,37 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
     public int Length { get; init; }
 
     public override bool IsNever => ElementType.IsNever;
+
+    internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
+    {
+        conversion = null;
+
+        if (type is not ArrayTypeSymbol arrayType)
+        {
+            return false;
+        }
+
+        if (arrayType == this)
+        {
+            return true;
+        }
+
+        if (!ElementType.IsConvertibleFrom(arrayType.ElementType, out conversion))
+        {
+            return false;
+        }
+
+        if (conversion is null)
+        {
+            return true;
+        }
+
+        var conversionType = new LambdaTypeSymbol([new Parameter("x", type)], this);
+
+        _ = AddConversion(conversion.ConversionKind, conversionType);
+
+        conversion = GetConversion(conversionType);
+
+        return true;
+    }
 }

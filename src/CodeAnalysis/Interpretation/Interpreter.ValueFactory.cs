@@ -12,12 +12,12 @@ partial class Interpreter
         {
             return type switch
             {
-                ArrayTypeSymbol => throw new NotImplementedException(type.GetType().Name),
+                ArrayTypeSymbol arrayType => new ArrayValue(arrayType, (ArrayValue)EvaluateExpression(value, context)),
                 ErrorTypeSymbol errorType => new ErrorValue(errorType, EvaluateExpression(value, context)),
-                LambdaTypeSymbol => throw new NotImplementedException(type.GetType().Name),
+                LambdaTypeSymbol lambdaType => new LambdaValue(lambdaType, FuncFactory.Create(lambdaType, value, context)),
                 OptionTypeSymbol optionType => new OptionValue(optionType, EvaluateExpression(value, context)),
                 //PointerTypeSymbol pointerType => new PointerValue(pointerType, EvaluateExpression(value, context)),
-                StructTypeSymbol structType => context.EvaluatedScope.Lookup(structType),
+                StructTypeSymbol => (InstanceValue)EvaluateExpression(value, context),
                 UnionTypeSymbol unionType => new UnionValue(unionType, EvaluateExpression(value, context)),
                 _ => throw new UnreachableException($"Unexpected type '{type}'")
             };

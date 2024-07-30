@@ -32,4 +32,15 @@ internal sealed record class UnionTypeSymbol : TypeSymbol
 
     public bool Equals(UnionTypeSymbol? other) => base.Equals(other);
     public override int GetHashCode() => base.GetHashCode();
+
+    internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
+    {
+        conversion = null;
+        if (type == this || Types.Any(t => t == type))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -30,6 +30,6 @@ partial class Binder
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 
-        return new BoundLiteralExpression(syntax, type, syntax.LiteralValue);
+        return new BoundLiteralExpression(syntax, type, syntax.InstanceValue);
     }
 }

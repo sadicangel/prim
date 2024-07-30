@@ -28,4 +28,17 @@ internal sealed record class ErrorTypeSymbol : TypeSymbol
     public TypeSymbol ValueType { get; init; }
 
     public override bool IsNever => ValueType.IsNever;
+
+    internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
+    {
+        conversion = null;
+        if (type == this)
+        {
+            return true;
+        }
+
+        conversion = GetConversion(type, this) ?? type.GetConversion(type, this);
+
+        return conversion is not null;
+    }
 }

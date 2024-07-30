@@ -10,9 +10,14 @@ var previousEvaluation = default(Evaluation);
 
 while (true)
 {
-    var code = console.Prompt(new TextPrompt<string>(">").DefaultValue("""
-        a: *i32 = 0;
-        """));
+    var @default = Markup.Escape("""
+        a: [i32|str:2] = [0,0];
+        """);
+
+    var code = console.Prompt(new TextPrompt<string>(">").DefaultValue(@default));
+
+    if (code == @default)
+        code = Markup.Remove(code);
 
     var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
 
@@ -26,7 +31,7 @@ while (true)
 
     foreach (var boundTree in compilation.BoundTrees)
     {
-        console.WriteLine(boundTree.SyntaxTree);
+        //console.WriteLine(boundTree.SyntaxTree);
         console.WriteLine(boundTree);
     }
 

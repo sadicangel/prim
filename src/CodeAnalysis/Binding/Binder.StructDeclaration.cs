@@ -63,7 +63,7 @@ partial class Binder
             var method = typeSymbol.GetMethod(syntax.Name.Text, type)
                 ?? throw new UnreachableException($"Unexpected method '{syntax.Name.Text}'");
 
-            var body = BindMethodBody(method, syntax.Body, context);
+            var body = BindLambdaBody(method.IsStatic ? null : typeSymbol, method.Parameters, method.ReturnType, syntax.Body, context);
 
             return new BoundMethodDeclaration(syntax, method, body);
         }
@@ -74,7 +74,7 @@ partial class Binder
             var @operator = typeSymbol.Type.GetOperator(syntax.OperatorToken.SyntaxKind, type)
                 ?? throw new UnreachableException($"Unexpected operator '{syntax.OperatorToken.Text}'");
 
-            var body = BindMethodBody(@operator, syntax.Body, context);
+            var body = BindLambdaBody(null, @operator.Parameters, @operator.ReturnType, syntax.Body, context);
 
             return new BoundOperatorDeclaration(syntax, @operator, body);
         }
@@ -85,34 +85,35 @@ partial class Binder
             var conversion = typeSymbol.GetConversion(type)
                 ?? throw new UnreachableException($"Unexpected conversion '{type}'");
 
-            var body = BindMethodBody(conversion, syntax.Body, context);
+            var body = BindLambdaBody(null, [conversion.Parameter], conversion.ReturnType, syntax.Body, context);
 
             return new BoundConversionDeclaration(syntax, conversion, body);
         }
 
-        static BoundExpression BindMethodBody(
-            MethodSymbol methodSymbol,
+        static BoundExpression BindLambdaBody(
+            TypeSymbol? containingSymbol,
+            BoundList<VariableSymbol> parameters,
+            TypeSymbol returnType,
             ExpressionSyntax syntax,
             Context context)
         {
             using (context.PushBoundScope())
             {
-                if (!methodSymbol.IsStatic)
+                if (containingSymbol is not null)
                 {
-                    _ = context.BoundScope.Declare(VariableSymbol.This((TypeSymbol)methodSymbol.ContainingSymbol));
+                    _ = context.BoundScope.Declare(VariableSymbol.This(containingSymbol));
                 }
 
-                foreach (var parameterSymbol in methodSymbol.Parameters)
+                foreach (var parameterSymbol in parameters)
                 {
                     // We've already reported redeclarations.
                     _ = context.BoundScope.Declare(parameterSymbol);
                 }
 
                 // TODO: Check for unused parameters.
-                var body = Coerce(BindExpression(syntax, context), methodSymbol.ReturnType, context);
+                var body = Coerce(BindExpression(syntax, context), returnType, context);
 
                 return body;
-
             }
         }
     }

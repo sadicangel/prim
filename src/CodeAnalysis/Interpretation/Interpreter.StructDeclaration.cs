@@ -56,9 +56,9 @@ partial class Interpreter
         static object EvaluateConversionDeclaration(BoundConversionDeclaration member, StructValue structValue, Context context)
         {
             var lambda = new LambdaValue(
-                member.MethodSymbol.LambdaType,
-                FuncFactory.Create(member.MethodSymbol.LambdaType, member.Body, context));
-            structValue.Set(member.MethodSymbol, lambda);
+                member.ConversionSymbol.LambdaType,
+                FuncFactory.Create(member.ConversionSymbol.LambdaType, member.Body, context));
+            structValue.Set(member.ConversionSymbol, lambda);
             return 0;
         }
     }

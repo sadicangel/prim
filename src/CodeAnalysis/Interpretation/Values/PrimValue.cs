@@ -3,10 +3,10 @@
 namespace CodeAnalysis.Interpretation.Values;
 internal abstract record class PrimValue(TypeSymbol Type)
 {
-    internal static LiteralValue Unit { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Unit, CodeAnalysis.Unit.Value);
-    internal static LiteralValue True { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, true);
-    internal static LiteralValue False { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Bool, false);
-    internal static LiteralValue EmptyStr { get; } = new LiteralValue(GlobalEvaluatedScope.Instance.Str, string.Empty);
+    internal static InstanceValue Unit { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Unit, CodeAnalysis.Unit.Value);
+    internal static InstanceValue True { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, true);
+    internal static InstanceValue False { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, false);
+    internal static InstanceValue EmptyStr { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Str, string.Empty);
 
     internal Dictionary<Symbol, PrimValue> Members { get; } = [];
 
@@ -14,7 +14,7 @@ internal abstract record class PrimValue(TypeSymbol Type)
 
     internal virtual PrimValue Get(Symbol symbol) => Members[symbol];
     internal T Get<T>(Symbol symbol) where T : PrimValue => (T)Get(symbol);
-    internal virtual void Set(Symbol symbol, PrimValue value) => Members[symbol] = value;
+    internal virtual void Set(Symbol symbol, PrimValue value) => Members.Add(symbol, value);
 
     public abstract override int GetHashCode();
     public abstract bool Equals(PrimValue? other);

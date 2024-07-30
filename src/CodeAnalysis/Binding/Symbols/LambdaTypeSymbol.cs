@@ -26,6 +26,26 @@ internal sealed record class LambdaTypeSymbol : TypeSymbol
     public override IEnumerable<Symbol> DeclaredSymbols => Parameters;
 
     public override bool IsNever => ReturnType.IsNever || Parameters.Any(p => p.Type.IsNever);
+
+    internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
+    {
+        // Because we allow lambdas without parameters, we need to be able to coerce
+        // any non lambda expression to a lambda return type, instead of its full type.
+        if (type is not LambdaTypeSymbol)
+        {
+            return ReturnType.IsConvertibleFrom(type, out conversion);
+        }
+
+        conversion = null;
+        if (type == this)
+        {
+            return true;
+        }
+
+        conversion = GetConversion(type, this) ?? type.GetConversion(type, this);
+
+        return conversion is not null;
+    }
 }
 
 internal readonly record struct Parameter(SyntaxNode Syntax, string Name, TypeSymbol Type)

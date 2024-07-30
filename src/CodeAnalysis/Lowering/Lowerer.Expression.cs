@@ -25,6 +25,7 @@ partial class Lowerer
             BoundKind.ArrayInitExpression => LowerArrayInitExpression((BoundArrayInitExpression)node, context),
             BoundKind.StructInitExpression => LowerStructInitExpression((BoundStructInitExpression)node, context),
             BoundKind.InvocationExpression => LowerInvocationExpression((BoundInvocationExpression)node, context),
+            BoundKind.ConversionExpression => LowerConversionExpression((BoundConversionExpression)node, context),
             BoundKind.UnaryExpression => LowerUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression => LowerBinaryExpression((BoundBinaryExpression)node, context),
             BoundKind.IfExpression => LowerIfExpression((BoundIfExpression)node, context),

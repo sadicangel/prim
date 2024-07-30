@@ -2,15 +2,15 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Binding.Expressions;
-internal sealed record class BoundConversionDeclaration(
+internal sealed record class BoundConversionExpression(
     SyntaxNode Syntax,
     ConversionSymbol ConversionSymbol,
-    BoundExpression Body)
-    : BoundMemberDeclaration(BoundKind.ConversionDeclaration, Syntax, ConversionSymbol.Type)
+    BoundExpression Expression)
+    : BoundExpression(BoundKind.ConversionExpression, Syntax, ConversionSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {
         yield return ConversionSymbol;
-        yield return Body;
+        yield return Expression;
     }
 }

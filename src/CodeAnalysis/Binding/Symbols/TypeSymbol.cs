@@ -68,51 +68,18 @@ internal abstract record class TypeSymbol(
     internal static string GetMethodName(SyntaxKind syntaxKind, LambdaTypeSymbol type) =>
         GetMethodName(SyntaxFacts.GetText(syntaxKind) ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntaxKind}'"), type);
 
-    internal bool IsCoercibleTo(TypeSymbol type) => IsCoercibleTo(this, type, out _);
-    internal bool IsCoercibleTo(TypeSymbol type, out MethodSymbol? conversion) => IsCoercibleTo(this, type, out conversion);
+    internal bool IsCoercibleFrom(TypeSymbol type) => IsConvertibleFrom(type, out _);
+    internal bool IsCoercibleFrom(TypeSymbol type, out ConversionSymbol? conversion) =>
+        IsConvertibleFrom(type, out conversion) && conversion?.IsExplicit is not true;
 
-    private static bool IsCoercibleTo(TypeSymbol left, TypeSymbol right, out MethodSymbol? conversion)
-    {
-        // HACK: Because we allow lambdas without parameters, we need to be able to coerce
-        // any expression to a lambda return type, instead of its full type.
-        if (left is not LambdaTypeSymbol && right is LambdaTypeSymbol rightLambdaType)
-        {
-            right = rightLambdaType.ReturnType;
-        }
+    internal bool IsCoercibleTo(TypeSymbol type) => IsCoercibleFrom(type, out _);
+    internal bool IsCoercibleTo(TypeSymbol type, out ConversionSymbol? conversion) => type.IsCoercibleFrom(this, out conversion);
 
-        conversion = null;
-        if (right.IsAny || left == right)
-        {
-            return true;
-        }
+    internal bool IsConvertibleFrom(TypeSymbol type) => IsConvertibleFrom(type, out _);
+    internal abstract bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion);
 
-        conversion = left.GetConversion(left, right) ?? right.GetConversion(left, right);
-
-        return conversion is not null && conversion.IsImplicitConversion;
-    }
-
-    internal bool IsConvertibleTo(TypeSymbol type) => IsConvertibleTo(this, type, out _);
-    internal bool IsConvertibleTo(TypeSymbol type, out MethodSymbol? conversion) => IsConvertibleTo(this, type, out conversion);
-
-    private static bool IsConvertibleTo(TypeSymbol left, TypeSymbol right, out MethodSymbol? conversion)
-    {
-        // HACK: Because we allow lambdas without parameters, we need to be able to coerce
-        // any expression to a lambda return type, instead of its full type.
-        if (left is not LambdaTypeSymbol && right is LambdaTypeSymbol rightLambdaType)
-        {
-            right = rightLambdaType.ReturnType;
-        }
-
-        conversion = null;
-        if (right.IsAny || left == right)
-        {
-            return true;
-        }
-
-        conversion = left.GetConversion(left, right) ?? right.GetConversion(left, right);
-
-        return conversion is not null;
-    }
+    internal bool IsConvertibleTo(TypeSymbol type) => IsConvertibleFrom(type, out _);
+    internal bool IsConvertibleTo(TypeSymbol type, out ConversionSymbol? conversion) => type.IsConvertibleFrom(this, out conversion);
 
     internal List<Symbol> GetSymbols(ReadOnlySpan<char> name)
     {
@@ -274,38 +241,35 @@ internal abstract record class TypeSymbol(
     }
 
     internal bool AddConversion(LambdaTypeSymbol type, ConversionDeclarationSyntax syntax) =>
-        AddConversion(syntax.ConversionKeyword.SyntaxKind, type, isStatic: true, syntax.IsReadOnly, syntax);
+        AddConversion(syntax.ConversionKeyword.SyntaxKind, type, syntax);
 
-    internal bool AddConversion(SyntaxKind conversionKind, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
+    internal bool AddConversion(SyntaxKind conversionKind, LambdaTypeSymbol type, SyntaxNode? syntax = null)
     {
         if (GetConversion(type) is not null) return false;
 
-        var methodSymbol = new MethodSymbol(
+        var conversionSymbol = new ConversionSymbol(
             conversionKind,
             syntax ?? SyntaxFactory.SyntheticToken(conversionKind),
-            GetMethodName(conversionKind, type),
+            $"{SyntaxFacts.GetText(conversionKind)}-{type.ReturnType.Name}<{type.Parameters[0].Type.Name}>",
             type,
-            ContainingSymbol: this,
-            isStatic,
-            isReadOnly);
-        _members.Add(methodSymbol);
+            ContainingSymbol: this);
+        _members.Add(conversionSymbol);
 
         return true;
     }
 
-    internal MethodSymbol? GetConversion(LambdaTypeSymbol type)
+    internal ConversionSymbol? GetConversion(LambdaTypeSymbol type)
     {
-        return _members.OfType<MethodSymbol>()
+        return _members.OfType<ConversionSymbol>()
             .Where(x => x.Type == type)
             .SingleOrDefault();
     }
 
-    internal MethodSymbol? GetConversion(TypeSymbol sourceType, TypeSymbol targetType)
+    internal ConversionSymbol? GetConversion(TypeSymbol sourceType, TypeSymbol targetType)
     {
-        return _members.OfType<MethodSymbol>()
-            .Where(x => x.IsConversion)
-            .Where(x => x.Parameters[0].Type.IsAny || x.Parameters[0].Type == sourceType)
-            .Where(x => x.ReturnType.IsAny || x.ReturnType == targetType)
+        return _members.OfType<ConversionSymbol>()
+            .Where(x => x.Parameter.Type.IsAny || x.Parameter.Type == sourceType)
+            .Where(x => x.ReturnType == targetType)
             .SingleOrDefault();
     }
 }

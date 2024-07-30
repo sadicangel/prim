@@ -22,13 +22,13 @@ partial class Binder
                 return expression;
             }
 
-            if (!isExplicit && conversion.IsExplicitConversion)
+            if (!isExplicit && conversion.IsExplicit)
             {
                 context.Diagnostics.ReportInvalidImplicitConversion(expression.Syntax.Location, expression.Type.Name, type.Name);
                 return new BoundNeverExpression(expression.Syntax);
             }
 
-            return new BoundUnaryExpression(expression.Syntax, conversion, expression);
+            return new BoundConversionExpression(expression.Syntax, conversion, expression);
         }
 
         context.Diagnostics.ReportInvalidExpressionType(expression.Syntax.Location, type.Name, expression.Type.Name);

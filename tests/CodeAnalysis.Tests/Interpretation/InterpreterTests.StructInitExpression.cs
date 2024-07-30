@@ -10,7 +10,7 @@ public partial class InterpreterTests
             Point: struct: { x: i32 = 0;  y: i32 = 0; }
             Point { .x = 10, .y = 10 }
             """.Evaluate();
-        var objectValue = Assert.IsType<ObjectValue>(value);
+        var objectValue = Assert.IsType<InstanceValue>(value);
         var x = objectValue.Members.Single(m => m.Key.Name == "x").Value.Value;
         var y = objectValue.Members.Single(m => m.Key.Name == "y").Value.Value;
 
