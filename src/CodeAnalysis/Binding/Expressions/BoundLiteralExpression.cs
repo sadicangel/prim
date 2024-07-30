@@ -6,7 +6,7 @@ internal sealed record class BoundLiteralExpression(SyntaxNode Syntax, TypeSymbo
     : BoundExpression(BoundKind.LiteralExpression, Syntax, Type)
 {
     public static BoundLiteralExpression Unit =>
-        new(SyntaxFactory.SyntheticToken(SyntaxKind.NullKeyword), PredefinedSymbols.Unit, CodeAnalysis.Unit.Value);
+        new(SyntaxFactory.SyntheticToken(SyntaxKind.NullKeyword), Predefined.Unit, CodeAnalysis.Unit.Value);
 
     public override IEnumerable<BoundNode> Children() => [];
 }

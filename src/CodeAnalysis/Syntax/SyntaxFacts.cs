@@ -113,6 +113,7 @@ public static class SyntaxFacts
             SyntaxKind.F80Keyword => "f80",
             SyntaxKind.F128Keyword => "f128",
 
+            SyntaxKind.ModuleKeyword => "module",
             SyntaxKind.StructKeyword => "struct",
 
             SyntaxKind.TrueKeyword => "true",
@@ -263,6 +264,7 @@ public static class SyntaxFacts
             "f80" => SyntaxKind.F80Keyword,
             "f128" => SyntaxKind.F128Keyword,
 
+            "module" => SyntaxKind.ModuleKeyword,
             "struct" => SyntaxKind.StructKeyword,
 
             "true" => SyntaxKind.TrueKeyword,

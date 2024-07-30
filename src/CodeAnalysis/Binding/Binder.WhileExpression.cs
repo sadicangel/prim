@@ -8,7 +8,7 @@ partial class Binder
 {
     private static BoundExpression BindWhileExpression(WhileExpressionSyntax syntax, Context context)
     {
-        var condition = Coerce(BindExpression(syntax.Condition, context), PredefinedSymbols.Bool, context);
+        var condition = Coerce(BindExpression(syntax.Condition, context), Predefined.Bool, context);
         if (condition.Type.IsNever)
         {
             return condition;

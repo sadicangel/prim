@@ -55,7 +55,7 @@ public partial class InterpreterTests
         var value = """
         a:: "";
         """.Evaluate();
-        Assert.Equal(PredefinedSymbols.Str, value.Type);
+        Assert.Equal(Predefined.Str, value.Type);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public partial class InterpreterTests
         var value = """
         a: ?i32;
         """.Evaluate();
-        Assert.Equal(new OptionTypeSymbol(PredefinedSymbols.I32), value.Type);
+        Assert.Equal(new OptionTypeSymbol(Predefined.I32, Predefined.GlobalModule), value.Type);
         Assert.Equal(PrimValue.Unit, value.Value);
     }
 }

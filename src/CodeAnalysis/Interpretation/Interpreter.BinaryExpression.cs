@@ -8,7 +8,7 @@ partial class Interpreter
     {
         var left = EvaluateExpression(node.Left, context);
         var right = EvaluateExpression(node.Right, context);
-        var target = node.MethodSymbol.ContainingSymbol == left.Type ? left : right;
+        var target = node.MethodSymbol.ContainingType == left.Type ? left : right;
         var function = target.Get<LambdaValue>(node.MethodSymbol);
         var value = function.Invoke(left, right);
         return value;

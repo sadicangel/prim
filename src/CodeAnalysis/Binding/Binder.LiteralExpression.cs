@@ -12,21 +12,21 @@ partial class Binder
         _ = context;
         var type = syntax.SyntaxKind switch
         {
-            SyntaxKind.I8LiteralExpression => PredefinedSymbols.I8,
-            SyntaxKind.I16LiteralExpression => PredefinedSymbols.I16,
-            SyntaxKind.I32LiteralExpression => PredefinedSymbols.I32,
-            SyntaxKind.I64LiteralExpression => PredefinedSymbols.I64,
-            SyntaxKind.U8LiteralExpression => PredefinedSymbols.U8,
-            SyntaxKind.U16LiteralExpression => PredefinedSymbols.U16,
-            SyntaxKind.U32LiteralExpression => PredefinedSymbols.U32,
-            SyntaxKind.U64LiteralExpression => PredefinedSymbols.U64,
-            SyntaxKind.F16LiteralExpression => PredefinedSymbols.F16,
-            SyntaxKind.F32LiteralExpression => PredefinedSymbols.F32,
-            SyntaxKind.F64LiteralExpression => PredefinedSymbols.F64,
-            SyntaxKind.StrLiteralExpression => PredefinedSymbols.Str,
-            SyntaxKind.TrueLiteralExpression => PredefinedSymbols.Bool,
-            SyntaxKind.FalseLiteralExpression => PredefinedSymbols.Bool,
-            SyntaxKind.NullLiteralExpression => PredefinedSymbols.Unit,
+            SyntaxKind.I8LiteralExpression => Predefined.I8,
+            SyntaxKind.I16LiteralExpression => Predefined.I16,
+            SyntaxKind.I32LiteralExpression => Predefined.I32,
+            SyntaxKind.I64LiteralExpression => Predefined.I64,
+            SyntaxKind.U8LiteralExpression => Predefined.U8,
+            SyntaxKind.U16LiteralExpression => Predefined.U16,
+            SyntaxKind.U32LiteralExpression => Predefined.U32,
+            SyntaxKind.U64LiteralExpression => Predefined.U64,
+            SyntaxKind.F16LiteralExpression => Predefined.F16,
+            SyntaxKind.F32LiteralExpression => Predefined.F32,
+            SyntaxKind.F64LiteralExpression => Predefined.F64,
+            SyntaxKind.StrLiteralExpression => Predefined.Str,
+            SyntaxKind.TrueLiteralExpression => Predefined.Bool,
+            SyntaxKind.FalseLiteralExpression => Predefined.Bool,
+            SyntaxKind.NullLiteralExpression => Predefined.Unit,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
         };
 

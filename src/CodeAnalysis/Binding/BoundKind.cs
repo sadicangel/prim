@@ -50,6 +50,7 @@ internal enum BoundKind
     GotoExpression,
     ConditionalGotoExpression,
 
+    ModuleSymbol,
     PropertySymbol,
     MethodSymbol,
     ConversionSymbol,

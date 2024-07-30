@@ -4,7 +4,7 @@ using CodeAnalysis.Binding.Symbols;
 namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class ErrorValue : PrimValue
 {
-    private static readonly PropertySymbol s_msgProperty = PredefinedSymbols.Err.GetProperty("msg")
+    private static readonly PropertySymbol s_msgProperty = Predefined.Err.GetProperty("msg")
         ?? throw new UnreachableException($"Missing property 'msg'");
     private readonly PrimValue _value;
 
@@ -17,8 +17,8 @@ internal sealed record class ErrorValue : PrimValue
         Add(
             implicit1,
             new LambdaValue(implicit1.LambdaType, (PrimValue x) => new ErrorValue(errorType, x)));
-        var implicit2 = errorType.GetConversion(PredefinedSymbols.Err, errorType)
-            ?? throw new UnreachableException($"Missing conversion from {PredefinedSymbols.Err} to {errorType}");
+        var implicit2 = errorType.GetConversion(Predefined.Err, errorType)
+            ?? throw new UnreachableException($"Missing conversion from {Predefined.Err} to {errorType}");
         Add(
             implicit2,
             new LambdaValue(implicit2.LambdaType, (PrimValue x) => new ErrorValue(errorType, x)));

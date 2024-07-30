@@ -6,7 +6,8 @@ internal sealed record class PropertySymbol(
     SyntaxNode Syntax,
     string Name,
     TypeSymbol Type,
-    Symbol ContainingSymbol,
+    ModuleSymbol ContainingModule,
+    TypeSymbol ContainingType,
     bool IsReadOnly,
     bool IsStatic)
     : Symbol(
@@ -14,6 +15,7 @@ internal sealed record class PropertySymbol(
         Syntax,
         Name,
         Type,
+        ContainingModule,
         IsReadOnly,
         IsStatic)
 {

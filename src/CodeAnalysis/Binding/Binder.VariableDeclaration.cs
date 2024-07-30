@@ -28,7 +28,7 @@ partial class Binder
                 {
                     expression ??= new BoundNeverExpression(syntax);
                     context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
-                    variableSymbol = variableSymbol with { Type = PredefinedSymbols.Never };
+                    variableSymbol = variableSymbol with { Type = Predefined.Never };
                 }
                 else
                 {

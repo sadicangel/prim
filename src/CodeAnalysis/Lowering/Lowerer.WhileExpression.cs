@@ -17,7 +17,7 @@ partial class Lowerer
         //  goto continue<$> when <condition> is true
         //  break<$>:
 
-        var checkLabel = context.CreateLabel("check");
+        var checkLabel = context.CreateLabel("check", node.Type.ContainingModule);
 
         var expression = new BoundBlockExpression(
             node.Syntax,

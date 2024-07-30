@@ -6,25 +6,27 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static IEnumerable<(DeclarationSyntax, SyntaxKind)> GetDeclarations(SyntaxNode syntax) =>
-        syntax.Children().OfType<DeclarationSyntax>().Select(s => (s, s.SyntaxKind));
+    private readonly record struct ScopedDeclaration(DeclarationSyntax Declaration, ModuleSymbol ContainingModule);
+
+    private static IEnumerable<(ScopedDeclaration, SyntaxKind)> GetDeclarations(SyntaxNode syntax, ModuleSymbol module) =>
+        syntax.Children().OfType<DeclarationSyntax>().Select(s => (new ScopedDeclaration(s, module), s.SyntaxKind));
 
     public static void Declare_StepOne(CompilationUnitSyntax syntax, Context context)
     {
-        var queue = new PriorityQueue<DeclarationSyntax, SyntaxKind>(GetDeclarations(syntax));
+        var queue = new PriorityQueue<ScopedDeclaration, SyntaxKind>(GetDeclarations(syntax, Predefined.GlobalModule));
         while (queue.Count > 0)
         {
-            var declaration = queue.Dequeue();
+            (var declaration, context.Module) = queue.Dequeue();
             Declare_StepOne(declaration, context);
         }
     }
 
     public static void Declare_StepTwo(CompilationUnitSyntax syntax, Context context)
     {
-        var queue = new PriorityQueue<DeclarationSyntax, SyntaxKind>(GetDeclarations(syntax));
+        var queue = new PriorityQueue<ScopedDeclaration, SyntaxKind>(GetDeclarations(syntax, Predefined.GlobalModule));
         while (queue.Count > 0)
         {
-            var declaration = queue.Dequeue();
+            (var declaration, context.Module) = queue.Dequeue();
             Declare_StepTwo(declaration, context);
         }
     }
@@ -37,7 +39,7 @@ partial class Binder
                 {
                     var structDeclaration = (StructDeclarationSyntax)declaration;
                     var structName = structDeclaration.Name.Text.ToString();
-                    var typeSymbol = new StructTypeSymbol(structDeclaration, structName);
+                    var typeSymbol = new StructTypeSymbol(structDeclaration, structName, context.Module);
                     if (!context.BoundScope.Declare(typeSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(structDeclaration.Location, structName);
                 }
@@ -47,12 +49,13 @@ partial class Binder
                     var variableDeclaration = (VariableDeclarationSyntax)declaration;
                     var variableName = variableDeclaration.Name.Text.ToString();
                     var variableType = variableDeclaration.Type is null
-                        ? PredefinedSymbols.Unknown
+                        ? Predefined.Unknown
                         : BindType(variableDeclaration.Type, context);
                     var variableSymbol = new VariableSymbol(
                         variableDeclaration,
                         variableName,
                         variableType,
+                        context.Module,
                         IsStatic: true,
                         variableDeclaration.IsReadOnly);
 

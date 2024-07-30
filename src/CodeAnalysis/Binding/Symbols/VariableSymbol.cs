@@ -6,6 +6,7 @@ internal sealed record class VariableSymbol(
     SyntaxNode Syntax,
     string Name,
     TypeSymbol Type,
+    ModuleSymbol ContainingModule,
     bool IsStatic,
     bool IsReadOnly)
     : Symbol(
@@ -13,6 +14,7 @@ internal sealed record class VariableSymbol(
         Syntax,
         Name,
         Type,
+        ContainingModule,
         IsStatic,
         IsReadOnly)
 {
@@ -23,6 +25,7 @@ internal sealed record class VariableSymbol(
         syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.ThisKeyword),
         "this",
         type,
+        type.ContainingModule,
         IsStatic: false,
         IsReadOnly: true);
 }

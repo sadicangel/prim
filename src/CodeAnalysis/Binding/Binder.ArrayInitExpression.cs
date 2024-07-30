@@ -19,9 +19,9 @@ partial class Binder
 
         var elements = new BoundList<BoundExpression>(builder.ToImmutable());
 
-        var elementType = TypeSymbol.FromSet(types, syntax);
+        var elementType = TypeSymbol.FromSet(types, context.Module, syntax);
 
-        var arrayType = new ArrayTypeSymbol(syntax, elementType, elements.Count);
+        var arrayType = new ArrayTypeSymbol(syntax, elementType, elements.Count, context.Module);
 
         return new BoundArrayInitExpression(syntax, arrayType, elements);
     }

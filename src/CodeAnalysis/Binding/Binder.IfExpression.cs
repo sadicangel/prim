@@ -7,7 +7,7 @@ partial class Binder
 {
     private static BoundExpression BindIfElseExpression(IfExpressionSyntax syntax, Context context)
     {
-        var condition = Coerce(BindExpression(syntax.Condition, context), PredefinedSymbols.Bool, context);
+        var condition = Coerce(BindExpression(syntax.Condition, context), Predefined.Bool, context);
         if (condition.Type.IsNever)
         {
             return condition;
@@ -42,12 +42,12 @@ partial class Binder
                 return @else;
             }
 
-            type = then.Type == @else.Type ? then.Type : new UnionTypeSymbol(syntax, [then.Type, @else.Type]);
+            type = then.Type == @else.Type ? then.Type : new UnionTypeSymbol(syntax, [then.Type, @else.Type], context.Module);
         }
         else
         {
             @else = BoundLiteralExpression.Unit;
-            type = then.Type.IsOption ? then.Type : new OptionTypeSymbol(syntax, then.Type);
+            type = then.Type.IsOption ? then.Type : new OptionTypeSymbol(syntax, then.Type, context.Module);
         }
 
         return new BoundIfExpression(syntax, condition, then, @else, type);

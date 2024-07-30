@@ -9,21 +9,22 @@ internal abstract record class TypeSymbol(
     BoundKind BoundKind,
     SyntaxNode Syntax,
     string Name,
-    TypeSymbol Type)
-    : Symbol(BoundKind, Syntax, Name, Type, IsStatic: true, IsReadOnly: true)
+    TypeSymbol Type,
+    ModuleSymbol ContainingModule)
+    : Symbol(BoundKind, Syntax, Name, Type, ContainingModule, IsStatic: true, IsReadOnly: true)
 {
     private readonly List<Symbol> _members = [];
 
-    public bool IsAny { get => this == PredefinedSymbols.Any; }
-    public bool IsErr { get => this == PredefinedSymbols.Err; }
-    public bool IsUnit { get => this == PredefinedSymbols.Unit; }
+    public bool IsAny { get => this == Predefined.Any; }
+    public bool IsErr { get => this == Predefined.Err; }
+    public bool IsUnit { get => this == Predefined.Unit; }
     public bool IsArray { get => this is ArrayTypeSymbol; }
     public bool IsLambda { get => this is LambdaTypeSymbol; }
     public abstract bool IsNever { get; }
     public bool IsOption { get => this is OptionTypeSymbol; }
     public bool IsUnion { get => this is UnionTypeSymbol; }
-    public bool IsUnknown { get => this == PredefinedSymbols.Unknown; }
-    public bool IsPredefined { get => PredefinedSymbolNames.All.Contains(Name); }
+    public bool IsUnknown { get => this == Predefined.Unknown; }
+    public bool IsPredefined { get => Predefined.All().Any(s => s.Name == Name); }
 
     public virtual IEnumerable<Symbol> DeclaredSymbols { get; } = [];
 
@@ -32,35 +33,35 @@ internal abstract record class TypeSymbol(
 
     public Type GetCrlType() => Name switch
     {
-        PredefinedSymbolNames.Unit => typeof(Unit),
-        PredefinedSymbolNames.Str => typeof(string),
-        PredefinedSymbolNames.Bool => typeof(bool),
-        PredefinedSymbolNames.I8 => typeof(sbyte),
-        PredefinedSymbolNames.I16 => typeof(short),
-        PredefinedSymbolNames.I32 => typeof(int),
-        PredefinedSymbolNames.I64 => typeof(long),
-        PredefinedSymbolNames.I128 => typeof(BigInteger),
-        PredefinedSymbolNames.ISize => typeof(nint),
-        PredefinedSymbolNames.U8 => typeof(byte),
-        PredefinedSymbolNames.U16 => typeof(ushort),
-        PredefinedSymbolNames.U32 => typeof(uint),
-        PredefinedSymbolNames.U64 => typeof(ulong),
-        PredefinedSymbolNames.U128 => typeof(BigInteger),
-        PredefinedSymbolNames.USize => typeof(nuint),
-        PredefinedSymbolNames.F16 => typeof(Half),
-        PredefinedSymbolNames.F32 => typeof(float),
-        PredefinedSymbolNames.F64 => typeof(double),
-        PredefinedSymbolNames.F80 => typeof(double),
-        PredefinedSymbolNames.F128 => typeof(double),
+        "unit" => typeof(Unit),
+        "str" => typeof(string),
+        "bool" => typeof(bool),
+        "i8" => typeof(sbyte),
+        "i16" => typeof(short),
+        "i32" => typeof(int),
+        "i64" => typeof(long),
+        "i128" => typeof(BigInteger),
+        "isize" => typeof(nint),
+        "u8" => typeof(byte),
+        "u16" => typeof(ushort),
+        "u32" => typeof(uint),
+        "u64" => typeof(ulong),
+        "u128" => typeof(BigInteger),
+        "usize" => typeof(nuint),
+        "f16" => typeof(Half),
+        "f32" => typeof(float),
+        "f64" => typeof(double),
+        "f80" => typeof(double),
+        "f128" => typeof(double),
         _ => throw new UnreachableException($"Unexpected built-in {nameof(TypeSymbol)} '{Name}'"),
     };
 
-    public static TypeSymbol FromSet(HashSet<TypeSymbol> types, SyntaxNode? syntax = null) => types switch
+    public static TypeSymbol FromSet(HashSet<TypeSymbol> types, ModuleSymbol containingModule, SyntaxNode? syntax = null) => types switch
     {
-        { Count: 0 } => PredefinedSymbols.Unknown,
+        { Count: 0 } => Predefined.Unknown,
         { Count: 1 } => types.Single(),
-        _ when types.Contains(PredefinedSymbols.Never) => PredefinedSymbols.Never,
-        _ => new UnionTypeSymbol(syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.UnionType), [.. types]),
+        _ when types.Contains(Predefined.Never) => Predefined.Never,
+        _ => new UnionTypeSymbol(syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.UnionType), [.. types], containingModule),
     };
 
     internal static string GetMethodName(ReadOnlySpan<char> name, LambdaTypeSymbol type) =>
@@ -107,7 +108,8 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             name,
             type,
-            ContainingSymbol: this,
+            ContainingModule,
+            ContainingType: this,
             isStatic,
             isReadOnly);
         _members.Add(propertySymbol);
@@ -138,7 +140,8 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             GetMethodName(name, type),
             type,
-            ContainingSymbol: this,
+            ContainingModule,
+            ContainingType: this,
             isStatic,
             isReadOnly);
         _members.Add(methodSymbol);
@@ -164,7 +167,8 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(operatorKind),
             GetMethodName(operatorKind, type),
             type,
-            ContainingSymbol: this,
+            ContainingModule,
+            ContainingType: this,
             isStatic,
             isReadOnly);
         _members.Add(methodSymbol);
@@ -253,7 +257,8 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(conversionKind),
             $"{SyntaxFacts.GetText(conversionKind)}-{type.ReturnType.Name}<{type.Parameters[0].Type.Name}>",
             type,
-            ContainingSymbol: this);
+            ContainingModule,
+            ContainingType: this);
         _members.Add(conversionSymbol);
 
         return true;

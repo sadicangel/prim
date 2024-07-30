@@ -109,6 +109,7 @@ public enum SyntaxKind
     F80Keyword,
     F128Keyword,
 
+    ModuleKeyword,
     StructKeyword,
 
     TrueKeyword,

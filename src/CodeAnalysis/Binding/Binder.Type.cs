@@ -34,17 +34,17 @@ partial class Binder
         {
             var length = (BoundLiteralExpression)BindExpression(syntax.Length, context);
             Debug.Assert(length.Value is int);
-            return new ArrayTypeSymbol(syntax, elementType, (int)length.Value!);
+            return new ArrayTypeSymbol(syntax, elementType, (int)length.Value!, context.Module);
         }
 
         context.Diagnostics.ReportInvalidArrayLength(syntax.Length.Location);
-        return new ArrayTypeSymbol(syntax, PredefinedSymbols.Never, length: 0);
+        return new ArrayTypeSymbol(syntax, Predefined.Never, length: 0, context.Module);
     }
 
     static ErrorTypeSymbol BindErrorType(ErrorTypeSyntax syntax, Context context)
     {
         var valueType = BindType(syntax.ValueType, context);
-        return new ErrorTypeSymbol(syntax, valueType);
+        return new ErrorTypeSymbol(syntax, valueType, context.Module);
     }
 
     static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, Context context)
@@ -64,7 +64,7 @@ partial class Binder
             parameters.Add(parameter);
         }
 
-        return new LambdaTypeSymbol(syntax, parameters, returnType);
+        return new LambdaTypeSymbol(syntax, parameters, returnType, context.Module);
     }
 
     static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, Context context)
@@ -73,7 +73,7 @@ partial class Binder
         if (context.BoundScope.Lookup(structName) is not StructTypeSymbol typeSymbol)
         {
             context.Diagnostics.ReportUndefinedType(syntax.IdentifierToken.Location, structName);
-            return PredefinedSymbols.Never;
+            return Predefined.Never;
         }
         return typeSymbol;
     }
@@ -81,13 +81,13 @@ partial class Binder
     static OptionTypeSymbol BindOptionType(OptionTypeSyntax syntax, Context context)
     {
         var underlyingType = BindType(syntax.UnderlyingType, context);
-        return new OptionTypeSymbol(syntax, underlyingType);
+        return new OptionTypeSymbol(syntax, underlyingType, context.Module);
     }
 
     static PointerTypeSymbol BindPointerType(PointerTypeSyntax syntax, Context context)
     {
         var elementType = BindType(syntax.ElementType, context);
-        return new PointerTypeSymbol(syntax, elementType);
+        return new PointerTypeSymbol(syntax, elementType, context.Module);
     }
 
     static StructTypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax, Context context)
@@ -95,31 +95,31 @@ partial class Binder
         _ = context;
         return syntax.PredefinedTypeToken.SyntaxKind switch
         {
-            SyntaxKind.AnyKeyword => PredefinedSymbols.Any,
-            SyntaxKind.ErrKeyword => PredefinedSymbols.Err,
-            SyntaxKind.UnknownKeyword => PredefinedSymbols.Unknown,
-            SyntaxKind.NeverKeyword => PredefinedSymbols.Never,
-            SyntaxKind.UnitKeyword => PredefinedSymbols.Unit,
-            SyntaxKind.TypeKeyword => PredefinedSymbols.Type,
-            SyntaxKind.StrKeyword => PredefinedSymbols.Str,
-            SyntaxKind.BoolKeyword => PredefinedSymbols.Bool,
-            SyntaxKind.I8Keyword => PredefinedSymbols.I8,
-            SyntaxKind.I16Keyword => PredefinedSymbols.I16,
-            SyntaxKind.I32Keyword => PredefinedSymbols.I32,
-            SyntaxKind.I64Keyword => PredefinedSymbols.I64,
-            SyntaxKind.I128Keyword => PredefinedSymbols.I128,
-            SyntaxKind.ISizeKeyword => PredefinedSymbols.ISize,
-            SyntaxKind.U8Keyword => PredefinedSymbols.U8,
-            SyntaxKind.U16Keyword => PredefinedSymbols.U16,
-            SyntaxKind.U32Keyword => PredefinedSymbols.U32,
-            SyntaxKind.U64Keyword => PredefinedSymbols.U64,
-            SyntaxKind.U128Keyword => PredefinedSymbols.U128,
-            SyntaxKind.USizeKeyword => PredefinedSymbols.USize,
-            SyntaxKind.F16Keyword => PredefinedSymbols.F16,
-            SyntaxKind.F32Keyword => PredefinedSymbols.F32,
-            SyntaxKind.F64Keyword => PredefinedSymbols.F64,
-            SyntaxKind.F80Keyword => PredefinedSymbols.F80,
-            SyntaxKind.F128Keyword => PredefinedSymbols.F128,
+            SyntaxKind.AnyKeyword => Predefined.Any,
+            SyntaxKind.ErrKeyword => Predefined.Err,
+            SyntaxKind.UnknownKeyword => Predefined.Unknown,
+            SyntaxKind.NeverKeyword => Predefined.Never,
+            SyntaxKind.UnitKeyword => Predefined.Unit,
+            SyntaxKind.TypeKeyword => Predefined.Type,
+            SyntaxKind.StrKeyword => Predefined.Str,
+            SyntaxKind.BoolKeyword => Predefined.Bool,
+            SyntaxKind.I8Keyword => Predefined.I8,
+            SyntaxKind.I16Keyword => Predefined.I16,
+            SyntaxKind.I32Keyword => Predefined.I32,
+            SyntaxKind.I64Keyword => Predefined.I64,
+            SyntaxKind.I128Keyword => Predefined.I128,
+            SyntaxKind.ISizeKeyword => Predefined.ISize,
+            SyntaxKind.U8Keyword => Predefined.U8,
+            SyntaxKind.U16Keyword => Predefined.U16,
+            SyntaxKind.U32Keyword => Predefined.U32,
+            SyntaxKind.U64Keyword => Predefined.U64,
+            SyntaxKind.U128Keyword => Predefined.U128,
+            SyntaxKind.USizeKeyword => Predefined.USize,
+            SyntaxKind.F16Keyword => Predefined.F16,
+            SyntaxKind.F32Keyword => Predefined.F32,
+            SyntaxKind.F64Keyword => Predefined.F64,
+            SyntaxKind.F80Keyword => Predefined.F80,
+            SyntaxKind.F128Keyword => Predefined.F128,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
         };
     }
@@ -130,6 +130,6 @@ partial class Binder
         foreach (var typeSyntax in syntax.Types)
             builder.Add(BindType(typeSyntax, context));
         var types = new BoundList<TypeSymbol>(builder.ToImmutable());
-        return new UnionTypeSymbol(syntax, types);
+        return new UnionTypeSymbol(syntax, types, context.Module);
     }
 }

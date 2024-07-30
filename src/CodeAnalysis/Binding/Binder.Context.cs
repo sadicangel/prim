@@ -13,6 +13,9 @@ partial class Binder
 
         private int _labelId = 0;
 
+        // TODO: Actually return current module.
+        public ModuleSymbol Module { get; set; } = Predefined.GlobalModule;
+
         public BoundScope BoundScope { get => _scopes.Peek(); }
 
         public LoopScope? LoopScope { get => _loops.TryPeek(out var loopScope) ? loopScope : null; }
@@ -25,8 +28,8 @@ partial class Binder
         public IDisposable PushLoopScope()
         {
             var labelId = Interlocked.Increment(ref _labelId);
-            var continueLabel = new LabelSymbol($"continue<{labelId}>");
-            var breakLabel = new LabelSymbol($"break<{labelId}>");
+            var continueLabel = new LabelSymbol($"continue<{labelId}>", Module);
+            var breakLabel = new LabelSymbol($"break<{labelId}>", Module);
             return Disposable.LoopScope(this, new LoopScope(continueLabel, breakLabel));
         }
         public IDisposable PushLambdaScope(LambdaTypeSymbol lambda) => Disposable.LambdaScope(this, lambda);

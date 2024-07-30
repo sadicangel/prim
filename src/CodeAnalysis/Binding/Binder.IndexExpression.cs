@@ -21,7 +21,7 @@ partial class Binder
 
         // TODO: Actually check where this should be readonly or not.
         // Maybe the indexer should be a property instead?
-        var index = Coerce(BindExpression(syntax.Index, context), PredefinedSymbols.I32, context);
+        var index = Coerce(BindExpression(syntax.Index, context), Predefined.I32, context);
         if (index.Type.IsNever)
         {
             return index;

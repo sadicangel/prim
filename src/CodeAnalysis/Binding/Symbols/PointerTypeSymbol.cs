@@ -4,17 +4,13 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class PointerTypeSymbol : TypeSymbol
 {
-    public PointerTypeSymbol(TypeSymbol elementType)
-        : this(SyntaxFactory.SyntheticToken(SyntaxKind.PointerType), elementType)
-    {
-    }
-
-    public PointerTypeSymbol(SyntaxNode syntax, TypeSymbol elementType)
+    public PointerTypeSymbol(SyntaxNode syntax, TypeSymbol elementType, ModuleSymbol ContainingModule)
         : base(
             BoundKind.PointerTypeSymbol,
             syntax,
             elementType.IsUnion || elementType.IsLambda ? $"*({elementType.Name})" : $"*{elementType.Name}",
-            PredefinedSymbols.Type)
+            Predefined.Type,
+            ContainingModule)
     {
         ElementType = elementType;
     }

@@ -6,6 +6,7 @@ internal abstract record class Symbol(
     SyntaxNode Syntax,
     string Name,
     TypeSymbol Type,
+    ModuleSymbol ContainingModule,
     bool IsStatic,
     bool IsReadOnly)
     : BoundNode(BoundKind, Syntax)

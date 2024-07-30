@@ -9,10 +9,10 @@ partial class Lowerer
     {
         private readonly ConcurrentDictionary<string, int> _labelIds = [];
 
-        public LabelSymbol CreateLabel(string prefix)
+        public LabelSymbol CreateLabel(string prefix, ModuleSymbol containingModule)
         {
             var labelId = _labelIds.AddOrUpdate(prefix, 1, (_, id) => id + 1);
-            return new($"{prefix}<{labelId}>");
+            return new($"{prefix}<{labelId}>", containingModule);
         }
     }
 }

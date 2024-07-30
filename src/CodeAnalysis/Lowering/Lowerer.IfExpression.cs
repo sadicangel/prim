@@ -19,8 +19,8 @@ partial class Lowerer
         //  <else>
         //  end<$>:
 
-        var elseLabel = context.CreateLabel("else");
-        var endLabel = context.CreateLabel("end");
+        var elseLabel = context.CreateLabel("else", node.Type.ContainingModule);
+        var endLabel = context.CreateLabel("end", node.Type.ContainingModule);
 
         var expression = new BoundBlockExpression(
             node.Syntax,
