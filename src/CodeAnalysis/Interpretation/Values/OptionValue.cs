@@ -5,48 +5,31 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Interpretation.Values;
 internal sealed record class OptionValue : PrimValue
 {
-    private readonly PrimValue? _value;
-
-    public OptionValue(PrimValue value) : this(new OptionTypeSymbol(value.Type.Syntax, value.Type), value) { }
+    private readonly PrimValue _value;
 
     public OptionValue(OptionTypeSymbol optionType, PrimValue? value = null) : base(optionType)
     {
-        _value = value;
+        _value = value ?? Unit;
 
         var coalesce1 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
             new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType)], optionType))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
-        Set(
+        Add(
             coalesce1,
             new LambdaValue(coalesce1.LambdaType, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
         var coalesce2 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
             new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType.UnderlyingType)], optionType.UnderlyingType))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
-        Set(
+        Add(
             coalesce2,
             new LambdaValue(coalesce2.LambdaType, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
-        var implicit1 = optionType.GetConversion(optionType.UnderlyingType, optionType)
-            ?? throw new UnreachableException($"Missing conversion from {optionType.UnderlyingType} to {optionType}");
-        Set(
-            implicit1,
-            new LambdaValue(implicit1.LambdaType, (PrimValue x) => new OptionValue(x)));
-        var implicit2 = optionType.GetConversion(PredefinedSymbols.Unit, optionType)
-            ?? throw new UnreachableException($"Missing conversion from {PredefinedSymbols.Unit} to {optionType}");
-        Set(
-            implicit2,
-            new LambdaValue(implicit2.LambdaType, (PrimValue x) => new OptionValue(optionType)));
-        var @explicit = optionType.GetConversion(optionType, optionType.UnderlyingType)
-            ?? throw new UnreachableException($"Missing conversion from {optionType} to {optionType.UnderlyingType}");
-        Set(
-            @explicit,
-            new LambdaValue(@explicit.LambdaType, (PrimValue x) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : throw new InvalidOperationException("Invalid cast")));
     }
 
-    public override PrimValue Value { get => _value ?? Unit; }
+    public override PrimValue Value { get => _value; }
 
-    public bool HasValue => _value is not null;
+    public bool HasValue => !_value.Type.IsUnit;
 
     public bool Equals(OptionValue? other) => Type == other?.Type && (HasValue ? (other.HasValue && Value.Equals(other.Value)) : !other.HasValue);
     public override int GetHashCode() => HashCode.Combine(Type, HasValue, Value);

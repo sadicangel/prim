@@ -15,7 +15,7 @@ partial class Binder
         {
             if (conversion is null)
             {
-                return expression;
+                return new BoundStackInstantiationExpression(expression.Syntax, type, expression);
             }
 
             return new BoundConversionExpression(expression.Syntax, conversion, expression);

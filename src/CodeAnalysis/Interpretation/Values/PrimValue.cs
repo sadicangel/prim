@@ -14,7 +14,8 @@ internal abstract record class PrimValue(TypeSymbol Type)
 
     internal virtual PrimValue Get(Symbol symbol) => Members[symbol];
     internal T Get<T>(Symbol symbol) where T : PrimValue => (T)Get(symbol);
-    internal virtual void Set(Symbol symbol, PrimValue value) => Members.Add(symbol, value);
+    internal virtual void Add(Symbol symbol, PrimValue value) => Members.Add(symbol, value);
+    internal virtual void Set(Symbol symbol, PrimValue value) => Members[symbol] = value;
 
     public abstract override int GetHashCode();
     public abstract bool Equals(PrimValue? other);

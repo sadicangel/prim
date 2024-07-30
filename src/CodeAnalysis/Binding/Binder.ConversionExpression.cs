@@ -9,6 +9,12 @@ partial class Binder
         var expression = BindExpression(syntax.Expression, context);
         var type = BindType(syntax.Type, context);
 
+        if (expression.Type == type)
+        {
+            context.Diagnostics.ReportRedundantConversion(expression.Syntax.Location);
+            return expression;
+        }
+
         return Convert(expression, type, isExplicit: true, context);
     }
 }

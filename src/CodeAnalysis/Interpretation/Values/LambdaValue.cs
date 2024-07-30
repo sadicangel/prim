@@ -10,7 +10,7 @@ internal sealed record class LambdaValue : PrimValue
         LambdaType = lambdaType;
         Delegate = @delegate;
         var invocationOperator = lambdaType.GetOperators(SyntaxKind.ParenthesisOpenParenthesisCloseToken).Single();
-        Set(invocationOperator, this);
+        Add(invocationOperator, this);
     }
 
     public LambdaTypeSymbol LambdaType { get; init; }

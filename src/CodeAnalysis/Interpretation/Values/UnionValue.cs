@@ -13,7 +13,7 @@ internal sealed record class UnionValue : PrimValue
         {
             var conversion = unionType.GetConversion(type, unionType)
                 ?? throw new UnreachableException($"Missing conversion from {type} to {unionType}");
-            Set(
+            Add(
                 conversion,
                 new LambdaValue(conversion.LambdaType, (PrimValue x) => new UnionValue(unionType, x)));
         }

@@ -12,7 +12,7 @@ partial class Interpreter
         var methodReference = new ReferenceValue(
             node.Symbol.Type,
             () => expression.Get(node.Symbol),
-            pv => expression.Set(node.Symbol, pv));
+            pv => expression.Add(node.Symbol, pv));
         return methodReference;
     }
 }

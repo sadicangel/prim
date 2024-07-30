@@ -47,6 +47,10 @@ partial class Interpreter
                 EvaluateStructInitExpression((BoundStructInitExpression)node, context),
             BoundKind.ConversionExpression =>
                 EvaluateConversionExpression((BoundConversionExpression)node, context),
+            BoundKind.StackInstantiationExpression =>
+                EvaluateStackInstantiationExpression((BoundStackInstantiationExpression)node, context),
+            //BoundKind.HeapInstantiationExpression =>
+            //    EvaluateHeapInstantiationExpression((BoundHeapInstantiationExpression)node, context),
             BoundKind.UnaryExpression =>
                 EvaluateUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression =>

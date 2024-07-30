@@ -15,11 +15,11 @@ partial class Binder
         {
             if (conversion is null)
             {
-                if (isExplicit)
+                if (isExplicit && expression is BoundReference)
                 {
                     context.Diagnostics.ReportRedundantConversion(expression.Syntax.Location);
                 }
-                return expression;
+                return new BoundStackInstantiationExpression(expression.Syntax, type, expression);
             }
 
             if (!isExplicit && conversion.IsExplicit)

@@ -24,5 +24,5 @@ internal sealed record class ReferenceValue : PrimValue
     public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 
     internal override PrimValue Get(Symbol symbol) => ReferencedValue.Get(symbol);
-    internal override void Set(Symbol symbol, PrimValue value) => ReferencedValue.Set(symbol, value);
+    internal override void Add(Symbol symbol, PrimValue value) => ReferencedValue.Add(symbol, value);
 }

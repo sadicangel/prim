@@ -35,6 +35,9 @@ internal enum BoundKind
 
     ConversionExpression,
 
+    StackInstantiationExpression,
+    HeapInstantiationExpression,
+
     UnaryExpression,
     BinaryExpression,
 

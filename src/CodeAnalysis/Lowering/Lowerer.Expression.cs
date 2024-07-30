@@ -26,6 +26,8 @@ partial class Lowerer
             BoundKind.StructInitExpression => LowerStructInitExpression((BoundStructInitExpression)node, context),
             BoundKind.InvocationExpression => LowerInvocationExpression((BoundInvocationExpression)node, context),
             BoundKind.ConversionExpression => LowerConversionExpression((BoundConversionExpression)node, context),
+            BoundKind.StackInstantiationExpression => LowerStackInstantiationExpression((BoundStackInstantiationExpression)node, context),
+            //BoundKind.HeapInstantiationExpression => LowerHeapInstantiationExpression((BoundHeapInstantiationExpression)node, context),
             BoundKind.UnaryExpression => LowerUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression => LowerBinaryExpression((BoundBinaryExpression)node, context),
             BoundKind.IfExpression => LowerIfExpression((BoundIfExpression)node, context),

@@ -34,7 +34,7 @@ public partial class BinderTests
             """));
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
-        Assert.Equal(BoundKind.UnaryExpression, node.BoundKind);
+        Assert.Equal(BoundKind.ConversionExpression, node.BoundKind);
     }
 
     public static TheoryData<string, string> GetConversions()

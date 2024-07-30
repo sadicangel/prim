@@ -14,12 +14,12 @@ internal sealed record class ErrorValue : PrimValue
 
         var implicit1 = errorType.GetConversion(errorType.ValueType, errorType)
             ?? throw new UnreachableException($"Missing conversion from {errorType.ValueType} to {errorType}");
-        Set(
+        Add(
             implicit1,
             new LambdaValue(implicit1.LambdaType, (PrimValue x) => new ErrorValue(errorType, x)));
         var implicit2 = errorType.GetConversion(PredefinedSymbols.Err, errorType)
             ?? throw new UnreachableException($"Missing conversion from {PredefinedSymbols.Err} to {errorType}");
-        Set(
+        Add(
             implicit2,
             new LambdaValue(implicit2.LambdaType, (PrimValue x) => new ErrorValue(errorType, x)));
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using CodeAnalysis.Binding.Symbols;
 
 namespace CodeAnalysis.Interpretation.Values;
@@ -16,7 +17,7 @@ internal sealed record class InstanceValue
         foreach (var (memberSymbol, memberValue) in Struct.Members)
         {
             if (!memberSymbol.IsStatic)
-                Set(memberSymbol, memberValue);
+                Add(memberSymbol, memberValue);
         }
     }
 
@@ -26,12 +27,29 @@ internal sealed record class InstanceValue
 
     public override object Value => _literalValue ?? Members;
 
+    [MemberNotNullWhen(true, nameof(_literalValue))]
     public bool IsLiteral => _literalValue is not null;
 
     public int Count { get => Members.Count; }
 
-    public bool Equals(InstanceValue? other) => Struct == other?.Struct && _literalValue == other._literalValue && Members.SequenceEqual(other.Members);
-    public override int GetHashCode() => HashCode.Combine(Struct, _literalValue, Members);
+    public bool Equals(InstanceValue? other)
+    {
+        if (Struct != other?.Struct) return false;
+
+        return IsLiteral ? _literalValue.Equals(other._literalValue) : Members.SequenceEqual(other.Members);
+    }
+
+    public override int GetHashCode()
+    {
+        if (IsLiteral)
+            return HashCode.Combine(Struct, _literalValue);
+
+        var hash = new HashCode();
+        hash.Add(Struct);
+        foreach (var member in Members)
+            hash.Add(member);
+        return hash.ToHashCode();
+    }
 
     internal override PrimValue Get(Symbol symbol) => symbol.IsStatic ? Struct.Get(symbol) : base.Get(symbol);
 

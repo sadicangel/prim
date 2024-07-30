@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Binding.Expressions;
-using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Interpretation;
@@ -13,10 +12,8 @@ partial class Interpreter
             throw new NotSupportedException($"Unexpected left hand side of {nameof(BoundAssignmentExpression)} '{node.Left.BoundKind}'");
         }
 
-        var value = node.Type is LambdaTypeSymbol lambdaType
-            ? new LambdaValue(lambdaType, FuncFactory.Create(lambdaType, node.Right, context))
-            : EvaluateExpression(node.Right, context);
-        @ref.ReferencedValue = value;
-        return value;
+        var right = ValueFactory.Create(node.Type, node.Right, context);
+        @ref.ReferencedValue = right;
+        return right;
     }
 }

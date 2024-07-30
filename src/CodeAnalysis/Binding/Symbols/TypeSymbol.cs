@@ -16,6 +16,7 @@ internal abstract record class TypeSymbol(
 
     public bool IsAny { get => this == PredefinedSymbols.Any; }
     public bool IsErr { get => this == PredefinedSymbols.Err; }
+    public bool IsUnit { get => this == PredefinedSymbols.Unit; }
     public bool IsArray { get => this is ArrayTypeSymbol; }
     public bool IsLambda { get => this is LambdaTypeSymbol; }
     public abstract bool IsNever { get; }
@@ -72,13 +73,13 @@ internal abstract record class TypeSymbol(
     internal bool IsCoercibleFrom(TypeSymbol type, out ConversionSymbol? conversion) =>
         IsConvertibleFrom(type, out conversion) && conversion?.IsExplicit is not true;
 
-    internal bool IsCoercibleTo(TypeSymbol type) => IsCoercibleFrom(type, out _);
+    internal bool IsCoercibleTo(TypeSymbol type) => IsCoercibleTo(type, out _);
     internal bool IsCoercibleTo(TypeSymbol type, out ConversionSymbol? conversion) => type.IsCoercibleFrom(this, out conversion);
 
     internal bool IsConvertibleFrom(TypeSymbol type) => IsConvertibleFrom(type, out _);
     internal abstract bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion);
 
-    internal bool IsConvertibleTo(TypeSymbol type) => IsConvertibleFrom(type, out _);
+    internal bool IsConvertibleTo(TypeSymbol type) => IsConvertibleTo(type, out _);
     internal bool IsConvertibleTo(TypeSymbol type, out ConversionSymbol? conversion) => type.IsConvertibleFrom(this, out conversion);
 
     internal List<Symbol> GetSymbols(ReadOnlySpan<char> name)

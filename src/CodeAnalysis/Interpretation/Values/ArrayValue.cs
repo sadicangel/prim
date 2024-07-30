@@ -14,7 +14,7 @@ internal sealed record class ArrayValue
         ArrayType = arrayType;
         Elements = elements;
         var index = arrayType.GetOperators(SyntaxKind.BracketOpenBracketCloseToken).Single();
-        Set(index, new LambdaValue(index.LambdaType, GetValue));
+        Add(index, new LambdaValue(index.LambdaType, GetValue));
     }
 
     public override PrimValue[] Value => Elements;

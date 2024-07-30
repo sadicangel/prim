@@ -32,7 +32,7 @@ partial class Interpreter
         static object EvaluatePropertyDeclaration(BoundPropertyDeclaration member, StructValue structValue, Context context)
         {
             var value = EvaluateExpression(member.Expression, context);
-            structValue.Set(member.PropertySymbol, value);
+            structValue.Add(member.PropertySymbol, value);
             return 0;
         }
 
@@ -41,7 +41,7 @@ partial class Interpreter
             var lambda = new LambdaValue(
                 member.MethodSymbol.LambdaType,
                 FuncFactory.Create(member.MethodSymbol.LambdaType, member.Body, context));
-            structValue.Set(member.MethodSymbol, lambda);
+            structValue.Add(member.MethodSymbol, lambda);
             return 0;
         }
 
@@ -58,7 +58,7 @@ partial class Interpreter
             var lambda = new LambdaValue(
                 member.ConversionSymbol.LambdaType,
                 FuncFactory.Create(member.ConversionSymbol.LambdaType, member.Body, context));
-            structValue.Set(member.ConversionSymbol, lambda);
+            structValue.Add(member.ConversionSymbol, lambda);
             return 0;
         }
     }

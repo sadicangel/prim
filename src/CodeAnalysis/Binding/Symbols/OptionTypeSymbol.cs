@@ -23,15 +23,6 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
         AddOperator(
             SyntaxKind.HookHookToken,
             new LambdaTypeSymbol([new Parameter("x", this), new Parameter("y", UnderlyingType)], UnderlyingType));
-        AddConversion(
-            SyntaxKind.ImplicitKeyword,
-            new LambdaTypeSymbol([new Parameter("x", UnderlyingType)], this));
-        AddConversion(
-            SyntaxKind.ImplicitKeyword,
-            new LambdaTypeSymbol([new Parameter("x", PredefinedSymbols.Unit)], this));
-        AddConversion(
-            SyntaxKind.ExplicitKeyword,
-            new LambdaTypeSymbol([new Parameter("x", this)], UnderlyingType));
     }
 
     public TypeSymbol UnderlyingType { get; init; }
@@ -41,12 +32,12 @@ internal sealed record class OptionTypeSymbol : TypeSymbol
     internal override bool IsConvertibleFrom(TypeSymbol type, out ConversionSymbol? conversion)
     {
         conversion = null;
-        if (type == this)
+        if (type == this || type.IsUnit || type == UnderlyingType)
         {
             return true;
         }
 
-        conversion = GetConversion(type, this) ?? type.GetConversion(type, this);
+        // TODO: Support underlying type conversions?
 
         return conversion is not null;
     }
