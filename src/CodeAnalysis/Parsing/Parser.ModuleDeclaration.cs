@@ -4,28 +4,28 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static StructDeclarationSyntax ParseStructDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static ModuleDeclarationSyntax ParseModuleDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var name = ParseIdentifierNameExpression(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
-        var structKeyword = iterator.Match(SyntaxKind.StructKeyword);
+        var moduleKeyword = iterator.Match(SyntaxKind.ModuleKeyword);
         var colonOrEquals = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
-        var members = ParseSyntaxList(
+        var declarations = ParseSyntaxList(
             syntaxTree,
             iterator,
             [SyntaxKind.BraceCloseToken, SyntaxKind.EofToken],
-            ParseMemberDeclaration);
+            ParseDeclaration);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
-        return new StructDeclarationSyntax(
+        return new ModuleDeclarationSyntax(
             syntaxTree,
             name,
             colonToken,
-            structKeyword,
+            moduleKeyword,
             colonOrEquals,
             braceOpenToken,
-            members,
+            declarations,
             braceCloseToken);
     }
 }

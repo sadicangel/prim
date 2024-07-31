@@ -13,6 +13,7 @@ internal enum BoundKind
 
     AssignmentExpression,
 
+    ModuleDeclaration,
     LabelDeclaration,
     StructDeclaration,
     VariableDeclaration,

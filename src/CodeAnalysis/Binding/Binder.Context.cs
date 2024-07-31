@@ -24,7 +24,9 @@ partial class Binder
 
         public DiagnosticBag Diagnostics { get => BoundTree.Diagnostics; }
 
-        public IDisposable PushBoundScope() => Disposable.BoundScope(this, new AnonymousScope(BoundScope));
+        public IDisposable PushBoundScope(ModuleSymbol? module = null) =>
+            Disposable.BoundScope(this, module as IBoundScope ?? new AnonymousScope(BoundScope));
+
         public IDisposable PushLoopScope()
         {
             var labelId = Interlocked.Increment(ref _labelId);
@@ -32,6 +34,7 @@ partial class Binder
             var breakLabel = new LabelSymbol($"break<{labelId}>", Module);
             return Disposable.LoopScope(this, new LoopScope(continueLabel, breakLabel));
         }
+
         public IDisposable PushLambdaScope(LambdaTypeSymbol lambda) => Disposable.LambdaScope(this, lambda);
 
         private readonly struct Disposable : IDisposable

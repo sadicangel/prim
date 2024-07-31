@@ -1,27 +1,25 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class StructDeclarationSyntax(
+public sealed record class ModuleDeclarationSyntax(
     SyntaxTree SyntaxTree,
     IdentifierNameExpressionSyntax Name,
     SyntaxToken ColonToken,
-    SyntaxToken StructKeyword,
+    SyntaxToken ModuleKeyword,
     SyntaxToken ColonOrEquals,
     SyntaxToken BraceOpenToken,
-    SyntaxList<MemberDeclarationSyntax> Members,
-    SyntaxToken BraceCloseToken)
-    : DeclarationSyntax(SyntaxKind.StructDeclaration, SyntaxTree)
+    SyntaxList<DeclarationSyntax> Declarations,
+    SyntaxToken BraceCloseToken
+    )
+    : DeclarationSyntax(SyntaxKind.ModuleDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly
-    { get => ColonOrEquals.SyntaxKind is SyntaxKind.ColonToken; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;
         yield return ColonToken;
-        yield return StructKeyword;
+        yield return ModuleKeyword;
         yield return ColonOrEquals;
         yield return BraceOpenToken;
-        foreach (var member in Members)
-            yield return member;
+        foreach (var declaration in Declarations)
+            yield return declaration;
         yield return BraceCloseToken;
     }
 }

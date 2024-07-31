@@ -162,8 +162,9 @@ public static class SyntaxFacts
 
             SyntaxKind.GroupExpression => null,
 
-            SyntaxKind.VariableDeclaration => null,
+            SyntaxKind.ModuleDeclaration => null,
             SyntaxKind.StructDeclaration => null,
+            SyntaxKind.VariableDeclaration => null,
             SyntaxKind.PropertyDeclaration => null,
             SyntaxKind.MethodDeclaration => null,
             SyntaxKind.OperatorDeclaration => null,

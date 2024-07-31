@@ -11,7 +11,9 @@ var previousEvaluation = default(Evaluation);
 while (true)
 {
     var @default = Markup.Escape("""
-        a: [i32|str:2] = [0,0];
+        a: module = {
+            b: i32 = 0;
+        }
         """);
 
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue(@default));
@@ -19,7 +21,7 @@ while (true)
     if (code == @default)
         code = Markup.Remove(code);
 
-    var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
+    var compilation = Compilation.Compile(new SourceText(code), previousCompilation);
 
     if (compilation.Diagnostics.Count > 0)
     {

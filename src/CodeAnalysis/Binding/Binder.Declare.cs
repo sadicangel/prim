@@ -6,78 +6,73 @@ using CodeAnalysis.Syntax.Expressions;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private readonly record struct ScopedDeclaration(DeclarationSyntax Declaration, ModuleSymbol ContainingModule);
-
-    private static IEnumerable<(ScopedDeclaration, SyntaxKind)> GetDeclarations(SyntaxNode syntax, ModuleSymbol module) =>
-        syntax.Children().OfType<DeclarationSyntax>().Select(s => (new ScopedDeclaration(s, module), s.SyntaxKind));
-
     public static void Declare_StepOne(CompilationUnitSyntax syntax, Context context)
     {
-        var queue = new PriorityQueue<ScopedDeclaration, SyntaxKind>(GetDeclarations(syntax, Predefined.GlobalModule));
-        while (queue.Count > 0)
-        {
-            (var declaration, _) = queue.Dequeue();
+        foreach (var declaration in syntax.Children().OfType<DeclarationSyntax>())
             Declare_StepOne(declaration, context);
-        }
     }
 
     public static void Declare_StepTwo(CompilationUnitSyntax syntax, Context context)
     {
-        var queue = new PriorityQueue<ScopedDeclaration, SyntaxKind>(GetDeclarations(syntax, Predefined.GlobalModule));
-        while (queue.Count > 0)
-        {
-            (var declaration, _) = queue.Dequeue();
+        foreach (var declaration in syntax.Children().OfType<DeclarationSyntax>())
             Declare_StepTwo(declaration, context);
-        }
     }
 
-    private static void Declare_StepOne(DeclarationSyntax declaration, Context context)
+    private static void Declare_StepOne(DeclarationSyntax syntax, Context context)
     {
-        switch (declaration.SyntaxKind)
+        switch (syntax.SyntaxKind)
         {
+            case SyntaxKind.ModuleDeclaration:
+                {
+                    var moduleDeclaration = (ModuleDeclarationSyntax)syntax;
+                    var moduleName = moduleDeclaration.Name.Text.ToString();
+                    var moduleSymbol = new ModuleSymbol(moduleDeclaration, moduleName, context.Module);
+                    if (!context.Module.Declare(moduleSymbol))
+                        context.Diagnostics.ReportSymbolRedeclaration(moduleDeclaration.Location, moduleName);
+                    using (context.PushBoundScope(moduleSymbol))
+                    {
+                        foreach (var declaration in syntax.Children().OfType<DeclarationSyntax>())
+                            Declare_StepOne(declaration, context);
+                    }
+                }
+                break;
             case SyntaxKind.StructDeclaration:
                 {
-                    var structDeclaration = (StructDeclarationSyntax)declaration;
+                    var structDeclaration = (StructDeclarationSyntax)syntax;
                     var structName = structDeclaration.Name.Text.ToString();
                     var typeSymbol = new StructTypeSymbol(structDeclaration, structName, context.Module);
-                    if (!context.BoundScope.Declare(typeSymbol))
+                    if (!context.Module.Declare(typeSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(structDeclaration.Location, structName);
                 }
                 break;
             case SyntaxKind.VariableDeclaration:
-                {
-                    var variableDeclaration = (VariableDeclarationSyntax)declaration;
-                    var variableName = variableDeclaration.Name.Text.ToString();
-                    var variableType = variableDeclaration.Type is null
-                        ? Predefined.Unknown
-                        : BindType(variableDeclaration.Type, context);
-                    var variableSymbol = new VariableSymbol(
-                        variableDeclaration,
-                        variableName,
-                        variableType,
-                        context.Module,
-                        IsStatic: true,
-                        variableDeclaration.IsReadOnly);
-
-                    if (!context.BoundScope.Declare(variableSymbol))
-                        context.Diagnostics.ReportSymbolRedeclaration(variableDeclaration.Location, variableName);
-                }
                 break;
             default:
-                throw new UnreachableException($"Unexpected declaration '{declaration.SyntaxKind}'");
+                throw new UnreachableException($"Unexpected declaration '{syntax.SyntaxKind}'");
         }
     }
 
-    private static void Declare_StepTwo(DeclarationSyntax declaration, Context context)
+    private static void Declare_StepTwo(DeclarationSyntax syntax, Context context)
     {
-        switch (declaration.SyntaxKind)
+        switch (syntax.SyntaxKind)
         {
+            case SyntaxKind.ModuleDeclaration:
+                var moduleDeclaration = (ModuleDeclarationSyntax)syntax;
+                var moduleName = moduleDeclaration.Name.Text.ToString();
+                if (context.BoundScope.Lookup(moduleName) is not ModuleSymbol moduleSymbol)
+                    throw new UnreachableException($"Unexpected declaration '{syntax}'");
+                using (context.PushBoundScope(moduleSymbol))
+                {
+                    foreach (var declaration in syntax.Children().OfType<DeclarationSyntax>())
+                        Declare_StepTwo(declaration, context);
+                }
+                break;
             case SyntaxKind.StructDeclaration:
                 {
-                    var structDeclaration = (StructDeclarationSyntax)declaration;
+                    var structDeclaration = (StructDeclarationSyntax)syntax;
                     var structName = structDeclaration.Name.Text.ToString();
                     if (context.BoundScope.Lookup(structName) is not StructTypeSymbol structType)
-                        throw new UnreachableException($"Unexpected declaration '{declaration}'");
+                        throw new UnreachableException($"Unexpected declaration '{syntax}'");
                     foreach (var member in structDeclaration.Members)
                     {
                         switch (member.SyntaxKind)
@@ -141,9 +136,26 @@ partial class Binder
                 }
                 break;
             case SyntaxKind.VariableDeclaration:
+                {
+                    var variableDeclaration = (VariableDeclarationSyntax)syntax;
+                    var variableName = variableDeclaration.Name.Text.ToString();
+                    var variableType = variableDeclaration.Type is null
+                        ? Predefined.Unknown
+                        : BindType(variableDeclaration.Type, context);
+                    var variableSymbol = new VariableSymbol(
+                        variableDeclaration,
+                        variableName,
+                        variableType,
+                        context.Module,
+                        IsStatic: true,
+                        variableDeclaration.IsReadOnly);
+
+                    if (!context.BoundScope.Declare(variableSymbol))
+                        context.Diagnostics.ReportSymbolRedeclaration(variableDeclaration.Location, variableName);
+                }
                 break;
             default:
-                throw new UnreachableException($"Unexpected declaration '{declaration.SyntaxKind}'");
+                throw new UnreachableException($"Unexpected declaration '{syntax.SyntaxKind}'");
         }
     }
 }

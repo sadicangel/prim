@@ -162,6 +162,7 @@ public enum SyntaxKind
 
     GroupExpression,
 
+    ModuleDeclaration,
     StructDeclaration,
     VariableDeclaration,
     PropertyDeclaration,

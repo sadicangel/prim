@@ -8,8 +8,8 @@ partial class Parser
     {
         return iterator.Peek(2).SyntaxKind switch
         {
-            // TODO: Support module declarations.
             // TODO: Support enum declarations.
+            SyntaxKind.ModuleKeyword => ParseModuleDeclaration(syntaxTree, iterator),
             SyntaxKind.StructKeyword => ParseStructDeclaration(syntaxTree, iterator),
             _ => ParseVariableDeclaration(syntaxTree, iterator),
         };

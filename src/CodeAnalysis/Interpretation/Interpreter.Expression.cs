@@ -21,6 +21,8 @@ partial class Interpreter
                 EvaluateAssignmentExpression((BoundAssignmentExpression)node, context),
             BoundKind.LabelDeclaration =>
                 EvaluateLabelDeclaration((BoundLabelDeclaration)node, context),
+            BoundKind.ModuleDeclaration =>
+                EvaluateModuleDeclaration((BoundModuleDeclaration)node, context),
             BoundKind.StructDeclaration =>
                 EvaluateStructDeclaration((BoundStructDeclaration)node, context),
             BoundKind.VariableDeclaration =>

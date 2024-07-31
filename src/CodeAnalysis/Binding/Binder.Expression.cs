@@ -21,6 +21,8 @@ partial class Binder
                 BindInitValueExpression((InitValueExpressionSyntax)syntax, context),
             SyntaxKind.VariableDeclaration =>
                 BindVariableDeclaration((VariableDeclarationSyntax)syntax, context),
+            SyntaxKind.ModuleDeclaration =>
+                BindModuleDeclaration((ModuleDeclarationSyntax)syntax, context),
             SyntaxKind.StructDeclaration =>
                 BindStructDeclaration((StructDeclarationSyntax)syntax, context),
             SyntaxKind.LocalDeclaration =>

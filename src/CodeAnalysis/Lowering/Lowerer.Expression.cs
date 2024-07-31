@@ -13,6 +13,7 @@ partial class Lowerer
             BoundKind.NeverExpression => LowerNeverExpression((BoundNeverExpression)node, context),
             BoundKind.LiteralExpression => LowerLiteralExpression((BoundLiteralExpression)node, context),
             BoundKind.AssignmentExpression => LowerAssignmentExpression((BoundAssignmentExpression)node, context),
+            BoundKind.ModuleDeclaration => LowerModuleDeclaration((BoundModuleDeclaration)node, context),
             BoundKind.LabelDeclaration => LowerLabelDeclaration((BoundLabelDeclaration)node, context),
             BoundKind.StructDeclaration => LowerStructDeclaration((BoundStructDeclaration)node, context),
             BoundKind.VariableDeclaration => LowerVariableDeclaration((BoundVariableDeclaration)node, context),
