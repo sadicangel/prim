@@ -11,7 +11,12 @@ partial class Interpreter
 
         public EvaluatedScope EvaluatedScope { get => _scopes.Peek(); }
         public int InstructionIndex { get; set; }
-        public PrimValue LastValue { get; set; } = PrimValue.Unit;
+        public PrimValue LastValue { get; set; } = new InstanceValue(EvaluatedScope.Unit, CodeAnalysis.Unit.Value);
+
+        internal InstanceValue Unit { get; } = new InstanceValue(EvaluatedScope.Unit, CodeAnalysis.Unit.Value);
+        internal InstanceValue True { get; } = new InstanceValue(EvaluatedScope.Bool, true);
+        internal InstanceValue False { get; } = new InstanceValue(EvaluatedScope.Bool, false);
+        internal InstanceValue EmptyStr { get; } = new InstanceValue(EvaluatedScope.Str, string.Empty);
 
         public IDisposable PushScope() => Disposable.EvaluatedScope(this, new EvaluatedScope(EvaluatedScope));
 

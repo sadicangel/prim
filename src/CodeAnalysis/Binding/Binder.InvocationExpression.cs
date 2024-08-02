@@ -23,7 +23,7 @@ partial class Binder
         if (operators is [])
         {
             context.Diagnostics.ReportUndefinedInvocationOperator(syntax.Location, expression.Type.Name);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         operators.RemoveAll(o => o.Parameters.Count != syntax.Arguments.Count);
@@ -31,7 +31,7 @@ partial class Binder
         if (operators is [])
         {
             context.Diagnostics.ReportInvalidArgumentListLength(syntax.Location, syntax.Arguments.Count);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         var arguments = new BoundList<BoundExpression>(syntax.Arguments.Select(arg => BindArgument(arg, context)).ToImmutableArray());
@@ -44,11 +44,11 @@ partial class Binder
                 case { Count: 0 }:
                     // TODO: Report first non matching argument instead.
                     context.Diagnostics.ReportInvalidArgumentListLength(syntax.Location, syntax.Arguments.Count);
-                    return new BoundNeverExpression(syntax);
+                    return new BoundNeverExpression(syntax, context.BoundScope.Never);
 
                 case { Count: > 1 }:
                     context.Diagnostics.ReportAmbiguousInvocationOperator(syntax.Location, [.. arguments.Select(a => a.Type.Name)]);
-                    return new BoundNeverExpression(syntax);
+                    return new BoundNeverExpression(syntax, context.BoundScope.Never);
 
                 default:
                     @operator = matchingOperators.Single();

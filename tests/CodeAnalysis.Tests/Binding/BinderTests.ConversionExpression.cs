@@ -4,24 +4,24 @@ using CodeAnalysis.Binding.Symbols;
 namespace CodeAnalysis.Tests.Binding;
 public partial class BinderTests
 {
-    private static readonly TypeSymbol[] s_numberTypes = [
-        Predefined.I8,
-        Predefined.I16,
-        Predefined.I32,
-        Predefined.I64,
-        Predefined.I128,
-        Predefined.ISize,
-        Predefined.U8,
-        Predefined.U16,
-        Predefined.U32,
-        Predefined.U64,
-        Predefined.U128,
-        Predefined.USize,
-        Predefined.F16,
-        Predefined.F32,
-        Predefined.F64,
-        Predefined.F80,
-        Predefined.F128,
+    private static readonly string[] s_numberTypes = [
+        PredefinedTypes.I8,
+        PredefinedTypes.I16,
+        PredefinedTypes.I32,
+        PredefinedTypes.I64,
+        PredefinedTypes.I128,
+        PredefinedTypes.Isz,
+        PredefinedTypes.U8,
+        PredefinedTypes.U16,
+        PredefinedTypes.U32,
+        PredefinedTypes.U64,
+        PredefinedTypes.U128,
+        PredefinedTypes.Usz,
+        PredefinedTypes.F16,
+        PredefinedTypes.F32,
+        PredefinedTypes.F64,
+        PredefinedTypes.F80,
+        PredefinedTypes.F128,
     ];
 
     [Theory]
@@ -43,7 +43,7 @@ public partial class BinderTests
         foreach (var sourceType in s_numberTypes)
             foreach (var targetType in s_numberTypes)
                 if (sourceType != targetType)
-                    data.Add(sourceType.Name, targetType.Name);
+                    data.Add(sourceType, targetType);
         return data;
     }
 }

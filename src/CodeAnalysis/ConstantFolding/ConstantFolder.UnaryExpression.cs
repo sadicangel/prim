@@ -13,7 +13,9 @@ partial class ConstantFolder
             return null;
         }
 
-        var typedValue = Interpreter.EvaluateUnaryExpression(node, new Interpreter.Context(GlobalEvaluatedScope.Instance, []));
+        var typedValue = Interpreter.EvaluateUnaryExpression(
+            node,
+            new Interpreter.Context(new EvaluatedScope(node.Type.ContainingModule.Global), []));
 
         Debug.Assert(typedValue.Type == node.Type);
 

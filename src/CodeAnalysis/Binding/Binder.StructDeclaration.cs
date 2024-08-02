@@ -46,12 +46,12 @@ partial class Binder
             }
             else if (property.Type.IsOption)
             {
-                init = Coerce(BoundLiteralExpression.Unit, property.Type, context);
+                init = Coerce(BoundLiteralExpression.Unit(context.BoundScope.Unit), property.Type, context);
             }
             else
             {
                 context.Diagnostics.ReportUninitializedProperty(syntax.Location, property.Name);
-                init = new BoundNeverExpression(syntax);
+                init = new BoundNeverExpression(syntax, context.BoundScope.Never);
             }
 
             return new BoundPropertyDeclaration(syntax, property, init);

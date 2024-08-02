@@ -4,26 +4,26 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class OptionTypeSymbol : TypeSymbol
 {
-    public OptionTypeSymbol(TypeSymbol underlyingType, ModuleSymbol ContainingModule)
-        : this(SyntaxFactory.SyntheticToken(SyntaxKind.OptionType), underlyingType, ContainingModule)
+    public OptionTypeSymbol(TypeSymbol underlyingType, TypeSymbol runtimeType, ModuleSymbol containingModule)
+        : this(SyntaxFactory.SyntheticToken(SyntaxKind.OptionType), underlyingType, runtimeType, containingModule)
     {
     }
 
-    public OptionTypeSymbol(SyntaxNode syntax, TypeSymbol underlyingType, ModuleSymbol containingModule)
+    public OptionTypeSymbol(SyntaxNode syntax, TypeSymbol underlyingType, TypeSymbol runtimeType, ModuleSymbol containingModule)
         : base(
             BoundKind.OptionTypeSymbol,
             syntax,
             underlyingType.IsUnion || underlyingType.IsLambda ? $"?({underlyingType.Name})" : $"?{underlyingType.Name}",
-            Predefined.Type,
+            runtimeType,
             containingModule)
     {
         UnderlyingType = underlyingType;
         AddOperator(
             SyntaxKind.HookHookToken,
-            new LambdaTypeSymbol([new Parameter("x", this), new Parameter("y", this)], this, containingModule));
+            new LambdaTypeSymbol([new Parameter("x", this), new Parameter("y", this)], this, runtimeType, containingModule));
         AddOperator(
             SyntaxKind.HookHookToken,
-            new LambdaTypeSymbol([new Parameter("x", this), new Parameter("y", UnderlyingType)], UnderlyingType, containingModule));
+            new LambdaTypeSymbol([new Parameter("x", this), new Parameter("y", UnderlyingType)], UnderlyingType, runtimeType, containingModule));
     }
 
     public TypeSymbol UnderlyingType { get; init; }

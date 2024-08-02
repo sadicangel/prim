@@ -1,5 +1,4 @@
-﻿using CodeAnalysis.Interpretation;
-using CodeAnalysis.Interpretation.Values;
+﻿using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.Tests.Interpretation;
 public partial class InterpreterTests
@@ -7,7 +6,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_AddExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 5);
+        var expected = new InstanceValue(_scope.I32, 5);
         var actual = """
         3 + 2
         """.Evaluate();
@@ -16,7 +15,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_SubtractExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 1);
+        var expected = new InstanceValue(_scope.I32, 1);
         var actual = """
         3 - 2
         """.Evaluate();
@@ -25,7 +24,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_MultiplyExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 6);
+        var expected = new InstanceValue(_scope.I32, 6);
         var actual = """
         3 * 2
         """.Evaluate();
@@ -34,7 +33,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_DivideExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 1);
+        var expected = new InstanceValue(_scope.I32, 1);
         var actual = """
         3 / 2
         """.Evaluate();
@@ -43,7 +42,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_ModuloExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 1);
+        var expected = new InstanceValue(_scope.I32, 1);
         var actual = """
         3 % 2
         """.Evaluate();
@@ -52,7 +51,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_PowerExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 9);
+        var expected = new InstanceValue(_scope.I32, 9);
         var actual = """
         3 ** 2
         """.Evaluate();
@@ -61,7 +60,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_LeftShiftExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 6);
+        var expected = new InstanceValue(_scope.I32, 6);
         var actual = """
         3 << 1
         """.Evaluate();
@@ -70,7 +69,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_RightShiftExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 1);
+        var expected = new InstanceValue(_scope.I32, 1);
         var actual = """
         3 >> 1
         """.Evaluate();
@@ -79,7 +78,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_LogicalOrExpression()
     {
-        var expected = PrimValue.True;
+        var expected = new InstanceValue(_scope.Bool, true);
         var actual = """
         true || false
         """.Evaluate();
@@ -88,7 +87,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_LogicalAndExpression()
     {
-        var expected = PrimValue.False;
+        var expected = new InstanceValue(_scope.Bool, false);
         var actual = """
         true && false
         """.Evaluate();
@@ -97,7 +96,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_BitwiseOrExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 3);
+        var expected = new InstanceValue(_scope.I32, 3);
         var actual = """
         1 | 2
         """.Evaluate();
@@ -106,7 +105,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_BitwiseAndExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 2);
+        var expected = new InstanceValue(_scope.I32, 2);
         var actual = """
         2 & 3
         """.Evaluate();
@@ -115,7 +114,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_ExclusiveOrExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 5);
+        var expected = new InstanceValue(_scope.I32, 5);
         var actual = """
         2 + 3
         """.Evaluate();
@@ -124,7 +123,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_EqualsExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, true);
+        var expected = new InstanceValue(_scope.Bool, true);
         var actual = """
         2 == 2
         """.Evaluate();
@@ -133,7 +132,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_NotEqualsExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, false);
+        var expected = new InstanceValue(_scope.Bool, false);
         var actual = """
         2 != 2
         """.Evaluate();
@@ -142,7 +141,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_LessThanExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, false);
+        var expected = new InstanceValue(_scope.Bool, false);
         var actual = """
         2 < 2
         """.Evaluate();
@@ -151,7 +150,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_LessThanOrEqualExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, true);
+        var expected = new InstanceValue(_scope.Bool, true);
         var actual = """
         2 <= 2
         """.Evaluate();
@@ -160,7 +159,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_GreaterThanExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, false);
+        var expected = new InstanceValue(_scope.Bool, false);
         var actual = """
         2 > 2
         """.Evaluate();
@@ -169,7 +168,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_GreaterThanOrEqualExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, true);
+        var expected = new InstanceValue(_scope.Bool, true);
         var actual = """
         2 >= 2
         """.Evaluate();
@@ -178,7 +177,7 @@ public partial class InterpreterTests
     [Fact]
     public void Evaluates_CoalesceExpression()
     {
-        var expected = new InstanceValue(GlobalEvaluatedScope.Instance.I32, 2);
+        var expected = new InstanceValue(_scope.I32, 2);
         var actual = """
         (null as ?i32) ?? 2
         """.Evaluate();

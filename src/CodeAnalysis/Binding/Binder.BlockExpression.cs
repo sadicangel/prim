@@ -23,7 +23,7 @@ partial class Binder
         if (expressions.Count > 0)
             types.Add(expressions[^1].Type);
 
-        var type = TypeSymbol.FromSet(types, context.Module);
+        var type = BindTypeSet(types, context);
 
         return new BoundBlockExpression(syntax, type, expressions);
     }

@@ -6,7 +6,7 @@ partial class Interpreter
 {
     public static PrimValue EvaluateBlockExpression(BoundBlockExpression node, Context context)
     {
-        PrimValue value = PrimValue.Unit;
+        PrimValue value = context.Unit;
         foreach (var expression in node.Expressions)
             value = EvaluateExpression(expression, context);
         return value;

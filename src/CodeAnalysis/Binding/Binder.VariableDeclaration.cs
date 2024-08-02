@@ -27,9 +27,9 @@ partial class Binder
             {
                 if (expression is null || expression.Type.IsUnknown)
                 {
-                    expression ??= new BoundNeverExpression(syntax);
+                    expression ??= new BoundNeverExpression(syntax, context.BoundScope.Never);
                     context.Diagnostics.ReportInvalidImplicitType(syntax.Location, expression.Type.Name);
-                    variableSymbol = variableSymbol with { Type = Predefined.Never };
+                    variableSymbol = variableSymbol with { Type = context.BoundScope.Never };
                 }
                 else
                 {
@@ -47,11 +47,11 @@ partial class Binder
                     if (!variableSymbol.Type.IsOption)
                     {
                         context.Diagnostics.ReportUninitializedVariable(syntax.Location, variableSymbol.Name);
-                        expression = new BoundNeverExpression(syntax);
+                        expression = new BoundNeverExpression(syntax, context.BoundScope.Never);
                     }
                     else
                     {
-                        expression = BoundLiteralExpression.Unit;
+                        expression = BoundLiteralExpression.Unit(context.BoundScope.Unit);
                     }
                 }
                 expression = Coerce(expression, variableSymbol.Type, context);

@@ -7,20 +7,20 @@ internal sealed record class OptionValue : PrimValue
 {
     private readonly PrimValue _value;
 
-    public OptionValue(OptionTypeSymbol optionType, PrimValue? value = null) : base(optionType)
+    public OptionValue(OptionTypeSymbol optionType, PrimValue value) : base(optionType)
     {
-        _value = value ?? Unit;
+        _value = value;
 
         var coalesce1 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
-            new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType)], optionType, optionType.ContainingModule))
+            new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType)], optionType, optionType.Type, optionType.ContainingModule))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
         Add(
             coalesce1,
             new LambdaValue(coalesce1.LambdaType, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
         var coalesce2 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
-            new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType.UnderlyingType)], optionType.UnderlyingType, optionType.ContainingModule))
+            new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType.UnderlyingType)], optionType.UnderlyingType, optionType.Type, optionType.ContainingModule))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
         Add(
             coalesce2,

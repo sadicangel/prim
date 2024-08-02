@@ -5,20 +5,20 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class UnionTypeSymbol : TypeSymbol
 {
-    public UnionTypeSymbol(SyntaxNode syntax, IEnumerable<TypeSymbol> types, ModuleSymbol containingModule)
+    public UnionTypeSymbol(SyntaxNode syntax, IEnumerable<TypeSymbol> types, TypeSymbol runtimeType, ModuleSymbol containingModule)
         : base(
             BoundKind.UnionTypeSymbol,
             syntax,
             string.Join(" | ", types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)),
-            Predefined.Type,
+            runtimeType,
             containingModule)
     {
         Types = [.. types];
-        foreach (var type in Types)
+        foreach (var unionType in Types)
         {
             AddConversion(
                 SyntaxKind.ImplicitKeyword,
-                new LambdaTypeSymbol([new Parameter("x", type)], this, containingModule));
+                new LambdaTypeSymbol([new Parameter("x", unionType)], this, runtimeType, containingModule));
         }
     }
 

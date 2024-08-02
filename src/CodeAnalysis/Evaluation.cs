@@ -8,7 +8,7 @@ public sealed class Evaluation
     {
         Compilation = compilation;
         Previous = previous;
-        EvaluatedScope = new EvaluatedScope(previous?.EvaluatedScope);
+        EvaluatedScope = new EvaluatedScope(previous?.EvaluatedScope ?? new EvaluatedScope(compilation.BoundScope));
         Values = new(Compilation.BoundTrees.Select(tree => Interpreter.Evaluate(tree, EvaluatedScope)));
     }
 

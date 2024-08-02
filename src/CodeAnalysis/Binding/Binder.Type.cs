@@ -34,17 +34,17 @@ partial class Binder
         {
             var length = (BoundLiteralExpression)BindExpression(syntax.Length, context);
             Debug.Assert(length.Value is int);
-            return new ArrayTypeSymbol(syntax, elementType, (int)length.Value!, context.Module);
+            return new ArrayTypeSymbol(syntax, elementType, (int)length.Value!, context.BoundScope.I32, context.BoundScope.RuntimeType, context.Module);
         }
 
         context.Diagnostics.ReportInvalidArrayLength(syntax.Length.Location);
-        return new ArrayTypeSymbol(syntax, Predefined.Never, length: 0, context.Module);
+        return new ArrayTypeSymbol(syntax, context.BoundScope.Never, length: 0, context.BoundScope.I32, context.BoundScope.RuntimeType, context.Module);
     }
 
     static ErrorTypeSymbol BindErrorType(ErrorTypeSyntax syntax, Context context)
     {
         var valueType = BindType(syntax.ValueType, context);
-        return new ErrorTypeSymbol(syntax, valueType, context.Module);
+        return new ErrorTypeSymbol(syntax, context.BoundScope.Err, valueType, context.BoundScope.RuntimeType, context.Module);
     }
 
     static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, Context context)
@@ -64,7 +64,7 @@ partial class Binder
             parameters.Add(parameter);
         }
 
-        return new LambdaTypeSymbol(syntax, parameters, returnType, context.Module);
+        return new LambdaTypeSymbol(syntax, parameters, returnType, context.BoundScope.RuntimeType, context.Module);
     }
 
     static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, Context context)
@@ -73,7 +73,7 @@ partial class Binder
         if (context.BoundScope.Lookup(structName) is not StructTypeSymbol typeSymbol)
         {
             context.Diagnostics.ReportUndefinedType(syntax.IdentifierToken.Location, structName);
-            return Predefined.Never;
+            return context.BoundScope.Never;
         }
         return typeSymbol;
     }
@@ -81,13 +81,13 @@ partial class Binder
     static OptionTypeSymbol BindOptionType(OptionTypeSyntax syntax, Context context)
     {
         var underlyingType = BindType(syntax.UnderlyingType, context);
-        return new OptionTypeSymbol(syntax, underlyingType, context.Module);
+        return new OptionTypeSymbol(syntax, underlyingType, context.BoundScope.RuntimeType, context.Module);
     }
 
     static PointerTypeSymbol BindPointerType(PointerTypeSyntax syntax, Context context)
     {
         var elementType = BindType(syntax.ElementType, context);
-        return new PointerTypeSymbol(syntax, elementType, context.Module);
+        return new PointerTypeSymbol(syntax, elementType, context.BoundScope.RuntimeType, context.Module);
     }
 
     static StructTypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax, Context context)
@@ -95,31 +95,31 @@ partial class Binder
         _ = context;
         return syntax.PredefinedTypeToken.SyntaxKind switch
         {
-            SyntaxKind.AnyKeyword => Predefined.Any,
-            SyntaxKind.ErrKeyword => Predefined.Err,
-            SyntaxKind.UnknownKeyword => Predefined.Unknown,
-            SyntaxKind.NeverKeyword => Predefined.Never,
-            SyntaxKind.UnitKeyword => Predefined.Unit,
-            SyntaxKind.TypeKeyword => Predefined.Type,
-            SyntaxKind.StrKeyword => Predefined.Str,
-            SyntaxKind.BoolKeyword => Predefined.Bool,
-            SyntaxKind.I8Keyword => Predefined.I8,
-            SyntaxKind.I16Keyword => Predefined.I16,
-            SyntaxKind.I32Keyword => Predefined.I32,
-            SyntaxKind.I64Keyword => Predefined.I64,
-            SyntaxKind.I128Keyword => Predefined.I128,
-            SyntaxKind.ISizeKeyword => Predefined.ISize,
-            SyntaxKind.U8Keyword => Predefined.U8,
-            SyntaxKind.U16Keyword => Predefined.U16,
-            SyntaxKind.U32Keyword => Predefined.U32,
-            SyntaxKind.U64Keyword => Predefined.U64,
-            SyntaxKind.U128Keyword => Predefined.U128,
-            SyntaxKind.USizeKeyword => Predefined.USize,
-            SyntaxKind.F16Keyword => Predefined.F16,
-            SyntaxKind.F32Keyword => Predefined.F32,
-            SyntaxKind.F64Keyword => Predefined.F64,
-            SyntaxKind.F80Keyword => Predefined.F80,
-            SyntaxKind.F128Keyword => Predefined.F128,
+            SyntaxKind.AnyKeyword => context.BoundScope.Any,
+            SyntaxKind.ErrKeyword => context.BoundScope.Err,
+            SyntaxKind.UnknownKeyword => context.BoundScope.Unknown,
+            SyntaxKind.NeverKeyword => context.BoundScope.Never,
+            SyntaxKind.UnitKeyword => context.BoundScope.Unit,
+            SyntaxKind.TypeKeyword => context.BoundScope.RuntimeType,
+            SyntaxKind.StrKeyword => context.BoundScope.Str,
+            SyntaxKind.BoolKeyword => context.BoundScope.Bool,
+            SyntaxKind.I8Keyword => context.BoundScope.I8,
+            SyntaxKind.I16Keyword => context.BoundScope.I16,
+            SyntaxKind.I32Keyword => context.BoundScope.I32,
+            SyntaxKind.I64Keyword => context.BoundScope.I64,
+            SyntaxKind.I128Keyword => context.BoundScope.I128,
+            SyntaxKind.IszKeyword => context.BoundScope.Isz,
+            SyntaxKind.U8Keyword => context.BoundScope.U8,
+            SyntaxKind.U16Keyword => context.BoundScope.U16,
+            SyntaxKind.U32Keyword => context.BoundScope.U32,
+            SyntaxKind.U64Keyword => context.BoundScope.U64,
+            SyntaxKind.U128Keyword => context.BoundScope.U128,
+            SyntaxKind.UszKeyword => context.BoundScope.Usz,
+            SyntaxKind.F16Keyword => context.BoundScope.F16,
+            SyntaxKind.F32Keyword => context.BoundScope.F32,
+            SyntaxKind.F64Keyword => context.BoundScope.F64,
+            SyntaxKind.F80Keyword => context.BoundScope.F80,
+            SyntaxKind.F128Keyword => context.BoundScope.F128,
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
         };
     }
@@ -130,6 +130,6 @@ partial class Binder
         foreach (var typeSyntax in syntax.Types)
             builder.Add(BindType(typeSyntax, context));
         var types = new BoundList<TypeSymbol>(builder.ToImmutable());
-        return new UnionTypeSymbol(syntax, types, context.Module);
+        return new UnionTypeSymbol(syntax, types, context.BoundScope.RuntimeType, context.Module);
     }
 }

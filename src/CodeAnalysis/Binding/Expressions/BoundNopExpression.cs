@@ -4,8 +4,8 @@ using CodeAnalysis.Syntax;
 namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundNopExpression(
     SyntaxNode Syntax,
-    TypeSymbol? Type = null)
-    : BoundExpression(BoundKind.NopExpression, Syntax, Type ?? Predefined.Unknown)
+    TypeSymbol Type)
+    : BoundExpression(BoundKind.NopExpression, Syntax, Type)
 {
     public override IEnumerable<BoundNode> Children() => [];
 }

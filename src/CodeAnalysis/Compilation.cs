@@ -1,5 +1,4 @@
 ﻿using CodeAnalysis.Binding;
-using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
@@ -12,7 +11,7 @@ public sealed class Compilation
         Func<SourceText, SyntaxTree> parseFunc = isScript ? SyntaxTree.ParseScript : SyntaxTree.Parse;
         SyntaxTrees = new(sourceTexts.Select(parseFunc));
         Previous = previous;
-        BoundScope = new AnonymousScope(Previous?.BoundScope ?? Predefined.GlobalModule);
+        BoundScope = new AnonymousScope(Previous?.BoundScope ?? IBoundScope.CreateGlobalScope());
         BoundTrees = new ReadOnlyList<BoundTree>(SyntaxTrees
             .Select(tree => BoundTree.Bind(tree, BoundScope)));
         Diagnostics = new DiagnosticBag(SyntaxTrees

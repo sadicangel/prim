@@ -16,12 +16,12 @@ partial class Binder
         if (@operator is null)
         {
             context.Diagnostics.ReportUndefinedIndexOperator(syntax.Location, expression.Type.Name);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         // TODO: Actually check where this should be readonly or not.
         // Maybe the indexer should be a property instead?
-        var index = Coerce(BindExpression(syntax.Index, context), Predefined.I32, context);
+        var index = Coerce(BindExpression(syntax.Index, context), context.BoundScope.I32, context);
         if (index.Type.IsNever)
         {
             return index;
@@ -33,7 +33,7 @@ partial class Binder
             if (indexValue < 0 || indexValue >= arrayType.Length)
             {
                 context.Diagnostics.ReportIndexOutOfRange(syntax.Location, arrayType.Length);
-                return new BoundNeverExpression(syntax);
+                return new BoundNeverExpression(syntax, context.BoundScope.Never);
             }
         }
 

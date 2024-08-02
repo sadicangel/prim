@@ -15,7 +15,9 @@ public partial class InterpreterTests
         s:: S {};
         s.hello
         """.Evaluate();
-        var expectedType = new LambdaTypeSymbol([], Predefined.Str, Predefined.GlobalModule);
-        Assert.Equal(expectedType, value.Type);
+
+        var type = Assert.IsType<LambdaTypeSymbol>(value.Type);
+        Assert.Empty(type.Parameters);
+        Assert.Equal(PredefinedTypes.Str, type.ReturnType.Name);
     }
 }

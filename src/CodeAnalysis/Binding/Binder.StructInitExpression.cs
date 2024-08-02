@@ -12,7 +12,7 @@ partial class Binder
         if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
         {
             context.Diagnostics.ReportUndefinedType(syntax.Location, structName);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         var builder = ImmutableArray.CreateBuilder<BoundPropertyInitExpression>(syntax.Properties.Count);

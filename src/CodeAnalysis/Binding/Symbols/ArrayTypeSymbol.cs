@@ -4,24 +4,27 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class ArrayTypeSymbol : TypeSymbol
 {
-    public ArrayTypeSymbol(SyntaxNode syntax, TypeSymbol elementType, int length, ModuleSymbol containingModule)
+    public ArrayTypeSymbol(SyntaxNode syntax, TypeSymbol elementType, int length, TypeSymbol indexerType, TypeSymbol runtimeType, ModuleSymbol containingModule)
         : base(
             BoundKind.ArrayTypeSymbol,
             syntax,
             $"[{elementType.Name}: {length}]",
-            Predefined.Type,
+            runtimeType,
             containingModule)
     {
         ElementType = elementType;
         Length = length;
+        IndexerType = indexerType;
         AddOperator(
             SyntaxKind.BracketOpenBracketCloseToken,
-            new LambdaTypeSymbol([new("index", Predefined.I32)], ElementType, containingModule),
+            new LambdaTypeSymbol([new("index", indexerType)], ElementType, runtimeType, containingModule),
             isReadOnly: false);
     }
 
     public TypeSymbol ElementType { get; init; }
     public int Length { get; init; }
+
+    public TypeSymbol IndexerType { get; init; }
 
     public override bool IsNever => ElementType.IsNever;
 
@@ -49,7 +52,7 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
             return true;
         }
 
-        var conversionType = new LambdaTypeSymbol([new Parameter("x", type)], this, ContainingModule);
+        var conversionType = new LambdaTypeSymbol([new Parameter("x", type)], this, Type, ContainingModule);
 
         _ = AddConversion(conversion.ConversionKind, conversionType);
 

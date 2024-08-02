@@ -5,12 +5,13 @@ namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class StructTypeSymbol(
     SyntaxNode Syntax,
     string Name,
+    TypeSymbol Type,
     ModuleSymbol ContainingModule)
     : TypeSymbol(
         BoundKind.StructTypeSymbol,
         Syntax,
         Name,
-        Predefined.Type,
+        Type,
         ContainingModule)
 {
     public override bool IsNever => Name == "never";

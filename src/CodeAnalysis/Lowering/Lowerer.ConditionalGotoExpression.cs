@@ -12,7 +12,7 @@ partial class Lowerer
 
             var unconditional = shouldJump
                 ? new BoundGotoExpression(node.Syntax, node.LabelSymbol, node.Expression)
-                : new BoundNopExpression(node.Syntax) as BoundExpression;
+                : new BoundNopExpression(node.Syntax, context.BoundScope.Unknown) as BoundExpression;
 
             return LowerExpression(unconditional, context);
         }

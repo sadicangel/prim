@@ -18,13 +18,13 @@ partial class Binder
         if (left is not BoundReference @ref)
         {
             context.Diagnostics.ReportInvalidAssignment(syntax.Location);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         if (@ref.Symbol.IsReadOnly)
         {
             context.Diagnostics.ReportReadOnlyAssignment(@ref.Syntax.Location, @ref.Symbol.Name);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         // TODO: Make this better. Maybe use ContainedSymbols instead?

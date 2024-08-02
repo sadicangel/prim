@@ -18,14 +18,14 @@ partial class Binder
             if (operators is [])
             {
                 context.Diagnostics.ReportUndefinedBinaryOperator(syntax.OperatorToken, left.Type.Name, right.Type.Name);
-                return new BoundNeverExpression(syntax);
+                return new BoundNeverExpression(syntax, context.BoundScope.Never);
             }
         }
 
         if (operators is not [var @operator])
         {
             context.Diagnostics.ReportAmbiguousBinaryOperator(syntax.OperatorToken, left.Type.Name, right.Type.Name);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         return new BoundBinaryExpression(syntax, left, @operator, right);

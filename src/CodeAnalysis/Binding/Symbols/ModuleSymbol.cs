@@ -4,12 +4,13 @@ namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class ModuleSymbol(
     SyntaxNode Syntax,
     string Name,
+    TypeSymbol Type,
     ModuleSymbol ContainingModule)
     : Symbol(
         BoundKind.ModuleSymbol,
         Syntax,
         Name,
-        Predefined.Never,
+        Type,
         ContainingModule,
         IsStatic: true,
         IsReadOnly: true),
@@ -20,6 +21,14 @@ internal sealed record class ModuleSymbol(
     public IBoundScope Parent => ContainingModule;
 
     public ModuleSymbol Module => this;
+
+    public ModuleSymbol Global => FindGlobalModule(this);
+    private static ModuleSymbol FindGlobalModule(ModuleSymbol module)
+    {
+        while (module != module.ContainingModule)
+            module = module.ContainingModule;
+        return module;
+    }
 
     public override IEnumerable<Symbol> DeclaredSymbols => _symbols.Values;
     public bool Declare(Symbol symbol) => _symbols.TryAdd(symbol.Name, symbol);

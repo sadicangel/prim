@@ -23,11 +23,11 @@ partial class Lowerer
             node.Syntax,
             node.Type,
             [
-                new BoundGotoExpression(checkLabel.Syntax, checkLabel, new BoundNopExpression(checkLabel.Syntax)),
+                new BoundGotoExpression(checkLabel.Syntax, checkLabel, new BoundNopExpression(checkLabel.Syntax, context.BoundScope.Unknown)),
                 new BoundLabelDeclaration(node.ContinueLabel.Syntax, node.ContinueLabel),
                 node.Body,
                 new BoundLabelDeclaration(checkLabel.Syntax, checkLabel),
-                new BoundConditionalGotoExpression(node.ContinueLabel.Syntax, node.ContinueLabel, node.Condition, new BoundNopExpression(node.ContinueLabel.Syntax), JumpTrue: true),
+                new BoundConditionalGotoExpression(node.ContinueLabel.Syntax, node.ContinueLabel, node.Condition, new BoundNopExpression(node.ContinueLabel.Syntax, context.BoundScope.Unknown), JumpTrue: true),
                 new BoundLabelDeclaration(node.BreakLabel.Syntax, node.BreakLabel)
             ]);
 

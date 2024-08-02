@@ -7,6 +7,6 @@ partial class Binder
     private static BoundNeverExpression BindEmptyExpression(EmptyExpressionSyntax syntax, Context context)
     {
         _ = context;
-        return new BoundNeverExpression(syntax);
+        return new BoundNeverExpression(syntax, context.BoundScope.Never);
     }
 }

@@ -25,13 +25,13 @@ partial class Binder
             if (!isExplicit && conversion.IsExplicit)
             {
                 context.Diagnostics.ReportInvalidImplicitConversion(expression.Syntax.Location, expression.Type.Name, type.Name);
-                return new BoundNeverExpression(expression.Syntax);
+                return new BoundNeverExpression(expression.Syntax, context.BoundScope.Never);
             }
 
             return new BoundConversionExpression(expression.Syntax, conversion, expression);
         }
 
         context.Diagnostics.ReportInvalidExpressionType(expression.Syntax.Location, type.Name, expression.Type.Name);
-        return new BoundNeverExpression(expression.Syntax);
+        return new BoundNeverExpression(expression.Syntax, context.BoundScope.Never);
     }
 }

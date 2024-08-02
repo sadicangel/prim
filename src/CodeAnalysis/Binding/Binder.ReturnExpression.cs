@@ -9,11 +9,11 @@ partial class Binder
         if (context.Lambda is null)
         {
             context.Diagnostics.ReportInvalidReturn(syntax.Location);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         var expression = syntax.Expression is null
-            ? new BoundNopExpression(syntax)
+            ? new BoundNopExpression(syntax, context.BoundScope.Unknown)
             : BindExpression(syntax.Expression, context);
         if (expression.Type.IsNever)
         {

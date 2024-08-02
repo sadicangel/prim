@@ -19,7 +19,7 @@ partial class Binder
         if (symbols.Count == 0)
         {
             context.Diagnostics.ReportUndefinedTypeMember(syntax.Name.Location, expression.Type.Name, syntax.Name.IdentifierToken.Text.ToString());
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         if (symbols.Count == 1)

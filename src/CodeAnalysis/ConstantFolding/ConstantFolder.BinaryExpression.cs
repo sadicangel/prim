@@ -17,7 +17,7 @@ partial class ConstantFolder
 
         var typedValue = Interpreter.EvaluateBinaryExpression(
             node,
-            new Interpreter.Context(GlobalEvaluatedScope.Instance, []));
+            new Interpreter.Context(new EvaluatedScope(node.Type.ContainingModule.Global), []));
 
         Debug.Assert(typedValue.Type == node.Type);
 

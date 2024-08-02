@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
-using CodeAnalysis.Binding.Symbols;
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Binding;
@@ -8,7 +7,8 @@ partial class Binder
 {
     private static BoundExpression BindWhileExpression(WhileExpressionSyntax syntax, Context context)
     {
-        var condition = Coerce(BindExpression(syntax.Condition, context), Predefined.Bool, context);
+
+        var condition = Coerce(BindExpression(syntax.Condition, context), context.BoundScope.Bool, context);
         if (condition.Type.IsNever)
         {
             return condition;

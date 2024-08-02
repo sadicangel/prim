@@ -26,9 +26,9 @@ partial class Lowerer
             node.Syntax,
             node.Type,
             [
-                new BoundConditionalGotoExpression(node.Condition.Syntax, elseLabel, node.Condition, new BoundNopExpression(node.Condition.Syntax), JumpTrue: false),
+                new BoundConditionalGotoExpression(node.Condition.Syntax, elseLabel, node.Condition, new BoundNopExpression(node.Condition.Syntax, context.BoundScope.Unknown), JumpTrue: false),
                 node.Then,
-                new BoundGotoExpression(endLabel.Syntax, endLabel, new BoundNopExpression(endLabel.Syntax)),
+                new BoundGotoExpression(endLabel.Syntax, endLabel, new BoundNopExpression(endLabel.Syntax, context.BoundScope.Unknown)),
                 new BoundLabelDeclaration(elseLabel.Syntax, elseLabel),
                 node.Else,
                 new BoundLabelDeclaration(endLabel.Syntax, endLabel),

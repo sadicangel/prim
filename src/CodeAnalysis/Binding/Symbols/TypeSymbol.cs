@@ -15,16 +15,16 @@ internal abstract record class TypeSymbol(
 {
     private readonly List<Symbol> _members = [];
 
-    public bool IsAny { get => this == Predefined.Any; }
-    public bool IsErr { get => this == Predefined.Err; }
-    public bool IsUnit { get => this == Predefined.Unit; }
+    public bool IsAny { get => Name is PredefinedTypes.Any; }
+    public bool IsErr { get => Name is PredefinedTypes.Err; }
+    public bool IsUnit { get => Name is PredefinedTypes.Unit; }
     public bool IsArray { get => this is ArrayTypeSymbol; }
     public bool IsLambda { get => this is LambdaTypeSymbol; }
     public abstract bool IsNever { get; }
     public bool IsOption { get => this is OptionTypeSymbol; }
     public bool IsUnion { get => this is UnionTypeSymbol; }
-    public bool IsUnknown { get => this == Predefined.Unknown; }
-    public bool IsPredefined { get => Predefined.All().Any(s => s.Name == Name); }
+    public bool IsUnknown { get => Name is PredefinedTypes.Unknown; }
+    public bool IsPredefined { get => PredefinedTypes.All.Contains(Name); }
 
     public override IEnumerable<Symbol> DeclaredSymbols => [];
 
@@ -41,27 +41,19 @@ internal abstract record class TypeSymbol(
         "i32" => typeof(int),
         "i64" => typeof(long),
         "i128" => typeof(BigInteger),
-        "isize" => typeof(nint),
+        "isz" => typeof(nint),
         "u8" => typeof(byte),
         "u16" => typeof(ushort),
         "u32" => typeof(uint),
         "u64" => typeof(ulong),
         "u128" => typeof(BigInteger),
-        "usize" => typeof(nuint),
+        "usz" => typeof(nuint),
         "f16" => typeof(Half),
         "f32" => typeof(float),
         "f64" => typeof(double),
         "f80" => typeof(double),
         "f128" => typeof(double),
         _ => throw new UnreachableException($"Unexpected built-in {nameof(TypeSymbol)} '{Name}'"),
-    };
-
-    public static TypeSymbol FromSet(HashSet<TypeSymbol> types, ModuleSymbol containingModule, SyntaxNode? syntax = null) => types switch
-    {
-        { Count: 0 } => Predefined.Unknown,
-        { Count: 1 } => types.Single(),
-        _ when types.Contains(Predefined.Never) => Predefined.Never,
-        _ => new UnionTypeSymbol(syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.UnionType), [.. types], containingModule),
     };
 
     internal static string GetMethodName(ReadOnlySpan<char> name, LambdaTypeSymbol type) =>

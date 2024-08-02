@@ -14,14 +14,14 @@ partial class Binder
         if (operators is [])
         {
             context.Diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken, operand.Type.Name);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         if (operators is not [var @operator])
         {
             // TODO: Is this case ever possible?
             context.Diagnostics.ReportAmbiguousUnaryOperator(syntax.OperatorToken, operand.Type.Name);
-            return new BoundNeverExpression(syntax);
+            return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         return new BoundUnaryExpression(syntax, @operator, operand);

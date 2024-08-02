@@ -3,11 +3,6 @@
 namespace CodeAnalysis.Interpretation.Values;
 internal abstract record class PrimValue(TypeSymbol Type)
 {
-    internal static InstanceValue Unit { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Unit, CodeAnalysis.Unit.Value);
-    internal static InstanceValue True { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, true);
-    internal static InstanceValue False { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Bool, false);
-    internal static InstanceValue EmptyStr { get; } = new InstanceValue(GlobalEvaluatedScope.Instance.Str, string.Empty);
-
     internal Dictionary<Symbol, PrimValue> Members { get; } = [];
 
     public abstract object Value { get; }

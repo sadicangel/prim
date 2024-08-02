@@ -26,7 +26,7 @@ partial class Binder
                 {
                     var moduleDeclaration = (ModuleDeclarationSyntax)syntax;
                     var moduleName = moduleDeclaration.Name.Text.ToString();
-                    var moduleSymbol = new ModuleSymbol(moduleDeclaration, moduleName, context.Module);
+                    var moduleSymbol = new ModuleSymbol(moduleDeclaration, moduleName, context.BoundScope.Never, context.Module);
                     if (!context.Module.Declare(moduleSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(moduleDeclaration.Location, moduleName);
                     using (context.PushBoundScope(moduleSymbol))
@@ -40,7 +40,7 @@ partial class Binder
                 {
                     var structDeclaration = (StructDeclarationSyntax)syntax;
                     var structName = structDeclaration.Name.Text.ToString();
-                    var typeSymbol = new StructTypeSymbol(structDeclaration, structName, context.Module);
+                    var typeSymbol = new StructTypeSymbol(structDeclaration, structName, context.BoundScope.RuntimeType, context.Module);
                     if (!context.Module.Declare(typeSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(structDeclaration.Location, structName);
                 }
@@ -140,7 +140,7 @@ partial class Binder
                     var variableDeclaration = (VariableDeclarationSyntax)syntax;
                     var variableName = variableDeclaration.Name.Text.ToString();
                     var variableType = variableDeclaration.Type is null
-                        ? Predefined.Unknown
+                        ? context.BoundScope.Unknown
                         : BindType(variableDeclaration.Type, context);
                     var variableSymbol = new VariableSymbol(
                         variableDeclaration,
