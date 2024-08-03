@@ -14,6 +14,7 @@ while (true)
         a: module = {
             b: i32 = 0;
         }
+        c := a.b;
         """);
 
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue(@default));

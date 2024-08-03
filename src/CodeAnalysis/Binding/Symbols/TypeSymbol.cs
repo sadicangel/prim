@@ -25,6 +25,7 @@ internal abstract record class TypeSymbol(
     public bool IsUnion { get => this is UnionTypeSymbol; }
     public bool IsUnknown { get => Name is PredefinedTypes.Unknown; }
     public bool IsPredefined { get => PredefinedTypes.All.Contains(Name); }
+    public bool IsModule { get => Name is PredefinedTypes.Module; }
 
     public override IEnumerable<Symbol> DeclaredSymbols => [];
 

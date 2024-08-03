@@ -6,6 +6,15 @@ partial class Interpreter
 {
     private static PrimValue EvaluateModuleDeclaration(BoundModuleDeclaration node, Context context)
     {
-        throw new NotImplementedException(node.GetType().Name);
+        var module = new ModuleValue(node.ModuleSymbol, context.Module, context.Module.BoundScope);
+        context.EvaluatedScope.Declare(node.ModuleSymbol, module);
+        using (context.PushScope(module))
+        {
+            foreach (var member in node.Declarations)
+            {
+                _ = EvaluateExpression(member, context);
+            }
+        }
+        return module;
     }
 }

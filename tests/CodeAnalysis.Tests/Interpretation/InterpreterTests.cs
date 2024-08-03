@@ -5,5 +5,5 @@ namespace CodeAnalysis.Tests.Interpretation;
 
 public partial class InterpreterTests
 {
-    private readonly EvaluatedScope _scope = new(IBoundScope.CreateGlobalScope());
+    private readonly IEvaluatedScope _scope = IEvaluatedScope.CreateGlobalScope(IBoundScope.CreateGlobalScope());
 }

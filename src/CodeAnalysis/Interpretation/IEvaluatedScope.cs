@@ -1,121 +1,64 @@
-﻿using System.Collections;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Interpretation.Values;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Interpretation;
 
-internal sealed class EvaluatedScope : IEnumerable<PrimValue>
+internal interface IEvaluatedScope
 {
-    private readonly IBoundScope _boundScope;
-    private Dictionary<Symbol, PrimValue>? _values;
+    public IEvaluatedScope Parent { get; }
 
-    public EvaluatedScope(IBoundScope boundScope)
+    public ModuleValue Module { get; }
+
+    StructValue RuntimeType { get; }
+    StructValue Any { get; }
+    StructValue Err { get; }
+    StructValue Unknown { get; }
+    StructValue Never { get; }
+    StructValue Unit { get; }
+    StructValue Str { get; }
+    StructValue Bool { get; }
+    StructValue I8 { get; }
+    StructValue I16 { get; }
+    StructValue I32 { get; }
+    StructValue I64 { get; }
+    StructValue I128 { get; }
+    StructValue Isz { get; }
+    StructValue U8 { get; }
+    StructValue U16 { get; }
+    StructValue U32 { get; }
+    StructValue U64 { get; }
+    StructValue U128 { get; }
+    StructValue Usz { get; }
+    StructValue F16 { get; }
+    StructValue F32 { get; }
+    StructValue F64 { get; }
+    StructValue F80 { get; }
+    StructValue F128 { get; }
+
+    void Declare(Symbol symbol, PrimValue value);
+
+    PrimValue Lookup(Symbol symbol);
+
+    void Replace(Symbol symbol, PrimValue value);
+
+    public static IEvaluatedScope CreateGlobalScope(IBoundScope scope)
     {
-        _boundScope = boundScope;
-        _values = CreatePredefinedTypes(boundScope);
-        Parent = this;
+        var global = Factory.CreateGlobalModule(scope);
+
+        return global;
     }
+}
+file readonly record struct R(StructValue Struct, Type ClrType);
 
-    public EvaluatedScope(EvaluatedScope parent)
+file static class Factory
+{
+    public static ModuleValue CreateGlobalModule(IBoundScope scope)
     {
-        _boundScope = parent._boundScope;
-        _values = null;
-        Parent = parent;
-    }
-
-    public EvaluatedScope Parent { get; }
-
-    public StructValue RuntimeType => (StructValue)Lookup(_boundScope.RuntimeType);
-    public StructValue Any => (StructValue)Lookup(_boundScope.Any);
-    public StructValue Err => (StructValue)Lookup(_boundScope.Err);
-    public StructValue Unknown => (StructValue)Lookup(_boundScope.Unknown);
-    public StructValue Never => (StructValue)Lookup(_boundScope.Never);
-    public StructValue Unit => (StructValue)Lookup(_boundScope.Unit);
-    public StructValue Str => (StructValue)Lookup(_boundScope.Str);
-    public StructValue Bool => (StructValue)Lookup(_boundScope.Bool);
-    public StructValue I8 => (StructValue)Lookup(_boundScope.I8);
-    public StructValue I16 => (StructValue)Lookup(_boundScope.I16);
-    public StructValue I32 => (StructValue)Lookup(_boundScope.I32);
-    public StructValue I64 => (StructValue)Lookup(_boundScope.I64);
-    public StructValue I128 => (StructValue)Lookup(_boundScope.I128);
-    public StructValue Isz => (StructValue)Lookup(_boundScope.Isz);
-    public StructValue U8 => (StructValue)Lookup(_boundScope.U8);
-    public StructValue U16 => (StructValue)Lookup(_boundScope.U16);
-    public StructValue U32 => (StructValue)Lookup(_boundScope.U32);
-    public StructValue U64 => (StructValue)Lookup(_boundScope.U64);
-    public StructValue U128 => (StructValue)Lookup(_boundScope.U128);
-    public StructValue Usz => (StructValue)Lookup(_boundScope.Usz);
-    public StructValue F16 => (StructValue)Lookup(_boundScope.F16);
-    public StructValue F32 => (StructValue)Lookup(_boundScope.F32);
-    public StructValue F64 => (StructValue)Lookup(_boundScope.F64);
-    public StructValue F80 => (StructValue)Lookup(_boundScope.F80);
-    public StructValue F128 => (StructValue)Lookup(_boundScope.F128);
-
-    public void Declare(Symbol symbol, PrimValue value)
-    {
-        if (!(_values ??= []).TryAdd(symbol, value))
-            throw new UnreachableException(DiagnosticMessage.SymbolRedeclaration(symbol.Name));
-    }
-
-    public PrimValue Lookup(Symbol symbol)
-    {
-        if (_values?.TryGetValue(symbol, out var value) is true)
-        {
-            return value;
-        }
-
-        if (!ReferenceEquals(this, Parent))
-        {
-            return Parent.Lookup(symbol);
-        }
-
-        throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
-    }
-
-    public void Replace(Symbol symbol, PrimValue value)
-    {
-        if (_values?.ContainsKey(symbol) is true)
-        {
-            _values[symbol] = value;
-            return;
-        }
-
-        if (!ReferenceEquals(this, Parent))
-        {
-            Parent.Replace(symbol, value);
-        }
-
-        throw new UnreachableException(DiagnosticMessage.UndefinedSymbol(symbol.Name));
-    }
-
-    public IEnumerator<PrimValue> GetEnumerator()
-    {
-        foreach (var value in EnumerateValues(this))
-            yield return value;
-
-        static IEnumerable<PrimValue> EnumerateValues(EvaluatedScope? scope)
-        {
-            if (scope is null) yield break;
-            if (scope._values is not null)
-            {
-                foreach (var (_, value) in scope._values)
-                    yield return value;
-            }
-            foreach (var value in EnumerateValues(scope.Parent))
-                yield return value;
-        }
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    private static Dictionary<Symbol, PrimValue> CreatePredefinedTypes(IBoundScope scope)
-    {
-        var m = new Dictionary<Symbol, PrimValue>();
+        var m = new ModuleValue(scope.Module.Global, null!, scope);
 
         ReadOnlySpan<StructTypeSymbol> all = [
             scope.RuntimeType,
@@ -147,18 +90,18 @@ internal sealed class EvaluatedScope : IEnumerable<PrimValue>
 
         foreach (var symbol in all)
         {
-            m[symbol] = new StructValue(symbol, scope.RuntimeType);
+            m.Declare(symbol, new StructValue(symbol, scope.RuntimeType));
             // TODO: Create members for struct.
         }
 
-        var boolStruct = (StructValue)m[scope.Bool];
+        var boolStruct = (StructValue)m.Lookup(scope.Bool);
 
-        ((StructValue)m[scope.Err])
+        ((StructValue)m.Lookup(scope.Err))
             .Add(
                 scope.Err.GetProperty("msg") ?? throw new UnreachableException($"Expected property '{"msg"}'"),
-                new InstanceValue(((StructValue)m[scope.Str]), ""));
+                new InstanceValue(((StructValue)m.Lookup(scope.Str)), ""));
 
-        ((StructValue)m[scope.Str])
+        ((StructValue)m.Lookup(scope.Str))
             .AddEqualityOperators<string>(boolStruct)
             .AddMembers(s =>
             {
@@ -179,128 +122,125 @@ internal sealed class EvaluatedScope : IEnumerable<PrimValue>
                         new InstanceValue(s, a.Value + (string)b.Value)));
             });
 
-        R M<T>(TypeSymbol s) => new((StructValue)m[s], typeof(T));
+        R M<T>(TypeSymbol s) => new((StructValue)m.Lookup(s), typeof(T));
 
-        ((StructValue)m[scope.Bool])
+        ((StructValue)m.Lookup(scope.Bool))
             .AddEqualityOperators<bool>(boolStruct)
             .AddLogicalOperators(boolStruct);
-        ((StructValue)m[scope.I8])
+        ((StructValue)m.Lookup(scope.I8))
             .AddEqualityOperators<sbyte>(boolStruct)
             .AddComparisonOperators<sbyte>(boolStruct)
             .AddBitwiseOperators<sbyte>()
             .AddMathOperators<sbyte>()
             .AddImplicitConversion<sbyte>(M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<sbyte>(M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m[scope.I16])
+        ((StructValue)m.Lookup(scope.I16))
             .AddEqualityOperators<short>(boolStruct)
             .AddComparisonOperators<short>(boolStruct)
             .AddBitwiseOperators<short>()
             .AddMathOperators<short>()
             .AddImplicitConversion<short>(M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<short>(M<sbyte>(scope.I8), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m[scope.I32])
+        ((StructValue)m.Lookup(scope.I32))
             .AddEqualityOperators<int>(boolStruct)
             .AddComparisonOperators<int>(boolStruct)
             .AddBitwiseOperators<int>()
             .AddMathOperators<int>()
             .AddImplicitConversion<int>(M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<int>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m[scope.I64])
+        ((StructValue)m.Lookup(scope.I64))
             .AddEqualityOperators<long>(boolStruct)
             .AddComparisonOperators<long>(boolStruct)
             .AddBitwiseOperators<long>()
             .AddMathOperators<long>()
             .AddImplicitConversion<long>(M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<long>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m[scope.I128])
+        ((StructValue)m.Lookup(scope.I128))
             .AddEqualityOperators<BigInteger>(boolStruct)
             .AddComparisonOperators<BigInteger>(boolStruct)
             .AddBitwiseOperators<BigInteger>()
             .AddMathOperators<BigInteger>()
             .AddExplicitConversion<BigInteger>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m[scope.Isz])
+        ((StructValue)m.Lookup(scope.Isz))
             .AddEqualityOperators<nint>(boolStruct)
             .AddComparisonOperators<nint>(boolStruct)
             .AddBitwiseOperators<nint>()
             .AddMathOperators<nint>()
             .AddExplicitConversion<nint>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
-        ((StructValue)m[scope.U8])
+        ((StructValue)m.Lookup(scope.U8))
             .AddEqualityOperators<byte>(boolStruct)
             .AddComparisonOperators<byte>(boolStruct)
             .AddBitwiseOperators<byte>()
             .AddMathOperators<byte>()
             .AddImplicitConversion<byte>(M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<byte>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz));
-        ((StructValue)m[scope.U16])
+        ((StructValue)m.Lookup(scope.U16))
             .AddEqualityOperators<ushort>(boolStruct)
             .AddComparisonOperators<ushort>(boolStruct)
             .AddBitwiseOperators<ushort>()
             .AddMathOperators<ushort>()
             .AddImplicitConversion<ushort>(M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<ushort>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8));
-        ((StructValue)m[scope.U32])
+        ((StructValue)m.Lookup(scope.U32))
             .AddEqualityOperators<uint>(boolStruct)
             .AddComparisonOperators<uint>(boolStruct)
             .AddBitwiseOperators<uint>()
             .AddMathOperators<uint>()
             .AddImplicitConversion<uint>(M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<uint>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16));
-        ((StructValue)m[scope.U64])
+        ((StructValue)m.Lookup(scope.U64))
             .AddEqualityOperators<ulong>(boolStruct)
             .AddComparisonOperators<ulong>(boolStruct)
             .AddBitwiseOperators<ulong>()
             .AddMathOperators<ulong>()
             .AddImplicitConversion<ulong>(M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<ulong>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32));
-        ((StructValue)m[scope.U128])
+        ((StructValue)m.Lookup(scope.U128))
             .AddEqualityOperators<BigInteger>(boolStruct)
             .AddComparisonOperators<BigInteger>(boolStruct)
             .AddBitwiseOperators<BigInteger>()
             .AddMathOperators<BigInteger>()
             .AddExplicitConversion<BigInteger>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
-        ((StructValue)m[scope.Usz])
+        ((StructValue)m.Lookup(scope.Usz))
             .AddEqualityOperators<nuint>(boolStruct)
             .AddComparisonOperators<nuint>(boolStruct)
             .AddBitwiseOperators<nuint>()
             .AddMathOperators<nuint>()
             .AddExplicitConversion<nuint>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m[scope.F16])
+        ((StructValue)m.Lookup(scope.F16))
             .AddEqualityOperators<Half>(boolStruct)
             .AddComparisonOperators<Half>(boolStruct)
             .AddMathOperators<Half>()
             .AddImplicitConversion<Half>(M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<Half>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
-        ((StructValue)m[scope.F32])
+        ((StructValue)m.Lookup(scope.F32))
             .AddEqualityOperators<float>(boolStruct)
             .AddComparisonOperators<float>(boolStruct)
             .AddMathOperators<float>()
             .AddImplicitConversion<float>(M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<float>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
-        ((StructValue)m[scope.F64])
+        ((StructValue)m.Lookup(scope.F64))
             .AddEqualityOperators<double>(boolStruct)
             .AddComparisonOperators<double>(boolStruct)
             .AddMathOperators<double>()
             .AddImplicitConversion<double>(M<double>(scope.F80), M<double>(scope.F128))
             .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
         // TODO: Fix these types using double.
-        ((StructValue)m[scope.F80])
+        ((StructValue)m.Lookup(scope.F80))
             .AddEqualityOperators<double>(boolStruct)
             .AddComparisonOperators<double>(boolStruct)
             .AddMathOperators<double>()
             .AddImplicitConversion<double>(M<double>(scope.F128))
             .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
-        ((StructValue)m[scope.F128])
+        ((StructValue)m.Lookup(scope.F128))
             .AddEqualityOperators<double>(boolStruct)
             .AddComparisonOperators<double>(boolStruct)
             .AddMathOperators<double>()
             .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
+
         return m;
     }
-}
-file readonly record struct R(StructValue Struct, Type ClrType);
 
-file static class StructValueExtensions
-{
     public static StructValue AddMembers(this StructValue s, Action<StructValue> add)
     {
         add(s);
