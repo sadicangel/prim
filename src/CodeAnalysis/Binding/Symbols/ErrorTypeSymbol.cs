@@ -15,10 +15,10 @@ internal sealed record class ErrorTypeSymbol : TypeSymbol
         ValueType = valueType;
         AddConversion(
             SyntaxKind.ImplicitKeyword,
-            new LambdaTypeSymbol([new Parameter("x", ValueType)], this, runtimeType, containingModule));
+            containingModule.CreateLambdaType([new Parameter("x", ValueType)], this));
         AddConversion(
             SyntaxKind.ImplicitKeyword,
-            new LambdaTypeSymbol([new Parameter("x", errType)], this, runtimeType, containingModule));
+            containingModule.CreateLambdaType([new Parameter("x", errType)], this));
     }
 
     public TypeSymbol ValueType { get; init; }

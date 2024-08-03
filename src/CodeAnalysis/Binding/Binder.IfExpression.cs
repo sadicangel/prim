@@ -42,12 +42,12 @@ partial class Binder
                 return @else;
             }
 
-            type = then.Type == @else.Type ? then.Type : new UnionTypeSymbol(syntax, [then.Type, @else.Type], context.BoundScope.RuntimeType, context.Module);
+            type = then.Type == @else.Type ? then.Type : context.BoundScope.CreateUnionType([then.Type, @else.Type], syntax);
         }
         else
         {
             @else = BoundLiteralExpression.Unit(context.BoundScope.Unit);
-            type = then.Type.IsOption ? then.Type : new OptionTypeSymbol(syntax, then.Type, context.BoundScope.RuntimeType, context.Module);
+            type = then.Type.IsOption ? then.Type : context.BoundScope.CreateOptionType(then.Type, syntax);
         }
 
         return new BoundIfExpression(syntax, condition, then, @else, type);

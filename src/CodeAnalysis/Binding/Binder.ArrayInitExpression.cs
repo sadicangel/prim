@@ -21,7 +21,7 @@ partial class Binder
 
         var elementType = BindTypeSet(types, context, syntax);
 
-        var arrayType = new ArrayTypeSymbol(syntax, elementType, elements.Count, context.BoundScope.I32, context.BoundScope.RuntimeType, context.Module);
+        var arrayType = context.BoundScope.CreateArrayType(elementType, elements.Count, syntax);
 
         return new BoundArrayInitExpression(syntax, arrayType, elements);
     }

@@ -18,7 +18,7 @@ internal sealed record class UnionTypeSymbol : TypeSymbol
         {
             AddConversion(
                 SyntaxKind.ImplicitKeyword,
-                new LambdaTypeSymbol([new Parameter("x", unionType)], this, runtimeType, containingModule));
+                containingModule.CreateLambdaType([new Parameter("x", unionType)], this));
         }
     }
 

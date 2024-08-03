@@ -29,22 +29,22 @@ partial class Binder
     {
         var elementType = BindType(syntax.ElementType, context);
 
-        // TODO: Allow any constant value coercible to i32 (or isize?).
+        // TODO: Allow any constant value coercible to i32 (or isz?).
         if (syntax.Length.SyntaxKind is SyntaxKind.I32LiteralExpression)
         {
             var length = (BoundLiteralExpression)BindExpression(syntax.Length, context);
             Debug.Assert(length.Value is int);
-            return new ArrayTypeSymbol(syntax, elementType, (int)length.Value!, context.BoundScope.I32, context.BoundScope.RuntimeType, context.Module);
+            return context.BoundScope.CreateArrayType(elementType, (int)length.Value!, syntax);
         }
 
         context.Diagnostics.ReportInvalidArrayLength(syntax.Length.Location);
-        return new ArrayTypeSymbol(syntax, context.BoundScope.Never, length: 0, context.BoundScope.I32, context.BoundScope.RuntimeType, context.Module);
+        return context.BoundScope.CreateArrayType(context.BoundScope.Never, length: 0, syntax);
     }
 
     static ErrorTypeSymbol BindErrorType(ErrorTypeSyntax syntax, Context context)
     {
         var valueType = BindType(syntax.ValueType, context);
-        return new ErrorTypeSymbol(syntax, context.BoundScope.Err, valueType, context.BoundScope.RuntimeType, context.Module);
+        return context.BoundScope.CreateErrorType(valueType, syntax);
     }
 
     static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, Context context)
@@ -64,7 +64,7 @@ partial class Binder
             parameters.Add(parameter);
         }
 
-        return new LambdaTypeSymbol(syntax, parameters, returnType, context.BoundScope.RuntimeType, context.Module);
+        return context.BoundScope.CreateLambdaType(parameters, returnType, syntax);
     }
 
     static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, Context context)
@@ -81,13 +81,13 @@ partial class Binder
     static OptionTypeSymbol BindOptionType(OptionTypeSyntax syntax, Context context)
     {
         var underlyingType = BindType(syntax.UnderlyingType, context);
-        return new OptionTypeSymbol(syntax, underlyingType, context.BoundScope.RuntimeType, context.Module);
+        return context.BoundScope.CreateOptionType(underlyingType, syntax);
     }
 
     static PointerTypeSymbol BindPointerType(PointerTypeSyntax syntax, Context context)
     {
         var elementType = BindType(syntax.ElementType, context);
-        return new PointerTypeSymbol(syntax, elementType, context.BoundScope.RuntimeType, context.Module);
+        return context.BoundScope.CreatePointerType(elementType, syntax);
     }
 
     static StructTypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax, Context context)
@@ -130,6 +130,6 @@ partial class Binder
         foreach (var typeSyntax in syntax.Types)
             builder.Add(BindType(typeSyntax, context));
         var types = new BoundList<TypeSymbol>(builder.ToImmutable());
-        return new UnionTypeSymbol(syntax, types, context.BoundScope.RuntimeType, context.Module);
+        return context.BoundScope.CreateUnionType(types, syntax);
     }
 }

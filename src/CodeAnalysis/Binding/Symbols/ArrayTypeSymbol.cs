@@ -17,7 +17,7 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
         IndexerType = indexerType;
         AddOperator(
             SyntaxKind.BracketOpenBracketCloseToken,
-            new LambdaTypeSymbol([new("index", indexerType)], ElementType, runtimeType, containingModule),
+            containingModule.CreateLambdaType([new("index", indexerType)], ElementType),
             isReadOnly: false);
     }
 
@@ -52,7 +52,7 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
             return true;
         }
 
-        var conversionType = new LambdaTypeSymbol([new Parameter("x", type)], this, Type, ContainingModule);
+        var conversionType = ContainingModule.CreateLambdaType([new Parameter("x", type)], this);
 
         _ = AddConversion(conversion.ConversionKind, conversionType);
 

@@ -14,10 +14,13 @@ partial class Binder
             throw new UnreachableException($"Unexpected symbol for '{nameof(ModuleDeclarationSyntax)}'");
 
         var builder = ImmutableArray.CreateBuilder<BoundDeclaration>(syntax.Declarations.Count);
-        foreach (var declarationSyntax in syntax.Declarations)
+        using (context.PushBoundScope(moduleSymbol))
         {
-            var declaration = BindDeclaration(declarationSyntax, context);
-            builder.Add(declaration);
+            foreach (var declarationSyntax in syntax.Declarations)
+            {
+                var declaration = BindDeclaration(declarationSyntax, context);
+                builder.Add(declaration);
+            }
         }
         var declarations = new BoundList<BoundDeclaration>(builder.ToImmutable());
         return new BoundModuleDeclaration(syntax, moduleSymbol, declarations);
