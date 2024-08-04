@@ -7,9 +7,9 @@ partial class Parser
     private static PropertyInitExpressionSyntax ParsePropertyInitExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var dotToken = iterator.Match(SyntaxKind.DotToken);
-        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var name = ParseSimpleNameExpression(syntaxTree, iterator);
         var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
         var init = ParseExpression(syntaxTree, iterator);
-        return new PropertyInitExpressionSyntax(syntaxTree, dotToken, identifierToken, equalsToken, init);
+        return new PropertyInitExpressionSyntax(syntaxTree, dotToken, name, equalsToken, init);
     }
 }

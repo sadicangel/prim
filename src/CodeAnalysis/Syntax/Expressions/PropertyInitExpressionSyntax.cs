@@ -1,10 +1,12 @@
 ﻿
+using CodeAnalysis.Syntax.Expressions.Names;
+
 namespace CodeAnalysis.Syntax.Expressions;
 
 public sealed record class PropertyInitExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken DotToken,
-    SyntaxToken IdentifierToken,
+    SimpleNameExpressionSyntax Name,
     SyntaxToken EqualsToken,
     ExpressionSyntax Init)
     : ExpressionSyntax(SyntaxKind.PropertyInitExpression, SyntaxTree)
@@ -12,7 +14,7 @@ public sealed record class PropertyInitExpressionSyntax(
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return DotToken;
-        yield return IdentifierToken;
+        yield return Name;
         yield return EqualsToken;
         yield return Init;
     }

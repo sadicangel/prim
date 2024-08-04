@@ -1,15 +1,17 @@
-﻿namespace CodeAnalysis.Syntax.Types;
+﻿using CodeAnalysis.Syntax.Expressions.Names;
+
+namespace CodeAnalysis.Syntax.Types;
 
 public sealed record class ParameterSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken IdentifierToken,
+    SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax Type)
     : SyntaxNode(SyntaxKind.Parameter, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return IdentifierToken;
+        yield return Name;
         yield return ColonToken;
         yield return Type;
     }

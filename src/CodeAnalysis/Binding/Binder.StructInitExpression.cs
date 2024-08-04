@@ -8,7 +8,7 @@ partial class Binder
 {
     private static BoundExpression BindStructInitExpression(StructInitExpressionSyntax syntax, Context context)
     {
-        var structName = syntax.IdentifierToken.Text.ToString();
+        var structName = syntax.Name.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
         {
             context.Diagnostics.ReportUndefinedType(syntax.Location, structName);
@@ -18,9 +18,9 @@ partial class Binder
         var builder = ImmutableArray.CreateBuilder<BoundPropertyInitExpression>(syntax.Properties.Count);
         foreach (var propertySyntax in syntax.Properties)
         {
-            if (typeSymbol.GetProperty(propertySyntax.IdentifierToken.Text) is not PropertySymbol property)
+            if (typeSymbol.GetProperty(propertySyntax.Name.IdentifierToken.Text) is not PropertySymbol property)
             {
-                context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.IdentifierToken.Text.ToString());
+                context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.Name.IdentifierToken.Text.ToString());
                 continue;
             }
 

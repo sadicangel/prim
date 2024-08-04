@@ -56,7 +56,7 @@ partial class Binder
         var seenParameterNames = new HashSet<string>();
         foreach (var parameterSyntax in syntax.Parameters)
         {
-            var parameterName = parameterSyntax.IdentifierToken.Text.ToString();
+            var parameterName = parameterSyntax.Name.IdentifierToken.Text.ToString();
             var parameterType = BindType(parameterSyntax.Type, context);
             if (!seenParameterNames.Add(parameterName))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, parameterName);
@@ -69,10 +69,10 @@ partial class Binder
 
     static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, Context context)
     {
-        var structName = syntax.IdentifierToken.Text.ToString();
+        var structName = syntax.Name.IdentifierToken.Text.ToString();
         if (context.BoundScope.Lookup(structName) is not StructTypeSymbol typeSymbol)
         {
-            context.Diagnostics.ReportUndefinedType(syntax.IdentifierToken.Location, structName);
+            context.Diagnostics.ReportUndefinedType(syntax.Name.IdentifierToken.Location, structName);
             return context.BoundScope.Never;
         }
         return typeSymbol;

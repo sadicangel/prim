@@ -1,9 +1,11 @@
 ﻿
 
+using CodeAnalysis.Syntax.Expressions.Names;
+
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class StructInitExpressionSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken IdentifierToken,
+    SimpleNameExpressionSyntax Name,
     SyntaxToken BraceOpenToken,
     SeparatedSyntaxList<PropertyInitExpressionSyntax> Properties,
     SyntaxToken BraceCloseToken)
@@ -11,7 +13,7 @@ public sealed record class StructInitExpressionSyntax(
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return IdentifierToken;
+        yield return Name;
         yield return BraceOpenToken;
         foreach (var node in Properties.SyntaxNodes)
             yield return node;

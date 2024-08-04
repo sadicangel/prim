@@ -69,8 +69,8 @@ partial class Parser
 
             static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
-                var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
-                return new NamedTypeSyntax(syntaxTree, identifierToken);
+                var name = ParseSimpleNameExpression(syntaxTree, iterator);
+                return new NamedTypeSyntax(syntaxTree, name);
             }
 
             static (SyntaxToken? ParenthesisOpenToken, TypeSyntax ElementType, SyntaxToken? ParenthesisCloseToken)
@@ -139,10 +139,10 @@ partial class Parser
                     [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
                     static (syntaxTree, iterator) =>
                     {
-                        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+                        var name = ParseSimpleNameExpression(syntaxTree, iterator);
                         var colonToken = iterator.Match(SyntaxKind.ColonToken);
                         var type = ParseType(syntaxTree, iterator);
-                        return new ParameterSyntax(syntaxTree, identifierToken, colonToken, type);
+                        return new ParameterSyntax(syntaxTree, name, colonToken, type);
                     });
                 var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
                 var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
