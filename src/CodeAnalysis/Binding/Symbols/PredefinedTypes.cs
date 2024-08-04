@@ -5,7 +5,6 @@ namespace CodeAnalysis.Binding.Symbols;
 internal static class PredefinedTypes
 {
     public const string Type = "type";
-    public const string Module = "module";
     public const string Any = "any";
     public const string Err = "err";
     public const string Unknown = "unknown";

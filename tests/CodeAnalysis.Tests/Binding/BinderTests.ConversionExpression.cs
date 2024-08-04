@@ -29,10 +29,12 @@ public partial class BinderTests
     public void Bind_ConversionExpression(string sourceTypeName, string targetTypeName)
     {
         var syntaxTree = SyntaxTree.ParseScript(new SourceText($"""
-            x: {sourceTypeName} : 3;
+            x:= 3{sourceTypeName};
             x as {targetTypeName}
             """));
+        Assert.Empty(syntaxTree.Diagnostics);
         var boundTree = BoundTree.Bind(syntaxTree, _scope);
+        Assert.Empty(boundTree.Diagnostics);
         var node = boundTree.CompilationUnit.BoundNodes[^1];
         Assert.Equal(BoundKind.ConversionExpression, node.BoundKind);
     }

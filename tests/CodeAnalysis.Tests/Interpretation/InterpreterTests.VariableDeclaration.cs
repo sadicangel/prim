@@ -8,7 +8,7 @@ public partial class InterpreterTests
     public void Evaluates_VariableDeclaration_ArrayType()
     {
         var value = """
-        a: [i32: 2]: [0, 0];
+        a: [i32: 2] = [0, 0];
         """.Evaluate();
         Assert.True(value.Type is ArrayTypeSymbol);
     }
@@ -17,7 +17,7 @@ public partial class InterpreterTests
     public void Evaluates_VariableDeclaration_LambdaType()
     {
         var value = """
-        a: (x: i32, y: i32) -> i32: x + y;
+        a: (x: i32, y: i32) -> i32 = x + y;
         """.Evaluate();
         Assert.True(value.Type is LambdaTypeSymbol);
     }
@@ -26,7 +26,7 @@ public partial class InterpreterTests
     public void Evaluates_VariableDeclaration_OptionType()
     {
         var value = """
-        a: ?i32: null;
+        a: ?i32 = null;
         """.Evaluate();
         Assert.True(value.Type is OptionTypeSymbol);
     }
@@ -35,7 +35,7 @@ public partial class InterpreterTests
     public void Evaluates_VariableDeclaration_StructType()
     {
         var value = """
-        a: i32: 0;
+        a: i32 = 0;
         """.Evaluate();
         Assert.True(value.Type is StructTypeSymbol);
     }
@@ -44,7 +44,7 @@ public partial class InterpreterTests
     public void Evaluates_VariableDeclaration_UnionType()
     {
         var value = """
-        a: i32 | str: "";
+        a: i32 | str = "";
         """.Evaluate();
         Assert.True(value.Type is UnionTypeSymbol);
     }
@@ -53,7 +53,7 @@ public partial class InterpreterTests
     public void Evaluates_VariableDeclaration_with_implicit_type()
     {
         var value = """
-        a:: "";
+        a:= "";
         """.Evaluate();
         Assert.Equal(PredefinedTypes.Str, value.Type.Name);
     }

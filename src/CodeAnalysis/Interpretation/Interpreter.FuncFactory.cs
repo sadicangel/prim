@@ -44,7 +44,7 @@ partial class Interpreter
                     [value, disposableVar],
                     Expression.Assign(
                         disposableVar,
-                        Expression.Call(contextConst, s_pushScopeMethodInfo)),
+                        Expression.Call(contextConst, s_pushScopeMethodInfo, Expression.Constant(null, typeof(ModuleValue)))),
                     Expression.TryFinally(
                         Expression.Block(
                             Expression.Block(lambdaType.Parameters.Select((p, i) =>

@@ -11,7 +11,6 @@ internal sealed class AnonymousScope(IBoundScope parent) : IBoundScope
     public ModuleSymbol Module => parent.Module;
 
     public StructTypeSymbol RuntimeType => Module.RuntimeType;
-    public StructTypeSymbol ModuleType => Module.ModuleType;
     public StructTypeSymbol Any => Module.Any;
     public StructTypeSymbol Err => Module.Err;
     public StructTypeSymbol Unknown => Module.Unknown;
@@ -73,7 +72,7 @@ internal sealed class AnonymousScope(IBoundScope parent) : IBoundScope
     public bool DeclareModule(string name, out ModuleSymbol moduleSymbol) =>
         DeclareModule(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), name, out moduleSymbol);
     public bool DeclareModule(SyntaxNode syntax, string name, out ModuleSymbol moduleSymbol)
-        => Declare(moduleSymbol = new ModuleSymbol(syntax, name, ModuleType, Module));
+        => Declare(moduleSymbol = new ModuleSymbol(syntax, name, Never, Module));
 
     public bool DeclareStruct(string name, out StructTypeSymbol structTypeSymbol)
         => Declare(structTypeSymbol = CreateStructType(name));

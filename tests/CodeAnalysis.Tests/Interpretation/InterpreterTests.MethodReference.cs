@@ -9,7 +9,7 @@ public partial class InterpreterTests
             hello: () -> str = "Hello world";
         }
 
-        s:: S {};
+        s:= S {};
         s.hello()
         """.Evaluate();
         Assert.Equal("Hello world", value.Value);
@@ -24,7 +24,7 @@ public partial class InterpreterTests
             hello: (obj: any) -> str = "Hello " + obj;
         }
 
-        s:: S {};
+        s:= S {};
         s.hello("John")
         """.Evaluate();
         Assert.Equal("Hello John", value.Value);

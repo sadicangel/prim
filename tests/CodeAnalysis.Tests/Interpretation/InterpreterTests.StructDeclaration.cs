@@ -7,7 +7,7 @@ public partial class InterpreterTests
     public void Evaluates_StructDeclaration()
     {
         var value = """
-            Point: struct: { x: i32 = 0;  y: i32 = 0; }
+            Point: struct = { x: i32 = 0;  y: i32 = 0; }
             """.Evaluate();
         Assert.True(value is StructValue);
     }

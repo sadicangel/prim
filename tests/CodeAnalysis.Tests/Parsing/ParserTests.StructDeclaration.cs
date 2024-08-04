@@ -6,7 +6,7 @@ public partial class ParserTests
     public void Parse_StructDeclaration()
     {
         var tree = SyntaxTree.Parse(new SourceText("""
-            Point2d: struct : {
+            Point2d: struct = {
                 x: i32 = 0;
                 y: i32 = 0;
             }

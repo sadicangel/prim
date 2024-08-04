@@ -12,7 +12,7 @@ public partial class InterpreterTests
             hello: (obj: any) -> str = "Hello " + obj;
         }
 
-        s:: S {};
+        s:= S {};
         s.hello
         """.Evaluate();
 

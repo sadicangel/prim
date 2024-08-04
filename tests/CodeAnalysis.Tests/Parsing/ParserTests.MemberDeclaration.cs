@@ -8,7 +8,7 @@ public partial class ParserTests
     public void Parse_MemberDeclaration()
     {
         var tree = SyntaxTree.Parse(new SourceText("""
-            Container: struct : {
+            Container: struct = {
                 member: i32 = 0;
             }
             """));

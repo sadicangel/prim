@@ -8,7 +8,6 @@ namespace CodeAnalysis.Binding;
 internal interface IBoundScope
 {
     StructTypeSymbol RuntimeType { get; }
-    StructTypeSymbol ModuleType { get; }
     StructTypeSymbol Any { get; }
     StructTypeSymbol Err { get; }
     StructTypeSymbol Unknown { get; }
@@ -76,7 +75,6 @@ file static class Factory
 
         ReadOnlySpan<bool> all = [
             global.Declare(type),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.ModuleKeyword), PredefinedTypes.Module, out var module),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedTypes.Any, out var any),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.ErrKeyword), PredefinedTypes.Err, out var err),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedTypes.Unknown, out var unknown),
@@ -112,7 +110,7 @@ file static class Factory
         // Global module is contained within itself. We need to avoid recursion.
         SetContainingModule(global, global);
         // Global module type `module` is contained within the global module. We need to avoid recursion.
-        SetType(global, module);
+        SetType(global, never);
         // All predefined symbols exist within the global module.
 
         err
