@@ -45,6 +45,12 @@ partial class Lexer
                 value = null;
                 return 1;
 
+            case [':', ':', ..]:
+                kind = SyntaxKind.ColonColonToken;
+                range = position..(position + 2);
+                value = null;
+                return 2;
+
             case [':', ..]:
                 kind = SyntaxKind.ColonToken;
                 range = position..(position + 1);

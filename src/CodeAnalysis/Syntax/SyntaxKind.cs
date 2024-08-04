@@ -32,6 +32,7 @@ public enum SyntaxKind
     BracketCloseToken,
     BracketOpenBracketCloseToken,
     ColonToken,
+    ColonColonToken,
     CommaToken,
     DotToken,
     DotDotToken,

@@ -23,6 +23,7 @@ public static class SyntaxFacts
             SyntaxKind.BracketCloseToken => "]",
             SyntaxKind.BracketOpenBracketCloseToken => "[]",
             SyntaxKind.ColonToken => ":",
+            SyntaxKind.ColonColonToken => "::",
             SyntaxKind.CommaToken => ",",
             SyntaxKind.DotToken => ".",
             SyntaxKind.DotDotToken => "..",
