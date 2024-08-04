@@ -1,16 +1,14 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
-
-public sealed record class BreakExpressionSyntax(
+﻿namespace CodeAnalysis.Syntax.Expressions.ControlFlow;
+public sealed record class ContinueExpressionSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken BreakKeyword,
+    SyntaxToken ContinueKeyword,
     ExpressionSyntax? Expression,
     SyntaxToken? SemicolonToken)
-    : ExpressionSyntax(SyntaxKind.BreakExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.ContinueExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return BreakKeyword;
+        yield return ContinueKeyword;
         if (Expression is not null)
             yield return Expression;
         if (SemicolonToken is not null)

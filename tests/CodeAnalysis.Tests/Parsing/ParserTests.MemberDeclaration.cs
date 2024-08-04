@@ -1,4 +1,4 @@
-﻿using CodeAnalysis.Syntax.Expressions;
+﻿using CodeAnalysis.Syntax.Expressions.Declarations;
 
 namespace CodeAnalysis.Tests.Parsing;
 

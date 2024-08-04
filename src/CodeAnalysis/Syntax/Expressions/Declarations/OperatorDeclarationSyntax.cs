@@ -1,20 +1,18 @@
-﻿using CodeAnalysis.Syntax.Expressions.Names;
-using CodeAnalysis.Syntax.Types;
+﻿using CodeAnalysis.Syntax.Types;
 
-namespace CodeAnalysis.Syntax.Expressions;
-
-public sealed record class MethodDeclarationSyntax(
+namespace CodeAnalysis.Syntax.Expressions.Declarations;
+public sealed record class OperatorDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SimpleNameExpressionSyntax Name,
+    SyntaxToken OperatorToken,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
     SyntaxToken EqualsToken,
     ExpressionSyntax Body)
-    : MemberDeclarationSyntax(SyntaxKind.MethodDeclaration, SyntaxTree)
+    : MemberDeclarationSyntax(SyntaxKind.OperatorDeclaration, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return Name;
+        yield return OperatorToken;
         yield return ColonToken;
         yield return Type;
         yield return EqualsToken;

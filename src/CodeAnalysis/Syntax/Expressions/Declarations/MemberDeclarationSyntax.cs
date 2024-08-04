@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions.Declarations;
 
 public abstract record class MemberDeclarationSyntax(
     SyntaxKind SyntaxKind,

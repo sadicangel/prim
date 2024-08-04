@@ -1,5 +1,4 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions.Declarations;
 public sealed record class LocalDeclarationSyntax(SyntaxTree SyntaxTree, DeclarationSyntax Declaration)
     : ExpressionSyntax(SyntaxKind.LocalDeclaration, SyntaxTree)
 {

@@ -1,7 +1,7 @@
 ﻿using CodeAnalysis.Syntax.Expressions.Names;
 using CodeAnalysis.Syntax.Types;
 
-namespace CodeAnalysis.Syntax.Expressions;
+namespace CodeAnalysis.Syntax.Expressions.Declarations;
 public sealed record class VariableDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SimpleNameExpressionSyntax Name,

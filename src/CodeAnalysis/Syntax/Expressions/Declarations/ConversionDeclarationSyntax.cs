@@ -1,18 +1,18 @@
 ﻿using CodeAnalysis.Syntax.Types;
 
-namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class OperatorDeclarationSyntax(
+namespace CodeAnalysis.Syntax.Expressions.Declarations;
+public sealed record class ConversionDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken OperatorToken,
+    SyntaxToken ConversionKeyword,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
     SyntaxToken EqualsToken,
     ExpressionSyntax Body)
-    : MemberDeclarationSyntax(SyntaxKind.OperatorDeclaration, SyntaxTree)
+    : MemberDeclarationSyntax(SyntaxKind.ConversionDeclaration, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return OperatorToken;
+        yield return ConversionKeyword;
         yield return ColonToken;
         yield return Type;
         yield return EqualsToken;

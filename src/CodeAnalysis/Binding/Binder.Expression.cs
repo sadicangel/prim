@@ -1,6 +1,8 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Expressions.ControlFlow;
+using CodeAnalysis.Syntax.Expressions.Declarations;
 using CodeAnalysis.Syntax.Expressions.Names;
 
 namespace CodeAnalysis.Binding;

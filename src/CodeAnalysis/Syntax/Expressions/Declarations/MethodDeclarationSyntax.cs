@@ -1,18 +1,20 @@
-﻿using CodeAnalysis.Syntax.Types;
+﻿using CodeAnalysis.Syntax.Expressions.Names;
+using CodeAnalysis.Syntax.Types;
 
-namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class ConversionDeclarationSyntax(
+namespace CodeAnalysis.Syntax.Expressions.Declarations;
+
+public sealed record class MethodDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken ConversionKeyword,
+    SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
     SyntaxToken EqualsToken,
     ExpressionSyntax Body)
-    : MemberDeclarationSyntax(SyntaxKind.ConversionDeclaration, SyntaxTree)
+    : MemberDeclarationSyntax(SyntaxKind.MethodDeclaration, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return ConversionKeyword;
+        yield return Name;
         yield return ColonToken;
         yield return Type;
         yield return EqualsToken;

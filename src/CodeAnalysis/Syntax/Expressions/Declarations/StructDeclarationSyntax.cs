@@ -1,27 +1,26 @@
 ﻿using CodeAnalysis.Syntax.Expressions.Names;
 
-namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class ModuleDeclarationSyntax(
+namespace CodeAnalysis.Syntax.Expressions.Declarations;
+public sealed record class StructDeclarationSyntax(
     SyntaxTree SyntaxTree,
     SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
-    SyntaxToken ModuleKeyword,
+    SyntaxToken StructKeyword,
     SyntaxToken EqualsToken,
     SyntaxToken BraceOpenToken,
-    SyntaxList<DeclarationSyntax> Declarations,
-    SyntaxToken BraceCloseToken
-    )
-    : DeclarationSyntax(SyntaxKind.ModuleDeclaration, SyntaxTree)
+    SyntaxList<MemberDeclarationSyntax> Members,
+    SyntaxToken BraceCloseToken)
+    : DeclarationSyntax(SyntaxKind.StructDeclaration, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;
         yield return ColonToken;
-        yield return ModuleKeyword;
+        yield return StructKeyword;
         yield return EqualsToken;
         yield return BraceOpenToken;
-        foreach (var declaration in Declarations)
-            yield return declaration;
+        foreach (var member in Members)
+            yield return member;
         yield return BraceCloseToken;
     }
 }

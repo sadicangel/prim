@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Expressions.Declarations;
 
 namespace CodeAnalysis.Binding.Symbols;
 

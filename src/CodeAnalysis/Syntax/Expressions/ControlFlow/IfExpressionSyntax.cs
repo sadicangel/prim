@@ -1,5 +1,4 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions.ControlFlow;
 public sealed record class IfExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IfKeyword,

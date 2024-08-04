@@ -1,6 +1,4 @@
-﻿
-
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions.ControlFlow;
 public sealed record class InvocationExpressionSyntax(
     SyntaxTree SyntaxTree,
     ExpressionSyntax Expression,

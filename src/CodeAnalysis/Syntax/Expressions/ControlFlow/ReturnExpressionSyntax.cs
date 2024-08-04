@@ -1,15 +1,15 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class ContinueExpressionSyntax(
+﻿namespace CodeAnalysis.Syntax.Expressions.ControlFlow;
+
+public sealed record class ReturnExpressionSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken ContinueKeyword,
+    SyntaxToken ReturnKeyword,
     ExpressionSyntax? Expression,
     SyntaxToken? SemicolonToken)
-    : ExpressionSyntax(SyntaxKind.ContinueExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.ReturnExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return ContinueKeyword;
+        yield return ReturnKeyword;
         if (Expression is not null)
             yield return Expression;
         if (SemicolonToken is not null)
