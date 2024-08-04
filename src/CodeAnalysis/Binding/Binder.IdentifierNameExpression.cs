@@ -1,11 +1,11 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Binding.Symbols;
-using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Expressions.Names;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindIdentifierNameExpression(IdentifierNameExpressionSyntax syntax, Context context)
+    private static BoundExpression BindSimpleNameExpression(SimpleNameExpressionSyntax syntax, Context context)
     {
         if (syntax.IdentifierToken.IsSynthetic)
         {

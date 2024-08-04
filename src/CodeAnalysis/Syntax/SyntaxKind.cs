@@ -143,6 +143,7 @@ public enum SyntaxKind
     // Expressions
 
     IdentifierNameExpression,
+    QualifiedNameExpression,
 
     I8LiteralExpression,
     U8LiteralExpression,

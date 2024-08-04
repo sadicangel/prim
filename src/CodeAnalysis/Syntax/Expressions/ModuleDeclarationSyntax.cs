@@ -1,7 +1,9 @@
-﻿namespace CodeAnalysis.Syntax.Expressions;
+﻿using CodeAnalysis.Syntax.Expressions.Names;
+
+namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class ModuleDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    IdentifierNameExpressionSyntax Name,
+    SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     SyntaxToken ModuleKeyword,
     SyntaxToken ColonOrEquals,

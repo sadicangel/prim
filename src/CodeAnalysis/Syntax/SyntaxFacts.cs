@@ -143,6 +143,7 @@ public static class SyntaxFacts
             SyntaxKind.Argument => null,
 
             SyntaxKind.IdentifierNameExpression => null,
+            SyntaxKind.QualifiedNameExpression => null,
 
             SyntaxKind.I8LiteralExpression => null,
             SyntaxKind.U8LiteralExpression => null,

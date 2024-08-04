@@ -6,7 +6,7 @@ partial class Parser
 {
     private static StructDeclarationSyntax ParseStructDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var name = ParseIdentifierNameExpression(syntaxTree, iterator);
+        var name = ParseSimpleNameExpression(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var structKeyword = iterator.Match(SyntaxKind.StructKeyword);
         var colonOrEquals = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);

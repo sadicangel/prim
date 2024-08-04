@@ -33,7 +33,7 @@ begin:
             case SyntaxKind.DotToken:
                 {
                     var dotToken = iterator.Match(SyntaxKind.DotToken);
-                    var name = ParseIdentifierNameExpression(syntaxTree, iterator);
+                    var name = ParseSimpleNameExpression(syntaxTree, iterator);
                     left = new MemberAccessExpressionSyntax(syntaxTree, left, dotToken, name);
                 }
                 goto begin;

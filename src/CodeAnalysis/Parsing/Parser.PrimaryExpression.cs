@@ -16,7 +16,7 @@ partial class Parser
             {
                 SyntaxKind.ColonToken => ParseLocalDeclaration(syntaxTree, iterator),
                 SyntaxKind.EqualsToken => ParseAssignmentExpression(syntaxTree, iterator),
-                _ => ParseIdentifierNameExpression(syntaxTree, iterator),
+                _ => ParseSimpleNameExpression(syntaxTree, iterator),
             }
         };
     }

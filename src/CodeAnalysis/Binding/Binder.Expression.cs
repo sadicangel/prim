@@ -1,6 +1,7 @@
 ﻿using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Expressions.Names;
 
 namespace CodeAnalysis.Binding;
 partial class Binder
@@ -10,7 +11,7 @@ partial class Binder
         return syntax.SyntaxKind switch
         {
             SyntaxKind.IdentifierNameExpression =>
-                BindIdentifierNameExpression((IdentifierNameExpressionSyntax)syntax, context),
+                BindSimpleNameExpression((SimpleNameExpressionSyntax)syntax, context),
             >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression =>
                 BindLiteralExpression((LiteralExpressionSyntax)syntax, context),
             SyntaxKind.GroupExpression =>

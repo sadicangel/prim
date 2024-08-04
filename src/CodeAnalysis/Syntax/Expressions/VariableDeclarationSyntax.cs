@@ -1,9 +1,10 @@
-﻿using CodeAnalysis.Syntax.Types;
+﻿using CodeAnalysis.Syntax.Expressions.Names;
+using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class VariableDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    IdentifierNameExpressionSyntax Name,
+    SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax? Type,
     InitValueExpressionSyntax? InitValue,
