@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Expressions.Names;
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static SimpleNameExpressionSyntax ParseSimpleNameExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static SimpleNameSyntax ParseSimpleName(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         var identifierToken = iterator.Current.SyntaxKind switch
         {
@@ -12,6 +12,6 @@ partial class Parser
             >= SyntaxKind.AnyKeyword and <= SyntaxKind.F64Keyword => iterator.Match(),
             _ => iterator.Match(SyntaxKind.IdentifierToken)
         };
-        return new SimpleNameExpressionSyntax(syntaxTree, identifierToken);
+        return new SimpleNameSyntax(syntaxTree, identifierToken);
     }
 }

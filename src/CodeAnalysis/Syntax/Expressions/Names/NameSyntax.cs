@@ -1,4 +1,4 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions.Names;
 
-public abstract record class NameExpressionSyntax(SyntaxKind SyntaxKind, SyntaxTree SyntaxTree)
+public abstract record class NameSyntax(SyntaxKind SyntaxKind, SyntaxTree SyntaxTree)
     : ExpressionSyntax(SyntaxKind, SyntaxTree);

@@ -6,7 +6,7 @@ partial class Parser
 {
     private static ModuleDeclarationSyntax ParseModuleDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var name = ParseSimpleNameExpression(syntaxTree, iterator);
+        var name = ParseSimpleName(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var moduleKeyword = iterator.Match(SyntaxKind.ModuleKeyword);
         var equalsToken = iterator.Match(SyntaxKind.EqualsToken);

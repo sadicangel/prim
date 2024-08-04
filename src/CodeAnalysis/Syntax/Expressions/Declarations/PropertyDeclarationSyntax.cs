@@ -4,7 +4,7 @@ using CodeAnalysis.Syntax.Types;
 namespace CodeAnalysis.Syntax.Expressions.Declarations;
 public sealed record class PropertyDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SimpleNameExpressionSyntax Name,
+    SimpleNameSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax Type,
     InitValueExpressionSyntax? InitValue,

@@ -1,11 +1,11 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions.Names;
 
-public record class QualifiedNameExpressionSyntax(
+public record class QualifiedNameSyntax(
     SyntaxTree SyntaxTree,
-    NameExpressionSyntax Left,
+    NameSyntax Left,
     SyntaxToken ColonColonToken,
-    SimpleNameExpressionSyntax Right)
-    : NameExpressionSyntax(SyntaxKind.QualifiedNameExpression, SyntaxTree)
+    SimpleNameSyntax Right)
+    : NameSyntax(SyntaxKind.QualifiedNameExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

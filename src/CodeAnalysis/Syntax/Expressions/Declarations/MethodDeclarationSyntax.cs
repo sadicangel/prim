@@ -5,7 +5,7 @@ namespace CodeAnalysis.Syntax.Expressions.Declarations;
 
 public sealed record class MethodDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SimpleNameExpressionSyntax Name,
+    SimpleNameSyntax Name,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
     SyntaxToken EqualsToken,

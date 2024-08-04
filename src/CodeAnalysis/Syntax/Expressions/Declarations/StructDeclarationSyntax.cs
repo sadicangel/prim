@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Syntax.Expressions.Declarations;
 public sealed record class StructDeclarationSyntax(
     SyntaxTree SyntaxTree,
-    SimpleNameExpressionSyntax Name,
+    SimpleNameSyntax Name,
     SyntaxToken ColonToken,
     SyntaxToken StructKeyword,
     SyntaxToken EqualsToken,

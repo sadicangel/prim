@@ -13,7 +13,7 @@ partial class Binder
         return syntax.SyntaxKind switch
         {
             SyntaxKind.IdentifierNameExpression =>
-                BindSimpleNameExpression((SimpleNameExpressionSyntax)syntax, context),
+                BindSimpleName((SimpleNameSyntax)syntax, context),
             >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression =>
                 BindLiteralExpression((LiteralExpressionSyntax)syntax, context),
             SyntaxKind.GroupExpression =>

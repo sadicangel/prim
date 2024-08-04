@@ -1,8 +1,8 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions.Names;
-public record class SimpleNameExpressionSyntax(
+public record class SimpleNameSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken)
-    : NameExpressionSyntax(SyntaxKind.IdentifierNameExpression, SyntaxTree)
+    : NameSyntax(SyntaxKind.IdentifierNameExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

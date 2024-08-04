@@ -6,7 +6,7 @@ public sealed record class MemberAccessExpressionSyntax(
     SyntaxTree SyntaxTree,
     ExpressionSyntax Expression,
     SyntaxToken OperatorToken,
-    SimpleNameExpressionSyntax Name)
+    SimpleNameSyntax Name)
     : ExpressionSyntax(SyntaxKind.MemberAccessExpression, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()

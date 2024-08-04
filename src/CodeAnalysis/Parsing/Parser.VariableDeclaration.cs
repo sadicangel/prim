@@ -11,7 +11,7 @@ partial class Parser
         // name: type = value;
         // name:= value;
         // name: type;
-        var name = ParseSimpleNameExpression(syntaxTree, iterator);
+        var name = ParseSimpleName(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var type = default(TypeSyntax);
         var initValue = default(InitValueExpressionSyntax);

@@ -6,7 +6,7 @@ namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class PropertyInitExpressionSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken DotToken,
-    SimpleNameExpressionSyntax Name,
+    SimpleNameSyntax Name,
     SyntaxToken EqualsToken,
     ExpressionSyntax Init)
     : ExpressionSyntax(SyntaxKind.PropertyInitExpression, SyntaxTree)

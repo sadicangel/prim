@@ -6,7 +6,7 @@ partial class Parser
 {
     private static StructInitExpressionSyntax ParseStructInitExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
-        var name = ParseSimpleNameExpression(syntaxTree, iterator);
+        var name = ParseSimpleName(syntaxTree, iterator);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
         var properties = ParseSeparatedSyntaxList(
             syntaxTree,

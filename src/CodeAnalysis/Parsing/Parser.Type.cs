@@ -69,7 +69,7 @@ partial class Parser
 
             static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
-                var name = ParseSimpleNameExpression(syntaxTree, iterator);
+                var name = ParseSimpleName(syntaxTree, iterator);
                 return new NamedTypeSyntax(syntaxTree, name);
             }
 
@@ -139,7 +139,7 @@ partial class Parser
                     [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
                     static (syntaxTree, iterator) =>
                     {
-                        var name = ParseSimpleNameExpression(syntaxTree, iterator);
+                        var name = ParseSimpleName(syntaxTree, iterator);
                         var colonToken = iterator.Match(SyntaxKind.ColonToken);
                         var type = ParseType(syntaxTree, iterator);
                         return new ParameterSyntax(syntaxTree, name, colonToken, type);

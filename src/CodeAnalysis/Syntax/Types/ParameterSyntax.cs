@@ -4,7 +4,7 @@ namespace CodeAnalysis.Syntax.Types;
 
 public sealed record class ParameterSyntax(
     SyntaxTree SyntaxTree,
-    SimpleNameExpressionSyntax Name,
+    SimpleNameSyntax Name,
     SyntaxToken ColonToken,
     TypeSyntax Type)
     : SyntaxNode(SyntaxKind.Parameter, SyntaxTree)
