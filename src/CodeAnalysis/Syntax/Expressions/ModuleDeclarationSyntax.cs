@@ -6,7 +6,7 @@ public sealed record class ModuleDeclarationSyntax(
     SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     SyntaxToken ModuleKeyword,
-    SyntaxToken ColonOrEquals,
+    SyntaxToken EqualsToken,
     SyntaxToken BraceOpenToken,
     SyntaxList<DeclarationSyntax> Declarations,
     SyntaxToken BraceCloseToken
@@ -18,7 +18,7 @@ public sealed record class ModuleDeclarationSyntax(
         yield return Name;
         yield return ColonToken;
         yield return ModuleKeyword;
-        yield return ColonOrEquals;
+        yield return EqualsToken;
         yield return BraceOpenToken;
         foreach (var declaration in Declarations)
             yield return declaration;

@@ -9,7 +9,7 @@ partial class Parser
         var name = ParseSimpleNameExpression(syntaxTree, iterator);
         var colonToken = iterator.Match(SyntaxKind.ColonToken);
         var moduleKeyword = iterator.Match(SyntaxKind.ModuleKeyword);
-        var colonOrEquals = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+        var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
         var declarations = ParseSyntaxList(
             syntaxTree,
@@ -23,7 +23,7 @@ partial class Parser
             name,
             colonToken,
             moduleKeyword,
-            colonOrEquals,
+            equalsToken,
             braceOpenToken,
             declarations,
             braceCloseToken);

@@ -22,7 +22,7 @@ partial class Parser
             var type = ParseType(syntaxTree, iterator);
             if (type is not LambdaTypeSyntax functionType)
                 throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(LambdaTypeSyntax)}'");
-            var equalsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+            var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
             var body = ParseTerminatedExpression(syntaxTree, iterator);
 
             return new ConversionDeclarationSyntax(
@@ -41,7 +41,7 @@ partial class Parser
             var type = ParseType(syntaxTree, iterator);
             if (type is not LambdaTypeSyntax functionType)
                 throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(LambdaTypeSyntax)}'");
-            var equalsToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+            var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
             var body = ParseTerminatedExpression(syntaxTree, iterator);
 
             return new OperatorDeclarationSyntax(
@@ -60,7 +60,7 @@ partial class Parser
             var type = ParseType(syntaxTree, iterator);
             if (type is not LambdaTypeSyntax functionType)
                 throw new InvalidOperationException($"Unexpected type '{type.GetType().Name}'. Expected '{nameof(LambdaTypeSyntax)}'");
-            var operatorToken = iterator.Match(SyntaxKind.EqualsToken, SyntaxKind.ColonToken);
+            var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
             var body = ParseTerminatedExpression(syntaxTree, iterator);
 
             return new MethodDeclarationSyntax(
@@ -68,7 +68,7 @@ partial class Parser
                 name,
                 colonToken,
                 functionType,
-                operatorToken,
+                equalsToken,
                 body);
         }
 
@@ -79,10 +79,10 @@ partial class Parser
             var type = ParseType(syntaxTree, iterator);
             var initValue = default(InitValueExpressionSyntax);
             var semicolonToken = default(SyntaxToken);
-            if (iterator.TryMatch(out var colonOrEqualsToken, SyntaxKind.EqualsToken, SyntaxKind.ColonToken))
+            if (iterator.TryMatch(out var equalsToken, SyntaxKind.EqualsToken))
             {
                 var expression = ParseExpression(syntaxTree, iterator);
-                initValue = new InitValueExpressionSyntax(syntaxTree, colonOrEqualsToken, expression);
+                initValue = new InitValueExpressionSyntax(syntaxTree, equalsToken, expression);
             }
             if (initValue?.IsTerminated is not true)
                 semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);

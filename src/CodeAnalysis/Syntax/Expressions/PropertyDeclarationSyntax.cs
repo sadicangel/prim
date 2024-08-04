@@ -11,8 +11,6 @@ public sealed record class PropertyDeclarationSyntax(
     SyntaxToken? SemicolonToken)
     : MemberDeclarationSyntax(SyntaxKind.PropertyDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => InitValue?.IsReadOnly ?? false; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;

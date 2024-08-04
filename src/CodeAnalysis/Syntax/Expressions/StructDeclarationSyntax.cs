@@ -6,21 +6,18 @@ public sealed record class StructDeclarationSyntax(
     SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     SyntaxToken StructKeyword,
-    SyntaxToken ColonOrEquals,
+    SyntaxToken EqualsToken,
     SyntaxToken BraceOpenToken,
     SyntaxList<MemberDeclarationSyntax> Members,
     SyntaxToken BraceCloseToken)
     : DeclarationSyntax(SyntaxKind.StructDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly
-    { get => ColonOrEquals.SyntaxKind is SyntaxKind.ColonToken; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;
         yield return ColonToken;
         yield return StructKeyword;
-        yield return ColonOrEquals;
+        yield return EqualsToken;
         yield return BraceOpenToken;
         foreach (var member in Members)
             yield return member;

@@ -8,18 +8,16 @@ public sealed record class MethodDeclarationSyntax(
     SimpleNameExpressionSyntax Name,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
-    SyntaxToken ColonOrEqualsToken,
+    SyntaxToken EqualsToken,
     ExpressionSyntax Body)
     : MemberDeclarationSyntax(SyntaxKind.MethodDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;
         yield return ColonToken;
         yield return Type;
-        yield return ColonOrEqualsToken;
+        yield return EqualsToken;
         yield return Body;
     }
 }

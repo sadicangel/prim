@@ -11,8 +11,6 @@ public sealed record class VariableDeclarationSyntax(
     SyntaxToken? SemicolonToken)
     : DeclarationSyntax(SyntaxKind.VariableDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => InitValue?.IsReadOnly ?? false; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return Name;

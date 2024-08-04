@@ -90,7 +90,7 @@ internal abstract record class TypeSymbol(
     }
 
     internal bool AddProperty(string name, TypeSymbol type, PropertyDeclarationSyntax syntax) =>
-        AddProperty(name, type, isStatic: false, syntax.IsReadOnly, syntax);
+        AddProperty(name, type, isStatic: false, isReadOnly: false, syntax);
 
     internal bool AddProperty(string name, TypeSymbol type, bool isStatic, bool isReadOnly, SyntaxNode? syntax = null)
     {
@@ -121,7 +121,7 @@ internal abstract record class TypeSymbol(
     }
 
     internal bool AddMethod(string name, LambdaTypeSymbol type, MethodDeclarationSyntax syntax) =>
-        AddMethod(name, type, isStatic: true, syntax.IsReadOnly, syntax);
+        AddMethod(name, type, isStatic: true, isReadOnly: true, syntax);
 
     internal bool AddMethod(string name, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {
@@ -149,7 +149,7 @@ internal abstract record class TypeSymbol(
         _members.OfType<MethodSymbol>().SingleOrDefault(m => m.Name == name);
 
     internal bool AddOperator(LambdaTypeSymbol type, OperatorDeclarationSyntax syntax) =>
-        AddOperator(syntax.OperatorToken.SyntaxKind, type, isStatic: true, syntax.IsReadOnly, syntax);
+        AddOperator(syntax.OperatorToken.SyntaxKind, type, isStatic: true, isReadOnly: true, syntax);
 
     internal bool AddOperator(SyntaxKind operatorKind, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {

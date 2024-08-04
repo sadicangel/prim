@@ -15,18 +15,18 @@ partial class Parser
         var type = default(TypeSyntax);
         var initValue = default(InitValueExpressionSyntax);
         var semicolonToken = default(SyntaxToken);
-        if (iterator.TryMatch(out var colonOrEqualsToken, SyntaxKind.EqualsToken, SyntaxKind.ColonToken))
+        if (iterator.TryMatch(out var equalsToken, SyntaxKind.EqualsToken))
         {
             var expression = ParseExpression(syntaxTree, iterator);
-            initValue = new InitValueExpressionSyntax(syntaxTree, colonOrEqualsToken, expression);
+            initValue = new InitValueExpressionSyntax(syntaxTree, equalsToken, expression);
         }
         else
         {
             type = ParseType(syntaxTree, iterator);
-            if (iterator.TryMatch(out colonOrEqualsToken, SyntaxKind.EqualsToken, SyntaxKind.ColonToken))
+            if (iterator.TryMatch(out equalsToken, SyntaxKind.EqualsToken))
             {
                 var expression = ParseExpression(syntaxTree, iterator);
-                initValue = new InitValueExpressionSyntax(syntaxTree, colonOrEqualsToken, expression);
+                initValue = new InitValueExpressionSyntax(syntaxTree, equalsToken, expression);
             }
         }
         if (initValue?.IsTerminated is not true)

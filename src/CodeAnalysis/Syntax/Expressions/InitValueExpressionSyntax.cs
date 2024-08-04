@@ -2,15 +2,13 @@
 
 public sealed record class InitValueExpressionSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxToken ColonOrEqualsToken,
+    SyntaxToken EqualsToken,
     ExpressionSyntax Expression)
     : ExpressionSyntax(SyntaxKind.InitValueExpression, SyntaxTree)
 {
-    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return ColonOrEqualsToken;
+        yield return EqualsToken;
         yield return Expression;
     }
 }

@@ -6,18 +6,16 @@ public sealed record class OperatorDeclarationSyntax(
     SyntaxToken OperatorToken,
     SyntaxToken ColonToken,
     LambdaTypeSyntax Type,
-    SyntaxToken ColonOrEqualsToken,
+    SyntaxToken EqualsToken,
     ExpressionSyntax Body)
     : MemberDeclarationSyntax(SyntaxKind.OperatorDeclaration, SyntaxTree)
 {
-    public bool IsReadOnly { get => ColonOrEqualsToken.SyntaxKind is SyntaxKind.ColonToken; }
-
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return OperatorToken;
         yield return ColonToken;
         yield return Type;
-        yield return ColonOrEqualsToken;
+        yield return EqualsToken;
         yield return Body;
     }
 }

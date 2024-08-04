@@ -140,7 +140,7 @@ partial class Binder
                     var variableType = variableDeclaration.Type is null
                         ? context.BoundScope.Unknown
                         : BindType(variableDeclaration.Type, context);
-                    if (!context.BoundScope.DeclareVariable(variableDeclaration, variableName, variableType, isStatic: true, variableDeclaration.IsReadOnly, out var variableSymbol))
+                    if (!context.BoundScope.DeclareVariable(variableDeclaration, variableName, variableType, isStatic: true, isReadOnly: false, out var variableSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(variableDeclaration.Location, variableName);
                 }
                 break;
