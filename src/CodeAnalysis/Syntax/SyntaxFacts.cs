@@ -100,19 +100,15 @@ public static class SyntaxFacts
             SyntaxKind.I16Keyword => "i16",
             SyntaxKind.I32Keyword => "i32",
             SyntaxKind.I64Keyword => "i64",
-            SyntaxKind.I128Keyword => "i128",
             SyntaxKind.IszKeyword => "isz",
             SyntaxKind.U8Keyword => "u8",
             SyntaxKind.U16Keyword => "u16",
             SyntaxKind.U32Keyword => "u32",
             SyntaxKind.U64Keyword => "u64",
-            SyntaxKind.U128Keyword => "u128",
             SyntaxKind.UszKeyword => "usz",
             SyntaxKind.F16Keyword => "f16",
             SyntaxKind.F32Keyword => "f32",
             SyntaxKind.F64Keyword => "f64",
-            SyntaxKind.F80Keyword => "f80",
-            SyntaxKind.F128Keyword => "f128",
 
             SyntaxKind.ModuleKeyword => "module",
             SyntaxKind.StructKeyword => "struct",
@@ -253,19 +249,15 @@ public static class SyntaxFacts
             "i16" => SyntaxKind.I16Keyword,
             "i32" => SyntaxKind.I32Keyword,
             "i64" => SyntaxKind.I64Keyword,
-            "i128" => SyntaxKind.I128Keyword,
             "isz" => SyntaxKind.IszKeyword,
             "u8" => SyntaxKind.U8Keyword,
             "u16" => SyntaxKind.U16Keyword,
             "u32" => SyntaxKind.U32Keyword,
             "u64" => SyntaxKind.U64Keyword,
-            "u128" => SyntaxKind.U128Keyword,
             "usz" => SyntaxKind.UszKeyword,
             "f16" => SyntaxKind.F16Keyword,
             "f32" => SyntaxKind.F32Keyword,
             "f64" => SyntaxKind.F64Keyword,
-            "f80" => SyntaxKind.F80Keyword,
-            "f128" => SyntaxKind.F128Keyword,
 
             "module" => SyntaxKind.ModuleKeyword,
             "struct" => SyntaxKind.StructKeyword,
@@ -288,7 +280,7 @@ public static class SyntaxFacts
         syntaxKind is >= SyntaxKind.IfKeyword and <= SyntaxKind.NullKeyword;
 
     public static bool IsPredefinedType(SyntaxKind syntaxKind) =>
-        syntaxKind is >= SyntaxKind.AnyKeyword and <= SyntaxKind.F128Keyword;
+        syntaxKind is >= SyntaxKind.AnyKeyword and <= SyntaxKind.F64Keyword;
 
     public static bool IsNumberLiteralToken(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.F64LiteralToken;

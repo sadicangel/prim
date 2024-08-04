@@ -9,7 +9,7 @@ partial class Parser
         var identifierToken = iterator.Current.SyntaxKind switch
         {
             SyntaxKind.ThisKeyword => iterator.Match(),
-            >= SyntaxKind.AnyKeyword and <= SyntaxKind.F128Keyword => iterator.Match(),
+            >= SyntaxKind.AnyKeyword and <= SyntaxKind.F64Keyword => iterator.Match(),
             _ => iterator.Match(SyntaxKind.IdentifierToken)
         };
         return new SimpleNameExpressionSyntax(syntaxTree, identifierToken);

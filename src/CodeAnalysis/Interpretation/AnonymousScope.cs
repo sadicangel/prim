@@ -25,19 +25,15 @@ internal sealed class AnonymousScope(IEvaluatedScope parent) : IEvaluatedScope
     public StructValue I16 => Module.I16;
     public StructValue I32 => Module.I32;
     public StructValue I64 => Module.I64;
-    public StructValue I128 => Module.I128;
     public StructValue Isz => Module.Isz;
     public StructValue U8 => Module.U8;
     public StructValue U16 => Module.U16;
     public StructValue U32 => Module.U32;
     public StructValue U64 => Module.U64;
-    public StructValue U128 => Module.U128;
     public StructValue Usz => Module.Usz;
     public StructValue F16 => Module.F16;
     public StructValue F32 => Module.F32;
     public StructValue F64 => Module.F64;
-    public StructValue F80 => Module.F80;
-    public StructValue F128 => Module.F128;
 
     public void Declare(Symbol symbol, PrimValue value)
     {

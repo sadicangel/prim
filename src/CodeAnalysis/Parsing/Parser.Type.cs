@@ -43,7 +43,7 @@ partial class Parser
         {
             return iterator.Current.SyntaxKind switch
             {
-                >= SyntaxKind.AnyKeyword and <= SyntaxKind.F128Keyword =>
+                >= SyntaxKind.AnyKeyword and <= SyntaxKind.F64Keyword =>
                     ParsePredefinedType(syntaxTree, iterator),
                 SyntaxKind.IdentifierToken =>
                     ParseNamedType(syntaxTree, iterator),

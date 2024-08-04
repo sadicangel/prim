@@ -19,19 +19,15 @@ internal interface IBoundScope
     StructTypeSymbol I16 { get; }
     StructTypeSymbol I32 { get; }
     StructTypeSymbol I64 { get; }
-    StructTypeSymbol I128 { get; }
     StructTypeSymbol Isz { get; }
     StructTypeSymbol U8 { get; }
     StructTypeSymbol U16 { get; }
     StructTypeSymbol U32 { get; }
     StructTypeSymbol U64 { get; }
-    StructTypeSymbol U128 { get; }
     StructTypeSymbol Usz { get; }
     StructTypeSymbol F16 { get; }
     StructTypeSymbol F32 { get; }
     StructTypeSymbol F64 { get; }
-    StructTypeSymbol F80 { get; }
-    StructTypeSymbol F128 { get; }
 
     IBoundScope Parent { get; }
     ModuleSymbol Module { get; }
@@ -86,19 +82,15 @@ file static class Factory
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedTypes.I16, out var i16),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedTypes.I32, out var i32),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedTypes.I64, out var i64),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I128Keyword), PredefinedTypes.I128, out var i128),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.IszKeyword), PredefinedTypes.Isz, out var isz),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedTypes.U8, out var u8),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedTypes.U16, out var u16),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedTypes.U32, out var u32),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedTypes.U64, out var u64),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U128Keyword), PredefinedTypes.U128, out var u128),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.UszKeyword), PredefinedTypes.Usz, out var usz),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedTypes.F16, out var f16),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedTypes.F32, out var f32),
             global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedTypes.F64, out var f64),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F80Keyword), PredefinedTypes.F80, out var f80),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F128Keyword), PredefinedTypes.F128, out var f128),
         ];
 
         if (all.IndexOf(false) is var index && index > 0)
@@ -140,46 +132,39 @@ file static class Factory
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(i16, i32, i64, i128, isz, f16, f32, f64, f80, f128)
-            .AddExplicitConversion(u8, u16, u32, u64, u128, usz);
+            .AddImplicitConversion(i16, i32, i64, isz, f16, f32, f64)
+            .AddExplicitConversion(u8, u16, u32, u64, usz);
 
         i16
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(i32, i64, i128, isz, f16, f32, f64, f80, f128)
-            .AddExplicitConversion(i8, u8, u16, u32, u64, u128, usz);
+            .AddImplicitConversion(i32, i64, isz, f16, f32, f64)
+            .AddExplicitConversion(i8, u8, u16, u32, u64, usz);
 
         i32
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(i64, i128, isz, f32, f64, f80, f128)
-            .AddExplicitConversion(i8, i16, u8, u16, u32, u64, u128, usz, f16);
+            .AddImplicitConversion(i64, isz, f32, f64)
+            .AddExplicitConversion(i8, i16, u8, u16, u32, u64, usz, f16);
 
         i64
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(i128, isz, f32, f64, f80, f128)
-            .AddExplicitConversion(i8, i16, i32, u8, u16, u32, u64, u128, usz, f16);
-
-        i128
-            .AddEqualityOperators()
-            .AddComparisonOperators()
-            .AddBitwiseOperators()
-            .AddMathOperators()
-            .AddExplicitConversion(i8, i16, i32, i64, isz, u8, u16, u32, u64, u128, usz, f16, f32, f64, f80, f128);
+            .AddImplicitConversion(isz, f32, f64)
+            .AddExplicitConversion(i8, i16, i32, u8, u16, u32, u64, usz, f16);
 
         isz
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddExplicitConversion(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128, usz, f16, f32, f64, f80, f128);
+            .AddExplicitConversion(i8, i16, i32, i64, u8, u16, u32, u64, usz, f16, f32, f64);
 
 
         u8
@@ -187,80 +172,59 @@ file static class Factory
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(u16, u32, u64, u128, usz, f16, f32, f64, f80, f128)
-            .AddExplicitConversion(i8, i16, i32, i64, i128, isz);
+            .AddImplicitConversion(u16, u32, u64, usz, f16, f32, f64)
+            .AddExplicitConversion(i8, i16, i32, i64, isz);
 
         u16
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(u32, u64, u128, usz, f16, f32, f64, f80, f128)
-            .AddExplicitConversion(u8, i8, i16, i32, i64, i128, isz);
+            .AddImplicitConversion(u32, u64, usz, f16, f32, f64)
+            .AddExplicitConversion(u8, i8, i16, i32, i64, isz);
 
         u32
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(u64, u128, usz, f32, f64, f80, f128)
-            .AddExplicitConversion(u8, u16, i8, i16, i32, i64, i128, isz, f16);
+            .AddImplicitConversion(u64, usz, f32, f64)
+            .AddExplicitConversion(u8, u16, i8, i16, i32, i64, isz, f16);
 
         u64
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddImplicitConversion(u128, usz, f32, f64, f80, f128)
-            .AddExplicitConversion(u8, u16, u32, i8, i16, i32, i64, i128, isz, f16);
-
-        u128
-            .AddEqualityOperators()
-            .AddComparisonOperators()
-            .AddBitwiseOperators()
-            .AddMathOperators()
-            .AddExplicitConversion(i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, usz, f16, f32, f64, f80, f128);
+            .AddImplicitConversion(usz, f32, f64)
+            .AddExplicitConversion(u8, u16, u32, i8, i16, i32, i64, isz, f16);
 
         usz
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddBitwiseOperators()
             .AddMathOperators()
-            .AddExplicitConversion(i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, u128, f16, f32, f64, f80, f128);
+            .AddExplicitConversion(i8, i16, i32, i64, isz, u8, u16, u32, u64, f16, f32, f64);
 
         f16
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddMathOperators()
-            .AddImplicitConversion(f32, f64, f80, f128)
-            .AddExplicitConversion(i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, u128, usz);
+            .AddImplicitConversion(f32, f64)
+            .AddExplicitConversion(i8, i16, i32, i64, isz, u8, u16, u32, u64, usz);
 
         f32
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddMathOperators()
-            .AddImplicitConversion(f64, f80, f128)
-            .AddExplicitConversion(f16, i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, u128, usz);
+            .AddImplicitConversion(f64)
+            .AddExplicitConversion(f16, i8, i16, i32, i64, isz, u8, u16, u32, u64, usz);
 
         f64
             .AddEqualityOperators()
             .AddComparisonOperators()
             .AddMathOperators()
-            .AddImplicitConversion(f80, f128)
-            .AddExplicitConversion(f16, f32, i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, u128, usz);
-
-        f80
-            .AddEqualityOperators()
-            .AddComparisonOperators()
-            .AddMathOperators()
-            .AddImplicitConversion(f128)
-            .AddExplicitConversion(f16, f32, f64, i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, u128, usz);
-
-        f128
-            .AddEqualityOperators()
-            .AddComparisonOperators()
-            .AddMathOperators()
-            .AddExplicitConversion(f16, f32, f64, f80, i8, i16, i32, i64, i128, isz, u8, u16, u32, u64, u128, usz);
+            .AddExplicitConversion(f16, f32, i8, i16, i32, i64, isz, u8, u16, u32, u64, usz);
 
         return global;
 

@@ -51,8 +51,6 @@ internal sealed record class ModuleSymbol(
         ?? throw new UnreachableException($"Undeclared predefined symbol 'i32'");
     public StructTypeSymbol I64 => Module.Lookup(PredefinedTypes.I64) as StructTypeSymbol
         ?? throw new UnreachableException($"Undeclared predefined symbol 'i64'");
-    public StructTypeSymbol I128 => Module.Lookup(PredefinedTypes.I128) as StructTypeSymbol
-        ?? throw new UnreachableException($"Undeclared predefined symbol 'i128'");
     public StructTypeSymbol Isz => Module.Lookup(PredefinedTypes.Isz) as StructTypeSymbol
         ?? throw new UnreachableException($"Undeclared predefined symbol 'isz'");
     public StructTypeSymbol U8 => Module.Lookup(PredefinedTypes.U8) as StructTypeSymbol
@@ -63,8 +61,6 @@ internal sealed record class ModuleSymbol(
         ?? throw new UnreachableException($"Undeclared predefined symbol 'u32'");
     public StructTypeSymbol U64 => Module.Lookup(PredefinedTypes.U64) as StructTypeSymbol
         ?? throw new UnreachableException($"Undeclared predefined symbol 'u64'");
-    public StructTypeSymbol U128 => Module.Lookup(PredefinedTypes.U128) as StructTypeSymbol
-        ?? throw new UnreachableException($"Undeclared predefined symbol 'u128'");
     public StructTypeSymbol Usz => Module.Lookup(PredefinedTypes.Usz) as StructTypeSymbol
         ?? throw new UnreachableException($"Undeclared predefined symbol 'usz'");
     public StructTypeSymbol F16 => Module.Lookup(PredefinedTypes.F16) as StructTypeSymbol
@@ -73,10 +69,6 @@ internal sealed record class ModuleSymbol(
         ?? throw new UnreachableException($"Undeclared predefined symbol 'f32'");
     public StructTypeSymbol F64 => Module.Lookup(PredefinedTypes.F64) as StructTypeSymbol
         ?? throw new UnreachableException($"Undeclared predefined symbol 'f64'");
-    public StructTypeSymbol F80 => Module.Lookup(PredefinedTypes.F80) as StructTypeSymbol
-        ?? throw new UnreachableException($"Undeclared predefined symbol 'f80'");
-    public StructTypeSymbol F128 => Module.Lookup(PredefinedTypes.F128) as StructTypeSymbol
-        ?? throw new UnreachableException($"Undeclared predefined symbol 'f128'");
 
     private static ModuleSymbol FindGlobalModule(ModuleSymbol module)
     {

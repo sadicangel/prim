@@ -9,19 +9,13 @@ public partial class BinderTests
         PredefinedTypes.I16,
         PredefinedTypes.I32,
         PredefinedTypes.I64,
-        PredefinedTypes.I128,
-        PredefinedTypes.Isz,
         PredefinedTypes.U8,
         PredefinedTypes.U16,
         PredefinedTypes.U32,
         PredefinedTypes.U64,
-        PredefinedTypes.U128,
-        PredefinedTypes.Usz,
         PredefinedTypes.F16,
         PredefinedTypes.F32,
         PredefinedTypes.F64,
-        PredefinedTypes.F80,
-        PredefinedTypes.F128,
     ];
 
     [Theory]

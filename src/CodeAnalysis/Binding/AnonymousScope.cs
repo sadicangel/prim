@@ -22,19 +22,15 @@ internal sealed class AnonymousScope(IBoundScope parent) : IBoundScope
     public StructTypeSymbol I16 => Module.I16;
     public StructTypeSymbol I32 => Module.I32;
     public StructTypeSymbol I64 => Module.I64;
-    public StructTypeSymbol I128 => Module.I128;
     public StructTypeSymbol Isz => Module.Isz;
     public StructTypeSymbol U8 => Module.U8;
     public StructTypeSymbol U16 => Module.U16;
     public StructTypeSymbol U32 => Module.U32;
     public StructTypeSymbol U64 => Module.U64;
-    public StructTypeSymbol U128 => Module.U128;
     public StructTypeSymbol Usz => Module.Usz;
     public StructTypeSymbol F16 => Module.F16;
     public StructTypeSymbol F32 => Module.F32;
     public StructTypeSymbol F64 => Module.F64;
-    public StructTypeSymbol F80 => Module.F80;
-    public StructTypeSymbol F128 => Module.F128;
 
     public bool Declare(Symbol symbol) => (_symbols ??= []).TryAdd(symbol.Name, symbol);
 

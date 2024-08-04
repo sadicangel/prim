@@ -25,19 +25,15 @@ internal interface IEvaluatedScope
     StructValue I16 { get; }
     StructValue I32 { get; }
     StructValue I64 { get; }
-    StructValue I128 { get; }
     StructValue Isz { get; }
     StructValue U8 { get; }
     StructValue U16 { get; }
     StructValue U32 { get; }
     StructValue U64 { get; }
-    StructValue U128 { get; }
     StructValue Usz { get; }
     StructValue F16 { get; }
     StructValue F32 { get; }
     StructValue F64 { get; }
-    StructValue F80 { get; }
-    StructValue F128 { get; }
 
     void Declare(Symbol symbol, PrimValue value);
 
@@ -73,19 +69,15 @@ file static class Factory
             scope.I16,
             scope.I32,
             scope.I64,
-            scope.I128,
             scope.Isz,
             scope.U8,
             scope.U16,
             scope.U32,
             scope.U64,
-            scope.U128,
             scope.Usz,
             scope.F16,
             scope.F32,
             scope.F64,
-            scope.F80,
-            scope.F128,
         ];
 
         foreach (var symbol in all)
@@ -132,111 +124,86 @@ file static class Factory
             .AddComparisonOperators<sbyte>(boolStruct)
             .AddBitwiseOperators<sbyte>()
             .AddMathOperators<sbyte>()
-            .AddImplicitConversion<sbyte>(M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<sbyte>(M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
+            .AddImplicitConversion<sbyte>(M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<sbyte>(M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
         ((StructValue)m.Lookup(scope.I16))
             .AddEqualityOperators<short>(boolStruct)
             .AddComparisonOperators<short>(boolStruct)
             .AddBitwiseOperators<short>()
             .AddMathOperators<short>()
-            .AddImplicitConversion<short>(M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<short>(M<sbyte>(scope.I8), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
+            .AddImplicitConversion<short>(M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<short>(M<sbyte>(scope.I8), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
         ((StructValue)m.Lookup(scope.I32))
             .AddEqualityOperators<int>(boolStruct)
             .AddComparisonOperators<int>(boolStruct)
             .AddBitwiseOperators<int>()
             .AddMathOperators<int>()
-            .AddImplicitConversion<int>(M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<int>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
+            .AddImplicitConversion<int>(M<long>(scope.I64), M<nint>(scope.Isz), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<int>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
         ((StructValue)m.Lookup(scope.I64))
             .AddEqualityOperators<long>(boolStruct)
             .AddComparisonOperators<long>(boolStruct)
             .AddBitwiseOperators<long>()
             .AddMathOperators<long>()
-            .AddImplicitConversion<long>(M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<long>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
-        ((StructValue)m.Lookup(scope.I128))
-            .AddEqualityOperators<BigInteger>(boolStruct)
-            .AddComparisonOperators<BigInteger>(boolStruct)
-            .AddBitwiseOperators<BigInteger>()
-            .AddMathOperators<BigInteger>()
-            .AddExplicitConversion<BigInteger>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
+            .AddImplicitConversion<long>(M<nint>(scope.Isz), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<long>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
         ((StructValue)m.Lookup(scope.Isz))
             .AddEqualityOperators<nint>(boolStruct)
             .AddComparisonOperators<nint>(boolStruct)
             .AddBitwiseOperators<nint>()
             .AddMathOperators<nint>()
-            .AddExplicitConversion<nint>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
+            .AddExplicitConversion<nint>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<nuint>(scope.Usz));
         ((StructValue)m.Lookup(scope.U8))
             .AddEqualityOperators<byte>(boolStruct)
             .AddComparisonOperators<byte>(boolStruct)
             .AddBitwiseOperators<byte>()
             .AddMathOperators<byte>()
-            .AddImplicitConversion<byte>(M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<byte>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz));
+            .AddImplicitConversion<byte>(M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<nuint>(scope.Usz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<byte>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz));
         ((StructValue)m.Lookup(scope.U16))
             .AddEqualityOperators<ushort>(boolStruct)
             .AddComparisonOperators<ushort>(boolStruct)
             .AddBitwiseOperators<ushort>()
             .AddMathOperators<ushort>()
-            .AddImplicitConversion<ushort>(M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<ushort>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8));
+            .AddImplicitConversion<ushort>(M<uint>(scope.U32), M<ulong>(scope.U64), M<nuint>(scope.Usz), M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<ushort>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8));
         ((StructValue)m.Lookup(scope.U32))
             .AddEqualityOperators<uint>(boolStruct)
             .AddComparisonOperators<uint>(boolStruct)
             .AddBitwiseOperators<uint>()
             .AddMathOperators<uint>()
-            .AddImplicitConversion<uint>(M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<uint>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16));
+            .AddImplicitConversion<uint>(M<ulong>(scope.U64), M<nuint>(scope.Usz), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<uint>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16));
         ((StructValue)m.Lookup(scope.U64))
             .AddEqualityOperators<ulong>(boolStruct)
             .AddComparisonOperators<ulong>(boolStruct)
             .AddBitwiseOperators<ulong>()
             .AddMathOperators<ulong>()
-            .AddImplicitConversion<ulong>(M<BigInteger>(scope.U128), M<nuint>(scope.Usz), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<ulong>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32));
-        ((StructValue)m.Lookup(scope.U128))
-            .AddEqualityOperators<BigInteger>(boolStruct)
-            .AddComparisonOperators<BigInteger>(boolStruct)
-            .AddBitwiseOperators<BigInteger>()
-            .AddMathOperators<BigInteger>()
-            .AddExplicitConversion<BigInteger>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
+            .AddImplicitConversion<ulong>(M<nuint>(scope.Usz), M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<ulong>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32));
         ((StructValue)m.Lookup(scope.Usz))
             .AddEqualityOperators<nuint>(boolStruct)
             .AddComparisonOperators<nuint>(boolStruct)
             .AddBitwiseOperators<nuint>()
             .AddMathOperators<nuint>()
-            .AddExplicitConversion<nuint>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128));
+            .AddExplicitConversion<nuint>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64));
         ((StructValue)m.Lookup(scope.F16))
             .AddEqualityOperators<Half>(boolStruct)
             .AddComparisonOperators<Half>(boolStruct)
             .AddMathOperators<Half>()
-            .AddImplicitConversion<Half>(M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<Half>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
+            .AddImplicitConversion<Half>(M<float>(scope.F32), M<double>(scope.F64))
+            .AddExplicitConversion<Half>(M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<nuint>(scope.Usz));
         ((StructValue)m.Lookup(scope.F32))
             .AddEqualityOperators<float>(boolStruct)
             .AddComparisonOperators<float>(boolStruct)
             .AddMathOperators<float>()
-            .AddImplicitConversion<float>(M<double>(scope.F64), M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<float>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
+            .AddImplicitConversion<float>(M<double>(scope.F64))
+            .AddExplicitConversion<float>(M<Half>(scope.F16), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<nuint>(scope.Usz));
         ((StructValue)m.Lookup(scope.F64))
             .AddEqualityOperators<double>(boolStruct)
             .AddComparisonOperators<double>(boolStruct)
             .AddMathOperators<double>()
-            .AddImplicitConversion<double>(M<double>(scope.F80), M<double>(scope.F128))
-            .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
-        // TODO: Fix these types using double.
-        ((StructValue)m.Lookup(scope.F80))
-            .AddEqualityOperators<double>(boolStruct)
-            .AddComparisonOperators<double>(boolStruct)
-            .AddMathOperators<double>()
-            .AddImplicitConversion<double>(M<double>(scope.F128))
-            .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
-        ((StructValue)m.Lookup(scope.F128))
-            .AddEqualityOperators<double>(boolStruct)
-            .AddComparisonOperators<double>(boolStruct)
-            .AddMathOperators<double>()
-            .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<double>(scope.F64), M<double>(scope.F80), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<BigInteger>(scope.I128), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<BigInteger>(scope.U128), M<nuint>(scope.Usz));
+            .AddExplicitConversion<double>(M<Half>(scope.F16), M<float>(scope.F32), M<sbyte>(scope.I8), M<short>(scope.I16), M<int>(scope.I32), M<long>(scope.I64), M<nint>(scope.Isz), M<byte>(scope.U8), M<ushort>(scope.U16), M<uint>(scope.U32), M<ulong>(scope.U64), M<nuint>(scope.Usz));
 
         return m;
     }

@@ -25,19 +25,15 @@ internal sealed record class ModuleValue(ModuleSymbol Module, ModuleValue Contai
     public StructValue I16 => (StructValue)Lookup(BoundScope.I16);
     public StructValue I32 => (StructValue)Lookup(BoundScope.I32);
     public StructValue I64 => (StructValue)Lookup(BoundScope.I64);
-    public StructValue I128 => (StructValue)Lookup(BoundScope.I128);
     public StructValue Isz => (StructValue)Lookup(BoundScope.Isz);
     public StructValue U8 => (StructValue)Lookup(BoundScope.U8);
     public StructValue U16 => (StructValue)Lookup(BoundScope.U16);
     public StructValue U32 => (StructValue)Lookup(BoundScope.U32);
     public StructValue U64 => (StructValue)Lookup(BoundScope.U64);
-    public StructValue U128 => (StructValue)Lookup(BoundScope.U128);
     public StructValue Usz => (StructValue)Lookup(BoundScope.Usz);
     public StructValue F16 => (StructValue)Lookup(BoundScope.F16);
     public StructValue F32 => (StructValue)Lookup(BoundScope.F32);
     public StructValue F64 => (StructValue)Lookup(BoundScope.F64);
-    public StructValue F80 => (StructValue)Lookup(BoundScope.F80);
-    public StructValue F128 => (StructValue)Lookup(BoundScope.F128);
 
     ModuleValue IEvaluatedScope.Module { get => this; }
 
