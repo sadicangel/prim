@@ -12,12 +12,8 @@ partial class Parser
             >= SyntaxKind.TrueKeyword and <= SyntaxKind.NullKeyword => ParseLiteralExpression(syntaxTree, iterator),
             >= SyntaxKind.I8LiteralToken and <= SyntaxKind.StrLiteralToken => ParseLiteralExpression(syntaxTree, iterator),
             SyntaxKind.ParenthesisOpenToken => ParseGroupExpression(syntaxTree, iterator),
-            _ => iterator.Peek(1).SyntaxKind switch
-            {
-                SyntaxKind.ColonToken => ParseLocalDeclaration(syntaxTree, iterator),
-                SyntaxKind.EqualsToken => ParseAssignmentExpression(syntaxTree, iterator),
-                _ => ParseSimpleName(syntaxTree, iterator),
-            }
+            _ when iterator.Peek(1).SyntaxKind is SyntaxKind.ColonToken => ParseLocalDeclaration(syntaxTree, iterator),
+            _ => ParseName(syntaxTree, iterator),
         };
     }
 }
