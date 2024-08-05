@@ -5,7 +5,7 @@ public record class QualifiedNameSyntax(
     NameSyntax Left,
     SyntaxToken ColonColonToken,
     SimpleNameSyntax Right)
-    : NameSyntax(SyntaxKind.QualifiedNameExpression, SyntaxTree)
+    : NameSyntax(SyntaxKind.QualifiedName, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

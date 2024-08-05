@@ -139,8 +139,8 @@ public static class SyntaxFacts
             SyntaxKind.Parameter => null,
             SyntaxKind.Argument => null,
 
-            SyntaxKind.IdentifierNameExpression => null,
-            SyntaxKind.QualifiedNameExpression => null,
+            SyntaxKind.SimpleName => null,
+            SyntaxKind.QualifiedName => null,
 
             SyntaxKind.I8LiteralExpression => null,
             SyntaxKind.U8LiteralExpression => null,

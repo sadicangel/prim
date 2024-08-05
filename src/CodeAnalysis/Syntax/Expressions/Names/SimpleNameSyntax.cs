@@ -2,7 +2,7 @@
 public record class SimpleNameSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken IdentifierToken)
-    : NameSyntax(SyntaxKind.IdentifierNameExpression, SyntaxTree)
+    : NameSyntax(SyntaxKind.SimpleName, SyntaxTree)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

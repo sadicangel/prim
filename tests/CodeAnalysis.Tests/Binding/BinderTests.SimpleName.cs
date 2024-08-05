@@ -4,7 +4,7 @@ namespace CodeAnalysis.Tests.Binding;
 public partial class BinderTests
 {
     [Fact]
-    public void Bind_IdentifierNameExpression()
+    public void Bind_SimpleName()
     {
         var syntaxTree = SyntaxTree.ParseScript(new SourceText("""
             a: i32 = 2;
