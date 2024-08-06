@@ -15,6 +15,8 @@ internal sealed record class ModuleValue(
 {
     public override ModuleValue Module => this;
 
+    public override object Value => ModuleSymbol.Name;
+
     public static ModuleValue CreateGlobalModule(ScopeSymbol scope)
     {
         var global = Factory.CreateGlobalModule(scope);

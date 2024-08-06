@@ -11,5 +11,7 @@ internal sealed record class AnonymousScopeValue(
         ContainingScope)
 {
     public override ModuleValue Module => ContainingModule;
+
+    public override object Value => AnonymousScopeSymbol.Name;
 }
 

@@ -20,7 +20,7 @@ internal static class RenderExtensions
 
     private static void WriteType(this IAnsiConsole console, TypeSymbol type)
     {
-        console.MarkupInterpolated($"[green i]{Markup.Escape(type.Name)}[/]");
+        console.MarkupInterpolated($"[green i]{Markup.Escape(type.QualifiedName)}[/]");
     }
 
     private static void WriteValue(this IAnsiConsole console, object value, int indent = 0)
@@ -104,6 +104,12 @@ internal static class RenderExtensions
                     console.Write("[ ");
                     console.Write(union.Value);
                     console.Write(" ] ");
+                }
+                break;
+            case ModuleValue module:
+                {
+                    Indent(console, indent);
+                    console.Write(module.Name);
                 }
                 break;
             default:

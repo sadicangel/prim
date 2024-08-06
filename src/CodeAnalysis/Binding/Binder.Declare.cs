@@ -26,7 +26,8 @@ partial class Binder
                 {
                     var moduleDeclaration = (ModuleDeclarationSyntax)syntax;
                     var moduleName = moduleDeclaration.Name.Text.ToString();
-                    if (!context.BoundScope.DeclareModule(moduleDeclaration, moduleName, out var moduleSymbol))
+                    var moduleSymbol = new ModuleSymbol(moduleDeclaration, moduleName, context.Module);
+                    if (!context.Module.Declare(moduleSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(moduleDeclaration.Location, moduleName);
                     using (context.PushBoundScope(moduleSymbol))
                     {
@@ -39,7 +40,8 @@ partial class Binder
                 {
                     var structDeclaration = (StructDeclarationSyntax)syntax;
                     var structName = structDeclaration.Name.Text.ToString();
-                    if (!context.BoundScope.DeclareStruct(structDeclaration, structName, out _))
+                    var structSymbol = new StructTypeSymbol(structDeclaration, structName, context.Module);
+                    if (!context.Module.Declare(structSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(structDeclaration.Location, structName);
                 }
                 break;
@@ -138,7 +140,14 @@ partial class Binder
                     var variableType = variableDeclaration.Type is null
                         ? context.BoundScope.Unknown
                         : BindType(variableDeclaration.Type, context);
-                    if (!context.BoundScope.DeclareVariable(variableDeclaration, variableName, variableType, isStatic: true, isReadOnly: false, out var variableSymbol))
+                    var variableSymbol = new VariableSymbol(
+                        variableDeclaration,
+                        variableName,
+                        variableType,
+                        context.BoundScope,
+                        IsStatic: true,
+                        IsReadOnly: false);
+                    if (!context.BoundScope.Declare(variableSymbol))
                         context.Diagnostics.ReportSymbolRedeclaration(variableDeclaration.Location, variableName);
                 }
                 break;

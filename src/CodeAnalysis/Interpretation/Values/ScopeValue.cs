@@ -23,8 +23,6 @@ internal abstract record class ScopeValue(ScopeSymbol ScopeSymbol, ModuleValue C
         }
     }
 
-    public override ScopeSymbol Value => ScopeSymbol;
-
     public StructValue RuntimeType => (StructValue)LookupLocal(ScopeSymbol.RuntimeType);
     public StructValue Any => (StructValue)LookupLocal(ScopeSymbol.Any);
     public StructValue Err => (StructValue)LookupLocal(ScopeSymbol.Err);

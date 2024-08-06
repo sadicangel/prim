@@ -40,29 +40,49 @@ file static class Factory
     {
         var global = MakeGlobalModule();
         var type = MakeRuntimeType(global);
+        StructTypeSymbol any;
+        StructTypeSymbol err;
+        StructTypeSymbol unknown;
+        StructTypeSymbol never;
+        StructTypeSymbol unit;
+        StructTypeSymbol str;
+        StructTypeSymbol @bool;
+        StructTypeSymbol i8;
+        StructTypeSymbol i16;
+        StructTypeSymbol i32;
+        StructTypeSymbol i64;
+        StructTypeSymbol isz;
+        StructTypeSymbol u8;
+        StructTypeSymbol u16;
+        StructTypeSymbol u32;
+        StructTypeSymbol u64;
+        StructTypeSymbol usz;
+        StructTypeSymbol f16;
+        StructTypeSymbol f32;
+        StructTypeSymbol f64;
 
         ReadOnlySpan<bool> all = [
             global.Declare(type),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedTypes.Any, out var any),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.ErrKeyword), PredefinedTypes.Err, out var err),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedTypes.Unknown, out var unknown),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedTypes.Never, out var never),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedTypes.Unit, out var unit),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.StrKeyword), PredefinedTypes.Str, out var str),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.BoolKeyword), PredefinedTypes.Bool, out var @bool),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I8Keyword), PredefinedTypes.I8, out var i8),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedTypes.I16, out var i16),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedTypes.I32, out var i32),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedTypes.I64, out var i64),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.IszKeyword), PredefinedTypes.Isz, out var isz),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedTypes.U8, out var u8),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedTypes.U16, out var u16),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedTypes.U32, out var u32),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedTypes.U64, out var u64),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.UszKeyword), PredefinedTypes.Usz, out var usz),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedTypes.F16, out var f16),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedTypes.F32, out var f32),
-            global.DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedTypes.F64, out var f64),
+            global.Declare(any = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.AnyKeyword), PredefinedTypes.Any, global)),
+            global.Declare(err = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.ErrKeyword), PredefinedTypes.Err, global)),
+            global.Declare(unknown = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.UnknownKeyword), PredefinedTypes.Unknown, global)),
+            global.Declare(never = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.NeverKeyword), PredefinedTypes.Never, global)),
+            global.Declare(unit = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.UnitKeyword), PredefinedTypes.Unit, global)),
+            global.Declare(str = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.StrKeyword), PredefinedTypes.Str, global)),
+            global.Declare(@bool = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.BoolKeyword), PredefinedTypes.Bool, global)),
+            global.Declare(i8 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I8Keyword), PredefinedTypes.I8, global)),
+            global.Declare(i16 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I16Keyword), PredefinedTypes.I16, global)),
+            global.Declare(i32 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I32Keyword), PredefinedTypes.I32, global)),
+            global.Declare(i64 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.I64Keyword), PredefinedTypes.I64, global)),
+            global.Declare(isz = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.IszKeyword), PredefinedTypes.Isz, global)),
+            global.Declare(u8 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U8Keyword), PredefinedTypes.U8, global)),
+            global.Declare(u16 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U16Keyword), PredefinedTypes.U16, global)),
+            global.Declare(u32 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U32Keyword), PredefinedTypes.U32, global)),
+            global.Declare(u64 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.U64Keyword), PredefinedTypes.U64, global)),
+            global.Declare(usz = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.UszKeyword), PredefinedTypes.Usz, global)),
+            global.Declare(f16 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F16Keyword), PredefinedTypes.F16, global)),
+            global.Declare(f32 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F32Keyword), PredefinedTypes.F32, global)),
+            global.Declare(f64 = new StructTypeSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.F64Keyword), PredefinedTypes.F64, global)),
         ];
 
         if (all.IndexOf(false) is var index && index > 0)
@@ -264,23 +284,29 @@ file static class Factory
 
     public static void DeclareFmtModule(ModuleSymbol global)
     {
-        if (!global.DeclareModule("fmt", out var fmt))
+        var fmt = new ModuleSymbol(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), "fmt", global);
+        if (!global.Declare(fmt))
             throw new UnreachableException($"Failed to declare 'fmt' module");
 
-        ReadOnlySpan<bool> all = [
-            fmt.DeclareVariable(
-                "print",
-                new LambdaTypeSymbol([new Parameter("obj", fmt.Any)], fmt.Unit, fmt),
-                isStatic: true,
-                isReadOnly: true,
-                out _),
+        var print = new VariableSymbol(
+            SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
+            "print",
+            new LambdaTypeSymbol([new Parameter("obj", fmt.Any)], fmt.Unit, fmt),
+            fmt,
+            IsStatic: true,
+            IsReadOnly: true);
 
-            fmt.DeclareVariable(
-                "scan",
-                new LambdaTypeSymbol([], fmt.Str, fmt),
-                isStatic: true,
-                isReadOnly: true,
-                out _),
+        var scan = new VariableSymbol(
+            SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
+            "scan",
+            new LambdaTypeSymbol([], fmt.Str, fmt),
+            fmt,
+            IsStatic: true,
+            IsReadOnly: true);
+
+        ReadOnlySpan<bool> all = [
+            fmt.Declare(print),
+            fmt.Declare(scan),
         ];
 
         if (all.IndexOf(false) is var index && index > 0)

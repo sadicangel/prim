@@ -10,7 +10,7 @@ partial class Interpreter
     private static StructValue EvaluateStructDeclaration(BoundStructDeclaration node, Context context)
     {
         var structValue = new StructValue(node.StructTypeSymbol, node.Type);
-        context.EvaluatedScope.Declare(node.StructTypeSymbol, structValue);
+        context.Module.Declare(node.StructTypeSymbol, structValue);
         foreach (var member in node.Members)
         {
             _ = member.BoundKind switch

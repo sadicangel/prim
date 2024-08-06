@@ -24,22 +24,4 @@ internal abstract record class Symbol(
     public override int GetHashCode() => HashCode.Combine(BoundKind, Name);
 
     public sealed override string ToString() => $"{Name}: {Type.Name}";
-
-    private static NameValue GetQualifiedName(Symbol symbol)
-    {
-        return EnumerateNames(symbol).ToArray();
-
-        static IEnumerable<string> EnumerateNames(Symbol symbol)
-        {
-            var module = symbol.ContainingModule;
-
-            while (!module.IsGlobal)
-            {
-                yield return module.Name;
-                module = module.ContainingModule;
-            }
-
-            yield return symbol.Name;
-        }
-    }
 }

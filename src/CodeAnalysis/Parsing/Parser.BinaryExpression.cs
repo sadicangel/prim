@@ -2,6 +2,7 @@
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Syntax.Expressions.ControlFlow;
+using CodeAnalysis.Syntax.Expressions.Names;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
@@ -36,6 +37,20 @@ begin:
                     var dotToken = iterator.Match(SyntaxKind.DotToken);
                     var name = ParseSimpleName(syntaxTree, iterator);
                     left = new MemberAccessExpressionSyntax(syntaxTree, left, dotToken, name);
+                }
+                goto begin;
+
+            case SyntaxKind.BraceOpenToken when left is NameSyntax name:
+                {
+                    var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
+                    var properties = ParseSeparatedSyntaxList(
+                        syntaxTree,
+                        iterator,
+                        SyntaxKind.CommaToken,
+                        [SyntaxKind.BraceCloseToken, SyntaxKind.EofToken],
+                        ParsePropertyInitExpression);
+                    var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
+                    left = new StructInitExpressionSyntax(syntaxTree, name, braceOpenToken, properties, braceCloseToken);
                 }
                 goto begin;
 

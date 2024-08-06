@@ -138,19 +138,4 @@ internal abstract record class ScopeSymbol(
 
         return false;
     }
-
-    public bool DeclareModule(string name, out ModuleSymbol moduleSymbol) =>
-        DeclareModule(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), name, out moduleSymbol);
-    public bool DeclareModule(SyntaxNode syntax, string name, out ModuleSymbol moduleSymbol)
-        => Declare(moduleSymbol = new ModuleSymbol(syntax, name, Module));
-
-    public bool DeclareStruct(string name, out StructTypeSymbol structTypeSymbol)
-        => DeclareStruct(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), name, out structTypeSymbol);
-    public bool DeclareStruct(SyntaxNode syntax, string name, out StructTypeSymbol structTypeSymbol)
-        => Declare(structTypeSymbol = new StructTypeSymbol(syntax, name, Module));
-
-    public bool DeclareVariable(string name, TypeSymbol type, bool isStatic, bool isReadOnly, out VariableSymbol variableSymbol)
-        => DeclareVariable(SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken), name, type, isStatic, isReadOnly, out variableSymbol);
-    public bool DeclareVariable(SyntaxNode syntax, string name, TypeSymbol type, bool isStatic, bool isReadOnly, out VariableSymbol variableSymbol)
-        => Declare(variableSymbol = new VariableSymbol(syntax, name, type, Module, isStatic, isReadOnly));
 }

@@ -14,4 +14,6 @@ internal abstract record class PrimValue(TypeSymbol Type)
 
     public abstract override int GetHashCode();
     public abstract bool Equals(PrimValue? other);
+
+    public sealed override string ToString() => $"{Value}: {Type.Name}";
 }

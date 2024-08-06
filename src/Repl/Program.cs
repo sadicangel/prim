@@ -11,16 +11,12 @@ var previousEvaluation = default(Evaluation);
 while (true)
 {
     var @default = Markup.Escape("""
-        a: module = {
-            b: module = {
-                c: i32 = 0;
+        vec: module = {
+            Point: struct = {
+                x: i32 = 0;
+                y: i32 = 0;
             }
         }
-        z: () -> i32 = {
-            a::b::c = 10;
-            a::b::c;
-        }
-        w: i32 = z();
         """);
 
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue(@default));
