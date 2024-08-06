@@ -9,6 +9,8 @@ internal enum BoundKind
     NopExpression,
     NeverExpression,
 
+    StackInstantiation,
+
     LiteralExpression,
 
     AssignmentExpression,

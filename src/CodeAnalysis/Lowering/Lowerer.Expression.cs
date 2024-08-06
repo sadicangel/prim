@@ -11,6 +11,7 @@ partial class Lowerer
         {
             BoundKind.NopExpression => LowerNopExpression((BoundNopExpression)node, context),
             BoundKind.NeverExpression => LowerNeverExpression((BoundNeverExpression)node, context),
+            BoundKind.StackInstantiation => LowerStackInstantiation((BoundStackInstantiation)node, context),
             BoundKind.LiteralExpression => LowerLiteralExpression((BoundLiteralExpression)node, context),
             BoundKind.AssignmentExpression => LowerAssignmentExpression((BoundAssignmentExpression)node, context),
             BoundKind.ModuleDeclaration => LowerModuleDeclaration((BoundModuleDeclaration)node, context),

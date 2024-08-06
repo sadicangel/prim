@@ -13,6 +13,8 @@ partial class Interpreter
                 EvaluateNopExpression((BoundNopExpression)node, context),
             BoundKind.NeverExpression =>
                 EvaluateNeverExpression((BoundNeverExpression)node, context),
+            BoundKind.StackInstantiation =>
+                EvaluateStackInstantiation((BoundStackInstantiation)node, context),
             BoundKind.LocalReference =>
                 EvaluateLocalReference((BoundLocalReference)node, context),
             BoundKind.GlobalReference =>

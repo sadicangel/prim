@@ -6,7 +6,7 @@ partial class Binder
 {
     private static BoundExpression Coerce(BoundExpression expression, TypeSymbol type, Context context)
     {
-        if (expression.Type.IsNever)
+        if (expression.Type.IsNever || expression.Type == type)
         {
             return expression;
         }
@@ -15,7 +15,7 @@ partial class Binder
         {
             if (conversion is null)
             {
-                return expression;
+                return new BoundStackInstantiation(expression.Syntax, expression, type);
             }
 
             return new BoundConversionExpression(expression.Syntax, conversion, expression);

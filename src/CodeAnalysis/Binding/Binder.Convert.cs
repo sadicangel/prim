@@ -6,7 +6,7 @@ partial class Binder
 {
     private static BoundExpression Convert(BoundExpression expression, TypeSymbol type, bool isExplicit, Context context)
     {
-        if (expression.Type.IsNever)
+        if (expression.Type.IsNever || expression.Type == type)
         {
             return expression;
         }
@@ -19,7 +19,8 @@ partial class Binder
                 {
                     context.Diagnostics.ReportRedundantConversion(expression.Syntax.Location);
                 }
-                return expression;
+
+                return new BoundStackInstantiation(expression.Syntax, expression, type);
             }
 
             if (!isExplicit && conversion.IsExplicit)
