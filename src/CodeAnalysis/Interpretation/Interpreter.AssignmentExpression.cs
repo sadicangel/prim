@@ -12,7 +12,7 @@ partial class Interpreter
             throw new NotSupportedException($"Unexpected left hand side of {nameof(BoundAssignmentExpression)} '{node.Left.BoundKind}'");
         }
 
-        var right = ValueFactory.Create(node.Type, node.Right, context);
+        var right = EvaluateExpression(node.Right, context);
         @ref.ReferencedValue = right;
         return right;
     }

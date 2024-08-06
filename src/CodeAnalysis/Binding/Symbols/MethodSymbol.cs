@@ -6,7 +6,6 @@ internal sealed record class MethodSymbol(
     SyntaxNode Syntax,
     string Name,
     LambdaTypeSymbol LambdaType,
-    ModuleSymbol ContainingModule,
     TypeSymbol ContainingType,
     bool IsStatic,
     bool IsReadOnly)
@@ -15,7 +14,8 @@ internal sealed record class MethodSymbol(
         Syntax,
         Name,
         LambdaType,
-        ContainingModule,
+        ContainingType.ContainingModule,
+        ContainingType.ContainingModule,
         IsStatic,
         IsReadOnly)
 {

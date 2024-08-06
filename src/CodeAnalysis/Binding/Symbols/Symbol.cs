@@ -7,11 +7,14 @@ internal abstract record class Symbol(
     string Name,
     TypeSymbol Type,
     ModuleSymbol ContainingModule,
+    ScopeSymbol ContainingScope,
     bool IsStatic,
     bool IsReadOnly)
     : BoundNode(BoundKind, Syntax)
 {
-    public QualifiedName QualifiedName { get; } = new QualifiedName(ContainingModule, Name);
+    public ScopeSymbol ContainingScope { get; init; } = ContainingScope;
+
+    public QualifiedName QualifiedName { get; init; } = new QualifiedName(ContainingModule, Name);
 
     public abstract IEnumerable<Symbol> DeclaredSymbols { get; }
 

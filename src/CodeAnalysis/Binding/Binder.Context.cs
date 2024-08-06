@@ -24,7 +24,7 @@ partial class Binder
         public DiagnosticBag Diagnostics { get => BoundTree.Diagnostics; }
 
         public IDisposable PushBoundScope(ModuleSymbol? module = null) =>
-            Disposable.BoundScope(this, module as ScopeSymbol ?? new AnonymousScopeSymbol(Module, BoundScope));
+            Disposable.BoundScope(this, module as ScopeSymbol ?? new AnonymousScopeSymbol(BoundScope));
 
         public IDisposable PushLoopScope()
         {

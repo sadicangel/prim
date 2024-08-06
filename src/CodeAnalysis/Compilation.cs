@@ -12,7 +12,7 @@ public sealed class Compilation
         Func<SourceText, SyntaxTree> parseFunc = isScript ? SyntaxTree.ParseScript : SyntaxTree.Parse;
         SyntaxTrees = new(sourceTexts.Select(parseFunc));
         Previous = previous;
-        BoundScope = Previous?.BoundScope ?? ModuleSymbol.CreateGlobalModule();
+        BoundScope = new AnonymousScopeSymbol(Previous?.BoundScope ?? ModuleSymbol.CreateGlobalModule());
         BoundTrees = new ReadOnlyList<BoundTree>(SyntaxTrees
             .Select(tree => BoundTree.Bind(tree, BoundScope)));
         Diagnostics = new DiagnosticBag(SyntaxTrees

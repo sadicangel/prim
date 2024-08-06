@@ -4,11 +4,10 @@ namespace CodeAnalysis.Interpretation.Values;
 
 internal sealed record class AnonymousScopeValue(
     AnonymousScopeSymbol AnonymousScopeSymbol,
-    ModuleValue ContainingModule,
     ScopeValue ContainingScope)
     : ScopeValue(
         AnonymousScopeSymbol,
-        ContainingModule,
+        ContainingScope.Module,
         ContainingScope)
 {
     public override ModuleValue Module => ContainingModule;

@@ -20,7 +20,7 @@ internal static class RenderExtensions
 
     private static void WriteType(this IAnsiConsole console, TypeSymbol type)
     {
-        console.MarkupInterpolated($"[green i]{type.Name}[/]");
+        console.MarkupInterpolated($"[green i]{Markup.Escape(type.Name)}[/]");
     }
 
     private static void WriteValue(this IAnsiConsole console, object value, int indent = 0)
@@ -30,7 +30,7 @@ internal static class RenderExtensions
             case ArrayValue array:
                 {
                     Indent(console, indent);
-                    console.MarkupInterpolated($"[grey66]{"["}[/]");
+                    console.MarkupInterpolated($"[grey66]{Markup.Escape("[")}[/]");
                     var first = true;
                     foreach (var element in array)
                     {
@@ -38,14 +38,14 @@ internal static class RenderExtensions
                         else console.Write(", ");
                         console.WriteValue(element, indent);
                     }
-                    console.MarkupInterpolated($"[grey66]{"]"}[/]");
+                    console.MarkupInterpolated($"[grey66]{Markup.Escape("]")}[/]");
                 }
                 break;
             case ErrorValue error:
                 {
                     Indent(console, indent);
                     if (error.IsError)
-                        console.MarkupInterpolated($"[maroon]err: [i]{error.ErrorMessage}[/][/]");
+                        console.MarkupInterpolated($"[maroon]err: [i]{Markup.Escape(error.ErrorMessage ?? "")}[/][/]");
                     else
                         console.WriteValue(error.Value);
                 }
@@ -64,19 +64,19 @@ internal static class RenderExtensions
                         foreach (var (ps, pv) in instance)
                         {
                             Indent(console, indent);
-                            console.MarkupInterpolated($"[grey66]{ps.Name}: [/]");
+                            console.MarkupInterpolated($"[grey66]{Markup.Escape(ps.Name)}: [/]");
                             console.WriteLine(pv);
                         }
                         --indent;
                         Indent(console, indent);
-                        console.MarkupInterpolated($"[grey66]{"}"}[/]");
+                        console.MarkupInterpolated($"[grey66]{Markup.Escape("}")}[/]");
                     }
                 }
                 break;
             case LambdaValue lambda:
                 {
                     Indent(console, indent);
-                    console.MarkupInterpolated($"[grey66]{lambda.Type}[/]");
+                    console.MarkupInterpolated($"[grey66]{Markup.Escape(lambda.Type.ToString())}[/]");
                 }
                 break;
             case OptionValue option:
@@ -95,7 +95,7 @@ internal static class RenderExtensions
             case StructValue @struct:
                 {
                     Indent(console, indent);
-                    console.MarkupInterpolated($"[grey66]{@struct.Name}[/]");
+                    console.MarkupInterpolated($"[grey66]{Markup.Escape(@struct.Name)}[/]");
                 }
                 break;
             case UnionValue union:
@@ -107,7 +107,7 @@ internal static class RenderExtensions
                 }
                 break;
             default:
-                console.MarkupInterpolated($"[grey66]{value}[/]");
+                console.MarkupInterpolated($"[grey66]{Markup.Escape(value.ToString() ?? "")}[/]");
                 break;
         }
     }
@@ -163,7 +163,7 @@ internal static class RenderExtensions
         }
 
         console.MarkupInterpolated($"""
-            [{colour}]{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): {diagnostic.Message}[/]
+            [{colour}]{Markup.Escape(fileName)}({startLine},{startCharacter},{endLine},{endCharacter}): {Markup.Escape(diagnostic.Message)}[/]
                 {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
                 {underline}
             """);
@@ -273,6 +273,47 @@ internal static class RenderExtensions
     public static void WriteLine(this IAnsiConsole console, BoundTree boundTree)
     {
         console.Write(boundTree);
+        console.WriteLine();
+    }
+
+    public static void Write(this IAnsiConsole console, ScopeSymbol scope)
+    {
+        var tree = ToTree(scope);
+
+        while (scope != scope.ContainingScope)
+        {
+            scope = scope.ContainingScope;
+            var node = ToTree(scope);
+            node.AddNode(tree);
+            tree = node;
+        }
+
+        console.Write(new Panel(tree).Header(scope.Name));
+
+        static Tree ToTree(ScopeSymbol scope)
+        {
+            var tree = new Tree($"[darkorange3_1]{scope.Name}[/]")
+                .Style("dim white");
+
+            foreach (var symbol in scope.DeclaredSymbols)
+            {
+                if (symbol is ScopeSymbol innerScope)
+                {
+                    tree.AddNode(ToTree(innerScope));
+                }
+                else
+                {
+                    tree.AddNode($"{Markup.Escape(symbol.Name)} [green i]{Markup.Escape(symbol.Type.Name)}[/]");
+                }
+            }
+
+            return tree;
+        }
+    }
+
+    public static void WriteLine(this IAnsiConsole console, ScopeSymbol scope)
+    {
+        console.Write(scope);
         console.WriteLine();
     }
 }

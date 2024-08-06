@@ -19,7 +19,7 @@ partial class Interpreter
         internal InstanceValue False { get; } = new InstanceValue(EvaluatedScope.Bool, false);
         internal InstanceValue EmptyStr { get; } = new InstanceValue(EvaluatedScope.Str, string.Empty);
 
-        public IDisposable PushScope(ModuleValue? module = null) => Disposable.EvaluatedScope(this, module as ScopeValue ?? new AnonymousScopeValue(new AnonymousScopeSymbol(Module.ModuleSymbol, EvaluatedScope.ScopeSymbol), Module, EvaluatedScope));
+        public IDisposable PushScope(ModuleValue? module = null) => Disposable.EvaluatedScope(this, module as ScopeValue ?? new AnonymousScopeValue(new AnonymousScopeSymbol(EvaluatedScope.ScopeSymbol), EvaluatedScope));
 
         private readonly struct Disposable : IDisposable
         {

@@ -13,13 +13,12 @@ internal sealed record class ModuleSymbol(
         Name,
         ContainingModule.Never,
         ContainingModule,
-        ContainingModule,
         IsStatic: true,
         IsReadOnly: true)
 {
-    private readonly Dictionary<string, Symbol> _symbols = [];
+    internal const string GlobalModuleName = "<global>";
 
-    public bool IsGlobal => Name == GlobalModule.Name;
+    public bool IsGlobal => Name == GlobalModuleName;
 
     public override bool IsAnonymous => false;
 
@@ -206,7 +205,7 @@ file static class Factory
             {
                 BoundKind = BoundKind.ModuleSymbol,
                 Syntax = SyntaxFactory.SyntheticToken(SyntaxKind.ModuleKeyword),
-                Name = "<global>",
+                Name = ModuleSymbol.GlobalModuleName,
                 Type = null!,
                 ContainingModule = null!,
                 IsStatic = true,
@@ -217,28 +216,37 @@ file static class Factory
             symbols = [];
 
             SetContainingModule(module, module);
+            SetContainingScope(module, module);
+            SetQualifiedName(module, new QualifiedName(module, ModuleSymbol.GlobalModuleName));
 
             return module;
 
             [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_symbols")]
-            extern static ref Dictionary<string, Symbol> GetSymbolsFieldRef(ModuleSymbol module);
+            extern static ref Dictionary<string, Symbol> GetSymbolsFieldRef(ScopeSymbol scope);
 
             [UnsafeAccessor(UnsafeAccessorKind.Method, Name = $"set_{nameof(Symbol.ContainingModule)}")]
             extern static void SetContainingModule(Symbol symbol, ModuleSymbol containingModule);
 
+            [UnsafeAccessor(UnsafeAccessorKind.Method, Name = $"set_{nameof(Symbol.ContainingScope)}")]
+            extern static void SetContainingScope(Symbol symbol, ScopeSymbol containingScope);
+
+            [UnsafeAccessor(UnsafeAccessorKind.Method, Name = $"set_{nameof(Symbol.QualifiedName)}")]
+            extern static void SetQualifiedName(Symbol symbol, QualifiedName qualifiedName);
+
         }
 
-        static StructTypeSymbol MakeRuntimeType(ModuleSymbol globalModule)
+        static StructTypeSymbol MakeRuntimeType(ModuleSymbol global)
         {
             var type = (StructTypeSymbol)RuntimeHelpers.GetUninitializedObject(typeof(StructTypeSymbol)) with
             {
                 BoundKind = BoundKind.StructTypeSymbol,
                 Syntax = SyntaxFactory.SyntheticToken(SyntaxKind.TypeKeyword),
-                Name = "type",
+                Name = PredefinedTypes.Type,
                 Type = null!,
-                ContainingModule = globalModule,
+                ContainingModule = global,
                 IsStatic = true,
                 IsReadOnly = true,
+                QualifiedName = new QualifiedName(global, PredefinedTypes.Type),
             };
 
             ref var members = ref GetMembersFieldRef(type);
@@ -256,20 +264,20 @@ file static class Factory
 
     public static void DeclareFmtModule(ModuleSymbol global)
     {
-        if (!global.DeclareModule("fmt", out _))
+        if (!global.DeclareModule("fmt", out var fmt))
             throw new UnreachableException($"Failed to declare 'fmt' module");
 
         ReadOnlySpan<bool> all = [
-            global.DeclareVariable(
+            fmt.DeclareVariable(
                 "print",
-                new LambdaTypeSymbol([new Parameter("obj", global.Any)], global.Unit, global),
+                new LambdaTypeSymbol([new Parameter("obj", fmt.Any)], fmt.Unit, fmt),
                 isStatic: true,
                 isReadOnly: true,
                 out _),
 
-            global.DeclareVariable(
+            fmt.DeclareVariable(
                 "scan",
-                new LambdaTypeSymbol([], global.Str, global),
+                new LambdaTypeSymbol([], fmt.Str, fmt),
                 isStatic: true,
                 isReadOnly: true,
                 out _),

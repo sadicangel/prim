@@ -7,7 +7,7 @@ partial class Interpreter
 {
     private static PrimValue EvaluateVariableDeclaration(BoundVariableDeclaration node, Context context)
     {
-        var value = ValueFactory.Create(node.Type, node.Expression, context);
+        var value = EvaluateExpression(node.Expression, context);
 
         if (value.Type != node.VariableSymbol.Type)
             throw new UnreachableException($"Unexpected expression type '{value.Type.Name}'. Expected '{node.VariableSymbol.Type.Name}'");

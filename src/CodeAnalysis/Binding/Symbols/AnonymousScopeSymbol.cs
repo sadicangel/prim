@@ -2,15 +2,12 @@
 
 namespace CodeAnalysis.Binding.Symbols;
 
-internal sealed record class AnonymousScopeSymbol(
-    ModuleSymbol ContainingModule,
-    ScopeSymbol ContainingScope)
+internal sealed record class AnonymousScopeSymbol(ScopeSymbol ContainingScope)
     : ScopeSymbol(
         BoundKind.AnonymousScopeSymbol,
         SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-        GetName(ContainingScope),
-        ContainingModule.Never,
-        ContainingModule,
+        $"<anonymous-{Guid.NewGuid()}>",
+        ContainingScope.Never,
         ContainingScope,
         IsStatic: true,
         IsReadOnly: true)
@@ -20,7 +17,4 @@ internal sealed record class AnonymousScopeSymbol(
     public override bool IsAnonymous => true;
 
     public override ModuleSymbol Module => ContainingModule;
-
-    private static string GetName(ScopeSymbol scopeSymbol) =>
-        $"{scopeSymbol.Name}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}<AnonymousScope>{Guid.NewGuid()}";
 }

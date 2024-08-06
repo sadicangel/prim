@@ -19,6 +19,8 @@ internal sealed record class ModuleValue(
     {
         var global = Factory.CreateGlobalModule(scope);
 
+        Factory.DeclareFmtModule(global);
+
         return global;
     }
 }
@@ -212,6 +214,23 @@ file static class Factory
             extern static void SetContainingScope(ScopeValue scope, ScopeValue containingScope);
 
         }
+    }
+
+    public static void DeclareFmtModule(ModuleValue global)
+    {
+        if (global.ModuleSymbol.Lookup("fmt") is not ModuleSymbol fmtSymbol)
+            throw new UnreachableException($"Failed to lookup 'fmt' module");
+
+        var fmt = new ModuleValue(fmtSymbol, global);
+        global.Declare(fmt.ModuleSymbol, fmt);
+
+        var print = fmtSymbol.Lookup("print") as VariableSymbol
+            ?? throw new UnreachableException($"Failed to lookup 'fmt::print'");
+        fmt.Declare(print, new LambdaValue((LambdaTypeSymbol)print.Type, (PrimValue x) => Console.WriteLine(x.Value)));
+
+        var scan = fmtSymbol.Lookup("scan") as VariableSymbol
+            ?? throw new UnreachableException($"Failed to lookup 'fmt::scan'");
+        fmt.Declare(scan, new LambdaValue((LambdaTypeSymbol)scan.Type, () => new InstanceValue(global.Str, Console.ReadLine() ?? "")));
     }
 
     public static StructValue AddMembers(this StructValue s, Action<StructValue> add)

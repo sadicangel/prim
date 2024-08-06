@@ -6,14 +6,14 @@ internal sealed record class ConversionSymbol(
     SyntaxNode Syntax,
     string Name,
     LambdaTypeSymbol LambdaType,
-    ModuleSymbol ContainingModule,
     TypeSymbol ContainingType)
     : Symbol(
         BoundKind.ConversionSymbol,
         Syntax,
         Name,
         LambdaType,
-        ContainingModule,
+        ContainingType.ContainingModule,
+        ContainingType.ContainingModule,
         IsStatic: true,
         IsReadOnly: true)
 {

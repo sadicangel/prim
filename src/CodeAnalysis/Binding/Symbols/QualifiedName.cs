@@ -15,4 +15,6 @@ internal readonly record struct QualifiedName(ModuleSymbol ContainingModule, str
             return $"{ContainingModule.QualifiedName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
         }
     }
+
+    public static implicit operator string(QualifiedName name) => name.ToString();
 }

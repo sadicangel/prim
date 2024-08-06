@@ -28,7 +28,18 @@ while (true)
     if (code == @default)
         code = Markup.Remove(code);
 
-    var compilation = Compilation.Compile(new SourceText(code), previousCompilation);
+    if (code.StartsWith('#'))
+    {
+        switch (code)
+        {
+            case "#scope" when previousCompilation is not null:
+                console.WriteLine(previousCompilation.BoundScope);
+                break;
+        }
+        continue;
+    }
+
+    var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
 
     if (compilation.Diagnostics.Count > 0)
     {

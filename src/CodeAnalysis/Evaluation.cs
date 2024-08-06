@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Interpretation;
+﻿using CodeAnalysis.Binding.Symbols;
+using CodeAnalysis.Interpretation;
 using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis;
@@ -8,8 +9,11 @@ public sealed class Evaluation
     {
         Compilation = compilation;
         Previous = previous;
-        EvaluatedScope = previous?.EvaluatedScope ?? ModuleValue.CreateGlobalModule(compilation.BoundScope);
+        EvaluatedScope = CreateInnerScope(previous?.EvaluatedScope ?? ModuleValue.CreateGlobalModule(compilation.BoundScope));
         Values = new(Compilation.BoundTrees.Select(tree => Interpreter.Evaluate(tree, EvaluatedScope)));
+
+        static ScopeValue CreateInnerScope(ScopeValue containingScope) =>
+            new AnonymousScopeValue(new AnonymousScopeSymbol(containingScope.ScopeSymbol), containingScope);
     }
 
     public Compilation Compilation { get; }

@@ -3,14 +3,15 @@
 namespace CodeAnalysis.Binding.Symbols;
 internal sealed record class LabelSymbol(
     SyntaxNode Syntax,
-    string Name, ModuleSymbol
-    ContainingModule)
+    string Name,
+    ScopeSymbol ContainingScope)
     : Symbol(
         BoundKind.LabelSymbol,
         Syntax,
         Name,
-        ContainingModule.Never,
-        ContainingModule,
+        ContainingScope.Never,
+        ContainingScope.Module,
+        ContainingScope,
         IsStatic: true,
         IsReadOnly: true)
 {

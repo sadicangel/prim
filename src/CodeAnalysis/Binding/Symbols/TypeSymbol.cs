@@ -10,7 +10,7 @@ internal abstract record class TypeSymbol(
     SyntaxNode Syntax,
     string Name,
     ModuleSymbol ContainingModule)
-    : Symbol(BoundKind, Syntax, Name, ContainingModule.RuntimeType, ContainingModule, IsStatic: true, IsReadOnly: true)
+    : Symbol(BoundKind, Syntax, Name, ContainingModule.RuntimeType, ContainingModule, ContainingModule, IsStatic: true, IsReadOnly: true)
 {
     private readonly List<Symbol> _members = [];
 
@@ -99,7 +99,6 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             name,
             type,
-            ContainingModule,
             ContainingType: this,
             isStatic,
             isReadOnly);
@@ -131,7 +130,6 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
             GetMethodName(name, type),
             type,
-            ContainingModule,
             ContainingType: this,
             isStatic,
             isReadOnly);
@@ -158,7 +156,6 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(operatorKind),
             GetMethodName(operatorKind, type),
             type,
-            ContainingModule,
             ContainingType: this,
             isStatic,
             isReadOnly);
@@ -248,7 +245,6 @@ internal abstract record class TypeSymbol(
             syntax ?? SyntaxFactory.SyntheticToken(conversionKind),
             $"{SyntaxFacts.GetText(conversionKind)}-{type.ReturnType.Name}<{type.Parameters[0].Type.Name}>",
             type,
-            ContainingModule,
             ContainingType: this);
         _members.Add(conversionSymbol);
 

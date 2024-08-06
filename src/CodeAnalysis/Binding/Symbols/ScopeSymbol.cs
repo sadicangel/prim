@@ -7,7 +7,6 @@ internal abstract record class ScopeSymbol(
     SyntaxNode Syntax,
     string Name,
     TypeSymbol Type,
-    ModuleSymbol ContainingModule,
     ScopeSymbol ContainingScope,
     bool IsStatic,
     bool IsReadOnly)
@@ -16,7 +15,8 @@ internal abstract record class ScopeSymbol(
         Syntax,
         Name,
         Type,
-        ContainingModule,
+        ContainingScope.Module,
+        ContainingScope,
         IsStatic,
         IsReadOnly)
 {
