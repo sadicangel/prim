@@ -76,7 +76,7 @@ internal static class RenderExtensions
             case LambdaValue lambda:
                 {
                     Indent(console, indent);
-                    console.MarkupInterpolated($"[grey66]{lambda.Type}[/][/]");
+                    console.MarkupInterpolated($"[grey66]{lambda.Type}[/]");
                 }
                 break;
             case OptionValue option:

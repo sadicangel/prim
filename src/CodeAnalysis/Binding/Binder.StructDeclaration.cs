@@ -12,8 +12,7 @@ partial class Binder
 {
     private static BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax, Context context)
     {
-        var symbolName = syntax.Name.Text.ToString();
-        if (context.BoundScope.Lookup(symbolName) is not StructTypeSymbol structTypeSymbol)
+        if (context.BoundScope.Lookup(syntax.Name.NameValue) is not StructTypeSymbol structTypeSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(StructDeclarationSyntax)}'");
 
         var builder = ImmutableArray.CreateBuilder<BoundMemberDeclaration>(syntax.Members.Count);
@@ -37,7 +36,7 @@ partial class Binder
 
         static BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax, TypeSymbol typeSymbol, Context context)
         {
-            var property = typeSymbol.GetProperty(syntax.Name.Text)
+            var property = typeSymbol.GetProperty(syntax.Name.NameValue)
                 ?? throw new UnreachableException($"Unexpected property '{syntax.Name.Text}'");
 
             BoundExpression init;

@@ -8,13 +8,13 @@ public sealed class Evaluation
     {
         Compilation = compilation;
         Previous = previous;
-        EvaluatedScope = new AnonymousScope(previous?.EvaluatedScope ?? IEvaluatedScope.CreateGlobalScope(compilation.BoundScope));
+        EvaluatedScope = previous?.EvaluatedScope ?? ModuleValue.CreateGlobalModule(compilation.BoundScope);
         Values = new(Compilation.BoundTrees.Select(tree => Interpreter.Evaluate(tree, EvaluatedScope)));
     }
 
     public Compilation Compilation { get; }
     public Evaluation? Previous { get; }
-    internal IEvaluatedScope? EvaluatedScope { get; }
+    internal ScopeValue? EvaluatedScope { get; }
     internal ReadOnlyList<PrimValue> Values { get; }
 
     public static Evaluation Evaluate(Compilation compilation, Evaluation? previous = null) => new(compilation, previous);

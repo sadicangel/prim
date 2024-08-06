@@ -14,11 +14,11 @@ partial class Binder
             return expression;
         }
 
-        var symbols = expression.Type.GetSymbols(syntax.Name.IdentifierToken.Text);
+        var symbols = expression.Type.GetSymbols(syntax.Name.NameValue);
 
         if (symbols.Count == 0)
         {
-            context.Diagnostics.ReportUndefinedTypeMember(syntax.Name.Location, expression.Type.Name, syntax.Name.IdentifierToken.Text.ToString());
+            context.Diagnostics.ReportUndefinedTypeMember(syntax.Name.Location, expression.Type.Name, syntax.Name.NameValue);
             return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 

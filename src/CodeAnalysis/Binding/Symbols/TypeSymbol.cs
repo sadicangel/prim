@@ -9,9 +9,8 @@ internal abstract record class TypeSymbol(
     BoundKind BoundKind,
     SyntaxNode Syntax,
     string Name,
-    TypeSymbol Type,
     ModuleSymbol ContainingModule)
-    : Symbol(BoundKind, Syntax, Name, Type, ContainingModule, IsStatic: true, IsReadOnly: true)
+    : Symbol(BoundKind, Syntax, Name, ContainingModule.RuntimeType, ContainingModule, IsStatic: true, IsReadOnly: true)
 {
     private readonly List<Symbol> _members = [];
 
@@ -75,7 +74,7 @@ internal abstract record class TypeSymbol(
     internal bool IsConvertibleTo(TypeSymbol type) => IsConvertibleTo(type, out _);
     internal bool IsConvertibleTo(TypeSymbol type, out ConversionSymbol? conversion) => type.IsConvertibleFrom(this, out conversion);
 
-    internal List<Symbol> GetSymbols(ReadOnlySpan<char> name)
+    internal List<Symbol> GetSymbols(string name)
     {
         var list = new List<Symbol>();
         foreach (var member in _members)
@@ -109,7 +108,7 @@ internal abstract record class TypeSymbol(
         return true;
     }
 
-    internal PropertySymbol? GetProperty(ReadOnlySpan<char> name)
+    internal PropertySymbol? GetProperty(string name)
     {
         foreach (var property in _members.OfType<PropertySymbol>())
         {

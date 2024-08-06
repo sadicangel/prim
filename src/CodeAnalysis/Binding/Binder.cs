@@ -1,8 +1,10 @@
-﻿namespace CodeAnalysis.Binding;
+﻿using CodeAnalysis.Binding.Symbols;
+
+namespace CodeAnalysis.Binding;
 
 internal static partial class Binder
 {
-    public static BoundCompilationUnit Bind(BoundTree boundTree, IBoundScope boundScope)
+    public static BoundCompilationUnit Bind(BoundTree boundTree, ScopeSymbol boundScope)
     {
         var compilationUnit = boundTree.SyntaxTree.CompilationUnit;
 

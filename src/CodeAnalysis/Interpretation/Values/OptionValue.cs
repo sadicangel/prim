@@ -13,14 +13,14 @@ internal sealed record class OptionValue : PrimValue
 
         var coalesce1 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
-            optionType.ContainingModule.CreateLambdaType([new Parameter("x", optionType), new Parameter("y", optionType)], optionType))
+            new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType)], optionType, optionType.ContainingModule))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
         Add(
             coalesce1,
             new LambdaValue(coalesce1.LambdaType, (PrimValue x, PrimValue y) => ((OptionValue)x).HasValue ? ((OptionValue)x).Value : y));
         var coalesce2 = optionType.GetOperator(
             SyntaxKind.HookHookToken,
-            optionType.ContainingModule.CreateLambdaType([new Parameter("x", optionType), new Parameter("y", optionType.UnderlyingType)], optionType.UnderlyingType))
+            new LambdaTypeSymbol([new Parameter("x", optionType), new Parameter("y", optionType.UnderlyingType)], optionType.UnderlyingType, optionType.ContainingModule))
             ?? throw new UnreachableException($"Missing operator {SyntaxKind.HookHookToken}");
         Add(
             coalesce2,

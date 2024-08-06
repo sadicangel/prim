@@ -9,8 +9,7 @@ partial class Binder
 {
     private static BoundModuleDeclaration BindModuleDeclaration(ModuleDeclarationSyntax syntax, Context context)
     {
-        var symbolName = syntax.Name.Text.ToString();
-        if (context.BoundScope.Lookup(symbolName) is not ModuleSymbol moduleSymbol)
+        if (context.BoundScope.Lookup(syntax.Name.NameValue) is not ModuleSymbol moduleSymbol)
             throw new UnreachableException($"Unexpected symbol for '{nameof(ModuleDeclarationSyntax)}'");
 
         var builder = ImmutableArray.CreateBuilder<BoundDeclaration>(syntax.Declarations.Count);

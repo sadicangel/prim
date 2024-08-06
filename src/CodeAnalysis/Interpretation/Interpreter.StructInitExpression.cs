@@ -7,8 +7,8 @@ partial class Interpreter
 {
     private static InstanceValue EvaluateStructInitExpression(BoundStructInitExpression node, Context context)
     {
-        var structValue = context.EvaluatedScope.Lookup(node.TypeSymbol) as StructValue
-            ?? throw new UnreachableException($"Unexpected struct value '{context.EvaluatedScope.Lookup(node.TypeSymbol)}'");
+        var structValue = context.EvaluatedScope.LookupLocal(node.TypeSymbol) as StructValue
+            ?? throw new UnreachableException($"Unexpected struct value '{context.EvaluatedScope.LookupLocal(node.TypeSymbol)}'");
 
         var objectValue = new InstanceValue(structValue);
 

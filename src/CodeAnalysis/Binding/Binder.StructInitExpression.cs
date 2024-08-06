@@ -8,19 +8,18 @@ partial class Binder
 {
     private static BoundExpression BindStructInitExpression(StructInitExpressionSyntax syntax, Context context)
     {
-        var structName = syntax.Name.IdentifierToken.Text.ToString();
-        if (context.BoundScope.Lookup(structName) is not TypeSymbol typeSymbol)
+        if (context.BoundScope.Lookup(syntax.Name.NameValue) is not TypeSymbol typeSymbol)
         {
-            context.Diagnostics.ReportUndefinedType(syntax.Location, structName);
+            context.Diagnostics.ReportUndefinedType(syntax.Location, syntax.Name.NameValue);
             return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
         var builder = ImmutableArray.CreateBuilder<BoundPropertyInitExpression>(syntax.Properties.Count);
         foreach (var propertySyntax in syntax.Properties)
         {
-            if (typeSymbol.GetProperty(propertySyntax.Name.IdentifierToken.Text) is not PropertySymbol property)
+            if (typeSymbol.GetProperty(propertySyntax.Name.NameValue) is not PropertySymbol property)
             {
-                context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, structName, propertySyntax.Name.IdentifierToken.Text.ToString());
+                context.Diagnostics.ReportUndefinedTypeMember(propertySyntax.Location, syntax.Name.NameValue, propertySyntax.Name.NameValue);
                 continue;
             }
 

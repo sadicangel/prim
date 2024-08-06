@@ -5,12 +5,12 @@ namespace CodeAnalysis.Interpretation;
 
 partial class Interpreter
 {
-    public sealed record class Context(IEvaluatedScope EvaluatedScope, Dictionary<LabelSymbol, int> LabelIndices)
+    public sealed record class Context(ScopeValue EvaluatedScope, Dictionary<LabelSymbol, int> LabelIndices)
     {
-        private readonly Stack<IEvaluatedScope> _scopes = new([EvaluatedScope]);
+        private readonly Stack<ScopeValue> _scopes = new([EvaluatedScope]);
 
         public ModuleValue Module => EvaluatedScope.Module;
-        public IEvaluatedScope EvaluatedScope { get => _scopes.Peek(); }
+        public ScopeValue EvaluatedScope { get => _scopes.Peek(); }
         public int InstructionIndex { get; set; }
         public PrimValue LastValue { get; set; } = new InstanceValue(EvaluatedScope.Unit, CodeAnalysis.Unit.Value);
 
@@ -19,7 +19,7 @@ partial class Interpreter
         internal InstanceValue False { get; } = new InstanceValue(EvaluatedScope.Bool, false);
         internal InstanceValue EmptyStr { get; } = new InstanceValue(EvaluatedScope.Str, string.Empty);
 
-        public IDisposable PushScope(ModuleValue? module = null) => Disposable.EvaluatedScope(this, module as IEvaluatedScope ?? new AnonymousScope(EvaluatedScope));
+        public IDisposable PushScope(ModuleValue? module = null) => Disposable.EvaluatedScope(this, module as ScopeValue ?? new AnonymousScopeValue(new AnonymousScopeSymbol(Module.ModuleSymbol, EvaluatedScope.ScopeSymbol), Module, EvaluatedScope));
 
         private readonly struct Disposable : IDisposable
         {
@@ -30,7 +30,7 @@ partial class Interpreter
                 _pop = pop;
             }
 
-            public static Disposable EvaluatedScope(Context context, IEvaluatedScope evaluatedScope) => new(
+            public static Disposable EvaluatedScope(Context context, ScopeValue evaluatedScope) => new(
                 () => context._scopes.Push(evaluatedScope),
                 () => context._scopes.Pop());
 

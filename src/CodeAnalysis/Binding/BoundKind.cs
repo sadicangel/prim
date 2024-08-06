@@ -23,6 +23,7 @@ internal enum BoundKind
     ConversionDeclaration,
 
     LocalReference,
+    GlobalReference,
     PropertyReference,
     MethodReference,
     MethodGroup,
@@ -35,9 +36,6 @@ internal enum BoundKind
     InvocationExpression,
 
     ConversionExpression,
-
-    StackInstantiationExpression,
-    HeapInstantiationExpression,
 
     UnaryExpression,
     BinaryExpression,
@@ -57,6 +55,7 @@ internal enum BoundKind
     ConversionSymbol,
     VariableSymbol,
     LabelSymbol,
+    AnonymousScopeSymbol,
 
     ArrayTypeSymbol,
     ErrorTypeSymbol,

@@ -6,7 +6,7 @@ partial class Interpreter
 {
     private static PrimValue EvaluateModuleDeclaration(BoundModuleDeclaration node, Context context)
     {
-        var module = new ModuleValue(node.ModuleSymbol, context.Module, context.Module.BoundScope);
+        var module = new ModuleValue(node.ModuleSymbol, context.Module);
         context.EvaluatedScope.Declare(node.ModuleSymbol, module);
         using (context.PushScope(module))
         {

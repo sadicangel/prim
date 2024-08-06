@@ -15,6 +15,8 @@ partial class Interpreter
                 EvaluateNeverExpression((BoundNeverExpression)node, context),
             BoundKind.LocalReference =>
                 EvaluateLocalReference((BoundLocalReference)node, context),
+            BoundKind.GlobalReference =>
+                EvaluateGlobalReference((BoundGlobalReference)node, context),
             BoundKind.LiteralExpression =>
                 EvaluateLiteralExpression((BoundLiteralExpression)node, context),
             BoundKind.AssignmentExpression =>
@@ -49,10 +51,6 @@ partial class Interpreter
                 EvaluateStructInitExpression((BoundStructInitExpression)node, context),
             BoundKind.ConversionExpression =>
                 EvaluateConversionExpression((BoundConversionExpression)node, context),
-            BoundKind.StackInstantiationExpression =>
-                EvaluateStackInstantiationExpression((BoundStackInstantiationExpression)node, context),
-            //BoundKind.HeapInstantiationExpression =>
-            //    EvaluateHeapInstantiationExpression((BoundHeapInstantiationExpression)node, context),
             BoundKind.UnaryExpression =>
                 EvaluateUnaryExpression((BoundUnaryExpression)node, context),
             BoundKind.BinaryExpression =>

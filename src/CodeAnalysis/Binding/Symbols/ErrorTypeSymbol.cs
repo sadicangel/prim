@@ -4,21 +4,20 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class ErrorTypeSymbol : TypeSymbol
 {
-    public ErrorTypeSymbol(SyntaxNode syntax, TypeSymbol errType, TypeSymbol valueType, TypeSymbol runtimeType, ModuleSymbol containingModule)
+    public ErrorTypeSymbol(SyntaxNode syntax, TypeSymbol valueType, ModuleSymbol containingModule)
         : base(
             BoundKind.ErrorTypeSymbol,
             syntax,
             valueType.IsUnion || valueType.IsLambda ? $"!({valueType.Name})" : $"!{valueType.Name}",
-            runtimeType,
             containingModule)
     {
         ValueType = valueType;
         AddConversion(
             SyntaxKind.ImplicitKeyword,
-            containingModule.CreateLambdaType([new Parameter("x", ValueType)], this));
+            new LambdaTypeSymbol([new Parameter("x", ValueType)], this, containingModule));
         AddConversion(
             SyntaxKind.ImplicitKeyword,
-            containingModule.CreateLambdaType([new Parameter("x", errType)], this));
+            new LambdaTypeSymbol([new Parameter("x", containingModule.Err)], this, containingModule));
     }
 
     public TypeSymbol ValueType { get; init; }

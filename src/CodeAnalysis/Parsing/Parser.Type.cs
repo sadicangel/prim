@@ -69,7 +69,7 @@ partial class Parser
 
             static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
             {
-                var name = ParseSimpleName(syntaxTree, iterator);
+                var name = ParseName(syntaxTree, iterator);
                 return new NamedTypeSyntax(syntaxTree, name);
             }
 

@@ -7,7 +7,7 @@ using CodeAnalysis.Lowering;
 namespace CodeAnalysis.Interpretation;
 internal static partial class Interpreter
 {
-    public static PrimValue Evaluate(BoundTree boundTree, IEvaluatedScope evaluatedScope)
+    public static PrimValue Evaluate(BoundTree boundTree, ScopeValue evaluatedScope)
     {
         boundTree = Lowerer.Lower(boundTree);
 

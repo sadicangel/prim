@@ -12,9 +12,15 @@ while (true)
 {
     var @default = Markup.Escape("""
         a: module = {
-            b: i32 = 0;
+            b: module = {
+                c: i32 = 0;
+            }
         }
-        c := a.b;
+        z: () -> i32 = {
+            a::b::c = 10;
+            a::b::c;
+        }
+        w: i32 = z();
         """);
 
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue(@default));
@@ -22,7 +28,7 @@ while (true)
     if (code == @default)
         code = Markup.Remove(code);
 
-    var compilation = Compilation.CompileScript(new SourceText(code), previousCompilation);
+    var compilation = Compilation.Compile(new SourceText(code), previousCompilation);
 
     if (compilation.Diagnostics.Count > 0)
     {

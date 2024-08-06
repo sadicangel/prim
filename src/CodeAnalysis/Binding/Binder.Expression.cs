@@ -14,6 +14,8 @@ partial class Binder
         {
             SyntaxKind.SimpleName =>
                 BindSimpleName((SimpleNameSyntax)syntax, context),
+            SyntaxKind.QualifiedName =>
+                BindQualifiedName((QualifiedNameSyntax)syntax, context),
             >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression =>
                 BindLiteralExpression((LiteralExpressionSyntax)syntax, context),
             SyntaxKind.GroupExpression =>

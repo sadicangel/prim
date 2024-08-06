@@ -5,9 +5,9 @@ using CodeAnalysis.Syntax.Expressions.Names;
 namespace CodeAnalysis.Binding;
 partial class Binder
 {
-    private static BoundExpression BindSimpleName(SimpleNameSyntax syntax, Context context)
+    private static BoundExpression BindQualifiedName(QualifiedNameSyntax syntax, Context context)
     {
-        if (syntax.IdentifierToken.IsSynthetic)
+        if (syntax.Right.IdentifierToken.IsSynthetic)
         {
             // Diagnostic already reported since identifier was not parsed.
             return new BoundNeverExpression(syntax, context.BoundScope.Never);
@@ -19,6 +19,6 @@ partial class Binder
             return new BoundNeverExpression(syntax, context.BoundScope.Never);
         }
 
-        return new BoundLocalReference(syntax, symbol, symbol.Type);
+        return new BoundGlobalReference(syntax, symbol, symbol.Type);
     }
 }

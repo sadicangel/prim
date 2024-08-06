@@ -4,12 +4,11 @@ namespace CodeAnalysis.Binding.Symbols;
 
 internal sealed record class LambdaTypeSymbol : TypeSymbol
 {
-    public LambdaTypeSymbol(SyntaxNode syntax, IEnumerable<Parameter> parameters, TypeSymbol returnType, TypeSymbol runtimeType, ModuleSymbol containingModule)
+    public LambdaTypeSymbol(SyntaxNode syntax, IEnumerable<Parameter> parameters, TypeSymbol returnType, ModuleSymbol containingModule)
         : base(
             BoundKind.LambdaTypeSymbol,
             syntax,
             $"({string.Join(", ", parameters.Select(p => p.ToString()))}) -> {returnType.Name}",
-            runtimeType,
             containingModule)
     {
         Parameters = [.. parameters.Select(p => new VariableSymbol(p.Syntax, p.Name, p.Type, containingModule, IsStatic: false, IsReadOnly: false))];
@@ -17,8 +16,8 @@ internal sealed record class LambdaTypeSymbol : TypeSymbol
         AddOperator(SyntaxKind.ParenthesisOpenParenthesisCloseToken, this);
     }
 
-    public LambdaTypeSymbol(IEnumerable<Parameter> parameters, TypeSymbol returnType, TypeSymbol runtimeType, ModuleSymbol containingModule)
-        : this(SyntaxFactory.SyntheticToken(SyntaxKind.LambdaType), parameters, returnType, runtimeType, containingModule)
+    public LambdaTypeSymbol(IEnumerable<Parameter> parameters, TypeSymbol returnType, ModuleSymbol containingModule)
+        : this(SyntaxFactory.SyntheticToken(SyntaxKind.LambdaType), parameters, returnType, containingModule)
     {
     }
 

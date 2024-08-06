@@ -56,8 +56,7 @@ partial class Binder
         {
             case SyntaxKind.ModuleDeclaration:
                 var moduleDeclaration = (ModuleDeclarationSyntax)syntax;
-                var moduleName = moduleDeclaration.Name.Text.ToString();
-                if (context.BoundScope.Lookup(moduleName) is not ModuleSymbol moduleSymbol)
+                if (context.BoundScope.Lookup(moduleDeclaration.Name.NameValue) is not ModuleSymbol moduleSymbol)
                     throw new UnreachableException($"Unexpected declaration '{syntax}'");
                 using (context.PushBoundScope(moduleSymbol))
                 {
@@ -68,8 +67,7 @@ partial class Binder
             case SyntaxKind.StructDeclaration:
                 {
                     var structDeclaration = (StructDeclarationSyntax)syntax;
-                    var structName = structDeclaration.Name.Text.ToString();
-                    if (context.BoundScope.Lookup(structName) is not StructTypeSymbol structType)
+                    if (context.BoundScope.Lookup(structDeclaration.Name.NameValue) is not StructTypeSymbol structType)
                         throw new UnreachableException($"Unexpected declaration '{syntax}'");
                     foreach (var member in structDeclaration.Members)
                     {

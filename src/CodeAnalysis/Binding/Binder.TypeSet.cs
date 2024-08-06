@@ -9,6 +9,6 @@ partial class Binder
         { Count: 0 } => context.BoundScope.Unknown,
         { Count: 1 } => types.Single(),
         _ when types.Contains(context.BoundScope.Never) => context.BoundScope.Never,
-        _ => context.BoundScope.CreateUnionType(types, syntax),
+        _ => new UnionTypeSymbol(syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.UnionType), types, context.Module),
     };
 }

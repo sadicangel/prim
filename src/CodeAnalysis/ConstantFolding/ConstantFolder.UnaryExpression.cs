@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Binding.Expressions;
 using CodeAnalysis.Interpretation;
+using CodeAnalysis.Interpretation.Values;
 
 namespace CodeAnalysis.ConstantFolding;
 partial class ConstantFolder
@@ -15,7 +16,7 @@ partial class ConstantFolder
 
         var typedValue = Interpreter.EvaluateUnaryExpression(
             node,
-            new Interpreter.Context(IEvaluatedScope.CreateGlobalScope(node.Type.ContainingModule.Global), []));
+            new Interpreter.Context(ModuleValue.CreateGlobalModule(node.Type.ContainingModule), []));
 
         Debug.Assert(typedValue.Type == node.Type);
 

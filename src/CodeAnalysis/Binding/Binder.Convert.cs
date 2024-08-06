@@ -19,7 +19,7 @@ partial class Binder
                 {
                     context.Diagnostics.ReportRedundantConversion(expression.Syntax.Location);
                 }
-                return new BoundStackInstantiationExpression(expression.Syntax, type, expression);
+                return expression;
             }
 
             if (!isExplicit && conversion.IsExplicit)

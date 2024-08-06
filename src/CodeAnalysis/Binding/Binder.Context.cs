@@ -5,9 +5,9 @@ namespace CodeAnalysis.Binding;
 
 partial class Binder
 {
-    public sealed record class Context(BoundTree BoundTree, IBoundScope BoundScope)
+    public sealed record class Context(BoundTree BoundTree, ScopeSymbol BoundScope)
     {
-        private readonly Stack<IBoundScope> _scopes = new([BoundScope]);
+        private readonly Stack<ScopeSymbol> _scopes = new([BoundScope]);
         private readonly Stack<LoopScope> _loops = [];
         private readonly Stack<LambdaTypeSymbol> _lambdas = [];
 
@@ -15,7 +15,7 @@ partial class Binder
 
         public ModuleSymbol Module { get => BoundScope.Module; }
 
-        public IBoundScope BoundScope { get => _scopes.Peek(); }
+        public ScopeSymbol BoundScope { get => _scopes.Peek(); }
 
         public LoopScope? LoopScope { get => _loops.TryPeek(out var loopScope) ? loopScope : null; }
 
@@ -24,13 +24,13 @@ partial class Binder
         public DiagnosticBag Diagnostics { get => BoundTree.Diagnostics; }
 
         public IDisposable PushBoundScope(ModuleSymbol? module = null) =>
-            Disposable.BoundScope(this, module as IBoundScope ?? new AnonymousScope(BoundScope));
+            Disposable.BoundScope(this, module as ScopeSymbol ?? new AnonymousScopeSymbol(Module, BoundScope));
 
         public IDisposable PushLoopScope()
         {
             var labelId = Interlocked.Increment(ref _labelId);
-            var continueLabel = new LabelSymbol($"continue<{labelId}>", BoundScope.Never, Module);
-            var breakLabel = new LabelSymbol($"break<{labelId}>", BoundScope.Never, Module);
+            var continueLabel = new LabelSymbol($"continue<{labelId}>", Module);
+            var breakLabel = new LabelSymbol($"break<{labelId}>", Module);
             return Disposable.LoopScope(this, new LoopScope(continueLabel, breakLabel));
         }
 
@@ -45,7 +45,7 @@ partial class Binder
                 _pop = pop;
             }
 
-            public static Disposable BoundScope(Context context, IBoundScope boundScope) => new(
+            public static Disposable BoundScope(Context context, ScopeSymbol boundScope) => new(
                 () => context._scopes.Push(boundScope),
                 () => context._scopes.Pop());
 

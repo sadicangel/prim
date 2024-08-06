@@ -5,7 +5,7 @@ using CodeAnalysis.Syntax.Expressions.Names;
 namespace CodeAnalysis.Syntax.Expressions;
 public sealed record class StructInitExpressionSyntax(
     SyntaxTree SyntaxTree,
-    SimpleNameSyntax Name,
+    NameSyntax Name,
     SyntaxToken BraceOpenToken,
     SeparatedSyntaxList<PropertyInitExpressionSyntax> Properties,
     SyntaxToken BraceCloseToken)

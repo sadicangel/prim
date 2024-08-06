@@ -23,7 +23,7 @@ partial class Interpreter
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_disposeScopeMethodInfo)}");
             s_evaluatedScopePropertyInfo = typeof(Context).GetProperty(nameof(Context.EvaluatedScope))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluatedScopePropertyInfo)}");
-            s_declareSymbolMethodInfo = typeof(IEvaluatedScope).GetMethod(nameof(IEvaluatedScope.Declare))
+            s_declareSymbolMethodInfo = typeof(ScopeValue).GetMethod(nameof(ScopeValue.Declare))
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_declareSymbolMethodInfo)}");
             s_evaluateNodeMethodInfo = typeof(Interpreter).GetMethod(nameof(EvaluateNode), BindingFlags.Public | BindingFlags.Static)
                 ?? throw new InvalidOperationException($"Reflection failed for {nameof(s_evaluateNodeMethodInfo)}");

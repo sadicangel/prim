@@ -34,17 +34,17 @@ partial class Binder
         {
             var length = (BoundLiteralExpression)BindExpression(syntax.Length, context);
             Debug.Assert(length.Value is int);
-            return context.BoundScope.CreateArrayType(elementType, (int)length.Value!, syntax);
+            return new ArrayTypeSymbol(syntax, elementType, (int)length.Value!, context.Module);
         }
 
         context.Diagnostics.ReportInvalidArrayLength(syntax.Length.Location);
-        return context.BoundScope.CreateArrayType(context.BoundScope.Never, length: 0, syntax);
+        return new ArrayTypeSymbol(syntax, context.BoundScope.Never, length: 0, context.Module);
     }
 
     static ErrorTypeSymbol BindErrorType(ErrorTypeSyntax syntax, Context context)
     {
         var valueType = BindType(syntax.ValueType, context);
-        return context.BoundScope.CreateErrorType(valueType, syntax);
+        return new ErrorTypeSymbol(syntax, valueType, context.Module);
     }
 
     static LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax, Context context)
@@ -56,7 +56,7 @@ partial class Binder
         var seenParameterNames = new HashSet<string>();
         foreach (var parameterSyntax in syntax.Parameters)
         {
-            var parameterName = parameterSyntax.Name.IdentifierToken.Text.ToString();
+            var parameterName = parameterSyntax.Name.NameValue.ToString();
             var parameterType = BindType(parameterSyntax.Type, context);
             if (!seenParameterNames.Add(parameterName))
                 context.Diagnostics.ReportSymbolRedeclaration(syntax.Location, parameterName);
@@ -64,15 +64,14 @@ partial class Binder
             parameters.Add(parameter);
         }
 
-        return context.BoundScope.CreateLambdaType(parameters, returnType, syntax);
+        return new LambdaTypeSymbol(syntax, parameters, returnType, context.Module);
     }
 
     static StructTypeSymbol BindNamedType(NamedTypeSyntax syntax, Context context)
     {
-        var structName = syntax.Name.IdentifierToken.Text.ToString();
-        if (context.BoundScope.Lookup(structName) is not StructTypeSymbol typeSymbol)
+        if (context.BoundScope.Lookup(syntax.Name.NameValue) is not StructTypeSymbol typeSymbol)
         {
-            context.Diagnostics.ReportUndefinedType(syntax.Name.IdentifierToken.Location, structName);
+            context.Diagnostics.ReportUndefinedType(syntax.Name.Location, syntax.Name.NameValue);
             return context.BoundScope.Never;
         }
         return typeSymbol;
@@ -81,13 +80,13 @@ partial class Binder
     static OptionTypeSymbol BindOptionType(OptionTypeSyntax syntax, Context context)
     {
         var underlyingType = BindType(syntax.UnderlyingType, context);
-        return context.BoundScope.CreateOptionType(underlyingType, syntax);
+        return new OptionTypeSymbol(syntax, underlyingType, context.Module);
     }
 
     static PointerTypeSymbol BindPointerType(PointerTypeSyntax syntax, Context context)
     {
         var elementType = BindType(syntax.ElementType, context);
-        return context.BoundScope.CreatePointerType(elementType, syntax);
+        return new PointerTypeSymbol(syntax, elementType, context.Module);
     }
 
     static StructTypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax, Context context)
@@ -126,6 +125,6 @@ partial class Binder
         foreach (var typeSyntax in syntax.Types)
             builder.Add(BindType(typeSyntax, context));
         var types = new BoundList<TypeSymbol>(builder.ToImmutable());
-        return context.BoundScope.CreateUnionType(types, syntax);
+        return new UnionTypeSymbol(syntax, types, context.Module);
     }
 }
