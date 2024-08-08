@@ -16,8 +16,7 @@ internal sealed record class ArrayTypeSymbol : TypeSymbol
         IndexerType = containingModule.Usz;
         AddOperator(
             SyntaxKind.BracketOpenBracketCloseToken,
-            new LambdaTypeSymbol([new("index", containingModule.Usz)], ElementType, containingModule),
-            isReadOnly: false);
+            new LambdaTypeSymbol([new("index", containingModule.Usz)], ElementType, containingModule));
     }
 
     public TypeSymbol ElementType { get; init; }

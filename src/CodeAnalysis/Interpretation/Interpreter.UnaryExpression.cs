@@ -7,7 +7,7 @@ partial class Interpreter
     public static PrimValue EvaluateUnaryExpression(BoundUnaryExpression node, Context context)
     {
         var operand = EvaluateExpression(node.Operand, context);
-        var lambda = operand.Get<LambdaValue>(node.MethodSymbol);
+        var lambda = operand.Get<LambdaValue>(node.OperatorSymbol);
         var value = lambda.Invoke(operand);
         return value;
     }

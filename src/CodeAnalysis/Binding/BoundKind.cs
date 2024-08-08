@@ -54,6 +54,7 @@ internal enum BoundKind
     ModuleSymbol,
     PropertySymbol,
     MethodSymbol,
+    OperatorSymbol,
     ConversionSymbol,
     VariableSymbol,
     LabelSymbol,

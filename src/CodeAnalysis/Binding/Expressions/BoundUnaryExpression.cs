@@ -5,13 +5,13 @@ namespace CodeAnalysis.Binding.Expressions;
 
 internal sealed record class BoundUnaryExpression(
     SyntaxNode Syntax,
-    MethodSymbol MethodSymbol,
+    OperatorSymbol OperatorSymbol,
     BoundExpression Operand)
-    : BoundExpression(BoundKind.UnaryExpression, Syntax, MethodSymbol.ReturnType)
+    : BoundExpression(BoundKind.UnaryExpression, Syntax, OperatorSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {
-        yield return MethodSymbol;
+        yield return OperatorSymbol;
         yield return Operand;
     }
 }

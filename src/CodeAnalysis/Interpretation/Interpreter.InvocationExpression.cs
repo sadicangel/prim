@@ -9,7 +9,7 @@ partial class Interpreter
         using (context.PushScope())
         {
             var expression = EvaluateExpression(node.Expression, context);
-            var function = expression.Get<LambdaValue>(node.MethodSymbol);
+            var function = expression.Get<LambdaValue>(node.OperatorSymbol);
             var arguments = node.Arguments.Select(a => EvaluateExpression(a, context)).ToArray();
             var value = function.Invoke(arguments);
             return value;

@@ -55,12 +55,6 @@ internal abstract record class TypeSymbol(
         _ => throw new UnreachableException($"Unexpected built-in {nameof(TypeSymbol)} '{Name}'"),
     };
 
-    internal static string GetMethodName(ReadOnlySpan<char> name, LambdaTypeSymbol type) =>
-        $"{name}<{string.Join(',', type.Parameters.Select(p => p.Type.Name))}>";
-
-    internal static string GetMethodName(SyntaxKind syntaxKind, LambdaTypeSymbol type) =>
-        GetMethodName(SyntaxFacts.GetText(syntaxKind) ?? throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntaxKind}'"), type);
-
     internal bool IsCoercibleFrom(TypeSymbol type) => IsConvertibleFrom(type, out _);
     internal bool IsCoercibleFrom(TypeSymbol type, out ConversionSymbol? conversion) =>
         IsConvertibleFrom(type, out conversion) && conversion?.IsExplicit is not true;
@@ -117,18 +111,17 @@ internal abstract record class TypeSymbol(
         return null;
     }
 
-    internal bool AddMethod(string name, LambdaTypeSymbol type, MethodDeclarationSyntax syntax) =>
-        AddMethod(name, type, isStatic: true, isReadOnly: true, syntax);
+    internal bool AddMethod(string nameNoMangling, LambdaTypeSymbol type, MethodDeclarationSyntax syntax) =>
+        AddMethod(nameNoMangling, type, isStatic: true, isReadOnly: true, syntax);
 
-    internal bool AddMethod(string name, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
+    internal bool AddMethod(string nameNoMangling, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
     {
-        if (GetProperty(name) is not null) return false;
-        if (GetMethod(name, type) is not null) return false;
+        if (GetProperty(nameNoMangling) is not null) return false;
+        if (GetMethod(nameNoMangling, type) is not null) return false;
 
         var methodSymbol = new MethodSymbol(
-            SyntaxKind.IdentifierToken,
             syntax ?? SyntaxFactory.SyntheticToken(SyntaxKind.IdentifierToken),
-            GetMethodName(name, type),
+            nameNoMangling,
             type,
             ContainingType: this,
             isStatic,
@@ -138,46 +131,50 @@ internal abstract record class TypeSymbol(
         return true;
     }
 
-    internal MethodSymbol? GetMethod(ReadOnlySpan<char> name, LambdaTypeSymbol type)
-        => GetMethod(GetMethodName(name, type));
-
-    internal MethodSymbol? GetMethod(string name) =>
-        _members.OfType<MethodSymbol>().SingleOrDefault(m => m.Name == name);
-
-    internal bool AddOperator(LambdaTypeSymbol type, OperatorDeclarationSyntax syntax) =>
-        AddOperator(syntax.OperatorToken.SyntaxKind, type, isStatic: true, isReadOnly: true, syntax);
-
-    internal bool AddOperator(SyntaxKind operatorKind, LambdaTypeSymbol type, bool isStatic = true, bool isReadOnly = true, SyntaxNode? syntax = null)
+    internal MethodSymbol? GetMethod(ReadOnlySpan<char> nameNoMangling, LambdaTypeSymbol type)
     {
-        if (GetOperator(operatorKind, type) is not null) return false;
-
-        var methodSymbol = new MethodSymbol(
-            operatorKind,
-            syntax ?? SyntaxFactory.SyntheticToken(operatorKind),
-            GetMethodName(operatorKind, type),
-            type,
-            ContainingType: this,
-            isStatic,
-            isReadOnly);
-        _members.Add(methodSymbol);
-
-        return true;
-    }
-
-    internal MethodSymbol? GetOperator(SyntaxKind operatorKind, LambdaTypeSymbol type)
-    {
-        foreach (var @operator in _members.OfType<MethodSymbol>())
+        foreach (var method in _members.OfType<MethodSymbol>())
         {
-            if (@operator.MethodKind == operatorKind && @operator.LambdaType == type)
-                return @operator;
+            if (nameNoMangling.Equals(method.NameNoMangling, StringComparison.Ordinal) && type == method.LambdaType)
+                return method;
         }
         return null;
     }
 
-    internal List<MethodSymbol> GetOperators(SyntaxKind operatorKind, Func<LambdaTypeSymbol, bool>? filter = null)
+    internal MethodSymbol? GetMethod(ReadOnlySpan<char> name)
     {
-        var operators = _members.OfType<MethodSymbol>()
-            .Where(o => o.MethodKind == operatorKind);
+        foreach (var method in _members.OfType<MethodSymbol>())
+        {
+            if (name.Equals(method.Name, StringComparison.Ordinal))
+                return method;
+        }
+        return null;
+    }
+
+    internal bool AddOperator(LambdaTypeSymbol type, OperatorDeclarationSyntax syntax) =>
+        AddOperator(syntax.OperatorToken.SyntaxKind, type, syntax);
+
+    internal bool AddOperator(SyntaxKind operatorKind, LambdaTypeSymbol type, SyntaxNode? syntax = null)
+    {
+        if (GetOperator(operatorKind, type) is not null) return false;
+
+        var methodSymbol = new OperatorSymbol(
+            operatorKind,
+            syntax ?? SyntaxFactory.SyntheticToken(operatorKind),
+            type,
+            ContainingType: this);
+        _members.Add(methodSymbol);
+
+        return true;
+    }
+
+    internal OperatorSymbol? GetOperator(SyntaxKind operatorKind, LambdaTypeSymbol type) =>
+        _members.OfType<OperatorSymbol>().SingleOrDefault(o => o.OperatorKind == operatorKind && o.LambdaType == type);
+
+    internal List<OperatorSymbol> GetOperators(SyntaxKind operatorKind, Func<LambdaTypeSymbol, bool>? filter = null)
+    {
+        var operators = _members.OfType<OperatorSymbol>()
+            .Where(o => o.OperatorKind == operatorKind);
 
         if (filter is not null)
             operators = operators.Where(o => filter(o.LambdaType));
@@ -185,10 +182,10 @@ internal abstract record class TypeSymbol(
         return operators.ToList();
     }
 
-    internal List<MethodSymbol> GetUnaryOperators(SyntaxKind operatorKind, TypeSymbol operandType, TypeSymbol? resultType = null)
+    internal List<OperatorSymbol> GetUnaryOperators(SyntaxKind operatorKind, TypeSymbol operandType, TypeSymbol? resultType = null)
     {
-        var operators = _members.OfType<MethodSymbol>()
-            .Where(o => o.MethodKind == operatorKind)
+        var operators = _members.OfType<OperatorSymbol>()
+            .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.IsUnaryOperator)
             .Where(o => operandType.IsCoercibleTo(o.Parameters[0].Type))
             .Where(o => resultType is null || resultType.IsCoercibleTo(o.ReturnType))
@@ -197,7 +194,7 @@ internal abstract record class TypeSymbol(
         if (operators.Count > 1)
         {
             var @operator = operators.SingleOrDefault(o =>
-                o.MethodKind == operatorKind &&
+                o.OperatorKind == operatorKind &&
                 o.IsUnaryOperator &&
                 o.Parameters[0].Type == operandType);
 
@@ -208,10 +205,10 @@ internal abstract record class TypeSymbol(
         return operators;
     }
 
-    internal List<MethodSymbol> GetBinaryOperators(SyntaxKind operatorKind, TypeSymbol leftType, TypeSymbol rightType, TypeSymbol? resultType = null)
+    internal List<OperatorSymbol> GetBinaryOperators(SyntaxKind operatorKind, TypeSymbol leftType, TypeSymbol rightType, TypeSymbol? resultType = null)
     {
-        var operators = _members.OfType<MethodSymbol>()
-            .Where(o => o.MethodKind == operatorKind)
+        var operators = _members.OfType<OperatorSymbol>()
+            .Where(o => o.OperatorKind == operatorKind)
             .Where(o => o.IsBinaryOperator)
             .Where(o => leftType.IsCoercibleTo(o.Parameters[0].Type))
             .Where(o => rightType.IsCoercibleTo(o.Parameters[1].Type))
@@ -221,7 +218,7 @@ internal abstract record class TypeSymbol(
         if (operators.Count > 1)
         {
             var @operator = operators.SingleOrDefault(o =>
-                o.MethodKind == operatorKind &&
+                o.OperatorKind == operatorKind &&
                 o.IsBinaryOperator &&
                 o.Parameters[0].Type == leftType &&
                 o.Parameters[1].Type == rightType);
@@ -243,7 +240,6 @@ internal abstract record class TypeSymbol(
         var conversionSymbol = new ConversionSymbol(
             conversionKind,
             syntax ?? SyntaxFactory.SyntheticToken(conversionKind),
-            $"{SyntaxFacts.GetText(conversionKind)}-{type.ReturnType.Name}<{type.Parameters[0].Type.Name}>",
             type,
             ContainingType: this);
         _members.Add(conversionSymbol);

@@ -74,10 +74,10 @@ partial class Binder
             return expression;
         }
 
-        static List<MethodSymbol> MatchOperators(List<MethodSymbol> operators, BoundList<BoundExpression> arguments, out MethodSymbol? exactMatch)
+        static List<OperatorSymbol> MatchOperators(List<OperatorSymbol> operators, BoundList<BoundExpression> arguments, out OperatorSymbol? exactMatch)
         {
             exactMatch = null;
-            var matchingOperators = new List<MethodSymbol>();
+            var matchingOperators = new List<OperatorSymbol>();
             foreach (var @operator in operators)
             {
                 var allArgsCoercible = true;

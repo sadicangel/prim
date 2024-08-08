@@ -6,14 +6,14 @@ namespace CodeAnalysis.Binding.Expressions;
 internal sealed record class BoundBinaryExpression(
     SyntaxNode Syntax,
     BoundExpression Left,
-    MethodSymbol MethodSymbol,
+    OperatorSymbol OperatorSymbol,
     BoundExpression Right)
-    : BoundExpression(BoundKind.BinaryExpression, Syntax, MethodSymbol.ReturnType)
+    : BoundExpression(BoundKind.BinaryExpression, Syntax, OperatorSymbol.ReturnType)
 {
     public override IEnumerable<BoundNode> Children()
     {
         yield return Left;
-        yield return MethodSymbol;
+        yield return OperatorSymbol;
         yield return Right;
     }
 }
