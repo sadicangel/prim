@@ -7,11 +7,9 @@
 
 ### Variables
 ```ocaml
-// Constants.
-a: str : "text";
-
 // Variables.
-b: i32 = 29;
+a: i32 = 29;
+b:= "string";
 
 // Functions.
 sum: (a: i32, b: i32) -> i32 = {
@@ -24,7 +22,7 @@ Point2D: struct = {
   x: f32;
   y: f32;
 }
-point: Point2D = {
+point:= Point2D {
   .x = 0,
   .y = 1,
 };
