@@ -10,5 +10,5 @@
   </Folder>
   <Project Path="src\CodeAnalysis\CodeAnalysis.csproj" />
   <Project Path="src\Repl\Repl.csproj" />
-  <Project Path="tests\CodeAnalysis.Tests\CodeAnalysis.Tests.csproj" />
+  <Project Path="tests\CodeAnalysis.Tests\CodeAnalysis.Tests.csproj" Id="b128fed9-f8b6-4543-b589-fffbadee61b3" />
 </Solution>
