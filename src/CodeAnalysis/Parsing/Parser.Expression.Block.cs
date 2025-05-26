@@ -1,0 +1,19 @@
+﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax.Expressions;
+
+namespace CodeAnalysis.Parsing;
+partial class Parser
+{
+    public static BlockExpressionSyntax ParseBlockExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    {
+        var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
+        var expressions = ParseSyntaxList(
+            syntaxTree,
+            iterator,
+            [SyntaxKind.BraceCloseToken],
+            ParseExpressionTerminated);
+        var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
+
+        return new BlockExpressionSyntax(syntaxTree, braceOpenToken, expressions, braceCloseToken);
+    }
+}

@@ -56,8 +56,9 @@ b := "a string"; // type inferred from the assigned value - str
 - The syntax uses -> to indicate the return type.
 - Functions can either have a block of code with a return statement or a single expression body.
 ```ts
-sum: (a: i32, b: i32) -> i32 = { return a + b; } // block body with
-double: (x: i32) -> i32 = x * 2; // single-expression body
+sum : (a: i32, b: i32) -> i32 = (a, b) -> { return a + b; } // block body
+double : (x: i32) -> i32 = x -> x * 2; // single-expression body
+double := (x: i32) -> x * 2; // type inference
 ```
 - Functions as first-class values, meaning they can be assigned to variables, be passed as arguments to other functions or returned from them.
 
@@ -65,27 +66,35 @@ double: (x: i32) -> i32 = x * 2; // single-expression body
 - The language supports user-defined structured types (struct) for grouping related fields.
 - Struct fields are defined with explicit types, and instances are created using literal syntax.
 ```ts
-Point2D: struct = { x: f32; y: f32; } // defining a 2D point structure
-point := Point2D { .x = 0, .y = 1 }; // creating an instance with literal field assignments
+Point2D : struct = struct { x: f32; y: f32; } // defining a 2D point structure
+Point2D := struct { x: f32; y: f32; } // type inference
+point := Point2D { x = 0, y = 1 }; // creating an instance with literal field assignments
 ```
 ### Arrays
-- Arrays are fixed-length. This is specified using the syntax `[Type: size]`, meaning the array has a predefined length that cannot be changed after initialization.
+- Arrays are fixed-length. This is specified using the syntax `Type[size]`, meaning the array has a predefined length that cannot be changed after initialization.
 - Arrays are initialized using square brackets ([]) containing a list of values.
 ```ts
-array : [i32: 2] = [1, 2]; //  array of two i32 values, initialized with the values 1 and 2.
-array := ["str1", "str2", "str3"]; // type inferred from the assigned value - [str: 3]
+array : i32[2] = [1, 2]; //  array of two i32 values, initialized with the values 1 and 2.
+array : i32[_] = [1, 2]; //  same as above, but the size is inferred from the values - i32[2]
+array := ["str1", "str2", "str3"]; // type inferred from the assigned value - str[3]
 ```
-- The type and length are both part of the array's signature. For example, `[i32: 2]` and `[i32: 3]` are considered different types and cannot be used interchangeably.
+- The type and length are both part of the array's signature. For example, `i32[2]` and `i32[3]` are considered different types and cannot be used interchangeably.
 
 - Since arrays have fixed lengths, the compiler can enforce bounds checking both at compile-time and runtime.
 
 ### Pointers  
-> _TODO_
+```ts
+a : i32 = 42; // a pointer to the variable b of type i32
+ptr : i32* = &a;
+ptr := &a; // type inference
+b := *ptr; // dereferencing the pointer to get the value of a*
+```
 
 ## Previous Versions
 
 - [v0.1](https://github.com/sadicangel/prim/tree/v0.1)
 - [v0.2](https://github.com/sadicangel/prim/tree/v0.2)
+- [v0.3](https://github.com/sadicangel/prim/tree/v0.3)
 
 ## References
 - [Crafting Interpreters](https://craftinginterpreters.com/)
