@@ -20,10 +20,10 @@ public sealed record class SyntaxToken(
 
     public override IEnumerable<SyntaxNode> Children() => [];
 
-    public static SyntaxToken CreateSynthetic(SyntaxKind syntaxKind, SyntaxTree syntaxTree, Range range = default) => new(
+    public static SyntaxToken CreateSynthetic(SyntaxKind syntaxKind, SyntaxTree? syntaxTree = null, Range range = default) => new(
         SyntaxKind: syntaxKind,
-        SyntaxTree: syntaxTree,
-        SourceSpan: new SourceSpan(syntaxTree.SourceText, range),
+        SyntaxTree: syntaxTree ?? SyntaxTree.Empty,
+        SourceSpan: new SourceSpan((syntaxTree ?? SyntaxTree.Empty).SourceText, range),
         LeadingTrivia: [],
         TrailingTrivia: [],
         Value: null);

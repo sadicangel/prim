@@ -1,6 +1,8 @@
 ﻿namespace CodeAnalysis.Text;
 public sealed record class SourceText(string Text, string FilePath)
 {
+    public static SourceText Empty { get; } = new(string.Empty, string.Empty);
+
     public SourceText(string text) : this(text, string.Empty) { }
 
     public string FileName { get; } = string.IsNullOrEmpty(FilePath) ? string.Empty : Path.GetFileName(FilePath);

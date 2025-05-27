@@ -9,6 +9,8 @@ public readonly record struct ParseOptions(bool IsScript);
 
 public sealed class SyntaxTree(SourceText sourceText, ParseOptions parseOptions = default)
 {
+    internal static SyntaxTree Empty { get; } = new SyntaxTree(SourceText.Empty);
+
     public SourceText SourceText { get; } = sourceText ?? throw new ArgumentNullException(nameof(sourceText));
     public ParseOptions ParseOptions { get; } = parseOptions;
     public DiagnosticBag Diagnostics { get; } = [];
