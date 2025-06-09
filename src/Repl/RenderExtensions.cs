@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Semantic;
+using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
 using Spectre.Console;
 
 namespace Repl;
@@ -207,8 +208,8 @@ internal static class RenderExtensions
                     //    // $"{base.Name}: {Type.Name}"
                     //    break;
 
-                    case ExpressionSyntax expression:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/]"));
+                    case SyntaxNode node:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{node.SyntaxKind}[/]"));
                         break;
 
                     default:
@@ -237,45 +238,49 @@ internal static class RenderExtensions
         console.WriteLine();
     }
 
-    //public static void Write(this IAnsiConsole console, BoundTree boundTree)
-    //{
-    //    var tree = new Tree($"[aqua]{boundTree.CompilationUnit.BoundKind}[/]")
-    //        .Style("dim white");
+    public static void Write(this IAnsiConsole console, BoundNode boundNode)
+    {
+        var tree = new Tree($"[aqua]{boundNode.BoundKind}[/]")
+            .Style("dim white");
 
-    //    WriteTo(boundTree.CompilationUnit, tree);
+        WriteTo(boundNode, tree);
 
-    //    console.Write(new Panel(tree).Header(nameof(BoundTree)));
+        console.Write(new Panel(tree).Header(boundNode.BoundKind.ToString()));
 
-    //    static void WriteTo(BoundNode boundNode, IHasTreeNodes treeNode)
-    //    {
-    //        foreach (var child in boundNode.Children())
-    //        {
-    //            switch (child)
-    //            {
-    //                case Symbol symbol:
-    //                    WriteTo(child, treeNode.AddNode($"[gold3]{symbol.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(symbol.ToString())}[/]"));
-    //                    break;
+        static void WriteTo(BoundNode boundNode, IHasTreeNodes treeNode)
+        {
+            foreach (var child in boundNode.Children())
+            {
+                switch (child)
+                {
+                    //case Symbol symbol:
+                    //    WriteTo(child, treeNode.AddNode($"[gold3]{symbol.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(symbol.ToString())}[/]"));
+                    //    break;
 
-    //                //case BoundExpression expression when expression.ConstValue is not null:
-    //                //    WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] ({expression.ConstValue}) [darkseagreen2 i]{expression.Type}[/]"));
-    //                //    break;
+                    //case BoundExpression expression when expression.ConstValue is not null:
+                    //    WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] ({expression.ConstValue}) [darkseagreen2 i]{expression.Type}[/]"));
+                    //    break;
 
-    //                case BoundExpression expression:
-    //                    WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"));
-    //                    break;
+                    case BoundExpression expression:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"));
+                        break;
 
-    //                default:
-    //                    throw new NotImplementedException(child.GetType().Name);
-    //            }
-    //        }
-    //    }
-    //}
+                    case BoundNode node:
+                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/]"));
+                        break;
 
-    //public static void WriteLine(this IAnsiConsole console, BoundTree boundTree)
-    //{
-    //    console.Write(boundTree);
-    //    console.WriteLine();
-    //}
+                    default:
+                        throw new NotImplementedException(child.GetType().Name);
+                }
+            }
+        }
+    }
+
+    public static void WriteLine(this IAnsiConsole console, BoundNode boundNode)
+    {
+        console.Write(boundNode);
+        console.WriteLine();
+    }
 
     //public static void Write(this IAnsiConsole console, ScopeSymbol scope)
     //{

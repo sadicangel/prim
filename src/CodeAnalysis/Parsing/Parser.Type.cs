@@ -31,7 +31,6 @@ partial class Parser
             TypeSyntax type = iterator.Current.SyntaxKind switch
             {
                 SyntaxKind.AnyKeyword or
-                SyntaxKind.ErrKeyword or
                 SyntaxKind.UnknownKeyword or
                 SyntaxKind.NeverKeyword or
                 SyntaxKind.UnitKeyword or
@@ -70,7 +69,6 @@ partial class Parser
         {
             var predefinedTypeToken = iterator.Match([
                 SyntaxKind.AnyKeyword,
-                SyntaxKind.ErrKeyword,
                 SyntaxKind.UnknownKeyword,
                 SyntaxKind.NeverKeyword,
                 SyntaxKind.UnitKeyword,
@@ -103,15 +101,9 @@ partial class Parser
                 iterator,
                 SyntaxKind.CommaToken,
                 [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
-                static (syntaxTree, iterator) =>
-                {
-                    var name = ParseSimpleName(syntaxTree, iterator);
-                    var colonToken = iterator.Match(SyntaxKind.ColonToken);
-                    var type = ParseType(syntaxTree, iterator);
-                    return new ParameterSyntax(syntaxTree, name, colonToken, type);
-                });
+                ParseType);
             var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-            var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
+            var arrowToken = iterator.Match(SyntaxKind.ArrowReturnToken);
             var returnType = ParseType(syntaxTree, iterator);
             return new LambdaTypeSyntax(syntaxTree, parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
         }

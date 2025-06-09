@@ -9,6 +9,11 @@ partial class Parser
 
     public static ExpressionSyntax ParseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator, bool allowUnterminated) => iterator.Current.SyntaxKind switch
     {
+        SyntaxKind.ModuleKeyword => ParseModuleDeclaration(syntaxTree, iterator),
+        SyntaxKind.StructKeyword => ParseStructDeclaration(syntaxTree, iterator),
+        SyntaxKind.LetKeyword => ParseVariableDeclaration(syntaxTree, iterator),
+        SyntaxKind.VarKeyword => ParseVariableDeclaration(syntaxTree, iterator),
+        SyntaxKind.LambdaKeyword => ParseLambdaExpression(syntaxTree, iterator),
         SyntaxKind.IfKeyword => ParseIfElseExpression(syntaxTree, iterator),
         //SyntaxKind.ForKeyword => ParseForExpression(syntaxTree, iterator),
         //SyntaxKind.WhileKeyword => ParseWhileExpression(syntaxTree, iterator),

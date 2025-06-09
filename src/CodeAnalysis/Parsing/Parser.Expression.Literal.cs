@@ -17,7 +17,7 @@ partial class Parser
             SyntaxKind.FalseKeyword =>
                 new LiteralExpressionSyntax(SyntaxKind.FalseLiteralExpression, syntaxTree, literalToken, false),
             SyntaxKind.NullKeyword =>
-                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, Null.Value),
+                new LiteralExpressionSyntax(SyntaxKind.NullLiteralExpression, syntaxTree, literalToken, Unit.Value),
             SyntaxKind.I8LiteralToken =>
                 new LiteralExpressionSyntax(SyntaxKind.I8LiteralExpression, syntaxTree, literalToken, literalToken.Value!),
             SyntaxKind.U8LiteralToken =>

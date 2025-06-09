@@ -12,6 +12,7 @@ internal enum BoundKind
     StackInstantiation,
 
     LiteralExpression,
+    LambdaExpression,
 
     AssignmentExpression,
 
@@ -50,23 +51,4 @@ internal enum BoundKind
     ReturnExpression,
     GotoExpression,
     ConditionalGotoExpression,
-
-    ModuleSymbol,
-    PropertySymbol,
-    MethodSymbol,
-    OperatorSymbol,
-    ConversionSymbol,
-    VariableSymbol,
-    LabelSymbol,
-    AnonymousScopeSymbol,
-
-    ParameterSymbol,
-
-    ArrayTypeSymbol,
-    ErrorTypeSymbol,
-    LambdaTypeSymbol,
-    OptionTypeSymbol,
-    PointerTypeSymbol,
-    StructTypeSymbol,
-    UnionTypeSymbol,
 }

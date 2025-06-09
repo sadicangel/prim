@@ -5,19 +5,8 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Diagnostics;
 
-public readonly record struct SymbolKind;
-
-public interface IReadOnlyDiagnosticBag : IReadOnlyList<Diagnostic>
-{
-    public bool HasErrorDiagnostics { get; }
-    public bool HasWarningDiagnostics { get; }
-
-    public IEnumerable<Diagnostic> GetErrors() => this.Where(d => d.Severity is DiagnosticSeverity.Error);
-    public IEnumerable<Diagnostic> GetWarnings() => this.Where(d => d.Severity is DiagnosticSeverity.Warning);
-}
-
 [DebuggerDisplay("Count = {Count}")]
-public sealed class DiagnosticBag : IReadOnlyDiagnosticBag
+public sealed class DiagnosticBag : IReadOnlyList<Diagnostic>
 {
     private readonly List<Diagnostic> _diagnostics;
 

@@ -1,17 +1,18 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Scanning;
 
 internal static partial class Scanner
 {
-    internal static IEnumerable<SyntaxToken> Scan(SyntaxTree syntaxTree)
+    internal static IEnumerable<SyntaxToken> Scan(SyntaxTree syntaxTree, DiagnosticBag diagnostics)
     {
         var badTokens = new List<SyntaxToken>();
         var length = 0;
         SyntaxToken token;
         do
         {
-            length += ScanSyntaxToken(syntaxTree, length, out token);
+            length += ScanSyntaxToken(syntaxTree, diagnostics, length, out token);
             if (token.SyntaxKind is SyntaxKind.InvalidSyntax)
             {
                 badTokens.Add(token);

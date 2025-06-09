@@ -1,21 +1,22 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
 partial class Scanner
 {
-    private static int ScanMultiLineComment(SyntaxTree syntaxTree, int position, out SyntaxTrivia trivia)
+    private static int ScanMultiLineComment(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxTrivia trivia)
     {
         var done = false;
         // Skip '/*'.
         var read = 2;
         while (!done)
         {
-            switch (syntaxTree.SourceText[(position + read)..])
+            switch (syntaxTree.SourceText[(offset + read)..])
             {
                 case []:
                 case ['\0', ..]:
-                    syntaxTree.Diagnostics.ReportUnterminatedComment(new SourceSpan(syntaxTree.SourceText, (position + read)..(position + read + 2)));
+                    diagnostics.ReportUnterminatedComment(new SourceSpan(syntaxTree.SourceText, (offset + read)..(offset + read + 2)));
                     done = true;
                     break;
                 case ['*', '/', ..]:
@@ -28,7 +29,7 @@ partial class Scanner
             }
         }
 
-        trivia = new SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, syntaxTree, new SourceSpan(syntaxTree.SourceText, position..(position + read)));
+        trivia = new SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, syntaxTree, new SourceSpan(syntaxTree.SourceText, offset..(offset + read)));
         return read;
     }
 }

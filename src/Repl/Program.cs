@@ -1,4 +1,6 @@
-﻿using CodeAnalysis;
+﻿using System.Collections.Immutable;
+using CodeAnalysis;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Repl;
@@ -13,11 +15,17 @@ var previousCompilation = default(Compilation);
 while (true)
 {
     var @default = Markup.Escape("""
-        vec: module = {
-            Point: struct = {
+        module vec {
+            struct Point {
                 x: i32 = 0;
                 y: i32 = 0;
             }
+        }
+
+        let main: () -> i32 = lambda () {
+            var a = 40;
+            var b = 2;
+            let c = a + b;
         }
         """);
 
@@ -39,11 +47,13 @@ while (true)
 
     var compilation = new Compilation(new SourceText(code), parseOptions, previousCompilation);
 
-    if (compilation.Diagnostics.Count > 0)
+    var parseDiagnostics = compilation.SyntaxTrees.Select(x => x.Diagnostics).SelectMany(x => x).ToImmutableArray();
+
+    if (parseDiagnostics.Length > 0)
     {
-        foreach (var diagnostic in compilation.Diagnostics)
+        foreach (var diagnostic in parseDiagnostics)
             console.WriteLine(diagnostic);
-        if (compilation.Diagnostics.HasErrorDiagnostics)
+        if (parseDiagnostics.HasErrorDiagnostics)
             continue;
     }
 
@@ -51,6 +61,8 @@ while (true)
     {
         console.WriteLine(syntaxTree);
     }
+
+    console.WriteLine(compilation.Program.EntryPoint);
 
     //foreach (var boundTree in compilation.BoundTrees)
     //{

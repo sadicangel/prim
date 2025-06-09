@@ -2,19 +2,18 @@
 
 namespace CodeAnalysis.Semantic.Symbols;
 internal abstract record class Symbol(
-    BoundKind BoundKind,
+    SymbolKind SymbolKind,
     SyntaxNode Syntax,
     string Name,
     TypeSymbol Type,
     Symbol ContainingSymbol,
     ModuleSymbol ContainingModule,
     Modifiers Modifiers)
-    : BoundNode(BoundKind, Syntax)
 {
-    public abstract override IEnumerable<Symbol> Children();
+    public string FullName => field ??= Name is "<global>" ? Name : $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
 
-    public virtual bool Equals(Symbol? other) => other is not null && BoundKind == other.BoundKind && Name == other.Name;
-    public override int GetHashCode() => HashCode.Combine(BoundKind, Name);
+    public virtual bool Equals(Symbol? other) => other is not null && SymbolKind == other.SymbolKind && Name == other.Name;
+    public override int GetHashCode() => HashCode.Combine(SymbolKind, Name);
 
     public sealed override string ToString() => $"{Name}: {Type.Name}";
 }

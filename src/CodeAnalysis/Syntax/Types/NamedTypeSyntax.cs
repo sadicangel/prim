@@ -1,4 +1,4 @@
-﻿using CodeAnalysis.Syntax.Expressions.Names;
+﻿using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Syntax.Types;
 public sealed record class NamedTypeSyntax(SyntaxTree SyntaxTree, NameSyntax Name)

@@ -1,21 +1,22 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
 
-internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
+internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens, DiagnosticBag Diagnostics)
 {
     private const int MaxSuccessiveMatchTokenErrors = 1;
 
     private int _successiveMatchTokenErrors = 0;
 
-    public int Index { get; private set; }
+    public int Offset { get; private set; }
 
-    public SyntaxToken Current { get => Tokens[int.Clamp(Index, 0, Tokens.Count - 1)]; }
+    public SyntaxToken Current { get => Tokens[int.Clamp(Offset, 0, Tokens.Count - 1)]; }
 
     public SyntaxToken Peek(int offset = 0)
     {
-        var index = Index + offset;
+        var index = Offset + offset;
         if (index >= Tokens.Count)
             return Tokens[^1];
         return Tokens[index];
@@ -26,7 +27,7 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
         if (syntaxKinds.Length == 0)
         {
             token = Current;
-            ++Index;
+            ++Offset;
             return true;
         }
 
@@ -35,7 +36,7 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
             if (syntaxKind == Current.SyntaxKind)
             {
                 token = Current;
-                ++Index;
+                ++Offset;
                 return true;
             }
         }
@@ -49,7 +50,7 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
         if (syntaxKinds.Length == 0)
         {
             var current = Current;
-            ++Index;
+            ++Offset;
             return current;
         }
 
@@ -64,13 +65,13 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens)
 
         if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
         {
-            Current.SyntaxTree.Diagnostics.ReportUnexpectedToken(syntaxKinds[0], Current);
+            Diagnostics.ReportUnexpectedToken(syntaxKinds[0], Current);
         }
 
-        var syntheticToken = SyntaxToken.CreateSynthetic(syntaxKinds[0], Current.SyntaxTree);
+        var syntheticToken = SyntaxToken.CreateSynthetic(syntaxKinds[0], Current.SyntaxTree, Offset..(Offset + 1));
 
         // Avoid overflowing the stack.
-        ++Index;
+        ++Offset;
 
         return syntheticToken;
     }

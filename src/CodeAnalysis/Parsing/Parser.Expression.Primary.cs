@@ -1,6 +1,6 @@
 ﻿using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Expressions.Names;
+using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser

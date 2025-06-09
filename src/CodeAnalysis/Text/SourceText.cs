@@ -32,7 +32,7 @@ public sealed record class SourceText(string Text, string FilePath)
         while (lower <= upper)
         {
             var index = lower + (upper - lower) / 2;
-            var start = Lines[index].SourceSpan.StartCharacter;
+            var start = Lines[index].SourceSpan.Range.Start.Value;
 
             if (offset.Value == start)
                 return index;

@@ -1,29 +1,37 @@
-﻿using CodeAnalysis.Scanning;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Scanning;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
+
+internal sealed record class ParseResult(CompilationUnitSyntax CompilationUnit, ImmutableArray<Diagnostic> Diagnostics);
+
 internal static partial class Parser
 {
     private delegate T ParseDelegate<out T>(SyntaxTree syntaxTree, SyntaxIterator iterator) where T : SyntaxNode;
     private delegate T? ParseOptionalDelegate<out T>(SyntaxTree syntaxTree, SyntaxIterator iterator) where T : SyntaxNode;
 
-    internal static CompilationUnitSyntax Parse(SyntaxTree syntaxTree)
+    internal static ParseResult Parse(SyntaxTree syntaxTree)
     {
-        //ParseDelegate<SyntaxNode> parseNode = syntaxTree.ParseOptions.IsScript ? ParseExpression : ParseExpression;
-        ParseDelegate<SyntaxNode> parseNode = ParseExpression;
+        var diagnostics = new DiagnosticBag();
 
-        var tokens = Scanner.Scan(syntaxTree).ToArray();
+        var tokens = Scanner.Scan(syntaxTree, diagnostics).ToArray();
         if (tokens.Length == 0)
         {
-            return new CompilationUnitSyntax(syntaxTree, [], SyntaxToken.CreateSynthetic(SyntaxKind.EofToken, syntaxTree));
+            return new ParseResult(
+                new CompilationUnitSyntax(syntaxTree, [], SyntaxToken.CreateSynthetic(SyntaxKind.EofToken, syntaxTree)),
+                []);
         }
 
-        var iterator = new SyntaxIterator(tokens);
+        var iterator = new SyntaxIterator(tokens, diagnostics);
 
-        var expressions = ParseSyntaxList(syntaxTree, iterator, [], parseNode);
+        var declarations = ParseSyntaxList(syntaxTree, iterator, [], ParseGlobalDeclaration);
 
         var eofToken = iterator.Match(SyntaxKind.EofToken);
 
-        return new CompilationUnitSyntax(syntaxTree, expressions, eofToken);
+        var compilationUnit = new CompilationUnitSyntax(syntaxTree, declarations, eofToken);
+
+        return new ParseResult(compilationUnit, [.. diagnostics]);
     }
 }

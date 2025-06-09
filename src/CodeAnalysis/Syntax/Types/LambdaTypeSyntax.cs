@@ -2,9 +2,9 @@
 public sealed record class LambdaTypeSyntax(
     SyntaxTree SyntaxTree,
     SyntaxToken ParenthesisOpenToken,
-    SeparatedSyntaxList<ParameterSyntax> Parameters,
+    SeparatedSyntaxList<TypeSyntax> Parameters,
     SyntaxToken ParenthesisCloseToken,
-    SyntaxToken ArrowToken,
+    SyntaxToken ArrowReturnToken,
     TypeSyntax ReturnType)
     : TypeSyntax(SyntaxKind.LambdaType, SyntaxTree)
 {
@@ -14,7 +14,7 @@ public sealed record class LambdaTypeSyntax(
         foreach (var parameter in Parameters.SyntaxNodes)
             yield return parameter;
         yield return ParenthesisCloseToken;
-        yield return ArrowToken;
+        yield return ArrowReturnToken;
         yield return ReturnType;
     }
 }

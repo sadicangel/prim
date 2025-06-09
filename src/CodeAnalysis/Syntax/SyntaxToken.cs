@@ -10,8 +10,6 @@ public sealed record class SyntaxToken(
     object? Value)
     : SyntaxNode(SyntaxKind, SyntaxTree)
 {
-    public bool IsSynthetic => SourceSpan.Length == 0;
-
     public override SourceSpan SourceSpan { get; } = SourceSpan;
 
     public override SourceSpan SourceSpanWithTrivia => SourceSpan.Union(
@@ -20,11 +18,14 @@ public sealed record class SyntaxToken(
 
     public override IEnumerable<SyntaxNode> Children() => [];
 
-    public static SyntaxToken CreateSynthetic(SyntaxKind syntaxKind, SyntaxTree? syntaxTree = null, Range range = default) => new(
+    public static SyntaxToken CreateSynthetic(SyntaxKind syntaxKind, SyntaxTree? syntaxTree = null, Range range = default, object? value = null) => new(
         SyntaxKind: syntaxKind,
         SyntaxTree: syntaxTree ?? SyntaxTree.Empty,
         SourceSpan: new SourceSpan((syntaxTree ?? SyntaxTree.Empty).SourceText, range),
         LeadingTrivia: [],
         TrailingTrivia: [],
-        Value: null);
+        Value: value)
+    {
+        IsSynthetic = true
+    };
 }

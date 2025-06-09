@@ -1,10 +1,11 @@
 ﻿using System.Collections.Immutable;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Scanning;
 partial class Scanner
 {
-    private static int ScanSyntaxTrivia(SyntaxTree syntaxTree, int offset, bool leading, out SyntaxList<SyntaxTrivia> trivia)
+    private static int ScanSyntaxTrivia(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, bool leading, out SyntaxList<SyntaxTrivia> trivia)
     {
         var builder = ImmutableArray.CreateBuilder<SyntaxTrivia>();
         var length = 0;
@@ -13,7 +14,7 @@ partial class Scanner
             var item = default(SyntaxTrivia)!;
             var read = syntaxTree.SourceText[(offset + length)..] switch
             {
-                ['/', '*', ..] => ScanMultiLineComment(syntaxTree, offset + length, out item),
+                ['/', '*', ..] => ScanMultiLineComment(syntaxTree, diagnostics, offset + length, out item),
                 ['/', '/', ..] => ScanSingleLineComment(syntaxTree, offset + length, out item),
                 ['\n' or '\r', ..] => ScanLineBreak(syntaxTree, offset + length, out item),
                 [' ' or '\t', ..] => ScanWhiteSpace(syntaxTree, offset + length, out item),

@@ -1,10 +1,11 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
 partial class Scanner
 {
-    private static int ScanSyntaxKind(SyntaxTree syntaxTree, int offset, out SyntaxKind kind, out Range range, out object? value)
+    private static int ScanSyntaxKind(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
     {
         switch (syntaxTree.SourceText[offset..])
         {
@@ -68,6 +69,18 @@ partial class Scanner
                 range = offset..(offset + 1);
                 value = null;
                 return 1;
+
+            case ['=', '>', ..]:
+                kind = SyntaxKind.ArrowLambdaToken;
+                range = offset..(offset + 2);
+                value = null;
+                return 2;
+
+            case ['-', '>', ..]:
+                kind = SyntaxKind.ArrowReturnToken;
+                range = offset..(offset + 2);
+                value = null;
+                return 2;
 
             // Operators
             case ['&', '&', ..]:
@@ -203,12 +216,6 @@ partial class Scanner
                 value = null;
                 return 1;
 
-            case ['-', '>', ..]:
-                kind = SyntaxKind.MinusGreaterThanToken;
-                range = offset..(offset + 2);
-                value = null;
-                return 2;
-
             case ['-', '=', ..]:
                 kind = SyntaxKind.MinusEqualsToken;
                 range = offset..(offset + 2);
@@ -306,11 +313,11 @@ partial class Scanner
                 return 1;
 
             case ['"', ..]:
-                return ScanString(syntaxTree, offset, out kind, out range, out value);
+                return ScanString(syntaxTree, diagnostics, offset, out kind, out range, out value);
 
             case [var d1, ..] when char.IsAsciiDigit(d1):
             case ['.', var d2, ..] when char.IsAsciiDigit(d2):
-                return ScanNumber(syntaxTree, offset, out kind, out range, out value);
+                return ScanNumber(syntaxTree, diagnostics, offset, out kind, out range, out value);
 
             case ['_', ..]:
             case [var l, ..] when char.IsAsciiLetter(l):
@@ -324,7 +331,7 @@ partial class Scanner
                 return 0;
 
             default:
-                syntaxTree.Diagnostics.ReportInvalidCharacter(new SourceSpan(syntaxTree.SourceText, offset..(offset + 1)), syntaxTree.SourceText[offset]);
+                diagnostics.ReportInvalidCharacter(new SourceSpan(syntaxTree.SourceText, offset..(offset + 1)), syntaxTree.SourceText[offset]);
                 kind = SyntaxKind.InvalidSyntax;
                 range = offset..(offset + 1);
                 value = null;

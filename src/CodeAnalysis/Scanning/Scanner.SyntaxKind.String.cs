@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
@@ -6,21 +7,21 @@ namespace CodeAnalysis.Scanning;
 partial class Scanner
 {
     // TODO: Support raw strings.
-    private static int ScanString(SyntaxTree syntaxTree, int position, out SyntaxKind kind, out Range range, out object? value)
+    private static int ScanString(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
     {
         var builder = new StringBuilder();
         var done = false;
         var read = 1;
         while (!done)
         {
-            var span = syntaxTree.SourceText[(position + read)..];
+            var span = syntaxTree.SourceText[(offset + read)..];
             switch (span)
             {
                 case ['\0', ..]:
                 case ['\r', ..]:
                 case ['\n', ..]:
                 case []:
-                    syntaxTree.Diagnostics.ReportUnterminatedString(new SourceSpan(syntaxTree.SourceText, position..(position + 1)));
+                    diagnostics.ReportUnterminatedString(new SourceSpan(syntaxTree.SourceText, offset..(offset + 1)));
                     done = true;
                     break;
                 case ['\\', '"', ..]:
@@ -40,7 +41,7 @@ partial class Scanner
         }
 
         kind = SyntaxKind.StrLiteralToken;
-        range = position..(position + read);
+        range = offset..(offset + read);
         value = builder.ToString();
         return read;
     }

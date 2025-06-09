@@ -5,7 +5,7 @@ public partial class ParserTests
     public void Parse_GroupExpression()
     {
         var tree = new SyntaxTree(new SourceText("(true)"), new ParseOptions { IsScript = true });
-        var node = Assert.Single(tree.CompilationUnit.SyntaxNodes);
+        var node = Assert.Single(tree.CompilationUnit.Declarations);
         Assert.Empty(tree.Diagnostics);
         Assert.Equal(SyntaxKind.GroupExpression, node.SyntaxKind);
     }

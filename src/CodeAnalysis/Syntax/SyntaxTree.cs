@@ -1,6 +1,6 @@
-﻿using CodeAnalysis.Diagnostics;
+﻿using System.Collections.Immutable;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Parsing;
-using CodeAnalysis.Scanning;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
@@ -13,19 +13,14 @@ public sealed class SyntaxTree(SourceText sourceText, ParseOptions parseOptions 
 
     public SourceText SourceText { get; } = sourceText ?? throw new ArgumentNullException(nameof(sourceText));
     public ParseOptions ParseOptions { get; } = parseOptions;
-    public DiagnosticBag Diagnostics { get; } = [];
-    public CompilationUnitSyntax CompilationUnit { get => field ??= Parser.Parse(this); }
+
+    internal ParseResult ParseResult => field ??= Parser.Parse(this);
+    public CompilationUnitSyntax CompilationUnit => ParseResult.CompilationUnit;
+    public ImmutableArray<Diagnostic> Diagnostics => ParseResult.Diagnostics;
 
     internal Dictionary<SyntaxNode, SyntaxNode?> NodeParents { get => field ??= NodeParentsHelper.CreateNodeParents(CompilationUnit); }
 
     internal SyntaxNode? GetParent(SyntaxNode node) => NodeParents[node];
-
-    public static SyntaxList<SyntaxToken> Scan(SourceText sourceText)
-    {
-        var syntaxTree = new SyntaxTree(sourceText);
-        var syntaxTokens = Scanner.Scan(syntaxTree);
-        return [.. syntaxTokens];
-    }
 }
 
 file static class NodeParentsHelper

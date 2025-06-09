@@ -5,11 +5,13 @@ public abstract record class SyntaxNode(SyntaxKind SyntaxKind, SyntaxTree Syntax
 {
     public SyntaxNode? Parent => SyntaxTree.GetParent(this);
 
+    public bool IsSynthetic { get; init; }
+
     public SyntaxToken FirstToken => this is SyntaxToken token ? token : Children().First().FirstToken;
     public SyntaxToken LastToken => this is SyntaxToken token ? token : Children().Last().LastToken;
 
     public virtual SourceSpan SourceSpan => SourceSpan.Union(Children().First().SourceSpan, Children().Last().SourceSpan);
-    public virtual SourceSpan SourceSpanWithTrivia => SourceSpan.Union(Children().First().SourceSpanWithTrivia, Children().Last().SourceSpanWithTrivia);
+    public virtual SourceSpan SourceSpanWithTrivia => SourceSpan.Union(Children().First(x => !x.IsSynthetic).SourceSpanWithTrivia, Children().Last(x => !x.IsSynthetic).SourceSpanWithTrivia);
 
     public sealed override string ToString() =>
         SourceSpan.Length > 0 ? $"{SyntaxKind} {SourceSpan}" : SyntaxKind.ToString();

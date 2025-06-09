@@ -29,7 +29,6 @@ public static class SyntaxFacts
             SyntaxKind.DotDotToken => "..",
             SyntaxKind.EqualsToken => "=",
             SyntaxKind.EqualsEqualsToken => "==",
-            SyntaxKind.MinusGreaterThanToken => "->",
             SyntaxKind.GreaterThanToken => ">",
             SyntaxKind.GreaterThanEqualsToken => ">=",
             SyntaxKind.GreaterThanGreaterThanToken => ">>",
@@ -64,6 +63,9 @@ public static class SyntaxFacts
             SyntaxKind.StarStarEqualsToken => "**=",
             SyntaxKind.TildeToken => "~",
 
+            SyntaxKind.ArrowLambdaToken => "=>",
+            SyntaxKind.ArrowReturnToken => "->",
+
             SyntaxKind.I8LiteralToken => null,
             SyntaxKind.U8LiteralToken => null,
             SyntaxKind.I16LiteralToken => null,
@@ -89,7 +91,6 @@ public static class SyntaxFacts
             SyntaxKind.ReturnKeyword => "return",
 
             SyntaxKind.AnyKeyword => "any",
-            SyntaxKind.ErrKeyword => "err",
             SyntaxKind.UnknownKeyword => "unknown",
             SyntaxKind.NeverKeyword => "never",
             SyntaxKind.UnitKeyword => "unit",
@@ -112,6 +113,9 @@ public static class SyntaxFacts
 
             SyntaxKind.ModuleKeyword => "module",
             SyntaxKind.StructKeyword => "struct",
+            SyntaxKind.LambdaKeyword => "lambda",
+            SyntaxKind.LetKeyword => "let",
+            SyntaxKind.VarKeyword => "var",
 
             SyntaxKind.TrueKeyword => "true",
             SyntaxKind.FalseKeyword => "false",
@@ -129,8 +133,7 @@ public static class SyntaxFacts
 
             SyntaxKind.PredefinedType => null,
             SyntaxKind.NamedType => null,
-            SyntaxKind.OptionType => null,
-            SyntaxKind.ErrorType => null,
+            SyntaxKind.MaybeType => null,
             SyntaxKind.PointerType => null,
             SyntaxKind.ArrayType => null,
             SyntaxKind.LambdaType => null,
@@ -164,17 +167,13 @@ public static class SyntaxFacts
             SyntaxKind.StructDeclaration => null,
             SyntaxKind.VariableDeclaration => null,
             SyntaxKind.PropertyDeclaration => null,
-            SyntaxKind.MethodDeclaration => null,
-            SyntaxKind.OperatorDeclaration => null,
-            SyntaxKind.ConversionDeclaration => null,
-            SyntaxKind.LocalDeclaration => null,
 
             SyntaxKind.EmptyExpression => null,
             SyntaxKind.StatementExpression => null,
             SyntaxKind.BlockExpression => null,
             SyntaxKind.ArrayExpression => null,
-            SyntaxKind.StructInitExpression => null,
-            SyntaxKind.PropertyInitExpression => null,
+            SyntaxKind.StructExpression => null,
+            SyntaxKind.PropertyExpression => null,
 
             SyntaxKind.IndexExpression => null,
             SyntaxKind.InvocationExpression => null,
@@ -208,10 +207,11 @@ public static class SyntaxFacts
             SyntaxKind.CoalesceExpression => null,
 
             SyntaxKind.AssignmentExpression => null,
-            SyntaxKind.InitValueExpression => null,
+            SyntaxKind.TypeClause => null,
+            SyntaxKind.InitClause => null,
 
             SyntaxKind.IfExpression => null,
-            SyntaxKind.ElseClauseExpression => null,
+            SyntaxKind.ElseClause => null,
             SyntaxKind.WhileExpression => null,
 
             SyntaxKind.ContinueExpression => null,
@@ -238,7 +238,6 @@ public static class SyntaxFacts
             "return" => SyntaxKind.ReturnKeyword,
 
             "any" => SyntaxKind.AnyKeyword,
-            "err" => SyntaxKind.ErrKeyword,
             "unknown" => SyntaxKind.UnknownKeyword,
             "never" => SyntaxKind.NeverKeyword,
             "unit" => SyntaxKind.UnitKeyword,
@@ -261,6 +260,9 @@ public static class SyntaxFacts
 
             "module" => SyntaxKind.ModuleKeyword,
             "struct" => SyntaxKind.StructKeyword,
+            "lambda" => SyntaxKind.LambdaKeyword,
+            "let" => SyntaxKind.LetKeyword,
+            "var" => SyntaxKind.VarKeyword,
 
             "true" => SyntaxKind.TrueKeyword,
             "false" => SyntaxKind.FalseKeyword,

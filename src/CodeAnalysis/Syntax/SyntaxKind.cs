@@ -38,7 +38,6 @@ public enum SyntaxKind
     DotDotToken,
     EqualsToken,
     EqualsEqualsToken,
-    MinusGreaterThanToken,
     GreaterThanToken,
     GreaterThanEqualsToken,
     GreaterThanGreaterThanToken,
@@ -73,6 +72,9 @@ public enum SyntaxKind
     StarStarEqualsToken,
     TildeToken,
 
+    ArrowLambdaToken,
+    ArrowReturnToken,
+
     AsKeyword,
     IfKeyword,
     ImplicitKeyword,
@@ -85,7 +87,6 @@ public enum SyntaxKind
     ReturnKeyword,
 
     AnyKeyword,
-    ErrKeyword,
     UnknownKeyword,
     NeverKeyword,
     UnitKeyword,
@@ -108,6 +109,9 @@ public enum SyntaxKind
 
     ModuleKeyword,
     StructKeyword,
+    LambdaKeyword,
+    LetKeyword,
+    VarKeyword,
 
     TrueKeyword,
     FalseKeyword,
@@ -124,10 +128,9 @@ public enum SyntaxKind
     // Other nodes
 
     ArrayType,
-    ErrorType,
     LambdaType,
     NamedType,
-    OptionType,
+    MaybeType,
     PointerType,
     PredefinedType,
     UnionType,
@@ -136,6 +139,14 @@ public enum SyntaxKind
     Argument,
 
     CompilationUnit,
+
+    // Declarations
+    GlobalDeclaration,
+    LocalDeclaration,
+    ModuleDeclaration,
+    StructDeclaration,
+    VariableDeclaration,
+    PropertyDeclaration,
 
     // Expressions
 
@@ -160,21 +171,15 @@ public enum SyntaxKind
 
     GroupExpression,
 
-    ModuleDeclaration,
-    StructDeclaration,
-    VariableDeclaration,
-    PropertyDeclaration,
-    MethodDeclaration,
-    OperatorDeclaration,
-    ConversionDeclaration,
-    LocalDeclaration,
-
     EmptyExpression,
+
     StatementExpression,
     BlockExpression,
+
     ArrayExpression,
-    StructInitExpression,
-    PropertyInitExpression,
+    LambdaExpression,
+    StructExpression,
+    PropertyExpression,
 
     IndexExpression,
     InvocationExpression,
@@ -208,11 +213,11 @@ public enum SyntaxKind
     CoalesceExpression,
 
     AssignmentExpression,
-
-    InitValueExpression,
+    TypeClause,
+    InitClause,
 
     IfExpression,
-    ElseClauseExpression,
+    ElseClause,
     WhileExpression,
 
     ContinueExpression,

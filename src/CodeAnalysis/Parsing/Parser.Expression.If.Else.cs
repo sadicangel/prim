@@ -1,10 +1,10 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions.ControlFlow;
+using CodeAnalysis.Syntax.ControlFlow;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser
 {
-    private static ElseClauseExpressionSyntax? ParseElseClauseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static ElseClauseSyntax? ParseElseClauseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
     {
         if (!iterator.TryMatch(out var elseKeyword, SyntaxKind.ElseKeyword))
         {
@@ -12,6 +12,6 @@ partial class Parser
         }
 
         var @else = ParseExpression(syntaxTree, iterator);
-        return new ElseClauseExpressionSyntax(syntaxTree, elseKeyword, @else);
+        return new ElseClauseSyntax(syntaxTree, elseKeyword, @else);
     }
 }

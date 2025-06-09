@@ -1,9 +1,11 @@
-﻿namespace CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax.Declarations;
+
+namespace CodeAnalysis.Syntax;
 public sealed record class CompilationUnitSyntax(
     SyntaxTree SyntaxTree,
-    SyntaxList<SyntaxNode> SyntaxNodes,
+    SyntaxList<GlobalDeclarationSyntax> Declarations,
     SyntaxToken EofToken
     ) : SyntaxNode(SyntaxKind.CompilationUnit, SyntaxTree)
 {
-    public override IEnumerable<SyntaxNode> Children() => SyntaxNodes;
+    public override IEnumerable<SyntaxNode> Children() => Declarations;
 }

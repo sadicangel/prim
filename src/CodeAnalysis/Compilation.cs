@@ -1,5 +1,7 @@
 ﻿using System.Collections.Immutable;
+using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Semantic;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
@@ -15,7 +17,7 @@ public sealed class Compilation(ImmutableArray<SourceText> sourceTexts, ParseOpt
 
     public ImmutableArray<SyntaxTree> SyntaxTrees => !field.IsDefault ? field : field = [.. SourceTexts.Select(st => new SyntaxTree(st, ParseOptions))];
 
-    public DiagnosticBag Diagnostics => field ??= new DiagnosticBag(SyntaxTrees.SelectMany(tree => tree.Diagnostics));
+    internal BoundProgram Program => field ??= Binder.Bind(SyntaxTrees);
 
     public Compilation(SourceText sourceText, ParseOptions parseOptions = default, Compilation? previous = null)
         : this([sourceText], parseOptions, previous)

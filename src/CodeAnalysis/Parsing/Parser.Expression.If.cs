@@ -1,5 +1,5 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions.ControlFlow;
+using CodeAnalysis.Syntax.ControlFlow;
 
 namespace CodeAnalysis.Parsing;
 partial class Parser

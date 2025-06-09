@@ -20,7 +20,7 @@ public readonly record struct SourceSpan(SourceText SourceText, Range Range) : I
     public int StartCharacter => Range.Start.Value - SourceText.Lines[StartLine].SourceSpan.Range.Start.Value;
 
     public int EndLine => SourceText.GetLineIndex(Range.End);
-    public int EndCharacter => Range.End.Value - SourceText.Lines[StartLine].SourceSpan.Range.End.Value;
+    public int EndCharacter => Range.End.Value - SourceText.Lines[StartLine].SourceSpan.Range.Start.Value;
 
     public override string ToString() => Text.ToString();
 
@@ -35,6 +35,9 @@ public readonly record struct SourceSpan(SourceText SourceText, Range Range) : I
     {
         Debug.Assert(left.SourceText == right.SourceText, "Cannot combine spans from different source texts.");
 
-        return new SourceSpan(left.SourceText, Math.Min(left.Range.Start.Value, right.Range.Start.Value)..Math.Max(left.Range.End.Value, right.Range.End.Value));
+        var min = Math.Min(left.Range.Start.Value, right.Range.Start.Value);
+        var max = Math.Max(left.Range.End.Value, right.Range.End.Value);
+
+        return new SourceSpan(left.SourceText, min..max);
     }
 }
