@@ -2,12 +2,13 @@
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static EmptyExpressionSyntax ParseEmptyExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static EmptyExpressionSyntax ParseEmptyExpression(SyntaxIterator iterator)
     {
         var semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
 
-        return new EmptyExpressionSyntax(syntaxTree, semicolonToken);
+        return new EmptyExpressionSyntax(semicolonToken);
     }
 }

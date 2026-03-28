@@ -3,18 +3,20 @@
 namespace CodeAnalysis.Syntax.Types;
 
 public sealed record class ArrayTypeSyntax(
-    SyntaxTree SyntaxTree,
     TypeSyntax ElementType,
     SyntaxToken BracketOpenToken,
-    ExpressionSyntax Length,
+    ExpressionSyntax? Length,
     SyntaxToken BracketCloseToken)
-    : TypeSyntax(SyntaxKind.ArrayType, SyntaxTree)
+    : TypeSyntax(SyntaxKind.ArrayType)
 {
+    public ArrayTypeSyntax(TypeSyntax elementType, SyntaxToken bracketOpenToken, SyntaxToken bracketCloseToken)
+        : this(elementType, bracketOpenToken, null, bracketCloseToken) { }
+
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return ElementType;
         yield return BracketOpenToken;
-        yield return Length;
+        if (Length is not null) yield return Length;
         yield return BracketCloseToken;
     }
 }

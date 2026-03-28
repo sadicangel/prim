@@ -1,10 +1,10 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
+
 public sealed record class LiteralExpressionSyntax(
     SyntaxKind SyntaxKind,
-    SyntaxTree SyntaxTree,
     SyntaxToken LiteralToken,
     object InstanceValue)
-    : ExpressionSyntax(SyntaxKind, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

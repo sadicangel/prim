@@ -1,11 +1,10 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions;
+
 public sealed record class GroupExpressionSyntax(
-    SyntaxTree SyntaxTree,
     SyntaxToken ParenthesisOpenToken,
     ExpressionSyntax Expression,
     SyntaxToken ParenthesisCloseToken)
-    : ExpressionSyntax(SyntaxKind.GroupExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.GroupExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

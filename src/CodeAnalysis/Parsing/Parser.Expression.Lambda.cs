@@ -2,36 +2,28 @@
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    public static LambdaExpressionSyntax ParseLambdaExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    public static LambdaExpressionSyntax ParseLambdaExpression(SyntaxIterator iterator)
     {
-        var lambdaKeyword = iterator.Match(SyntaxKind.LambdaKeyword);
         var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
         var parameters = ParseSyntaxList(
-            syntaxTree,
             iterator,
             SyntaxKind.CommaToken,
             [SyntaxKind.ParenthesisCloseToken],
-            static (syntaxTree, iterator) =>
-            {
-                var name = ParseSimpleName(syntaxTree, iterator);
-                var typeClause = ParseTypeClause(syntaxTree, iterator, isOptional: true);
+            ParseSimpleName);
 
-                return new ParameterSyntax(syntaxTree, name, typeClause);
-            });
         var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-        var body = iterator.TryMatch(out var arrowLambdaToken, SyntaxKind.ArrowLambdaToken)
-            ? ParseStatementExpression(syntaxTree, iterator)
-            : ParseBlockExpression(syntaxTree, iterator) as ExpressionSyntax;
+        var equalsGreaterThanToken = iterator.Match(SyntaxKind.EqualsGreaterThanToken);
+        // TODO: This should be block expression or statement expression. Not all.
+        var body = ParseExpressionTerminated(iterator);
 
         return new LambdaExpressionSyntax(
-            syntaxTree,
-            lambdaKeyword,
             parenthesisOpenToken,
             parameters,
             parenthesisCloseToken,
-            arrowLambdaToken,
+            equalsGreaterThanToken,
             body);
     }
 }

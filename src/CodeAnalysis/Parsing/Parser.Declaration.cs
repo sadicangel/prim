@@ -2,13 +2,14 @@
 using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    public static DeclarationSyntax ParseDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator) => iterator.Current.SyntaxKind switch
+    public static DeclarationSyntax ParseDeclaration(SyntaxIterator iterator) => iterator.Current.SyntaxKind switch
     {
         // TODO: Support enum declarations.
-        SyntaxKind.ModuleKeyword => ParseModuleDeclaration(syntaxTree, iterator),
-        SyntaxKind.StructKeyword => ParseStructDeclaration(syntaxTree, iterator),
-        _ => ParseVariableDeclaration(syntaxTree, iterator),
+        SyntaxKind.ModuleKeyword => ParseModuleDeclaration(iterator),
+        SyntaxKind.StructKeyword => ParseStructDeclaration(iterator),
+        _ => ParseVariableDeclaration(iterator),
     };
 }

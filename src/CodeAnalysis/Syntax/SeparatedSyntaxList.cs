@@ -3,7 +3,7 @@
 namespace CodeAnalysis.Syntax;
 
 public readonly record struct SeparatedSyntaxList<T>(ImmutableArray<SyntaxNode> SyntaxNodes)
-    : IEquatable<SeparatedSyntaxList<T>>, IReadOnlyList<T> where T : SyntaxNode
+    : IReadOnlyList<T> where T : SyntaxNode
 {
     public int Count { get => (SyntaxNodes.Length + 1) / 2; }
 

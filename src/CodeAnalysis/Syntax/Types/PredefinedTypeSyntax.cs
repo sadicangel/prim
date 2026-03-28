@@ -1,7 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax.Types;
 
-public sealed record class PredefinedTypeSyntax(SyntaxTree SyntaxTree, SyntaxToken PredefinedTypeToken)
-    : TypeSyntax(SyntaxKind.PredefinedType, SyntaxTree)
+public sealed record class PredefinedTypeSyntax(SyntaxToken PredefinedTypeToken)
+    : TypeSyntax(SyntaxKind.PredefinedType)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

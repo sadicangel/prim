@@ -1,14 +1,9 @@
 ﻿namespace CodeAnalysis.Syntax.Names;
 
-public record class QualifiedNameSyntax(
-    SyntaxTree SyntaxTree,
-    NameSyntax Left,
-    SyntaxToken ColonColonToken,
-    SimpleNameSyntax Right)
-    : NameSyntax(SyntaxKind.QualifiedName, SyntaxTree)
+public record class QualifiedNameSyntax(NameSyntax Left, SyntaxToken ColonColonToken, SimpleNameSyntax Right)
+    : NameSyntax(SyntaxKind.QualifiedName)
 {
     public override string FullName => field ??= string.Join(SyntaxFacts.GetText(SyntaxKind.ColonColonToken), EnumerateNames(this));
-
 
     private static IEnumerable<string> EnumerateNames(NameSyntax name)
     {

@@ -2,16 +2,17 @@
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
-    private static int ScanLineBreak(SyntaxTree syntaxTree, int offset, out SyntaxTrivia trivia)
+    private static int ScanLineBreak(SourceText sourceText, int offset, out SyntaxTrivia trivia)
     {
         var read = 0;
-        if (syntaxTree.SourceText[(offset + read)..] is ['\r', '\n', ..])
+        if (sourceText[(offset + read)..] is ['\r', '\n', ..])
             read++;
         read++;
 
-        trivia = new SyntaxTrivia(SyntaxKind.LineBreakTrivia, syntaxTree, new SourceSpan(syntaxTree.SourceText, offset..(offset + read)));
+        trivia = new SyntaxTrivia(SyntaxKind.LineBreakTrivia, new SourceSpan(sourceText, offset..(offset + read)));
         return read;
     }
 }

@@ -2,11 +2,8 @@
 
 namespace CodeAnalysis.Syntax;
 
-public sealed record class SyntaxTrivia(
-    SyntaxKind SyntaxKind,
-    SyntaxTree SyntaxTree,
-    SourceSpan SourceSpan)
-    : SyntaxNode(SyntaxKind, SyntaxTree)
+public sealed record class SyntaxTrivia(SyntaxKind SyntaxKind, SourceSpan SourceSpan)
+    : SyntaxNode(SyntaxKind)
 {
     public override SourceSpan SourceSpan { get; } = SourceSpan;
 

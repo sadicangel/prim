@@ -1,9 +1,9 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
+﻿using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static ExpressionSyntax ParseExpressionTerminated(SyntaxTree syntaxTree, SyntaxIterator iterator) =>
-        ParseExpression(syntaxTree, iterator, allowUnterminated: false);
+    private static ExpressionSyntax ParseExpressionTerminated(SyntaxIterator iterator) =>
+        ParseExpression(iterator, allowUnterminated: false);
 }

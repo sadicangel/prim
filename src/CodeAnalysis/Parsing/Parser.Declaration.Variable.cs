@@ -2,19 +2,19 @@
 using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    public static VariableDeclarationSyntax ParseVariableDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    public static VariableDeclarationSyntax ParseVariableDeclaration(SyntaxIterator iterator)
     {
-        var varOrLetKeyword = iterator.Match(SyntaxKind.LetKeyword, SyntaxKind.VarKeyword);
-        var name = ParseSimpleName(syntaxTree, iterator);
-        var typeClause = ParseTypeClause(syntaxTree, iterator, isOptional: true);
-        var initClause = ParseInitClause(syntaxTree, iterator, isOptional: true);
+        var bindingKeyword = iterator.Match(SyntaxKind.LetKeyword, SyntaxKind.VarKeyword);
+        var name = ParseSimpleName(iterator);
+        var typeClause = ParseTypeClause(iterator, isOptional: true);
+        var initClause = ParseInitClause(iterator, isOptional: true);
         _ = iterator.TryMatch(out var semicolonToken, SyntaxKind.SemicolonToken);
 
         return new VariableDeclarationSyntax(
-            syntaxTree,
-            varOrLetKeyword,
+            bindingKeyword,
             name,
             typeClause,
             initClause,

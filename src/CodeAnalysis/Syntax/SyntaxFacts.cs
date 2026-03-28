@@ -63,8 +63,8 @@ public static class SyntaxFacts
             SyntaxKind.StarStarEqualsToken => "**=",
             SyntaxKind.TildeToken => "~",
 
-            SyntaxKind.ArrowLambdaToken => "=>",
-            SyntaxKind.ArrowReturnToken => "->",
+            SyntaxKind.EqualsGreaterThanToken => "=>",
+            SyntaxKind.MinusGreaterThanToken => "->",
 
             SyntaxKind.I8LiteralToken => null,
             SyntaxKind.U8LiteralToken => null,
@@ -113,7 +113,6 @@ public static class SyntaxFacts
 
             SyntaxKind.ModuleKeyword => "module",
             SyntaxKind.StructKeyword => "struct",
-            SyntaxKind.LambdaKeyword => "lambda",
             SyntaxKind.LetKeyword => "let",
             SyntaxKind.VarKeyword => "var",
 
@@ -260,7 +259,6 @@ public static class SyntaxFacts
 
             "module" => SyntaxKind.ModuleKeyword,
             "struct" => SyntaxKind.StructKeyword,
-            "lambda" => SyntaxKind.LambdaKeyword,
             "let" => SyntaxKind.LetKeyword,
             "var" => SyntaxKind.VarKeyword,
 

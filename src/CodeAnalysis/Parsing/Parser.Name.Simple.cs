@@ -2,13 +2,14 @@
 using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
     // simple_name = 'identifier'
-    private static SimpleNameSyntax ParseSimpleName(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static SimpleNameSyntax ParseSimpleName(SyntaxIterator iterator)
     {
         var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
 
-        return new SimpleNameSyntax(syntaxTree, identifierToken);
+        return new SimpleNameSyntax(identifierToken);
     }
 }

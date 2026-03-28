@@ -3,20 +3,20 @@ using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
     // qualified_name = simple_name ( "::" name )* ;
-    private static QualifiedNameSyntax ParseQualifiedName(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static QualifiedNameSyntax ParseQualifiedName(SyntaxIterator iterator)
     {
-        NameSyntax left = ParseSimpleName(syntaxTree, iterator);
+        NameSyntax left = ParseSimpleName(iterator);
         do
         {
             var colonColonToken = iterator.Match(SyntaxKind.ColonColonToken);
-            var right = ParseSimpleName(syntaxTree, iterator);
+            var right = ParseSimpleName(iterator);
 
-            left = new QualifiedNameSyntax(syntaxTree, left, colonColonToken, right);
-        }
-        while (iterator.Current.SyntaxKind is SyntaxKind.ColonColonToken);
+            left = new QualifiedNameSyntax(left, colonColonToken, right);
+        } while (iterator.Current.SyntaxKind is SyntaxKind.ColonColonToken);
 
         return Unsafe.As<QualifiedNameSyntax>(left);
     }

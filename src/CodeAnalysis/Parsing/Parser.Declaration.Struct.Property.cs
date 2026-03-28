@@ -2,17 +2,17 @@
 using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxIterator iterator)
     {
-        var name = ParseSimpleName(syntaxTree, iterator);
-        var typeClause = ParseTypeClause(syntaxTree, iterator, isOptional: false);
-        var initClause = ParseInitClause(syntaxTree, iterator, isOptional: true);
+        var name = ParseSimpleName(iterator);
+        var typeClause = ParseTypeClause(iterator, isOptional: false);
+        var initClause = ParseInitClause(iterator, isOptional: true);
         var semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
 
         return new PropertyDeclarationSyntax(
-            syntaxTree,
             name,
             typeClause,
             initClause,

@@ -1,13 +1,13 @@
-﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Declarations;
+﻿using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
-{
-    public static GlobalDeclarationSyntax ParseGlobalDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
-    {
-        var declaration = ParseDeclaration(syntaxTree, iterator);
 
-        return new GlobalDeclarationSyntax(syntaxTree, declaration);
+internal partial class Parser
+{
+    public static GlobalDeclarationSyntax ParseGlobalDeclaration(SyntaxIterator iterator)
+    {
+        var declaration = ParseDeclaration(iterator);
+
+        return new GlobalDeclarationSyntax(declaration);
     }
 }

@@ -2,10 +2,10 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
     private static SeparatedSyntaxList<TNode> ParseSyntaxList<TNode>(
-        SyntaxTree syntaxTree,
         SyntaxIterator iterator,
         SyntaxKind separatorKind,
         ReadOnlySpan<SyntaxKind> endingKinds,
@@ -19,7 +19,7 @@ partial class Parser
         {
             var start = iterator.Current;
 
-            var node = parseNode(syntaxTree, iterator);
+            var node = parseNode(iterator);
             nodes.Add(node);
 
             if (iterator.TryMatch(out var separatorToken, separatorKind))

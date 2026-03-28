@@ -2,11 +2,8 @@
 
 namespace CodeAnalysis.Syntax.Expressions;
 
-public sealed record class TypeClauseSyntax(
-    SyntaxTree SyntaxTree,
-    SyntaxToken ColonToken,
-    TypeSyntax Type)
-    : SyntaxNode(SyntaxKind.TypeClause, SyntaxTree)
+public sealed record class TypeClauseSyntax(SyntaxToken ColonToken, TypeSyntax Type)
+    : SyntaxNode(SyntaxKind.TypeClause)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

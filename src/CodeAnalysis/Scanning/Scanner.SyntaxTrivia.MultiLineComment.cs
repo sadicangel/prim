@@ -3,20 +3,21 @@ using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
-    private static int ScanMultiLineComment(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxTrivia trivia)
+    private static int ScanMultiLineComment(SourceText sourceText, DiagnosticBag diagnostics, int offset, out SyntaxTrivia trivia)
     {
         var done = false;
         // Skip '/*'.
         var read = 2;
         while (!done)
         {
-            switch (syntaxTree.SourceText[(offset + read)..])
+            switch (sourceText[(offset + read)..])
             {
                 case []:
                 case ['\0', ..]:
-                    diagnostics.ReportUnterminatedComment(new SourceSpan(syntaxTree.SourceText, (offset + read)..(offset + read + 2)));
+                    diagnostics.ReportUnterminatedComment(new SourceSpan(sourceText, (offset + read)..(offset + read + 2)));
                     done = true;
                     break;
                 case ['*', '/', ..]:
@@ -29,7 +30,7 @@ partial class Scanner
             }
         }
 
-        trivia = new SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, syntaxTree, new SourceSpan(syntaxTree.SourceText, offset..(offset + read)));
+        trivia = new SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, new SourceSpan(sourceText, offset..(offset + read)));
         return read;
     }
 }

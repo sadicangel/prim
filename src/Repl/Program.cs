@@ -14,17 +14,20 @@ var previousCompilation = default(Compilation);
 
 while (true)
 {
-    var @default = Markup.Escape("""
-        module vec {
-            struct Point {
-                x: i32 = 0;
-                y: i32 = 0;
-            }
+    var @default = Markup.Escape(
+        """
+        module vec;
+
+        struct Point {
+            x: i32 = 0;
+            y: i32 = 0;
         }
 
-        let main: () -> i32 = lambda () {
+        let value: i32 = 0;
+
+        let main: (str[]) -> i32 = (args) => {
             var a = 40;
-            var b = 2;
+            var b = -2;
             let c = a + b;
         }
         """);
@@ -47,7 +50,7 @@ while (true)
 
     var compilation = new Compilation(new SourceText(code), parseOptions, previousCompilation);
 
-    var parseDiagnostics = compilation.SyntaxTrees.Select(x => x.Diagnostics).SelectMany(x => x).ToImmutableArray();
+    var parseDiagnostics = compilation.GetDiagnostics().ToImmutableArray();
 
     if (parseDiagnostics.Length > 0)
     {
@@ -57,12 +60,24 @@ while (true)
             continue;
     }
 
+    console.Clear(true);
+
     foreach (var syntaxTree in compilation.SyntaxTrees)
     {
         console.WriteLine(syntaxTree);
     }
 
-    console.WriteLine(compilation.Program.EntryPoint);
+    var (boundNode, bindDiagnostics) = compilation.Bind(compilation.GlobalModule);
+
+    if (bindDiagnostics.Length > 0)
+    {
+        foreach (var diagnostic in bindDiagnostics)
+            console.WriteLine(diagnostic);
+        if (bindDiagnostics.HasErrorDiagnostics)
+            continue;
+    }
+
+    console.WriteLine(boundNode);
 
     //foreach (var boundTree in compilation.BoundTrees)
     //{

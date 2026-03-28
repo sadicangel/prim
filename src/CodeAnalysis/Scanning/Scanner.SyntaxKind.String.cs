@@ -4,24 +4,25 @@ using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
     // TODO: Support raw strings.
-    private static int ScanString(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
+    private static int ScanString(SourceText sourceText, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
     {
         var builder = new StringBuilder();
         var done = false;
         var read = 1;
         while (!done)
         {
-            var span = syntaxTree.SourceText[(offset + read)..];
+            var span = sourceText[(offset + read)..];
             switch (span)
             {
                 case ['\0', ..]:
                 case ['\r', ..]:
                 case ['\n', ..]:
                 case []:
-                    diagnostics.ReportUnterminatedString(new SourceSpan(syntaxTree.SourceText, offset..(offset + 1)));
+                    diagnostics.ReportUnterminatedString(new SourceSpan(sourceText, offset..(offset + 1)));
                     done = true;
                     break;
                 case ['\\', '"', ..]:

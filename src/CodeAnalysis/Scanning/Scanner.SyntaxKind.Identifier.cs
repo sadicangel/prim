@@ -1,19 +1,20 @@
 ﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
-    private static int ScanIdentifier(SyntaxTree syntaxTree, int position, out SyntaxKind kind, out Range range, out object? value)
+    private static int ScanIdentifier(SourceText sourceText, int position, out SyntaxKind kind, out Range range, out object? value)
     {
         var read = 0;
         do
         {
             read++;
-        }
-        while (IsValid(syntaxTree.SourceText[position + read]));
+        } while (IsValid(sourceText[position + read]));
 
         range = position..(position + read);
-        kind = SyntaxFacts.GetKeywordKind(syntaxTree.SourceText[range]);
+        kind = SyntaxFacts.GetKeywordKind(sourceText[range]);
         value = kind switch
         {
             SyntaxKind.TrueKeyword => true,

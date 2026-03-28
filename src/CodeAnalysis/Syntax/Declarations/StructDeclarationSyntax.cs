@@ -3,13 +3,12 @@
 namespace CodeAnalysis.Syntax.Declarations;
 
 public sealed record class StructDeclarationSyntax(
-    SyntaxTree SyntaxTree,
     SyntaxToken StructKeyword,
     SimpleNameSyntax Name,
     SyntaxToken BraceOpenToken,
     SyntaxList<PropertyDeclarationSyntax> Properties,
     SyntaxToken BraceCloseToken)
-    : DeclarationSyntax(SyntaxKind.StructDeclaration, SyntaxTree)
+    : DeclarationSyntax(SyntaxKind.StructDeclaration)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

@@ -2,19 +2,19 @@
 using CodeAnalysis.Syntax.ControlFlow;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static IfExpressionSyntax ParseIfElseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static IfExpressionSyntax ParseIfElseExpression(SyntaxIterator iterator)
     {
         var ifKeyword = iterator.Match(SyntaxKind.IfKeyword);
         var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
-        var condition = ParseExpression(syntaxTree, iterator);
+        var condition = ParseExpression(iterator);
         var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-        var then = ParseExpression(syntaxTree, iterator);
-        var elseClause = ParseElseClauseExpression(syntaxTree, iterator);
+        var then = ParseExpression(iterator);
+        var elseClause = ParseElseClauseExpression(iterator);
 
         return new IfExpressionSyntax(
-            syntaxTree,
             ifKeyword,
             parenthesisOpenToken,
             condition,

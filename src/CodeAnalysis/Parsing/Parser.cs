@@ -1,37 +1,37 @@
-﻿using System.Collections.Immutable;
-using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Scanning;
+﻿using CodeAnalysis.Scanning;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax.Declarations;
+using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Parsing;
 
-internal sealed record class ParseResult(CompilationUnitSyntax CompilationUnit, ImmutableArray<Diagnostic> Diagnostics);
-
 internal static partial class Parser
 {
-    private delegate T ParseDelegate<out T>(SyntaxTree syntaxTree, SyntaxIterator iterator) where T : SyntaxNode;
-    private delegate T? ParseOptionalDelegate<out T>(SyntaxTree syntaxTree, SyntaxIterator iterator) where T : SyntaxNode;
+    private delegate T ParseDelegate<out T>(SyntaxIterator iterator) where T : SyntaxNode;
 
-    internal static ParseResult Parse(SyntaxTree syntaxTree)
+    private delegate T? ParseOptionalDelegate<out T>(SyntaxIterator iterator) where T : SyntaxNode;
+
+    internal static Result<CompilationUnitSyntax> Parse(SourceText sourceText)
     {
-        var diagnostics = new DiagnosticBag();
-
-        var tokens = Scanner.Scan(syntaxTree, diagnostics).ToArray();
-        if (tokens.Length == 0)
+        var (syntaxTokens, scanDiagnostics) = Scanner.Scan(sourceText);
+        if (syntaxTokens.Length == 0)
         {
-            return new ParseResult(
-                new CompilationUnitSyntax(syntaxTree, [], SyntaxToken.CreateSynthetic(SyntaxKind.EofToken, syntaxTree)),
-                []);
+            return new Result<CompilationUnitSyntax>(
+                new CompilationUnitSyntax(null, [], SyntaxToken.CreateSynthetic(SyntaxKind.EofToken)),
+                scanDiagnostics);
         }
 
-        var iterator = new SyntaxIterator(tokens, diagnostics);
+        var iterator = new SyntaxIterator(sourceText, syntaxTokens);
 
-        var declarations = ParseSyntaxList(syntaxTree, iterator, [], ParseGlobalDeclaration);
-
+        // TODO: Maybe factor out module declaration?
+        var all = ParseSyntaxList(iterator, [], ParseGlobalDeclaration);
+        var module = all.SingleOrDefault(x => x.Declaration is ModuleDeclarationSyntax)?.Declaration as ModuleDeclarationSyntax;
+        var declarations = new SyntaxList<GlobalDeclarationSyntax>([.. all.Where(x => x.Declaration is not ModuleDeclarationSyntax)]);
         var eofToken = iterator.Match(SyntaxKind.EofToken);
 
-        var compilationUnit = new CompilationUnitSyntax(syntaxTree, declarations, eofToken);
 
-        return new ParseResult(compilationUnit, [.. diagnostics]);
+        return new Result<CompilationUnitSyntax>(
+            new CompilationUnitSyntax(module, declarations, eofToken),
+            [.. scanDiagnostics, .. iterator.Diagnostics]);
     }
 }

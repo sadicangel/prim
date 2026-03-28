@@ -1,48 +1,35 @@
-﻿using CodeAnalysis.Semantic;
+﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Semantic;
 using CodeAnalysis.Semantic.Symbols;
-using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Declarations;
+using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Binding;
 
-internal static partial class Binder
+internal abstract class Binder(Binder? parent) : ISymbolScope, IDiagnosticReporter
 {
-    public static BoundProgram Bind(IEnumerable<SyntaxTree> syntaxTrees)
+    private readonly DiagnosticBag _diagnostics = parent?._diagnostics ?? [];
+
+    protected Binder? Parent => parent;
+
+    public abstract ModuleSymbol Module { get; }
+
+    /// <inheritdoc />
+    public abstract bool TryDeclare(Symbol symbol);
+
+    /// <inheritdoc />
+    public virtual bool TryLookup<TSymbol>(string name, [MaybeNullWhen(false)] out TSymbol symbol) where TSymbol : Symbol
     {
-        var globalModule = SymbolFactory.CreateGlobalModule();
-
-        var context = new BindingContext(globalModule, []);
-
-        foreach (var declaration in syntaxTrees.SelectMany(tree => tree.CompilationUnit.Declarations.OfType<GlobalDeclarationSyntax>()))
-        {
-            DeclarePass1Global(declaration, context);
-        }
-
-        foreach (var declaration in syntaxTrees.SelectMany(tree => tree.CompilationUnit.Declarations.OfType<GlobalDeclarationSyntax>()))
-        {
-            DeclarePass2Global(declaration, context);
-        }
-
-        var entryPoint = globalModule.FindEntryPoint() ?? throw new NotImplementedException("entry point"); // TODO: Emit diagnostic
-
-        return new BoundProgram(entryPoint, context.Diagnostics);
+        if (TryLookupInCurrentScope(name, out symbol)) return true;
+        return parent?.TryLookup(name, out symbol) is true;
     }
 
-    private static VariableSymbol? FindEntryPoint(this Symbol symbol)
-    {
-        return symbol switch
-        {
-            ModuleSymbol module => module.Members.Select(FindEntryPoint).FirstOrDefault(x => x is not null),
-            VariableSymbol variable when IsEntryPoint(variable) => variable,
-            _ => null,
-        };
+    protected abstract bool TryLookupInCurrentScope<TSymbol>(string name, [MaybeNullWhen(false)] out TSymbol symbol) where TSymbol : Symbol;
 
-        static bool IsEntryPoint(VariableSymbol variable)
-        {
-            return variable is not null
-                && variable.Name == "main"
-                && variable.Type is LambdaSymbol lambda
-                && lambda.ReturnType == variable.ContainingModule.I32;
-        }
-    }
+    /// <inheritdoc />
+    public IEnumerable<Diagnostic> GetDiagnostics() => _diagnostics;
+
+    /// <inheritdoc />
+    public void Report(SourceSpan sourceSpan, DiagnosticSeverity severity, string message) =>
+        _diagnostics.Report(sourceSpan, severity, message);
 }

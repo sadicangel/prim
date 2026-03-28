@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace CodeAnalysis.Text;
-public readonly record struct SourceSpan(SourceText SourceText, Range Range) : IReadOnlyList<char>
+
+public readonly record struct SourceSpan(SourceText SourceText, Range Range)
 {
     public char this[Index index] => SourceText[Range][index];
     public char this[int index] => SourceText[Range][index];
     public ReadOnlySpan<char> this[Range range] => SourceText[Range][range];
 
     public int Length => Range.End.Value - Range.Start.Value;
-    int IReadOnlyCollection<char>.Count => Length;
-
-    public readonly ReadOnlySpan<char> Text => SourceText.Text.AsSpan(Range);
 
     public string FileName { get => SourceText.FileName; }
     public string FilePath { get => SourceText.FilePath; }
@@ -22,14 +19,7 @@ public readonly record struct SourceSpan(SourceText SourceText, Range Range) : I
     public int EndLine => SourceText.GetLineIndex(Range.End);
     public int EndCharacter => Range.End.Value - SourceText.Lines[StartLine].SourceSpan.Range.Start.Value;
 
-    public override string ToString() => Text.ToString();
-
-    public IEnumerator<char> GetEnumerator()
-    {
-        foreach (var @char in this)
-            yield return @char;
-    }
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public override string ToString() => SourceText[Range].ToString();
 
     public static SourceSpan Union(SourceSpan left, SourceSpan right)
     {

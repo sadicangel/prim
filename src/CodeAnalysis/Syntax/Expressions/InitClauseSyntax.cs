@@ -1,9 +1,7 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class InitClauseSyntax(
-    SyntaxTree SyntaxTree,
-    SyntaxToken EqualsToken,
-    ExpressionSyntax Expression)
-    : SyntaxNode(SyntaxKind.InitClause, SyntaxTree)
+
+public sealed record class InitClauseSyntax(SyntaxToken EqualsToken, ExpressionSyntax Expression)
+    : SyntaxNode(SyntaxKind.InitClause)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

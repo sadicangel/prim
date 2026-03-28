@@ -1,10 +1,10 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
+
 public sealed record class BlockExpressionSyntax(
-    SyntaxTree SyntaxTree,
     SyntaxToken BraceOpenToken,
     SyntaxList<ExpressionSyntax> Expressions,
     SyntaxToken BraceCloseToken)
-    : ExpressionSyntax(SyntaxKind.BlockExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.BlockExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

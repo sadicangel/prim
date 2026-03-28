@@ -1,7 +1,7 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class EmptyExpressionSyntax(SyntaxTree SyntaxTree, SyntaxToken SemicolonToken)
-    : ExpressionSyntax(SyntaxKind.EmptyExpression, SyntaxTree)
+﻿namespace CodeAnalysis.Syntax.Expressions;
+
+public sealed record class EmptyExpressionSyntax(SyntaxToken SemicolonToken)
+    : ExpressionSyntax(SyntaxKind.EmptyExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

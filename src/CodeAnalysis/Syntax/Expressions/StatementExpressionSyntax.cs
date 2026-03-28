@@ -1,10 +1,7 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
-public sealed record class StatementExpressionSyntax(
-    SyntaxTree SyntaxTree,
-    ExpressionSyntax Expression,
-    SyntaxToken SemicolonToken)
-    : ExpressionSyntax(SyntaxKind.StatementExpression, SyntaxTree)
+﻿namespace CodeAnalysis.Syntax.Expressions;
+
+public sealed record class StatementExpressionSyntax(ExpressionSyntax Expression, SyntaxToken SemicolonToken)
+    : ExpressionSyntax(SyntaxKind.StatementExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

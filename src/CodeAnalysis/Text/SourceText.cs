@@ -1,4 +1,5 @@
 ﻿namespace CodeAnalysis.Text;
+
 public sealed record class SourceText(string Text, string FilePath)
 {
     public static SourceText Empty { get; } = new(string.Empty, string.Empty);
@@ -69,15 +70,15 @@ public sealed record class SourceText(string Text, string FilePath)
             }
             else
             {
-                lines.Add(new SourceLine(new(this, lineStart..position), new(this, lineStart..(position + lineBreakWidth))));
+                lines.Add(new SourceLine(new SourceSpan(this, lineStart..position), new SourceSpan(this, lineStart..(position + lineBreakWidth))));
                 position += lineBreakWidth;
                 lineStart = position;
             }
         }
 
         if (position >= lineStart)
-            lines.Add(new SourceLine(new(this, lineStart..position), new(this, lineStart..position)));
+            lines.Add(new SourceLine(new SourceSpan(this, lineStart..position), new SourceSpan(this, lineStart..position)));
 
-        return new(lines);
+        return new ReadOnlyList<SourceLine>(lines);
     }
 }

@@ -1,11 +1,10 @@
-﻿
-namespace CodeAnalysis.Syntax.Expressions;
+﻿namespace CodeAnalysis.Syntax.Expressions;
+
 public sealed record class ArrayInitializerExpressionSyntax(
-    SyntaxTree SyntaxTree,
     SyntaxToken BracketOpenToken,
     SeparatedSyntaxList<ExpressionSyntax> Elements,
     SyntaxToken BracketCloseToken)
-    : ExpressionSyntax(SyntaxKind.ArrayExpression, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind.ArrayExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

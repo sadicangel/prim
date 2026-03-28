@@ -1,14 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
+using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Parsing;
 
-internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens, DiagnosticBag Diagnostics)
+internal record class SyntaxIterator(SourceText SourceText, IReadOnlyList<SyntaxToken> Tokens)
 {
     private const int MaxSuccessiveMatchTokenErrors = 1;
 
     private int _successiveMatchTokenErrors = 0;
+
+    public DiagnosticBag Diagnostics { get; } = [];
 
     public int Offset { get; private set; }
 
@@ -56,11 +59,13 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens, Diagnost
 
         foreach (var syntaxKind in syntaxKinds)
         {
-            if (TryMatch(out var token, syntaxKind))
+            if (!TryMatch(out var token, syntaxKind))
             {
-                _successiveMatchTokenErrors = 0;
-                return token;
+                continue;
             }
+
+            _successiveMatchTokenErrors = 0;
+            return token;
         }
 
         if (_successiveMatchTokenErrors++ < MaxSuccessiveMatchTokenErrors)
@@ -68,11 +73,51 @@ internal record class SyntaxIterator(IReadOnlyList<SyntaxToken> Tokens, Diagnost
             Diagnostics.ReportUnexpectedToken(syntaxKinds[0], Current);
         }
 
-        var syntheticToken = SyntaxToken.CreateSynthetic(syntaxKinds[0], Current.SyntaxTree, Offset..(Offset + 1));
+        var syntheticToken = SyntaxToken.CreateSynthetic(syntaxKinds[0]);
 
         // Avoid overflowing the stack.
         ++Offset;
 
         return syntheticToken;
+    }
+
+    public bool Skip(int count = 1)
+    {
+        var offset = Offset + count;
+        if (offset >= Tokens.Count) return false;
+        Offset = offset;
+        return true;
+    }
+
+    public bool SkipUntil(SyntaxKind syntaxKind)
+    {
+        while (Current.SyntaxKind != syntaxKind)
+        {
+            if (!Skip()) return false;
+        }
+
+        return true;
+    }
+
+    public bool IsLambdaExpressionAhead()
+    {
+        using var checkpoint = new Checkpoint(this);
+        if (Current.SyntaxKind == SyntaxKind.ParenthesisOpenToken && SkipUntil(SyntaxKind.ParenthesisCloseToken))
+        {
+            Skip();
+            return Current.SyntaxKind == SyntaxKind.EqualsGreaterThanToken;
+        }
+
+        return false;
+    }
+
+    private readonly ref struct Checkpoint(SyntaxIterator iterator) : IDisposable
+    {
+        private readonly int _offset = iterator.Offset;
+
+        public void Dispose()
+        {
+            iterator.Offset = _offset;
+        }
     }
 }

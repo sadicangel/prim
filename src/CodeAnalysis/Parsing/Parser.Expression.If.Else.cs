@@ -2,16 +2,17 @@
 using CodeAnalysis.Syntax.ControlFlow;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static ElseClauseSyntax? ParseElseClauseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static ElseClauseSyntax? ParseElseClauseExpression(SyntaxIterator iterator)
     {
         if (!iterator.TryMatch(out var elseKeyword, SyntaxKind.ElseKeyword))
         {
             return null;
         }
 
-        var @else = ParseExpression(syntaxTree, iterator);
-        return new ElseClauseSyntax(syntaxTree, elseKeyword, @else);
+        var @else = ParseExpression(iterator);
+        return new ElseClauseSyntax(elseKeyword, @else);
     }
 }

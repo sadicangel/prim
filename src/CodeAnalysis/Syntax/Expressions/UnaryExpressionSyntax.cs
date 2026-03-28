@@ -1,10 +1,10 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
+
 public sealed record class UnaryExpressionSyntax(
     SyntaxKind SyntaxKind,
-    SyntaxTree SyntaxTree,
     SyntaxToken OperatorToken,
     ExpressionSyntax Operand)
-    : ExpressionSyntax(SyntaxKind, SyntaxTree)
+    : ExpressionSyntax(SyntaxKind)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

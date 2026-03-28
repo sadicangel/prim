@@ -3,6 +3,7 @@ using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Declarations;
+
 internal sealed record class BoundVariableDeclaration(
     SyntaxNode Syntax,
     VariableSymbol VariableSymbol,

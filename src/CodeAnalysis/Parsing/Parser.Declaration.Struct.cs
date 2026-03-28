@@ -2,22 +2,22 @@
 using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static StructDeclarationSyntax ParseStructDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static StructDeclarationSyntax ParseStructDeclaration(SyntaxIterator iterator)
     {
         var structKeyword = iterator.Match(SyntaxKind.StructKeyword);
-        var name = ParseSimpleName(syntaxTree, iterator);
+        var name = ParseSimpleName(iterator);
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
-        var members = ParseSyntaxList(syntaxTree, iterator, [SyntaxKind.BraceCloseToken], ParsePropertyDeclaration);
+        var properties = ParseSyntaxList(iterator, [SyntaxKind.BraceCloseToken], ParsePropertyDeclaration);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
         return new StructDeclarationSyntax(
-            syntaxTree,
             structKeyword,
             name,
             braceOpenToken,
-            members,
+            properties,
             braceCloseToken);
     }
 }

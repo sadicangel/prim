@@ -23,7 +23,7 @@ internal abstract record class TypeSymbol(
         return this switch
         {
             ArraySymbol t => predicate(t.ElementType),
-            LambdaSymbol t => predicate(t.ReturnType),
+            LambdaSymbol t => predicate(t.ReturnType), // TODO: This is wrong!
             PointerSymbol t => predicate(t.ElementType),
             StructSymbol t => predicate(t),
             UnionSymbol t => t.Types.Any(predicate),

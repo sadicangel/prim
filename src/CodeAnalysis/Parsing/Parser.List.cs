@@ -2,10 +2,10 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
     private static SyntaxList<TNode> ParseSyntaxList<TNode>(
-        SyntaxTree syntaxTree,
         SyntaxIterator iterator,
         ReadOnlySpan<SyntaxKind> endingKinds,
         ParseDelegate<TNode> parseNode)
@@ -17,7 +17,7 @@ partial class Parser
         {
             var start = iterator.Current;
 
-            nodes.Add(parseNode(syntaxTree, iterator));
+            nodes.Add(parseNode(iterator));
 
             // No tokens consumed. Skip the current token to avoid infinite loop.
             // No need to report any extra error as parse methods already failed.

@@ -2,12 +2,13 @@
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
     // binary_expression = unary-expression (binary-operator binary_expression)*
-    private static ExpressionSyntax ParseBinaryExpression(SyntaxTree syntaxTree, SyntaxIterator iterator, int? parentPrecedence = null)
+    private static ExpressionSyntax ParseBinaryExpression(SyntaxIterator iterator, int? parentPrecedence = null)
     {
-        var left = ParseUnaryExpression(syntaxTree, iterator, parentPrecedence);
+        var left = ParseUnaryExpression(iterator, parentPrecedence);
 
 begin:
         switch (iterator.Current.SyntaxKind)
@@ -16,8 +17,8 @@ begin:
                 {
                     var operatorToken = iterator.Match();
                     var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(operatorToken.SyntaxKind);
-                    var right = ParseBinaryExpression(syntaxTree, iterator, binaryPrecedence);
-                    left = new BinaryExpressionSyntax(syntaxKind, syntaxTree, left, operatorToken, right);
+                    var right = ParseBinaryExpression(iterator, binaryPrecedence);
+                    left = new BinaryExpressionSyntax(syntaxKind, left, operatorToken, right);
                 }
                 goto begin;
         }

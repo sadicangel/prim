@@ -3,10 +3,9 @@
 namespace CodeAnalysis.Syntax.ControlFlow;
 
 public sealed record class ElseClauseSyntax(
-    SyntaxTree SyntaxTree,
     SyntaxToken ElseKeyword,
     ExpressionSyntax Else)
-    : SyntaxNode(SyntaxKind.ElseClause, SyntaxTree)
+    : SyntaxNode(SyntaxKind.ElseClause)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

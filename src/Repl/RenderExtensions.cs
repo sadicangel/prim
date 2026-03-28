@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic;
+using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Syntax;
 using Spectre.Console;
 
 namespace Repl;
+
 internal static class RenderExtensions
 {
     private static void Indent(IAnsiConsole console, int indent, string indentString = "  ")
@@ -127,159 +129,156 @@ internal static class RenderExtensions
     //    console.WriteLine();
     //}
 
-    public static void Write(this IAnsiConsole console, Diagnostic diagnostic)
+    extension(IAnsiConsole console)
     {
-        var fileName = diagnostic.SourceSpan.FileName;
-        var startLine = diagnostic.SourceSpan.StartLine + 1;
-        var startCharacter = diagnostic.SourceSpan.StartCharacter + 1;
-        var endLine = diagnostic.SourceSpan.EndLine + 1;
-        var endCharacter = diagnostic.SourceSpan.EndCharacter + 1;
-
-        var span = diagnostic.SourceSpan.Range;
-        var lineIndex = diagnostic.SourceSpan.SourceText.GetLineIndex(span.Start);
-        var line = diagnostic.SourceSpan.SourceText.Lines[lineIndex];
-
-        var colour = diagnostic.Severity switch
+        public void Write(Diagnostic diagnostic)
         {
-            DiagnosticSeverity.Error => "red",
-            DiagnosticSeverity.Warning => "gold3",
-            DiagnosticSeverity.Information => "darkslategray3",
-            _ => throw new UnreachableException($"Unexpected {nameof(DiagnosticSeverity)} '{diagnostic.Severity}'"),
-        };
+            var fileName = diagnostic.SourceSpan.FileName;
+            var startLine = diagnostic.SourceSpan.StartLine + 1;
+            var startCharacter = diagnostic.SourceSpan.StartCharacter + 1;
+            var endLine = diagnostic.SourceSpan.EndLine + 1;
+            var endCharacter = diagnostic.SourceSpan.EndCharacter + 1;
 
-        var prefixSpan = new Range(line.SourceSpan.Range.Start, span.Start);
-        var suffixSpan = new Range(span.End, line.SourceSpan.Range.End);
+            var span = diagnostic.SourceSpan.Range;
+            var lineIndex = diagnostic.SourceSpan.SourceText.GetLineIndex(span.Start);
+            var line = diagnostic.SourceSpan.SourceText.Lines[lineIndex];
 
-        var prefix = diagnostic.SourceSpan.SourceText[prefixSpan];
-        var highlight = diagnostic.SourceSpan.SourceText[span];
-        var suffix = diagnostic.SourceSpan.SourceText[suffixSpan];
-
-        var underline = string.Empty;
-        if (startLine == endLine)
-        {
-            underline = string.Create(diagnostic.SourceSpan.StartCharacter + highlight.Length, diagnostic.SourceSpan.StartCharacter, static (span, start) =>
+            var colour = diagnostic.Severity switch
             {
-                span[..start].Fill(' ');
-                span[start..].Fill('^');
-            });
-        }
-
-        console.MarkupInterpolated($"""
-            [{colour}]{Markup.Escape(fileName)}({startLine},{startCharacter},{endLine},{endCharacter}): {Markup.Escape(diagnostic.Message)}[/]
-                {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
-                {underline}
-            """);
-    }
-
-    public static void WriteLine(this IAnsiConsole console, Diagnostic diagnostic)
-    {
-        console.Write(diagnostic);
-        console.WriteLine();
-    }
-
-    public static void Write(this IAnsiConsole console, SyntaxTree syntaxTree)
-    {
-        var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.SyntaxKind}[/]")
-            .Style("dim white");
-
-        WriteTo(syntaxTree.CompilationUnit, tree);
-
-        console.Write(new Panel(tree).Header(nameof(SyntaxTree)));
-
-        static void WriteTo(SyntaxNode syntaxNode, IHasTreeNodes treeNode)
-        {
-            foreach (var child in syntaxNode.Children())
-            {
-                switch (child)
-                {
-                    case SyntaxToken token:
-                        foreach (var trivia in token.LeadingTrivia)
-                            treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
-                        if (token.Value is not null)
-                            treeNode.AddNode($"[green3]{token.SyntaxKind}[/] {FormatLiteral(token)}");
-                        else
-                            treeNode.AddNode($"[green3]{token.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(token.SourceSpan.ToString())}[/]");
-                        foreach (var trivia in token.TrailingTrivia)
-                            treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
-                        break;
-
-                    //case TypeSyntax type:
-                    //    WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(type.Text.ToString())}[/]"));
-                    //    // $"{base.Name}: {Type.Name}"
-                    //    break;
-
-                    case SyntaxNode node:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{node.SyntaxKind}[/]"));
-                        break;
-
-                    default:
-                        throw new NotImplementedException(child.GetType().Name);
-                }
-            }
-        }
-
-        static string FormatLiteral(SyntaxToken token)
-        {
-            return token.SyntaxKind switch
-            {
-                >= SyntaxKind.I8LiteralToken and <= SyntaxKind.F64LiteralToken => $"[gold3]{token.Value}[/]",
-                SyntaxKind.StrLiteralToken => $"[darkorange3]\"{Markup.Escape(token.Value?.ToString() ?? "")}\"[/]",
-                SyntaxKind.TrueKeyword or
-                SyntaxKind.FalseKeyword or
-                SyntaxKind.NullKeyword => $"[blue3_1]{token.Value}[/]",
-                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{token.SyntaxKind}'"),
+                DiagnosticSeverity.Error => "red",
+                DiagnosticSeverity.Warning => "gold3",
+                DiagnosticSeverity.Information => "darkslategray3",
+                _ => throw new UnreachableException($"Unexpected {nameof(DiagnosticSeverity)} '{diagnostic.Severity}'"),
             };
-        }
-    }
 
-    public static void WriteLine(this IAnsiConsole console, SyntaxTree syntaxTree)
-    {
-        console.Write(syntaxTree);
-        console.WriteLine();
-    }
+            var prefixSpan = new Range(line.SourceSpan.Range.Start, span.Start);
+            var suffixSpan = new Range(span.End, line.SourceSpan.Range.End);
 
-    public static void Write(this IAnsiConsole console, BoundNode boundNode)
-    {
-        var tree = new Tree($"[aqua]{boundNode.BoundKind}[/]")
-            .Style("dim white");
+            var prefix = diagnostic.SourceSpan.SourceText[prefixSpan];
+            var highlight = diagnostic.SourceSpan.SourceText[span];
+            var suffix = diagnostic.SourceSpan.SourceText[suffixSpan];
 
-        WriteTo(boundNode, tree);
-
-        console.Write(new Panel(tree).Header(boundNode.BoundKind.ToString()));
-
-        static void WriteTo(BoundNode boundNode, IHasTreeNodes treeNode)
-        {
-            foreach (var child in boundNode.Children())
+            var underline = string.Empty;
+            if (startLine == endLine)
             {
-                switch (child)
+                underline = string.Create(
+                    diagnostic.SourceSpan.StartCharacter + highlight.Length,
+                    diagnostic.SourceSpan.StartCharacter,
+                    static (span, start) =>
+                    {
+                        span[..start].Fill(' ');
+                        span[start..].Fill('^');
+                    });
+            }
+
+            console.MarkupInterpolated(
+                $"""
+                [{colour}]{Markup.Escape(fileName)}({startLine},{startCharacter},{endLine},{endCharacter}): {Markup.Escape(diagnostic.Message)}[/]
+                    {prefix.ToString()}[{colour}]{highlight.ToString()}[/]{suffix.ToString()}
+                    {underline}
+                """);
+        }
+
+        public void WriteLine(Diagnostic diagnostic)
+        {
+            console.Write(diagnostic);
+            console.WriteLine();
+        }
+
+        public void Write(SyntaxTree syntaxTree)
+        {
+            var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.SyntaxKind}[/]")
+                .Style("dim white");
+
+            WriteTo(syntaxTree.CompilationUnit, tree);
+
+            console.Write(new Panel(tree).Header(nameof(SyntaxTree)));
+
+            static void WriteTo(SyntaxNode syntaxNode, IHasTreeNodes treeNode)
+            {
+                foreach (var child in syntaxNode.Children())
                 {
-                    //case Symbol symbol:
-                    //    WriteTo(child, treeNode.AddNode($"[gold3]{symbol.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(symbol.ToString())}[/]"));
-                    //    break;
+                    switch (child)
+                    {
+                        case SyntaxToken token:
+                            foreach (var trivia in token.LeadingTrivia)
+                                treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
+                            if (token.Value is not null)
+                                treeNode.AddNode($"[green3]{token.SyntaxKind}[/] {FormatLiteral(token)}");
+                            else
+                                treeNode.AddNode($"[green3]{token.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(token.SourceSpan.ToString())}[/]");
+                            foreach (var trivia in token.TrailingTrivia)
+                                treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
+                            break;
 
-                    //case BoundExpression expression when expression.ConstValue is not null:
-                    //    WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] ({expression.ConstValue}) [darkseagreen2 i]{expression.Type}[/]"));
-                    //    break;
+                        //case TypeSyntax type:
+                        //    WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(type.Text.ToString())}[/]"));
+                        //    // $"{base.Name}: {Type.Name}"
+                        //    break;
 
-                    case BoundExpression expression:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"));
-                        break;
+                        case SyntaxNode node:
+                            WriteTo(child, treeNode.AddNode($"[aqua]{node.SyntaxKind}[/]"));
+                            break;
 
-                    case BoundNode node:
-                        WriteTo(child, treeNode.AddNode($"[aqua]{child.BoundKind}[/]"));
-                        break;
+                        default:
+                            throw new NotImplementedException(child.GetType().Name);
+                    }
+                }
+            }
 
-                    default:
-                        throw new NotImplementedException(child.GetType().Name);
+            static string FormatLiteral(SyntaxToken token)
+            {
+                return token.SyntaxKind switch
+                {
+                    >= SyntaxKind.I8LiteralToken and <= SyntaxKind.F64LiteralToken => $"[gold3]{token.Value}[/]",
+                    SyntaxKind.StrLiteralToken => $"[darkorange3]\"{Markup.Escape(token.Value?.ToString() ?? "")}\"[/]",
+                    SyntaxKind.TrueKeyword or
+                        SyntaxKind.FalseKeyword or
+                        SyntaxKind.NullKeyword => $"[blue3_1]{token.Value}[/]",
+                    _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{token.SyntaxKind}'"),
+                };
+            }
+        }
+
+        public void WriteLine(SyntaxTree syntaxTree)
+        {
+            console.Write(syntaxTree);
+            console.WriteLine();
+        }
+
+        public void Write(BoundNode boundNode)
+        {
+            var tree = new Tree("BoundNode")
+                .Style("dim white");
+
+            WriteTo(boundNode, tree);
+
+            console.Write(new Panel(tree).Header(boundNode.BoundKind.ToString()));
+
+            static void WriteTo(BoundNode boundNode, IHasTreeNodes treeNode)
+            {
+                treeNode = boundNode switch
+                {
+                    BoundVariableDeclaration declaration =>
+                        treeNode.AddNode($"[aqua]{declaration.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(declaration.VariableSymbol.Name)}[/]"),
+                    BoundExpression expression =>
+                        treeNode.AddNode($"[aqua]{expression.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"),
+                    _ =>
+                        treeNode.AddNode($"[aqua]{boundNode.BoundKind}[/]")
+                };
+
+                foreach (var child in boundNode.Children())
+                {
+                    WriteTo(child, treeNode);
                 }
             }
         }
-    }
 
-    public static void WriteLine(this IAnsiConsole console, BoundNode boundNode)
-    {
-        console.Write(boundNode);
-        console.WriteLine();
+        public void WriteLine(BoundNode boundNode)
+        {
+            console.Write(boundNode);
+            console.WriteLine();
+        }
     }
 
     //public static void Write(this IAnsiConsole console, ScopeSymbol scope)

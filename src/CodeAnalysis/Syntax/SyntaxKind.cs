@@ -1,4 +1,5 @@
 ﻿namespace CodeAnalysis.Syntax;
+
 public enum SyntaxKind
 {
     InvalidSyntax,
@@ -72,8 +73,8 @@ public enum SyntaxKind
     StarStarEqualsToken,
     TildeToken,
 
-    ArrowLambdaToken,
-    ArrowReturnToken,
+    EqualsGreaterThanToken,
+    MinusGreaterThanToken,
 
     AsKeyword,
     IfKeyword,
@@ -109,7 +110,6 @@ public enum SyntaxKind
 
     ModuleKeyword,
     StructKeyword,
-    LambdaKeyword,
     LetKeyword,
     VarKeyword,
 

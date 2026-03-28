@@ -2,18 +2,18 @@
 using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Syntax.Declarations;
+
 public sealed record class VariableDeclarationSyntax(
-    SyntaxTree SyntaxTree,
-    SyntaxToken LetOrVarKeyword,
+    SyntaxToken BindingKeyword,
     SimpleNameSyntax Name,
     TypeClauseSyntax? TypeClause,
     InitClauseSyntax? InitClause,
     SyntaxToken? SemicolonToken)
-    : DeclarationSyntax(SyntaxKind.VariableDeclaration, SyntaxTree)
+    : DeclarationSyntax(SyntaxKind.VariableDeclaration)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return LetOrVarKeyword;
+        yield return BindingKeyword;
         yield return Name;
         if (TypeClause is not null)
             yield return TypeClause;

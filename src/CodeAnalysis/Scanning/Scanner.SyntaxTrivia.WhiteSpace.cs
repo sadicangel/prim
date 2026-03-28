@@ -2,15 +2,16 @@
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
-    private static int ScanWhiteSpace(SyntaxTree syntaxTree, int position, out SyntaxTrivia trivia)
+    private static int ScanWhiteSpace(SourceText sourceText, int position, out SyntaxTrivia trivia)
     {
         var done = false;
         var read = 0;
         while (!done)
         {
-            switch (syntaxTree.SourceText[(position + read)..])
+            switch (sourceText[(position + read)..])
             {
                 case []:
                 case ['\0' or '\r' or '\n', ..]:
@@ -23,7 +24,7 @@ partial class Scanner
             }
         }
 
-        trivia = new SyntaxTrivia(SyntaxKind.WhiteSpaceTrivia, syntaxTree, new SourceSpan(syntaxTree.SourceText, position..(position + read)));
+        trivia = new SyntaxTrivia(SyntaxKind.WhiteSpaceTrivia, new SourceSpan(sourceText, position..(position + read)));
         return read;
     }
 }

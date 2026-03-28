@@ -2,12 +2,12 @@
 
 internal sealed class NaturalSortStringComparer(StringComparison comparison) : IComparer<string>
 {
-    public static NaturalSortStringComparer Ordinal { get; } = new NaturalSortStringComparer(StringComparison.Ordinal);
-    public static NaturalSortStringComparer OrdinalIgnoreCase { get; } = new NaturalSortStringComparer(StringComparison.OrdinalIgnoreCase);
-    public static NaturalSortStringComparer CurrentCulture { get; } = new NaturalSortStringComparer(StringComparison.CurrentCulture);
-    public static NaturalSortStringComparer CurrentCultureIgnoreCase { get; } = new NaturalSortStringComparer(StringComparison.CurrentCultureIgnoreCase);
-    public static NaturalSortStringComparer InvariantCulture { get; } = new NaturalSortStringComparer(StringComparison.InvariantCulture);
-    public static NaturalSortStringComparer InvariantCultureIgnoreCase { get; } = new NaturalSortStringComparer(StringComparison.InvariantCultureIgnoreCase);
+    public static NaturalSortStringComparer Ordinal { get; } = new(StringComparison.Ordinal);
+    public static NaturalSortStringComparer OrdinalIgnoreCase { get; } = new(StringComparison.OrdinalIgnoreCase);
+    public static NaturalSortStringComparer CurrentCulture { get; } = new(StringComparison.CurrentCulture);
+    public static NaturalSortStringComparer CurrentCultureIgnoreCase { get; } = new(StringComparison.CurrentCultureIgnoreCase);
+    public static NaturalSortStringComparer InvariantCulture { get; } = new(StringComparison.InvariantCulture);
+    public static NaturalSortStringComparer InvariantCultureIgnoreCase { get; } = new(StringComparison.InvariantCultureIgnoreCase);
 
     public int Compare(string? x, string? y)
     {
@@ -84,9 +84,7 @@ internal sealed class NaturalSortStringComparer(StringComparison comparison) : I
             var start = currentPosition;
             var isFirstCharDigit = char.IsDigit(s[currentPosition]);
 
-            while (++currentPosition < s.Length && char.IsDigit(s[currentPosition]) == isFirstCharDigit)
-            {
-            }
+            while (++currentPosition < s.Length && char.IsDigit(s[currentPosition]) == isFirstCharDigit) { }
 
             _start = start;
             _length = currentPosition - start;

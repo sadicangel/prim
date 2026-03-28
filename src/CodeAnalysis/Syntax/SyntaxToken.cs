@@ -1,14 +1,14 @@
 ﻿using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
+
 public sealed record class SyntaxToken(
     SyntaxKind SyntaxKind,
-    SyntaxTree SyntaxTree,
     SourceSpan SourceSpan,
     SyntaxList<SyntaxTrivia> LeadingTrivia,
     SyntaxList<SyntaxTrivia> TrailingTrivia,
     object? Value)
-    : SyntaxNode(SyntaxKind, SyntaxTree)
+    : SyntaxNode(SyntaxKind)
 {
     public override SourceSpan SourceSpan { get; } = SourceSpan;
 
@@ -18,14 +18,11 @@ public sealed record class SyntaxToken(
 
     public override IEnumerable<SyntaxNode> Children() => [];
 
-    public static SyntaxToken CreateSynthetic(SyntaxKind syntaxKind, SyntaxTree? syntaxTree = null, Range range = default, object? value = null) => new(
+    public static SyntaxToken CreateSynthetic(SyntaxKind syntaxKind) => new(
         SyntaxKind: syntaxKind,
-        SyntaxTree: syntaxTree ?? SyntaxTree.Empty,
-        SourceSpan: new SourceSpan((syntaxTree ?? SyntaxTree.Empty).SourceText, range),
+        SourceSpan: new SourceSpan(SourceText.Empty, default),
         LeadingTrivia: [],
         TrailingTrivia: [],
-        Value: value)
-    {
-        IsSynthetic = true
-    };
+        Value: null)
+    { IsSynthetic = true };
 }

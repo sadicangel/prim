@@ -2,18 +2,18 @@
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    public static BlockExpressionSyntax ParseBlockExpression(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    public static BlockExpressionSyntax ParseBlockExpression(SyntaxIterator iterator)
     {
         var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
         var expressions = ParseSyntaxList(
-            syntaxTree,
             iterator,
             [SyntaxKind.BraceCloseToken],
             ParseExpressionTerminated);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
-        return new BlockExpressionSyntax(syntaxTree, braceOpenToken, expressions, braceCloseToken);
+        return new BlockExpressionSyntax(braceOpenToken, expressions, braceCloseToken);
     }
 }

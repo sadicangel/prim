@@ -1,10 +1,9 @@
 ﻿namespace CodeAnalysis.Syntax.Types;
 
 public sealed record class MaybeTypeSyntax(
-    SyntaxTree SyntaxTree,
     TypeSyntax UnderlyingType,
     SyntaxToken HookToken)
-    : TypeSyntax(SyntaxKind.MaybeType, SyntaxTree)
+    : TypeSyntax(SyntaxKind.MaybeType)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

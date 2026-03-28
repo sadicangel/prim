@@ -4,9 +4,10 @@ using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
-    private static int ScanNumber(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
+    private static int ScanNumber(SourceText sourceText, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
     {
         var read = 0;
         var isFloat = false;
@@ -14,18 +15,19 @@ partial class Scanner
         var numberStyles = NumberStyles.Number;
 
         // TODO: Handle negative number literals.
-        if (syntaxTree.SourceText[offset + read] is '-')
+        if (sourceText[offset + read] is '-')
             read++;
 
-        switch (syntaxTree.SourceText[(offset + read)..])
+        switch (sourceText[(offset + read)..])
         {
             case ['0', 'b', ..]:
                 {
                     read += 2;
-                    while (syntaxTree.SourceText[offset + read] is '0' or '1')
+                    while (sourceText[offset + read] is '0' or '1')
                     {
                         ++read;
                     }
+
                     numberStyles = NumberStyles.BinaryNumber;
                 }
                 break;
@@ -33,43 +35,46 @@ partial class Scanner
             case ['0', 'x' or 'X', ..]:
                 {
                     read += 2;
-                    while (char.IsAsciiHexDigit(syntaxTree.SourceText[offset + read]))
+                    while (char.IsAsciiHexDigit(sourceText[offset + read]))
                     {
                         ++read;
                     }
+
                     numberStyles = NumberStyles.HexNumber;
                 }
                 break;
             default:
                 {
-                    while (char.IsAsciiDigit(syntaxTree.SourceText[offset + read]))
+                    while (char.IsAsciiDigit(sourceText[offset + read]))
                     {
                         ++read;
                     }
 
-                    if (syntaxTree.SourceText[offset + read] is '.')
+                    if (sourceText[offset + read] is '.')
                     {
                         isFloat = true;
                         ++read;
-                        while (char.IsAsciiDigit(syntaxTree.SourceText[offset + read]))
+                        while (char.IsAsciiDigit(sourceText[offset + read]))
                         {
                             ++read;
                         }
                     }
 
-                    if (syntaxTree.SourceText[offset + read] is 'e' or 'E')
+                    if (sourceText[offset + read] is 'e' or 'E')
                     {
                         isFloat = true;
-                        if (!char.IsAsciiDigit(syntaxTree.SourceText[offset + read - 1]))
+                        if (!char.IsAsciiDigit(sourceText[offset + read - 1]))
                         {
                             isInvalid = true;
                         }
+
                         ++read;
-                        while (char.IsAsciiDigit(syntaxTree.SourceText[offset + read]))
+                        while (char.IsAsciiDigit(sourceText[offset + read]))
                         {
                             ++read;
                         }
                     }
+
                     break;
                 }
         }
@@ -81,32 +86,32 @@ partial class Scanner
 
             if (!isInvalid)
             {
-                switch (syntaxTree.SourceText[(offset + read)..])
+                switch (sourceText[(offset + read)..])
                 {
                     case ['f', '1', '6', ..]:
                         read += 3;
                         kind = SyntaxKind.F16LiteralToken;
-                        isInvalid = !Half.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], out var f16);
+                        isInvalid = !Half.TryParse(sourceText[offset..(offset + read - 3)], out var f16);
                         value = f16;
                         break;
 
                     case ['f', '3', '2', ..]:
                         read += 3;
                         kind = SyntaxKind.F32LiteralToken;
-                        isInvalid = !float.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], out var f32);
+                        isInvalid = !float.TryParse(sourceText[offset..(offset + read - 3)], out var f32);
                         value = f32;
                         break;
 
                     case ['f', '6', '4', ..]:
                         read += 3;
                         kind = SyntaxKind.F64LiteralToken;
-                        isInvalid = !double.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], out var f64);
+                        isInvalid = !double.TryParse(sourceText[offset..(offset + read - 3)], out var f64);
                         value = f64;
                         break;
 
                     default:
                         kind = SyntaxKind.F64LiteralToken;
-                        isInvalid = !double.TryParse(syntaxTree.SourceText[offset..(offset + read)], out var @float);
+                        isInvalid = !double.TryParse(sourceText[offset..(offset + read)], out var @float);
                         value = @float;
                         break;
                 }
@@ -114,82 +119,82 @@ partial class Scanner
         }
         else
         {
-            switch (syntaxTree.SourceText[(offset + read)..])
+            switch (sourceText[(offset + read)..])
             {
                 case ['i', '8', ..]:
                     read += 2;
                     kind = SyntaxKind.I8LiteralToken;
-                    isInvalid = !sbyte.TryParse(syntaxTree.SourceText[offset..(offset + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var i8);
+                    isInvalid = !sbyte.TryParse(sourceText[offset..(offset + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var i8);
                     value = i8;
                     break;
 
                 case ['u', '8', ..]:
                     read += 2;
                     kind = SyntaxKind.U8LiteralToken;
-                    isInvalid = !byte.TryParse(syntaxTree.SourceText[offset..(offset + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var u8);
+                    isInvalid = !byte.TryParse(sourceText[offset..(offset + read - 2)], numberStyles, CultureInfo.InvariantCulture, out var u8);
                     value = u8;
                     break;
 
                 case ['i', '1', '6', ..]:
                     read += 3;
                     kind = SyntaxKind.I16LiteralToken;
-                    isInvalid = !short.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i16);
+                    isInvalid = !short.TryParse(sourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i16);
                     value = i16;
                     break;
 
                 case ['u', '1', '6', ..]:
                     read += 3;
                     kind = SyntaxKind.U16LiteralToken;
-                    isInvalid = !ushort.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u16);
+                    isInvalid = !ushort.TryParse(sourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u16);
                     value = u16;
                     break;
 
                 case ['f', '1', '6', ..]:
                     read += 3;
                     kind = SyntaxKind.F16LiteralToken;
-                    isInvalid = !Half.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], CultureInfo.InvariantCulture, out var f16);
+                    isInvalid = !Half.TryParse(sourceText[offset..(offset + read - 3)], CultureInfo.InvariantCulture, out var f16);
                     value = f16;
                     break;
 
                 case ['i', '3', '2', ..]:
                     read += 3;
                     kind = SyntaxKind.I32LiteralToken;
-                    isInvalid = !int.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i32);
+                    isInvalid = !int.TryParse(sourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i32);
                     value = i32;
                     break;
 
                 case ['u', '3', '2', ..]:
                     read += 3;
                     kind = SyntaxKind.U32LiteralToken;
-                    isInvalid = !uint.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u32);
+                    isInvalid = !uint.TryParse(sourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u32);
                     value = u32;
                     break;
 
                 case ['f', '3', '2', ..]:
                     read += 3;
                     kind = SyntaxKind.F32LiteralToken;
-                    isInvalid = !float.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], CultureInfo.InvariantCulture, out var f32);
+                    isInvalid = !float.TryParse(sourceText[offset..(offset + read - 3)], CultureInfo.InvariantCulture, out var f32);
                     value = f32;
                     break;
 
                 case ['i', '6', '4', ..]:
                     read += 3;
                     kind = SyntaxKind.I64LiteralToken;
-                    isInvalid = !long.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i64);
+                    isInvalid = !long.TryParse(sourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var i64);
                     value = i64;
                     break;
 
                 case ['u', '6', '4', ..]:
                     read += 3;
                     kind = SyntaxKind.U64LiteralToken;
-                    isInvalid = !ulong.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u64);
+                    isInvalid = !ulong.TryParse(sourceText[offset..(offset + read - 3)], numberStyles, CultureInfo.InvariantCulture, out var u64);
                     value = u64;
                     break;
 
                 case ['f', '6', '4', ..]:
                     read += 3;
                     kind = SyntaxKind.F64LiteralToken;
-                    isInvalid = !double.TryParse(syntaxTree.SourceText[offset..(offset + read - 3)], CultureInfo.InvariantCulture, out var f64);
+                    isInvalid = !double.TryParse(sourceText[offset..(offset + read - 3)], CultureInfo.InvariantCulture, out var f64);
                     value = f64;
                     break;
 
@@ -197,7 +202,7 @@ partial class Scanner
                     kind = SyntaxKind.I32LiteralToken;
                     value = 0;
                     isInvalid = true;
-                    if (long.TryParse(syntaxTree.SourceText[offset..(offset + read)], numberStyles, CultureInfo.InvariantCulture, out var @int))
+                    if (long.TryParse(sourceText[offset..(offset + read)], numberStyles, CultureInfo.InvariantCulture, out var @int))
                     {
                         isInvalid = false;
                         if (@int is >= int.MinValue and <= int.MaxValue)
@@ -211,6 +216,7 @@ partial class Scanner
                             value = @int;
                         }
                     }
+
                     break;
             }
         }
@@ -219,7 +225,7 @@ partial class Scanner
         if (isInvalid)
         {
             diagnostics.ReportInvalidSyntaxValue(
-                new SourceSpan(syntaxTree.SourceText, range),
+                new SourceSpan(sourceText, range),
                 kind);
         }
 

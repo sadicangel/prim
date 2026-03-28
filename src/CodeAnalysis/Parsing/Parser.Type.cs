@@ -2,9 +2,10 @@
 using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static TypeSyntax ParseType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static TypeSyntax ParseType(SyntaxIterator iterator)
     {
         // type         : predefined | named | maybe | array | pointer | lambda | union 
         // predefined   : identifier (predefined names)
@@ -18,56 +19,56 @@ partial class Parser
         // union        : type '|' type ['|' union]*
 
         var types = ParseSyntaxList(
-            syntaxTree,
             iterator,
             SyntaxKind.PipeToken,
             [SyntaxKind.ColonToken, SyntaxKind.EqualsToken],
             ParseSingleType);
 
-        return types is [var type] ? type : new UnionTypeSyntax(syntaxTree, types);
+        return types is [var type] ? type : new UnionTypeSyntax(types);
 
-        static TypeSyntax ParseSingleType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+        static TypeSyntax ParseSingleType(SyntaxIterator iterator)
         {
             TypeSyntax type = iterator.Current.SyntaxKind switch
             {
                 SyntaxKind.AnyKeyword or
-                SyntaxKind.UnknownKeyword or
-                SyntaxKind.NeverKeyword or
-                SyntaxKind.UnitKeyword or
-                SyntaxKind.TypeKeyword or
-                SyntaxKind.StrKeyword or
-                SyntaxKind.BoolKeyword or
-                SyntaxKind.I8Keyword or
-                SyntaxKind.I16Keyword or
-                SyntaxKind.I32Keyword or
-                SyntaxKind.I64Keyword or
-                SyntaxKind.IszKeyword or
-                SyntaxKind.U8Keyword or
-                SyntaxKind.U16Keyword or
-                SyntaxKind.U32Keyword or
-                SyntaxKind.U64Keyword or
-                SyntaxKind.UszKeyword or
-                SyntaxKind.F16Keyword or
-                SyntaxKind.F32Keyword or
-                SyntaxKind.F64Keyword => ParsePredefinedType(syntaxTree, iterator),
+                    SyntaxKind.UnknownKeyword or
+                    SyntaxKind.NeverKeyword or
+                    SyntaxKind.UnitKeyword or
+                    SyntaxKind.TypeKeyword or
+                    SyntaxKind.StrKeyword or
+                    SyntaxKind.BoolKeyword or
+                    SyntaxKind.I8Keyword or
+                    SyntaxKind.I16Keyword or
+                    SyntaxKind.I32Keyword or
+                    SyntaxKind.I64Keyword or
+                    SyntaxKind.IszKeyword or
+                    SyntaxKind.U8Keyword or
+                    SyntaxKind.U16Keyword or
+                    SyntaxKind.U32Keyword or
+                    SyntaxKind.U64Keyword or
+                    SyntaxKind.UszKeyword or
+                    SyntaxKind.F16Keyword or
+                    SyntaxKind.F32Keyword or
+                    SyntaxKind.F64Keyword => ParsePredefinedType(iterator),
 
-                SyntaxKind.ParenthesisOpenToken => ParseLambdaType(syntaxTree, iterator),
+                SyntaxKind.ParenthesisOpenToken => ParseLambdaType(iterator),
 
-                _ => ParseNamedType(syntaxTree, iterator)
+                _ => ParseNamedType(iterator)
             };
 
             return iterator.Current.SyntaxKind switch
             {
-                SyntaxKind.BracketOpenToken => ParseArrayType(syntaxTree, iterator, type),
-                SyntaxKind.StarToken => ParsePointerType(syntaxTree, iterator, type),
-                SyntaxKind.HookToken => ParseMaybeType(syntaxTree, iterator, type),
+                SyntaxKind.BracketOpenToken => ParseArrayType(iterator, type),
+                SyntaxKind.StarToken => ParsePointerType(iterator, type),
+                SyntaxKind.HookToken => ParseMaybeType(iterator, type),
                 _ => type,
             };
         }
 
-        static PredefinedTypeSyntax ParsePredefinedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+        static PredefinedTypeSyntax ParsePredefinedType(SyntaxIterator iterator)
         {
-            var predefinedTypeToken = iterator.Match([
+            var predefinedTypeToken = iterator.Match(
+            [
                 SyntaxKind.AnyKeyword,
                 SyntaxKind.UnknownKeyword,
                 SyntaxKind.NeverKeyword,
@@ -90,50 +91,54 @@ partial class Parser
                 SyntaxKind.F64Keyword
             ]);
 
-            return new PredefinedTypeSyntax(syntaxTree, predefinedTypeToken);
+            return new PredefinedTypeSyntax(predefinedTypeToken);
         }
 
-        static LambdaTypeSyntax ParseLambdaType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+        static LambdaTypeSyntax ParseLambdaType(SyntaxIterator iterator)
         {
             var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
             var parameters = ParseSyntaxList(
-                syntaxTree,
                 iterator,
                 SyntaxKind.CommaToken,
                 [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
                 ParseType);
             var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-            var arrowToken = iterator.Match(SyntaxKind.ArrowReturnToken);
-            var returnType = ParseType(syntaxTree, iterator);
-            return new LambdaTypeSyntax(syntaxTree, parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
+            var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
+            var returnType = ParseType(iterator);
+            return new LambdaTypeSyntax(parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
         }
 
-        static NamedTypeSyntax ParseNamedType(SyntaxTree syntaxTree, SyntaxIterator iterator)
+        static NamedTypeSyntax ParseNamedType(SyntaxIterator iterator)
         {
-            var name = ParseName(syntaxTree, iterator);
-            return new NamedTypeSyntax(syntaxTree, name);
+            var name = ParseName(iterator);
+            return new NamedTypeSyntax(name);
         }
 
-        static ArrayTypeSyntax ParseArrayType(SyntaxTree syntaxTree, SyntaxIterator iterator, TypeSyntax elementType)
+        static ArrayTypeSyntax ParseArrayType(SyntaxIterator iterator, TypeSyntax elementType)
         {
             var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
-            var length = ParseExpression(syntaxTree, iterator, allowUnterminated: false);
-            var bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
+            if (iterator.TryMatch(out var bracketCloseToken, SyntaxKind.BracketCloseToken))
+            {
+                return new ArrayTypeSyntax(elementType, bracketOpenToken, bracketCloseToken);
+            }
 
-            return new ArrayTypeSyntax(syntaxTree, elementType, bracketOpenToken, length, bracketCloseToken);
+            var length = ParseExpression(iterator, allowUnterminated: false);
+            bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
+
+            return new ArrayTypeSyntax(elementType, bracketOpenToken, length, bracketCloseToken);
         }
 
-        static PointerTypeSyntax ParsePointerType(SyntaxTree syntaxTree, SyntaxIterator iterator, TypeSyntax elementType)
+        static PointerTypeSyntax ParsePointerType(SyntaxIterator iterator, TypeSyntax elementType)
         {
             var starToken = iterator.Match(SyntaxKind.StarToken);
 
-            return new PointerTypeSyntax(syntaxTree, elementType, starToken);
+            return new PointerTypeSyntax(elementType, starToken);
         }
 
-        static MaybeTypeSyntax ParseMaybeType(SyntaxTree syntaxTree, SyntaxIterator iterator, TypeSyntax underlyingType)
+        static MaybeTypeSyntax ParseMaybeType(SyntaxIterator iterator, TypeSyntax underlyingType)
         {
             var hookToken = iterator.Match(SyntaxKind.HookToken);
-            return new MaybeTypeSyntax(syntaxTree, underlyingType, hookToken);
+            return new MaybeTypeSyntax(underlyingType, hookToken);
         }
     }
 }

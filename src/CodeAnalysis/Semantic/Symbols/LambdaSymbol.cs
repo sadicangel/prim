@@ -11,5 +11,5 @@ internal sealed record class LambdaSymbol(
     : TypeSymbol(
         SymbolKind.Lambda,
         Syntax,
-        $"({string.Join(", ", Parameters.Select(p => p.ToString()))}) -> {ReturnType.Name}",
+        $"({string.Join(", ", Parameters.Select(p => p.Name))}) -> {ReturnType.Name}",
         ContainingModule);

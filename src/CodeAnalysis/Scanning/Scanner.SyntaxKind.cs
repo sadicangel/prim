@@ -3,11 +3,12 @@ using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Scanning;
-partial class Scanner
+
+internal partial class Scanner
 {
-    private static int ScanSyntaxKind(SyntaxTree syntaxTree, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
+    private static int ScanSyntaxKind(SourceText sourceText, DiagnosticBag diagnostics, int offset, out SyntaxKind kind, out Range range, out object? value)
     {
-        switch (syntaxTree.SourceText[offset..])
+        switch (sourceText[offset..])
         {
             // Punctuation
             case ['{', ..]:
@@ -71,13 +72,13 @@ partial class Scanner
                 return 1;
 
             case ['=', '>', ..]:
-                kind = SyntaxKind.ArrowLambdaToken;
+                kind = SyntaxKind.EqualsGreaterThanToken;
                 range = offset..(offset + 2);
                 value = null;
                 return 2;
 
             case ['-', '>', ..]:
-                kind = SyntaxKind.ArrowReturnToken;
+                kind = SyntaxKind.MinusGreaterThanToken;
                 range = offset..(offset + 2);
                 value = null;
                 return 2;
@@ -313,15 +314,15 @@ partial class Scanner
                 return 1;
 
             case ['"', ..]:
-                return ScanString(syntaxTree, diagnostics, offset, out kind, out range, out value);
+                return ScanString(sourceText, diagnostics, offset, out kind, out range, out value);
 
             case [var d1, ..] when char.IsAsciiDigit(d1):
             case ['.', var d2, ..] when char.IsAsciiDigit(d2):
-                return ScanNumber(syntaxTree, diagnostics, offset, out kind, out range, out value);
+                return ScanNumber(sourceText, diagnostics, offset, out kind, out range, out value);
 
             case ['_', ..]:
             case [var l, ..] when char.IsAsciiLetter(l):
-                return ScanIdentifier(syntaxTree, offset, out kind, out range, out value);
+                return ScanIdentifier(sourceText, offset, out kind, out range, out value);
 
             // Control
             case []:
@@ -331,7 +332,7 @@ partial class Scanner
                 return 0;
 
             default:
-                diagnostics.ReportInvalidCharacter(new SourceSpan(syntaxTree.SourceText, offset..(offset + 1)), syntaxTree.SourceText[offset]);
+                diagnostics.ReportInvalidCharacter(new SourceSpan(sourceText, offset..(offset + 1)), sourceText[offset]);
                 kind = SyntaxKind.InvalidSyntax;
                 range = offset..(offset + 1);
                 value = null;

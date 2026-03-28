@@ -2,27 +2,27 @@
 using CodeAnalysis.Syntax.Expressions;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
-{
-    private static ExpressionSyntax ParseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator) =>
-        ParseExpression(syntaxTree, iterator, allowUnterminated: true);
 
-    public static ExpressionSyntax ParseExpression(SyntaxTree syntaxTree, SyntaxIterator iterator, bool allowUnterminated) => iterator.Current.SyntaxKind switch
+internal partial class Parser
+{
+    private static ExpressionSyntax ParseExpression(SyntaxIterator iterator) =>
+        ParseExpression(iterator, allowUnterminated: true);
+
+    public static ExpressionSyntax ParseExpression(SyntaxIterator iterator, bool allowUnterminated) => iterator.Current.SyntaxKind switch
     {
-        SyntaxKind.ModuleKeyword => ParseModuleDeclaration(syntaxTree, iterator),
-        SyntaxKind.StructKeyword => ParseStructDeclaration(syntaxTree, iterator),
-        SyntaxKind.LetKeyword => ParseVariableDeclaration(syntaxTree, iterator),
-        SyntaxKind.VarKeyword => ParseVariableDeclaration(syntaxTree, iterator),
-        SyntaxKind.LambdaKeyword => ParseLambdaExpression(syntaxTree, iterator),
-        SyntaxKind.IfKeyword => ParseIfElseExpression(syntaxTree, iterator),
-        //SyntaxKind.ForKeyword => ParseForExpression(syntaxTree, iterator),
-        //SyntaxKind.WhileKeyword => ParseWhileExpression(syntaxTree, iterator),
-        //SyntaxKind.BreakKeyword => ParseBreakExpression(syntaxTree, iterator),
-        //SyntaxKind.ContinueKeyword => ParseContinueExpression(syntaxTree, iterator),
-        //SyntaxKind.ReturnKeyword => ParseReturnExpression(syntaxTree, iterator),
-        SyntaxKind.BraceOpenToken => ParseBlockExpression(syntaxTree, iterator),
-        SyntaxKind.BracketOpenToken => ParseArrayInitializerExpression(syntaxTree, iterator),
-        SyntaxKind.SemicolonToken => ParseEmptyExpression(syntaxTree, iterator),
-        _ => allowUnterminated ? ParseBinaryExpression(syntaxTree, iterator) : ParseStatementExpression(syntaxTree, iterator),
+        SyntaxKind.ModuleKeyword => ParseModuleDeclaration(iterator),
+        SyntaxKind.StructKeyword => ParseStructDeclaration(iterator),
+        SyntaxKind.LetKeyword => ParseVariableDeclaration(iterator),
+        SyntaxKind.VarKeyword => ParseVariableDeclaration(iterator),
+        SyntaxKind.IfKeyword => ParseIfElseExpression(iterator),
+        //SyntaxKind.ForKeyword => ParseForExpression(iterator),
+        //SyntaxKind.WhileKeyword => ParseWhileExpression(iterator),
+        //SyntaxKind.BreakKeyword => ParseBreakExpression(iterator),
+        //SyntaxKind.ContinueKeyword => ParseContinueExpression(iterator),
+        //SyntaxKind.ReturnKeyword => ParseReturnExpression(iterator),
+        SyntaxKind.BraceOpenToken => ParseBlockExpression(iterator),
+        SyntaxKind.BracketOpenToken => ParseArrayInitializerExpression(iterator),
+        SyntaxKind.SemicolonToken => ParseEmptyExpression(iterator),
+        _ => allowUnterminated ? ParseBinaryExpression(iterator) : ParseStatementExpression(iterator),
     };
 }

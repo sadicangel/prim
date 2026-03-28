@@ -2,22 +2,15 @@
 using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Parsing;
-partial class Parser
+
+internal partial class Parser
 {
-    private static ModuleDeclarationSyntax ParseModuleDeclaration(SyntaxTree syntaxTree, SyntaxIterator iterator)
+    private static ModuleDeclarationSyntax ParseModuleDeclaration(SyntaxIterator iterator)
     {
         var moduleKeyword = iterator.Match(SyntaxKind.ModuleKeyword);
-        var name = ParseSimpleName(syntaxTree, iterator);
-        var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
-        var declarations = ParseSyntaxList(syntaxTree, iterator, [SyntaxKind.BraceCloseToken], ParseGlobalDeclaration);
-        var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
+        var name = ParseSimpleName(iterator);
+        var semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
 
-        return new ModuleDeclarationSyntax(
-            syntaxTree,
-            moduleKeyword,
-            name,
-            braceOpenToken,
-            declarations,
-            braceCloseToken);
+        return new ModuleDeclarationSyntax(moduleKeyword, name, semicolonToken);
     }
 }

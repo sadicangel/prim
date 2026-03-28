@@ -26,11 +26,18 @@ internal sealed record class ModuleSymbol(SyntaxNode Syntax, string Name, Module
     public StructSymbol F32 => Get<StructSymbol>("f32");
     public StructSymbol F64 => Get<StructSymbol>("f64");
 
+    internal bool IsGlobal => Name == "<global>";
+
     private TSymbol Get<TSymbol>(string name) where TSymbol : Symbol
     {
-        if (!TryLookup<TSymbol>(name, out var symbol))
-            throw new InvalidOperationException($"Missing {nameof(Symbol)} '{name}'");
-
-        return symbol;
+        var current = this;
+        while (true)
+        {
+            if (current.TryLookup<TSymbol>(name, out var symbol))
+                return symbol;
+            if (current == current.ContainingModule)
+                throw new InvalidOperationException($"Missing {nameof(Symbol)} '{name}'");
+            current = current.ContainingModule;
+        }
     }
 }
