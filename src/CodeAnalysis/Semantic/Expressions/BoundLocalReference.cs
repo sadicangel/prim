@@ -7,5 +7,8 @@ internal sealed record class BoundLocalReference(SyntaxNode Syntax, Symbol Symbo
     : BoundExpression(BoundKind.LocalReference, Syntax, Symbol.Type)
 {
     /// <inheritdoc />
-    public override IEnumerable<BoundNode> Children() => [];
+    public override IEnumerable<ITreeNode> Children()
+    {
+        yield return Symbol;
+    }
 }

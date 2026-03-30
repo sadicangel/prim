@@ -7,5 +7,8 @@ internal sealed record class BoundGlobalReference(SyntaxNode Syntax, Symbol Symb
     : BoundExpression(BoundKind.GlobalReference, Syntax, Symbol.Type)
 {
     /// <inheritdoc />
-    public override IEnumerable<BoundNode> Children() => [];
+    public override IEnumerable<ITreeNode> Children()
+    {
+        yield return Symbol;
+    }
 }

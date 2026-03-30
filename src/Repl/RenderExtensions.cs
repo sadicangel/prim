@@ -3,8 +3,14 @@ using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
+using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 using Spectre.Console;
+using IAnsiConsole = Spectre.Console.IAnsiConsole;
+using IHasTreeNodes = Spectre.Console.IHasTreeNodes;
+using Markup = Spectre.Console.Markup;
+using Panel = Spectre.Console.Panel;
+using Tree = Spectre.Console.Tree;
 
 namespace Repl;
 
@@ -187,8 +193,7 @@ internal static class RenderExtensions
 
         public void Write(SyntaxTree syntaxTree)
         {
-            var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.SyntaxKind}[/]")
-                .Style("dim white");
+            var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.SyntaxKind}[/]").Style("dim white");
 
             WriteTo(syntaxTree.CompilationUnit, tree);
 
@@ -246,37 +251,48 @@ internal static class RenderExtensions
             console.WriteLine();
         }
 
-        public void Write(BoundNode boundNode)
+        public void Write(ITreeNode node)
         {
-            var tree = new Tree("BoundNode")
-                .Style("dim white");
+            var tree = new Tree(node.GetType().Name).Style("dim white");
 
-            WriteTo(boundNode, tree);
+            WriteTo(node, tree);
 
-            console.Write(new Panel(tree).Header(boundNode.BoundKind.ToString()));
+            console.Write(new Panel(tree).Header(GetKind(node)));
 
-            static void WriteTo(BoundNode boundNode, IHasTreeNodes treeNode)
+            static void WriteTo(ITreeNode node, IHasTreeNodes tree)
             {
-                treeNode = boundNode switch
+                tree = node switch
                 {
                     BoundVariableDeclaration declaration =>
-                        treeNode.AddNode($"[aqua]{declaration.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(declaration.VariableSymbol.Name)}[/]"),
+                        tree.AddNode($"[aqua]{declaration.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(declaration.VariableSymbol.Name)}[/]"),
                     BoundExpression expression =>
-                        treeNode.AddNode($"[aqua]{expression.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"),
+                        tree.AddNode($"[aqua]{expression.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"),
+                    Symbol symbol =>
+                        tree.AddNode($"[aqua]{Markup.Escape(symbol.Name)}[/]"),
                     _ =>
-                        treeNode.AddNode($"[aqua]{boundNode.BoundKind}[/]")
+                        tree.AddNode($"[aqua]{GetKind(node)}[/]")
                 };
 
-                foreach (var child in boundNode.Children())
+                foreach (var child in node.Children())
                 {
-                    WriteTo(child, treeNode);
+                    WriteTo(child, tree);
                 }
+            }
+
+            static string GetKind(ITreeNode treeNode)
+            {
+                return treeNode switch
+                {
+                    Symbol symbol => symbol.SymbolKind.ToString(),
+                    BoundNode node => node.BoundKind.ToString(),
+                    _ => throw new UnreachableException($"Unexpected {nameof(ITreeNode)} '{treeNode.GetType().Name}'")
+                };
             }
         }
 
-        public void WriteLine(BoundNode boundNode)
+        public void WriteLine(ITreeNode node)
         {
-            console.Write(boundNode);
+            console.Write(node);
             console.WriteLine();
         }
     }

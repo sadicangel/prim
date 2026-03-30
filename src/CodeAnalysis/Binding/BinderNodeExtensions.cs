@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CodeAnalysis.Semantic.Expressions;
+using CodeAnalysis.Semantic;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Expressions;
 
@@ -9,7 +9,7 @@ internal static class BinderNodeExtensions
 {
     extension(Binder binder)
     {
-        public BoundExpression BindNode(SyntaxNode syntax)
+        public BoundNode BindNode(SyntaxNode syntax)
         {
             return syntax switch
             {

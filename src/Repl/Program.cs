@@ -67,7 +67,7 @@ while (true)
         console.WriteLine(syntaxTree);
     }
 
-    var (boundNode, bindDiagnostics) = compilation.Bind(compilation.GlobalModule);
+    var (boundNode, bindDiagnostics) = compilation.Bind(compilation.EntryPoint!);
 
     if (bindDiagnostics.Length > 0)
     {

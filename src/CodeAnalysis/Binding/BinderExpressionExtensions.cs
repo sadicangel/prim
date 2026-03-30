@@ -37,10 +37,12 @@ internal static class BinderExpressionExtensions
                     binder.BindLambdaExpression((LambdaExpressionSyntax)syntax),
                 SyntaxKind.VariableDeclaration =>
                     binder.BindVariableDeclaration((VariableDeclarationSyntax)syntax),
-                //SyntaxKind.ModuleDeclaration =>
-                //    binder.BindModuleDeclaration((ModuleDeclarationSyntax)syntax),
-                //SyntaxKind.StructDeclaration =>
-                //    binder.BindStructDeclaration((StructDeclarationSyntax)syntax),
+                SyntaxKind.ModuleDeclaration =>
+                    binder.BindModuleDeclaration((ModuleDeclarationSyntax)syntax),
+                SyntaxKind.StructDeclaration =>
+                    binder.BindStructDeclaration((StructDeclarationSyntax)syntax),
+                SyntaxKind.PropertyDeclaration =>
+                    binder.BindPropertyDeclaration((PropertyDeclarationSyntax)syntax),
                 //SyntaxKind.LocalDeclaration =>
                 //    binder.BindLocalDeclaration((LocalDeclarationSyntax)syntax),
                 //SyntaxKind.EmptyExpression =>
@@ -163,6 +165,60 @@ internal static class BinderExpressionExtensions
             var body = binder.BindExpression(syntax.Body);
 
             return new BoundLambdaExpression(syntax, lambdaBinder.Lambda, [.. lambdaBinder.Parameters], body);
+        }
+
+        private BoundModuleDeclaration BindModuleDeclaration(ModuleDeclarationSyntax syntax)
+        {
+            var module = binder.Module;
+            if (syntax.Name.FullName != "<global>" && !binder.TryLookup<ModuleSymbol>(syntax.Name.FullName, out module))
+            {
+                throw new UnreachableException($"Module {syntax.Name.FullName}' should have already been declared");
+            }
+
+            var members = module.Members.Select(member =>
+            {
+                var (boundNode, diagnostics) = member.Bind();
+                binder.AddDiagnostics(diagnostics);
+                return boundNode;
+            }).ToImmutableArray();
+
+            return new BoundModuleDeclaration(binder.Module, members);
+        }
+
+        private BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax)
+        {
+            if (!binder.TryLookup<StructSymbol>(syntax.Name.FullName, out var @struct))
+            {
+                throw new UnreachableException($"Struct '{syntax.Name.FullName}' should have already been declared");
+            }
+
+            binder = new TypeBinder(@struct, binder);
+            var properties = @struct.Members
+                .Select(member => binder.BindPropertyDeclaration((PropertyDeclarationSyntax)member.Syntax))
+                .ToImmutableArray();
+
+            return new BoundStructDeclaration(@struct, properties);
+        }
+
+        private BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax)
+        {
+            if (!binder.TryLookup<PropertySymbol>(syntax.Name.FullName, out var property))
+            {
+                throw new UnreachableException($"Property '{syntax.Name.FullName}' should have already been declared");
+            }
+
+            var initializer = default(BoundExpression);
+            if (syntax.InitClause is not null)
+            {
+                initializer = binder.BindExpression(syntax.InitClause.Expression);
+
+                if (initializer.Type.MapsToUnknown)
+                {
+                    binder.ReportInvalidImplicitType(syntax.SourceSpan, initializer.Type.Name);
+                }
+            }
+
+            return new BoundPropertyDeclaration(property, initializer);
         }
 
         private BoundVariableDeclaration BindVariableDeclaration(VariableDeclarationSyntax syntax)

@@ -29,10 +29,10 @@ public sealed class Compilation(ImmutableArray<SourceText> sourceTexts, ParseOpt
 
     public IEnumerable<Diagnostic> GetDiagnostics() => SyntaxTrees.SelectMany(x => x.Diagnostics);
 
-    private ModuleSymbol GetGlobalModule()
+    internal ModuleSymbol GetGlobalModule()
     {
         var global = Previous?.GlobalModule ?? SymbolFactory.CreateGlobalModule();
-        var binder = new ModuleBinder(global);
+        var binder = new GlobalSymbolBinder(global);
         binder.DeclareSymbols(SyntaxTrees);
         return global;
     }

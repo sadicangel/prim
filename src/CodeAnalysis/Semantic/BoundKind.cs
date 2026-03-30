@@ -16,6 +16,7 @@ internal enum BoundKind
 
     AssignmentExpression,
 
+    PredefinedDeclaration,
     ModuleDeclaration,
     LabelDeclaration,
     StructDeclaration,

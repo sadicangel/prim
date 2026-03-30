@@ -2,6 +2,7 @@
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Expressions;
+
 internal abstract record class BoundExpression(
     BoundKind BoundKind,
     SyntaxNode Syntax,

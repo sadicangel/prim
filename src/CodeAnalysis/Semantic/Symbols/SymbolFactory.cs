@@ -103,14 +103,17 @@ internal static class SymbolFactory
         return type;
     }
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = $"_members")]
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_members")]
     static extern ref Dictionary<string, Symbol> GetMembersField(ContainerSymbol container);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "set_IsPredefined")]
+    static extern void SetIsPredefined(Symbol symbol, bool value);
 
     private static T Declare<T>(ContainerSymbol container, T symbol) where T : Symbol
     {
         if (!container.TryDeclare(symbol))
             throw new InvalidOperationException($"Could not declare symbol '{symbol}'");
-
+        SetIsPredefined(symbol, true);
         return symbol;
     }
 

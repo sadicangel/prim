@@ -32,4 +32,6 @@ internal abstract class Binder(Binder? parent) : ISymbolScope, IDiagnosticReport
     /// <inheritdoc />
     public void Report(SourceSpan sourceSpan, DiagnosticSeverity severity, string message) =>
         _diagnostics.Report(sourceSpan, severity, message);
+
+    public void AddDiagnostics(IEnumerable<Diagnostic> diagnostics) => _diagnostics.AddRange(diagnostics);
 }

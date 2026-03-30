@@ -2,9 +2,9 @@
 using CodeAnalysis.Syntax.Names;
 
 /*
- Point = {
-    x = 2,
-    y = 3,
+ struct Point {
+    x: i32 = 2;
+    y: i32;
 }
  */
 

@@ -1,6 +1,7 @@
 ﻿using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Symbols;
+
 internal abstract record class Symbol(
     SymbolKind SymbolKind,
     SyntaxNode Syntax,
@@ -8,12 +9,17 @@ internal abstract record class Symbol(
     TypeSymbol Type,
     Symbol ContainingSymbol,
     ModuleSymbol ContainingModule,
-    Modifiers Modifiers)
+    Modifiers Modifiers) : ITreeNode
 {
     public string FullName => field ??= Name is "<global>" ? Name : $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
+
+    public bool IsPredefined { get; init; }
 
     public virtual bool Equals(Symbol? other) => other is not null && SymbolKind == other.SymbolKind && Name == other.Name;
     public override int GetHashCode() => HashCode.Combine(SymbolKind, Name);
 
     public sealed override string ToString() => $"{Name}: {Type.Name}";
+
+    /// <inheritdoc />
+    public IEnumerable<ITreeNode> Children() => [];
 }

@@ -10,9 +10,9 @@ internal sealed record class BoundVariableDeclaration(
     BoundExpression Expression)
     : BoundDeclaration(BoundKind.VariableDeclaration, Syntax, VariableSymbol.Type)
 {
-    public override IEnumerable<BoundNode> Children()
+    public override IEnumerable<ITreeNode> Children()
     {
-        //yield return VariableSymbol;
+        yield return VariableSymbol;
         yield return Expression;
     }
 }

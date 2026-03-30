@@ -9,7 +9,6 @@ public enum SymbolKind
 
     Array,
     Lambda,
-    Maybe,
     Pointer,
     Struct,
     Union,
