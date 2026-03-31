@@ -3,7 +3,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Symbols;
 
-internal sealed record class LambdaSymbol(
+internal sealed record class LambdaTypeSymbol(
     SyntaxNode Syntax,
     ImmutableArray<TypeSymbol> Parameters,
     TypeSymbol ReturnType,

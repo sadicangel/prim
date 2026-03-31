@@ -4,7 +4,7 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Semantic.Symbols;
 
-internal sealed record class UnionSymbol(SyntaxNode Syntax, ImmutableArray<TypeSymbol> Types, ModuleSymbol ContainingModule)
+internal sealed record class UnionTypeSymbol(SyntaxNode Syntax, ImmutableArray<TypeSymbol> Types, ModuleSymbol ContainingModule)
     : TypeSymbol(
         SymbolKind.Union,
         Syntax,

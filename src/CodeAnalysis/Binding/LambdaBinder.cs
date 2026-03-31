@@ -8,12 +8,12 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Binding;
 
-internal sealed class LambdaBinder(LambdaSymbol lambda, Binder parent) : Binder(parent)
+internal sealed class LambdaBinder(LambdaTypeSymbol lambdaTypeType, Binder parent) : Binder(parent)
 {
     private Dictionary<string, VariableSymbol>? _parameters;
     private HashSet<VariableSymbol>? _captures;
 
-    public LambdaSymbol Lambda => lambda;
+    public LambdaTypeSymbol LambdaType => lambdaTypeType;
 
     public IEnumerable<VariableSymbol> Parameters => _parameters?.Values.AsEnumerable() ?? [];
 
@@ -48,7 +48,7 @@ internal sealed class LambdaBinder(LambdaSymbol lambda, Binder parent) : Binder(
             throw new UnreachableException($"Unexpected redeclaration of parameters in {nameof(LambdaBinder)}");
         }
 
-        var parameterTypes = Lambda.Parameters;
+        var parameterTypes = LambdaType.Parameters;
         var parameterNames = syntax.Parameters.ToImmutableArray();
         if (parameterNames.Length != parameterTypes.Length)
         {

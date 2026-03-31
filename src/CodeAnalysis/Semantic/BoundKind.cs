@@ -26,12 +26,7 @@ internal enum BoundKind
     OperatorDeclaration,
     ConversionDeclaration,
 
-    LocalReference,
-    GlobalReference,
-    PropertyReference,
-    MethodReference,
-    MethodGroup,
-    IndexReference,
+    Reference,
 
     BlockExpression,
     ArrayInitExpression,

@@ -137,7 +137,7 @@ internal static class BinderExpressionExtensions
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
-            return new BoundLocalReference(syntax, symbol);
+            return new BoundReference(syntax, symbol);
         }
 
         private BoundExpression BindQualifiedName(QualifiedNameSyntax syntax)
@@ -148,7 +148,7 @@ internal static class BinderExpressionExtensions
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
-            return new BoundGlobalReference(syntax, symbol);
+            return new BoundReference(syntax, symbol);
         }
 
         private BoundLambdaExpression BindLambdaExpression(LambdaExpressionSyntax syntax)
@@ -164,7 +164,7 @@ internal static class BinderExpressionExtensions
 
             var body = binder.BindExpression(syntax.Body);
 
-            return new BoundLambdaExpression(syntax, lambdaBinder.Lambda, [.. lambdaBinder.Parameters], body);
+            return new BoundLambdaExpression(syntax, lambdaBinder.LambdaType, [.. lambdaBinder.Parameters], body);
         }
 
         private BoundModuleDeclaration BindModuleDeclaration(ModuleDeclarationSyntax syntax)
@@ -187,17 +187,17 @@ internal static class BinderExpressionExtensions
 
         private BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax)
         {
-            if (!binder.TryLookup<StructSymbol>(syntax.Name.FullName, out var @struct))
+            if (!binder.TryLookup<StructTypeSymbol>(syntax.Name.FullName, out var structType))
             {
                 throw new UnreachableException($"Struct '{syntax.Name.FullName}' should have already been declared");
             }
 
-            binder = new TypeBinder(@struct, binder);
-            var properties = @struct.Members
+            binder = new TypeBinder(structType, binder);
+            var properties = structType.Members
                 .Select(member => binder.BindPropertyDeclaration((PropertyDeclarationSyntax)member.Syntax))
                 .ToImmutableArray();
 
-            return new BoundStructDeclaration(@struct, properties);
+            return new BoundStructDeclaration(structType, properties);
         }
 
         private BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax)
@@ -234,9 +234,9 @@ internal static class BinderExpressionExtensions
 
             if (syntax.InitClause?.Expression is { } initExpression)
             {
-                if (variableType is LambdaSymbol lambda)
+                if (variableType is LambdaTypeSymbol lambdaType)
                 {
-                    binder = new LambdaBinder(lambda, binder);
+                    binder = new LambdaBinder(lambdaType, binder);
                 }
 
                 var expression = binder.BindExpression(initExpression);
@@ -292,22 +292,41 @@ internal static class BinderExpressionExtensions
                 { Count: 0 } => binder.Module.Unit,
                 { Count: 1 } => types.Single(),
                 _ when types.Contains(binder.Module.Never) => binder.Module.Never,
-                _ => new UnionSymbol(syntax, [.. types], binder.Module)
+                _ => new UnionTypeSymbol(syntax, [.. types], binder.Module)
             };
 
             return new BoundBlockExpression(syntax, type, expressions.MoveToImmutable());
         }
 
+        private BoundReference? BindOperator(SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> types)
+        {
+            if (types.IsEmpty)
+            {
+                throw new UnreachableException("Cannot bind an operator with no operand types");
+            }
+
+            var operatorName = Mangler.Mangle(operatorToken.SyntaxKind, types);
+            foreach (var type in types)
+            {
+                if (new TypeBinder(type).TryLookup<VariableSymbol>(operatorName, out var @operator))
+                {
+                    return new BoundReference(operatorToken, @operator);
+                }
+            }
+
+            // TODO: Report all the types we looked through, not just the first one.
+            binder.ReportUndefinedTypeMember(operatorToken.SourceSpan, types[0].FullName, operatorName);
+
+            return null;
+        }
+
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
             var operand = binder.BindExpression(syntax.Operand);
-            var operatorName = Mangler.Mangle(syntax.OperatorToken.SyntaxKind, operand.Type);
-            if (new TypeBinder(operand.Type).TryLookup<VariableSymbol>(operatorName, out var @operator))
+            if (binder.BindOperator(syntax.OperatorToken, operand.Type) is { } @operator)
             {
                 return new BoundUnaryExpression(syntax, @operator, operand);
             }
-
-            binder.ReportUndefinedUnaryOperator(syntax.OperatorToken, operand.Type.Name);
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }
@@ -316,17 +335,10 @@ internal static class BinderExpressionExtensions
         {
             var left = binder.BindExpression(syntax.Left);
             var right = binder.BindExpression(syntax.Right);
-
-            var operatorName = Mangler.Mangle(syntax.OperatorToken.SyntaxKind, left.Type, right.Type);
-            foreach (var type in (ReadOnlySpan<TypeSymbol>)[left.Type, right.Type])
+            if (binder.BindOperator(syntax.OperatorToken, left.Type, right.Type) is { } @operator)
             {
-                if (new TypeBinder(type).TryLookup<VariableSymbol>(operatorName, out var @operator))
-                {
-                    return new BoundBinaryExpression(syntax, left, @operator, right);
-                }
+                return new BoundBinaryExpression(syntax, left, @operator, right);
             }
-
-            binder.ReportUndefinedBinaryOperator(syntax.OperatorToken, left.Type.Name, right.Type.Name);
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }

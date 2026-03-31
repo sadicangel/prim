@@ -22,11 +22,11 @@ internal abstract record class TypeSymbol(
     {
         return this switch
         {
-            ArraySymbol t => predicate(t.ElementType),
-            LambdaSymbol t => predicate(t.ReturnType), // TODO: This is wrong!
-            PointerSymbol t => predicate(t.ElementType),
-            StructSymbol t => predicate(t),
-            UnionSymbol t => t.Types.Any(predicate),
+            ArrayTypeSymbol t => predicate(t.ElementType),
+            LambdaTypeSymbol t => predicate(t.ReturnType), // TODO: This is wrong!
+            PointerTypeSymbol t => predicate(t.ElementType),
+            StructTypeSymbol t => predicate(t),
+            UnionTypeSymbol t => t.Types.Any(predicate),
             _ => throw new UnreachableException($"Unexpected type '{this}'"),
         };
     }

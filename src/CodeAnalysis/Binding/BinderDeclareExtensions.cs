@@ -73,7 +73,7 @@ internal static class BinderDeclareExtensions
 
         private void DeclareStruct(StructDeclarationSyntax syntax)
         {
-            var @struct = new StructSymbol(syntax, syntax.Name.FullName, binder.Module);
+            var @struct = new StructTypeSymbol(syntax, syntax.Name.FullName, binder.Module);
 
             if (!binder.TryDeclare(@struct))
             {
@@ -83,17 +83,17 @@ internal static class BinderDeclareExtensions
 
         private void DeclareStructMembers(StructDeclarationSyntax syntax)
         {
-            if (!binder.TryLookup<StructSymbol>(syntax.Name.FullName, out var @struct))
+            if (!binder.TryLookup<StructTypeSymbol>(syntax.Name.FullName, out var structType))
             {
                 // TODO: Should this be a diagnostics instead?
-                throw new UnreachableException($"Missing {nameof(StructSymbol)} '{syntax.Name.FullName}'");
+                throw new UnreachableException($"Missing {nameof(StructTypeSymbol)} '{syntax.Name.FullName}'");
             }
 
             foreach (var propertySyntax in syntax.Properties)
             {
                 var propertyType = binder.BindType(propertySyntax.TypeClause.Type);
-                var property = new PropertySymbol(propertySyntax, propertySyntax.Name.FullName, propertyType, @struct, Modifiers.None);
-                if (!@struct.TryDeclare(property))
+                var property = new PropertySymbol(propertySyntax, propertySyntax.Name.FullName, propertyType, structType, Modifiers.None);
+                if (!structType.TryDeclare(property))
                 {
                     binder.ReportSymbolRedeclaration(propertySyntax.SourceSpan, property.Name);
                 }

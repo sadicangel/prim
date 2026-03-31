@@ -12,26 +12,26 @@ internal static class SymbolFactory
         var global = MakeGlobalModule();
 
         var type = Declare(global, MakeRuntimeType(global));
-        var never = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.NeverKeyword), "never", global));
+        var never = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.NeverKeyword), "never", global));
 
-        var any = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.AnyKeyword), "any", global));
-        var unknown = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnknownKeyword), "unknown", global));
-        var unit = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnitKeyword), "unit", global));
-        var str = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.StrKeyword), "str", global));
-        var @bool = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.BoolKeyword), "bool", global));
-        var i8 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I8Keyword), "i8", global));
-        var i16 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I16Keyword), "i16", global));
-        var i32 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I32Keyword), "i32", global));
-        var i64 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I64Keyword), "i64", global));
-        var isz = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.IszKeyword), "isz", global));
-        var u8 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U8Keyword), "u8", global));
-        var u16 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U16Keyword), "u16", global));
-        var u32 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U32Keyword), "u32", global));
-        var u64 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U64Keyword), "u64", global));
-        var usz = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UszKeyword), "usz", global));
-        var f16 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F16Keyword), "f16", global));
-        var f32 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F32Keyword), "f32", global));
-        var f64 = Declare(global, new StructSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F64Keyword), "f64", global));
+        var any = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.AnyKeyword), "any", global));
+        var unknown = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnknownKeyword), "unknown", global));
+        var unit = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnitKeyword), "unit", global));
+        var str = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.StrKeyword), "str", global));
+        var @bool = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.BoolKeyword), "bool", global));
+        var i8 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I8Keyword), "i8", global));
+        var i16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I16Keyword), "i16", global));
+        var i32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I32Keyword), "i32", global));
+        var i64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I64Keyword), "i64", global));
+        var isz = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.IszKeyword), "isz", global));
+        var u8 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U8Keyword), "u8", global));
+        var u16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U16Keyword), "u16", global));
+        var u32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U32Keyword), "u32", global));
+        var u64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U64Keyword), "u64", global));
+        var usz = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UszKeyword), "usz", global));
+        var f16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F16Keyword), "f16", global));
+        var f32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F32Keyword), "f32", global));
+        var f64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F64Keyword), "f64", global));
 
         // Type is its own type. We need to avoid recursion.
         SetType(type, type);
@@ -85,9 +85,9 @@ internal static class SymbolFactory
         static extern void SetContainingModule(Symbol symbol, ModuleSymbol containingModule);
     }
 
-    private static StructSymbol MakeRuntimeType(ModuleSymbol global)
+    private static StructTypeSymbol MakeRuntimeType(ModuleSymbol global)
     {
-        var type = (StructSymbol)RuntimeHelpers.GetUninitializedObject(typeof(StructSymbol)) with
+        var type = (StructTypeSymbol)RuntimeHelpers.GetUninitializedObject(typeof(StructTypeSymbol)) with
         {
             SymbolKind = SymbolKind.Struct,
             Syntax = SyntaxToken.CreateSynthetic(SyntaxKind.TypeKeyword),
@@ -126,7 +126,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.EqualsEqualsToken),
                     Name: Mangler.Mangle(SyntaxKind.EqualsEqualsToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.EqualsEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -139,7 +139,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangEqualsToken),
                     Name: Mangler.Mangle(SyntaxKind.BangEqualsToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -158,7 +158,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanToken),
                     Name: Mangler.Mangle(SyntaxKind.LessThanToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -171,7 +171,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanEqualsToken),
                     Name: Mangler.Mangle(SyntaxKind.LessThanEqualsToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -184,7 +184,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanToken),
                     Name: Mangler.Mangle(SyntaxKind.GreaterThanToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -197,7 +197,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanEqualsToken),
                     Name: Mangler.Mangle(SyntaxKind.GreaterThanEqualsToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -216,7 +216,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Name: Mangler.Mangle(SyntaxKind.PlusToken, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                         Parameters: [type],
                         ReturnType: type,
@@ -229,7 +229,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
                     Name: Mangler.Mangle(SyntaxKind.MinusToken, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
                         Parameters: [type],
                         ReturnType: type,
@@ -242,7 +242,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Name: Mangler.Mangle(SyntaxKind.PlusToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -255,7 +255,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
                     Name: Mangler.Mangle(SyntaxKind.MinusToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -268,7 +268,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarToken),
                     Name: Mangler.Mangle(SyntaxKind.StarToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -281,7 +281,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.SlashToken),
                     Name: Mangler.Mangle(SyntaxKind.SlashToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.SlashToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -294,7 +294,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PercentToken),
                     Name: Mangler.Mangle(SyntaxKind.PercentToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PercentToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -307,7 +307,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarStarToken),
                     Name: Mangler.Mangle(SyntaxKind.StarStarToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarStarToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -326,7 +326,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.TildeToken),
                     Name: Mangler.Mangle(SyntaxKind.TildeToken, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.TildeToken),
                         Parameters: [type],
                         ReturnType: type,
@@ -339,7 +339,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandToken),
                     Name: Mangler.Mangle(SyntaxKind.AmpersandToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -352,7 +352,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipeToken),
                     Name: Mangler.Mangle(SyntaxKind.PipeToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipeToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -365,7 +365,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.HatToken),
                     Name: Mangler.Mangle(SyntaxKind.HatToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.HatToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -378,7 +378,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanLessThanToken),
                     Name: Mangler.Mangle(SyntaxKind.LessThanLessThanToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanLessThanToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -391,7 +391,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanGreaterThanToken),
                     Name: Mangler.Mangle(SyntaxKind.GreaterThanGreaterThanToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanGreaterThanToken),
                         Parameters: [type, type],
                         ReturnType: type,
@@ -410,7 +410,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangToken),
                     Name: Mangler.Mangle(SyntaxKind.BangToken, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangToken),
                         Parameters: [type],
                         ReturnType: type.ContainingModule.Bool,
@@ -423,7 +423,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandAmpersandToken),
                     Name: Mangler.Mangle(SyntaxKind.AmpersandAmpersandToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandAmpersandToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -436,7 +436,7 @@ internal static class SymbolFactory
                 new VariableSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipePipeToken),
                     Name: Mangler.Mangle(SyntaxKind.PipePipeToken, type, type),
-                    Type: new LambdaSymbol(
+                    Type: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipePipeToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
@@ -453,7 +453,7 @@ internal static class SymbolFactory
             new VariableSymbol(
                 Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                 Name: Mangler.Mangle(SyntaxKind.PlusToken, type, type),
-                Type: new LambdaSymbol(
+                Type: new LambdaTypeSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Parameters: [type, type],
                     ReturnType: type,
@@ -466,7 +466,7 @@ internal static class SymbolFactory
             new VariableSymbol(
                 Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                 Name: Mangler.Mangle(SyntaxKind.PlusToken, type, type.ContainingModule.Any),
-                Type: new LambdaSymbol(
+                Type: new LambdaTypeSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Parameters: [type, type.ContainingModule.Any],
                     ReturnType: type,
@@ -479,7 +479,7 @@ internal static class SymbolFactory
             new VariableSymbol(
                 Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                 Name: Mangler.Mangle(SyntaxKind.PlusToken, type.ContainingModule.Any, type),
-                Type: new LambdaSymbol(
+                Type: new LambdaTypeSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Parameters: [type.ContainingModule.Any, type],
                     ReturnType: type,

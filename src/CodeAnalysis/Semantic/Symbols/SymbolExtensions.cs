@@ -15,10 +15,10 @@ internal static class SymbolExtensions
             };
 
             static bool IsEntryPoint(VariableSymbol variable) =>
-                variable is { Name: "main", Type: LambdaSymbol lambda } && IsMainType(lambda);
+                variable is { Name: "main", Type: LambdaTypeSymbol lambdaType } && IsMainType(lambdaType);
 
-            static bool IsMainType(LambdaSymbol lambda) => lambda.ReturnType == lambda.ContainingModule.I32
-                && lambda.Parameters is [ArraySymbol args] && args.ElementType == lambda.ContainingModule.Str;
+            static bool IsMainType(LambdaTypeSymbol lambdaType) => lambdaType.ReturnType == lambdaType.ContainingModule.I32
+                && lambdaType.Parameters is [ArrayTypeSymbol args] && args.ElementType == lambdaType.ContainingModule.Str;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using CodeAnalysis;
 using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Evaluation;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Repl;
@@ -79,12 +80,7 @@ while (true)
 
     console.WriteLine(boundNode);
 
-    //foreach (var boundTree in compilation.BoundTrees)
-    //{
-    //    console.WriteLine(boundTree);
-    //}
-
-    //var evaluation = Evaluation.Evaluate(compilation, previousEvaluation);
+    var evaluation = new Interpreter().Interpret(boundNode);
 
     //console.WriteLine(evaluation.Values[0]);
 

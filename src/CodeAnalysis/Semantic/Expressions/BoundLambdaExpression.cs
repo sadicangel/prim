@@ -6,7 +6,7 @@ namespace CodeAnalysis.Semantic.Expressions;
 
 internal sealed record class BoundLambdaExpression(
     SyntaxNode Syntax,
-    LambdaSymbol LambdaType,
+    LambdaTypeSymbol LambdaType,
     ImmutableArray<VariableSymbol> Parameters,
     BoundExpression Body)
     : BoundExpression(BoundKind.LambdaExpression, Syntax, LambdaType)

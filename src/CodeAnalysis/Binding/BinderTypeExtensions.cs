@@ -27,7 +27,7 @@ internal static class BinderTypeExtensions
             };
         }
 
-        private ArraySymbol BindArrayType(ArrayTypeSyntax syntax)
+        private ArrayTypeSymbol BindArrayType(ArrayTypeSyntax syntax)
         {
             var elementType = binder.BindType(syntax.ElementType);
 
@@ -36,37 +36,37 @@ internal static class BinderTypeExtensions
                 // TODO: This should probably be isz, not i32.
                 case LiteralExpressionSyntax { SyntaxKind: SyntaxKind.I32LiteralExpression } literal:
                     Debug.Assert(literal.InstanceValue is int);
-                    return new ArraySymbol(syntax, elementType, (int)literal.InstanceValue, binder.Module);
+                    return new ArrayTypeSymbol(syntax, elementType, (int)literal.InstanceValue, binder.Module);
 
                 case null:
-                    return new ArraySymbol(syntax, elementType, null, binder.Module);
+                    return new ArrayTypeSymbol(syntax, elementType, null, binder.Module);
 
                 default:
                     binder.ReportInvalidArrayLength(syntax.Length.SourceSpan);
-                    return new ArraySymbol(syntax, binder.Module.Never, Length: 0, binder.Module);
+                    return new ArrayTypeSymbol(syntax, binder.Module.Never, Length: 0, binder.Module);
             }
         }
 
-        private LambdaSymbol BindLambdaType(LambdaTypeSyntax syntax)
+        private LambdaTypeSymbol BindLambdaType(LambdaTypeSyntax syntax)
         {
             var parameters = syntax.Parameters.Select(binder.BindType).ToImmutableArray();
             var returnType = binder.BindType(syntax.ReturnType);
 
-            return new LambdaSymbol(syntax, parameters, returnType, binder.Module);
+            return new LambdaTypeSymbol(syntax, parameters, returnType, binder.Module);
         }
 
-        private UnionSymbol BindMaybeType(MaybeTypeSyntax syntax)
+        private UnionTypeSymbol BindMaybeType(MaybeTypeSyntax syntax)
         {
             var underlyingType = binder.BindType(syntax.UnderlyingType);
 
-            return new UnionSymbol(syntax, [binder.Module.Unit, underlyingType], binder.Module);
+            return new UnionTypeSymbol(syntax, [binder.Module.Unit, underlyingType], binder.Module);
         }
 
-        private StructSymbol BindNamedType(NamedTypeSyntax syntax)
+        private StructTypeSymbol BindNamedType(NamedTypeSyntax syntax)
         {
-            if (binder.Module.TryLookup<StructSymbol>(syntax.Name.FullName, out var @struct))
+            if (binder.Module.TryLookup<StructTypeSymbol>(syntax.Name.FullName, out var structType))
             {
-                return @struct;
+                return structType;
             }
 
             binder.ReportUndefinedType(syntax.Name.SourceSpan, syntax.Name.FullName);
@@ -74,13 +74,13 @@ internal static class BinderTypeExtensions
             return binder.Module.Never;
         }
 
-        private PointerSymbol BindPointerType(PointerTypeSyntax syntax)
+        private PointerTypeSymbol BindPointerType(PointerTypeSyntax syntax)
         {
             var elementType = binder.BindType(syntax.ElementType);
-            return new PointerSymbol(syntax, elementType, binder.Module);
+            return new PointerTypeSymbol(syntax, elementType, binder.Module);
         }
 
-        private StructSymbol BindPredefinedType(PredefinedTypeSyntax syntax)
+        private StructTypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax)
         {
             return syntax.PredefinedTypeToken.SyntaxKind switch
             {
@@ -108,11 +108,11 @@ internal static class BinderTypeExtensions
             };
         }
 
-        private UnionSymbol BindUnionType(UnionTypeSyntax syntax)
+        private UnionTypeSymbol BindUnionType(UnionTypeSyntax syntax)
         {
             var types = syntax.Types.Select(binder.BindType).ToImmutableArray();
 
-            return new UnionSymbol(syntax, types, binder.Module);
+            return new UnionTypeSymbol(syntax, types, binder.Module);
         }
     }
 }

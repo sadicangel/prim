@@ -5,9 +5,9 @@ namespace CodeAnalysis.Semantic.Expressions;
 
 internal sealed record class BoundUnaryExpression(
     SyntaxNode Syntax,
-    VariableSymbol Operator,
+    BoundReference Operator,
     BoundExpression Operand)
-    : BoundExpression(BoundKind.UnaryExpression, Syntax, ((LambdaSymbol)Operator.Type).ReturnType)
+    : BoundExpression(BoundKind.UnaryExpression, Syntax, ((LambdaTypeSymbol)Operator.Type).ReturnType)
 {
     public override IEnumerable<ITreeNode> Children()
     {

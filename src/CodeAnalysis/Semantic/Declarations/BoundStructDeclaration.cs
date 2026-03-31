@@ -4,7 +4,7 @@ using CodeAnalysis.Semantic.Symbols;
 namespace CodeAnalysis.Semantic.Declarations;
 
 internal sealed record class BoundStructDeclaration(
-    StructSymbol StructSymbol,
+    StructTypeSymbol StructSymbol,
     ImmutableArray<BoundPropertyDeclaration> Properties)
     : BoundDeclaration(BoundKind.StructDeclaration, StructSymbol.Syntax, StructSymbol.ContainingModule.RuntimeType)
 {
