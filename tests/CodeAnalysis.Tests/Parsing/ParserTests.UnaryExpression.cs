@@ -1,4 +1,5 @@
 ﻿namespace CodeAnalysis.Tests.Parsing;
+
 partial class ParserTests
 {
     [Theory]

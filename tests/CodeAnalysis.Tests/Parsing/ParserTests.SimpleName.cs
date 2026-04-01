@@ -1,4 +1,5 @@
 ﻿namespace CodeAnalysis.Tests.Parsing;
+
 public partial class ParserTests
 {
     [Fact]

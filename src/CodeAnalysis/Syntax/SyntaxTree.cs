@@ -10,7 +10,7 @@ public readonly record struct ParseOptions(bool IsScript);
 
 public sealed class SyntaxTree(SourceText sourceText, ParseOptions parseOptions = default)
 {
-    private readonly Lazy<Result<CompilationUnitSyntax>> _parseResult = new(() => Parser.Parse(sourceText));
+    private readonly Lazy<Result<CompilationUnitSyntax>> _parseResult = new(() => SyntaxTokenStream.Parse(sourceText));
 
     public SourceText SourceText { get; } = sourceText ?? throw new ArgumentNullException(nameof(sourceText));
     public ParseOptions ParseOptions { get; } = parseOptions;

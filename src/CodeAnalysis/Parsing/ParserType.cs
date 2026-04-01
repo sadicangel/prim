@@ -1,32 +1,49 @@
-﻿using CodeAnalysis.Syntax;
+﻿using System.Diagnostics.CodeAnalysis;
+using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Parsing;
 
-internal partial class Parser
+internal static class ParserType
 {
-    private static TypeSyntax ParseType(SyntaxTokenStream stream)
+    extension(SyntaxTokenStream stream)
     {
-        // type         : predefined | named | maybe | array | pointer | lambda | union 
-        // predefined   : identifier (predefined names)
-        // named        : identifier
-        // maybe        : type '?'
-        // array        : type '[' expr ']'
-        // pointer      : type '*'
-        // lambda       : '(' parameters? ')' '->' type
-        // parameters   : parameter [',' parameters]*
-        // parameter    : identifier ':' type
-        // union        : type '|' type ['|' union]*
+        public TypeClauseSyntax? ParseTypeClause([DoesNotReturnIf(false)] bool isOptional)
+        {
+            if (isOptional && stream.Current.SyntaxKind is not SyntaxKind.ColonToken)
+            {
+                return null;
+            }
 
-        var types = ParseSyntaxList(
-            stream,
-            SyntaxKind.PipeToken,
-            [SyntaxKind.ColonToken, SyntaxKind.EqualsToken],
-            ParseSingleType);
+            var colonToken = stream.Match(SyntaxKind.ColonToken);
+            var type = stream.ParseType();
 
-        return types is [var type] ? type : new UnionTypeSyntax(types);
+            return new TypeClauseSyntax(colonToken, type);
+        }
 
-        static TypeSyntax ParseSingleType(SyntaxTokenStream stream)
+        public TypeSyntax ParseType()
+        {
+            // type         : predefined | named | maybe | array | pointer | lambda | union 
+            // predefined   : identifier (predefined names)
+            // named        : identifier
+            // maybe        : type '?'
+            // array        : type '[' expr ']'
+            // pointer      : type '*'
+            // lambda       : '(' parameters? ')' '->' type
+            // parameters   : parameter [',' parameters]*
+            // parameter    : identifier ':' type
+            // union        : type '|' type ['|' union]*
+
+            var types = stream.ParseSyntaxList(
+                SyntaxKind.PipeToken,
+                [SyntaxKind.ColonToken, SyntaxKind.EqualsToken],
+                ParseSingleType);
+
+            return types is [var type] ? type : new UnionTypeSyntax(types);
+        }
+
+        private TypeSyntax ParseSingleType()
         {
             TypeSyntax type = stream.Current.SyntaxKind switch
             {
@@ -49,23 +66,23 @@ internal partial class Parser
                     SyntaxKind.UszKeyword or
                     SyntaxKind.F16Keyword or
                     SyntaxKind.F32Keyword or
-                    SyntaxKind.F64Keyword => ParsePredefinedType(stream),
+                    SyntaxKind.F64Keyword => stream.ParsePredefinedType(),
 
-                SyntaxKind.ParenthesisOpenToken => ParseLambdaType(stream),
+                SyntaxKind.ParenthesisOpenToken => stream.ParseLambdaType(),
 
-                _ => ParseNamedType(stream)
+                _ => stream.ParseNamedType()
             };
 
             return stream.Current.SyntaxKind switch
             {
-                SyntaxKind.BracketOpenToken => ParseArrayType(stream, type),
-                SyntaxKind.StarToken => ParsePointerType(stream, type),
-                SyntaxKind.HookToken => ParseMaybeType(stream, type),
+                SyntaxKind.BracketOpenToken => stream.ParseArrayType(type),
+                SyntaxKind.StarToken => stream.ParsePointerType(type),
+                SyntaxKind.HookToken => stream.ParseMaybeType(type),
                 _ => type,
             };
         }
 
-        static PredefinedTypeSyntax ParsePredefinedType(SyntaxTokenStream stream)
+        private PredefinedTypeSyntax ParsePredefinedType()
         {
             var predefinedTypeToken = stream.Match(
             [
@@ -94,27 +111,26 @@ internal partial class Parser
             return new PredefinedTypeSyntax(predefinedTypeToken);
         }
 
-        static LambdaTypeSyntax ParseLambdaType(SyntaxTokenStream stream)
+        private LambdaTypeSyntax ParseLambdaType()
         {
             var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
-            var parameters = ParseSyntaxList(
-                stream,
+            var parameters = stream.ParseSyntaxList(
                 SyntaxKind.CommaToken,
                 [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
                 ParseType);
             var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
             var arrowToken = stream.Match(SyntaxKind.MinusGreaterThanToken);
-            var returnType = ParseType(stream);
+            var returnType = stream.ParseType();
             return new LambdaTypeSyntax(parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
         }
 
-        static NamedTypeSyntax ParseNamedType(SyntaxTokenStream stream)
+        private NamedTypeSyntax ParseNamedType()
         {
-            var name = ParseName(stream);
+            var name = stream.ParseName();
             return new NamedTypeSyntax(name);
         }
 
-        static ArrayTypeSyntax ParseArrayType(SyntaxTokenStream stream, TypeSyntax elementType)
+        private ArrayTypeSyntax ParseArrayType(TypeSyntax elementType)
         {
             var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
             if (stream.TryMatch(out var bracketCloseToken, SyntaxKind.BracketCloseToken))
@@ -122,20 +138,20 @@ internal partial class Parser
                 return new ArrayTypeSyntax(elementType, bracketOpenToken, bracketCloseToken);
             }
 
-            var length = ParseExpression(stream, allowUnterminated: false);
+            var length = stream.ParseExpressionTerminated();
             bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
 
             return new ArrayTypeSyntax(elementType, bracketOpenToken, length, bracketCloseToken);
         }
 
-        static PointerTypeSyntax ParsePointerType(SyntaxTokenStream stream, TypeSyntax elementType)
+        private PointerTypeSyntax ParsePointerType(TypeSyntax elementType)
         {
             var starToken = stream.Match(SyntaxKind.StarToken);
 
             return new PointerTypeSyntax(elementType, starToken);
         }
 
-        static MaybeTypeSyntax ParseMaybeType(SyntaxTokenStream stream, TypeSyntax underlyingType)
+        private MaybeTypeSyntax ParseMaybeType(TypeSyntax underlyingType)
         {
             var hookToken = stream.Match(SyntaxKind.HookToken);
             return new MaybeTypeSyntax(underlyingType, hookToken);
