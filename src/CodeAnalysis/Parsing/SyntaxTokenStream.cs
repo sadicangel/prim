@@ -5,7 +5,7 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Parsing;
 
-internal record class SyntaxIterator(SourceText SourceText, IReadOnlyList<SyntaxToken> Tokens)
+internal record class SyntaxTokenStream(SourceText SourceText, IReadOnlyList<SyntaxToken> Tokens)
 {
     private const int MaxSuccessiveMatchTokenErrors = 1;
 
@@ -111,13 +111,13 @@ internal record class SyntaxIterator(SourceText SourceText, IReadOnlyList<Syntax
         return false;
     }
 
-    private readonly ref struct Checkpoint(SyntaxIterator iterator) : IDisposable
+    private readonly ref struct Checkpoint(SyntaxTokenStream stream) : IDisposable
     {
-        private readonly int _offset = iterator.Offset;
+        private readonly int _offset = stream.Offset;
 
         public void Dispose()
         {
-            iterator.Offset = _offset;
+            stream.Offset = _offset;
         }
     }
 }

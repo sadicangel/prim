@@ -5,9 +5,9 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static ExpressionSyntax ParseBlockExpressionStatement(SyntaxIterator iterator) => iterator.Current.SyntaxKind switch
+    private static ExpressionSyntax ParseBlockExpressionStatement(SyntaxTokenStream stream) => stream.Current.SyntaxKind switch
     {
-        SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(iterator),
-        _ => ParseExpressionTerminated(iterator),
+        SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(stream),
+        _ => ParseExpressionTerminated(stream),
     };
 }

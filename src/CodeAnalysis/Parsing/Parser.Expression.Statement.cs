@@ -5,10 +5,10 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static StatementExpressionSyntax ParseStatementExpression(SyntaxIterator iterator)
+    private static StatementExpressionSyntax ParseStatementExpression(SyntaxTokenStream stream)
     {
-        var expression = ParseBinaryExpression(iterator);
-        var semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
+        var expression = ParseBinaryExpression(stream);
+        var semicolonToken = stream.Match(SyntaxKind.SemicolonToken);
 
         return new StatementExpressionSyntax(expression, semicolonToken);
     }

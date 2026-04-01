@@ -6,7 +6,7 @@ namespace CodeAnalysis.Parsing;
 internal partial class Parser
 {
     private static SeparatedSyntaxList<TNode> ParseSyntaxList<TNode>(
-        SyntaxIterator iterator,
+        SyntaxTokenStream stream,
         SyntaxKind separatorKind,
         ReadOnlySpan<SyntaxKind> endingKinds,
         ParseDelegate<TNode> parseNode)
@@ -15,22 +15,22 @@ internal partial class Parser
         var nodes = ImmutableArray.CreateBuilder<SyntaxNode>();
 
         var parseNext = true;
-        while (parseNext && !endingKinds.Contains(iterator.Current.SyntaxKind))
+        while (parseNext && !endingKinds.Contains(stream.Current.SyntaxKind))
         {
-            var start = iterator.Current;
+            var start = stream.Current;
 
-            var node = parseNode(iterator);
+            var node = parseNode(stream);
             nodes.Add(node);
 
-            if (iterator.TryMatch(out var separatorToken, separatorKind))
+            if (stream.TryMatch(out var separatorToken, separatorKind))
                 nodes.Add(separatorToken);
             else
                 parseNext = false;
 
             // No tokens consumed. Skip the current token to avoid infinite loop.
             // No need to report any extra error as parse methods already failed.
-            if (iterator.Current == start)
-                _ = iterator.Match();
+            if (stream.Current == start)
+                _ = stream.Match();
         }
 
         return new SeparatedSyntaxList<TNode>(nodes.ToImmutable());

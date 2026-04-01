@@ -6,9 +6,9 @@ namespace CodeAnalysis.Parsing;
 internal partial class Parser
 {
     // simple_name = 'identifier'
-    private static SimpleNameSyntax ParseSimpleName(SyntaxIterator iterator)
+    private static SimpleNameSyntax ParseSimpleName(SyntaxTokenStream stream)
     {
-        var identifierToken = iterator.Match(SyntaxKind.IdentifierToken);
+        var identifierToken = stream.Match(SyntaxKind.IdentifierToken);
 
         return new SimpleNameSyntax(identifierToken);
     }

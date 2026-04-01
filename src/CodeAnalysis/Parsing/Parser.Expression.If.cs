@@ -5,14 +5,14 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static IfExpressionSyntax ParseIfElseExpression(SyntaxIterator iterator)
+    private static IfExpressionSyntax ParseIfElseExpression(SyntaxTokenStream stream)
     {
-        var ifKeyword = iterator.Match(SyntaxKind.IfKeyword);
-        var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
-        var condition = ParseExpression(iterator);
-        var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-        var then = ParseExpression(iterator);
-        var elseClause = ParseElseClauseExpression(iterator);
+        var ifKeyword = stream.Match(SyntaxKind.IfKeyword);
+        var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
+        var condition = ParseExpression(stream);
+        var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
+        var then = ParseExpression(stream);
+        var elseClause = ParseElseClauseExpression(stream);
 
         return new IfExpressionSyntax(
             ifKeyword,

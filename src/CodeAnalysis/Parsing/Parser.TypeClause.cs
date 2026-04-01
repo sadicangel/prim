@@ -6,13 +6,13 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static TypeClauseSyntax? ParseTypeClause(SyntaxIterator iterator, [DoesNotReturnIf(false)] bool isOptional)
+    private static TypeClauseSyntax? ParseTypeClause(SyntaxTokenStream stream, [DoesNotReturnIf(false)] bool isOptional)
     {
         if (isOptional)
         {
-            if (iterator.TryMatch(out var colonToken, SyntaxKind.ColonToken))
+            if (stream.TryMatch(out var colonToken, SyntaxKind.ColonToken))
             {
-                var type = ParseType(iterator);
+                var type = ParseType(stream);
                 return new TypeClauseSyntax(colonToken, type);
             }
 
@@ -20,8 +20,8 @@ internal partial class Parser
         }
         else
         {
-            var colonToken = iterator.Match(SyntaxKind.ColonToken);
-            var type = ParseType(iterator);
+            var colonToken = stream.Match(SyntaxKind.ColonToken);
+            var type = ParseType(stream);
 
             return new TypeClauseSyntax(colonToken, type);
         }

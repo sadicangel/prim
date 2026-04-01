@@ -5,7 +5,7 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static TypeSyntax ParseType(SyntaxIterator iterator)
+    private static TypeSyntax ParseType(SyntaxTokenStream stream)
     {
         // type         : predefined | named | maybe | array | pointer | lambda | union 
         // predefined   : identifier (predefined names)
@@ -19,16 +19,16 @@ internal partial class Parser
         // union        : type '|' type ['|' union]*
 
         var types = ParseSyntaxList(
-            iterator,
+            stream,
             SyntaxKind.PipeToken,
             [SyntaxKind.ColonToken, SyntaxKind.EqualsToken],
             ParseSingleType);
 
         return types is [var type] ? type : new UnionTypeSyntax(types);
 
-        static TypeSyntax ParseSingleType(SyntaxIterator iterator)
+        static TypeSyntax ParseSingleType(SyntaxTokenStream stream)
         {
-            TypeSyntax type = iterator.Current.SyntaxKind switch
+            TypeSyntax type = stream.Current.SyntaxKind switch
             {
                 SyntaxKind.AnyKeyword or
                     SyntaxKind.UnknownKeyword or
@@ -49,25 +49,25 @@ internal partial class Parser
                     SyntaxKind.UszKeyword or
                     SyntaxKind.F16Keyword or
                     SyntaxKind.F32Keyword or
-                    SyntaxKind.F64Keyword => ParsePredefinedType(iterator),
+                    SyntaxKind.F64Keyword => ParsePredefinedType(stream),
 
-                SyntaxKind.ParenthesisOpenToken => ParseLambdaType(iterator),
+                SyntaxKind.ParenthesisOpenToken => ParseLambdaType(stream),
 
-                _ => ParseNamedType(iterator)
+                _ => ParseNamedType(stream)
             };
 
-            return iterator.Current.SyntaxKind switch
+            return stream.Current.SyntaxKind switch
             {
-                SyntaxKind.BracketOpenToken => ParseArrayType(iterator, type),
-                SyntaxKind.StarToken => ParsePointerType(iterator, type),
-                SyntaxKind.HookToken => ParseMaybeType(iterator, type),
+                SyntaxKind.BracketOpenToken => ParseArrayType(stream, type),
+                SyntaxKind.StarToken => ParsePointerType(stream, type),
+                SyntaxKind.HookToken => ParseMaybeType(stream, type),
                 _ => type,
             };
         }
 
-        static PredefinedTypeSyntax ParsePredefinedType(SyntaxIterator iterator)
+        static PredefinedTypeSyntax ParsePredefinedType(SyntaxTokenStream stream)
         {
-            var predefinedTypeToken = iterator.Match(
+            var predefinedTypeToken = stream.Match(
             [
                 SyntaxKind.AnyKeyword,
                 SyntaxKind.UnknownKeyword,
@@ -94,50 +94,50 @@ internal partial class Parser
             return new PredefinedTypeSyntax(predefinedTypeToken);
         }
 
-        static LambdaTypeSyntax ParseLambdaType(SyntaxIterator iterator)
+        static LambdaTypeSyntax ParseLambdaType(SyntaxTokenStream stream)
         {
-            var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
+            var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
             var parameters = ParseSyntaxList(
-                iterator,
+                stream,
                 SyntaxKind.CommaToken,
                 [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
                 ParseType);
-            var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-            var arrowToken = iterator.Match(SyntaxKind.MinusGreaterThanToken);
-            var returnType = ParseType(iterator);
+            var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
+            var arrowToken = stream.Match(SyntaxKind.MinusGreaterThanToken);
+            var returnType = ParseType(stream);
             return new LambdaTypeSyntax(parenthesisOpenToken, parameters, parenthesisCloseToken, arrowToken, returnType);
         }
 
-        static NamedTypeSyntax ParseNamedType(SyntaxIterator iterator)
+        static NamedTypeSyntax ParseNamedType(SyntaxTokenStream stream)
         {
-            var name = ParseName(iterator);
+            var name = ParseName(stream);
             return new NamedTypeSyntax(name);
         }
 
-        static ArrayTypeSyntax ParseArrayType(SyntaxIterator iterator, TypeSyntax elementType)
+        static ArrayTypeSyntax ParseArrayType(SyntaxTokenStream stream, TypeSyntax elementType)
         {
-            var bracketOpenToken = iterator.Match(SyntaxKind.BracketOpenToken);
-            if (iterator.TryMatch(out var bracketCloseToken, SyntaxKind.BracketCloseToken))
+            var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
+            if (stream.TryMatch(out var bracketCloseToken, SyntaxKind.BracketCloseToken))
             {
                 return new ArrayTypeSyntax(elementType, bracketOpenToken, bracketCloseToken);
             }
 
-            var length = ParseExpression(iterator, allowUnterminated: false);
-            bracketCloseToken = iterator.Match(SyntaxKind.BracketCloseToken);
+            var length = ParseExpression(stream, allowUnterminated: false);
+            bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
 
             return new ArrayTypeSyntax(elementType, bracketOpenToken, length, bracketCloseToken);
         }
 
-        static PointerTypeSyntax ParsePointerType(SyntaxIterator iterator, TypeSyntax elementType)
+        static PointerTypeSyntax ParsePointerType(SyntaxTokenStream stream, TypeSyntax elementType)
         {
-            var starToken = iterator.Match(SyntaxKind.StarToken);
+            var starToken = stream.Match(SyntaxKind.StarToken);
 
             return new PointerTypeSyntax(elementType, starToken);
         }
 
-        static MaybeTypeSyntax ParseMaybeType(SyntaxIterator iterator, TypeSyntax underlyingType)
+        static MaybeTypeSyntax ParseMaybeType(SyntaxTokenStream stream, TypeSyntax underlyingType)
         {
-            var hookToken = iterator.Match(SyntaxKind.HookToken);
+            var hookToken = stream.Match(SyntaxKind.HookToken);
             return new MaybeTypeSyntax(underlyingType, hookToken);
         }
     }

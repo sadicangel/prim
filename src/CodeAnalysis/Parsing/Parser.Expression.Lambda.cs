@@ -5,19 +5,19 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    public static LambdaExpressionSyntax ParseLambdaExpression(SyntaxIterator iterator)
+    public static LambdaExpressionSyntax ParseLambdaExpression(SyntaxTokenStream stream)
     {
-        var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
+        var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
         var parameters = ParseSyntaxList(
-            iterator,
+            stream,
             SyntaxKind.CommaToken,
             [SyntaxKind.ParenthesisCloseToken],
             ParseSimpleName);
 
-        var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
-        var equalsGreaterThanToken = iterator.Match(SyntaxKind.EqualsGreaterThanToken);
+        var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
+        var equalsGreaterThanToken = stream.Match(SyntaxKind.EqualsGreaterThanToken);
         // TODO: This should be block expression or statement expression. Not all.
-        var body = ParseExpressionTerminated(iterator);
+        var body = ParseExpressionTerminated(stream);
 
         return new LambdaExpressionSyntax(
             parenthesisOpenToken,

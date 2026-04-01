@@ -5,14 +5,14 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static ElseClauseSyntax? ParseElseClauseExpression(SyntaxIterator iterator)
+    private static ElseClauseSyntax? ParseElseClauseExpression(SyntaxTokenStream stream)
     {
-        if (!iterator.TryMatch(out var elseKeyword, SyntaxKind.ElseKeyword))
+        if (!stream.TryMatch(out var elseKeyword, SyntaxKind.ElseKeyword))
         {
             return null;
         }
 
-        var @else = ParseExpression(iterator);
+        var @else = ParseExpression(stream);
         return new ElseClauseSyntax(elseKeyword, @else);
     }
 }

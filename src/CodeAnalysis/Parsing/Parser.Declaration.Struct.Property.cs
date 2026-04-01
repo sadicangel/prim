@@ -5,12 +5,12 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxIterator iterator)
+    private static PropertyDeclarationSyntax ParsePropertyDeclaration(SyntaxTokenStream stream)
     {
-        var name = ParseSimpleName(iterator);
-        var typeClause = ParseTypeClause(iterator, isOptional: false);
-        var initClause = ParseInitClause(iterator, isOptional: true);
-        var semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
+        var name = ParseSimpleName(stream);
+        var typeClause = ParseTypeClause(stream, isOptional: false);
+        var initClause = ParseInitClause(stream, isOptional: true);
+        var semicolonToken = stream.Match(SyntaxKind.SemicolonToken);
 
         return new PropertyDeclarationSyntax(
             name,

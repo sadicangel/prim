@@ -6,13 +6,13 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static InitClauseSyntax? ParseInitClause(SyntaxIterator iterator, [DoesNotReturnIf(false)] bool isOptional)
+    private static InitClauseSyntax? ParseInitClause(SyntaxTokenStream stream, [DoesNotReturnIf(false)] bool isOptional)
     {
         if (isOptional)
         {
-            if (iterator.TryMatch(out var equalsToken, SyntaxKind.EqualsToken))
+            if (stream.TryMatch(out var equalsToken, SyntaxKind.EqualsToken))
             {
-                var expression = ParseExpression(iterator);
+                var expression = ParseExpression(stream);
                 return new InitClauseSyntax(equalsToken, expression);
             }
 
@@ -20,8 +20,8 @@ internal partial class Parser
         }
         else
         {
-            var equalsToken = iterator.Match(SyntaxKind.EqualsToken);
-            var expression = ParseExpression(iterator);
+            var equalsToken = stream.Match(SyntaxKind.EqualsToken);
+            var expression = ParseExpression(stream);
 
             return new InitClauseSyntax(equalsToken, expression);
         }

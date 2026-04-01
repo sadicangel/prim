@@ -6,11 +6,11 @@ namespace CodeAnalysis.Parsing;
 internal partial class Parser
 {
     // group_expression = '(' expr ')'
-    private static GroupExpressionSyntax ParseGroupExpression(SyntaxIterator iterator)
+    private static GroupExpressionSyntax ParseGroupExpression(SyntaxTokenStream stream)
     {
-        var parenthesisOpenToken = iterator.Match(SyntaxKind.ParenthesisOpenToken);
-        var expression = ParseExpression(iterator);
-        var parenthesisCloseToken = iterator.Match(SyntaxKind.ParenthesisCloseToken);
+        var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
+        var expression = ParseExpression(stream);
+        var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
 
         return new GroupExpressionSyntax(
             parenthesisOpenToken,

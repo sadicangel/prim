@@ -7,9 +7,9 @@ namespace CodeAnalysis.Parsing;
 internal partial class Parser
 {
     // literal_expression = 'true' | 'false' | 'null' | i8_literal | u8_literal | i16_literal | u16_literal | i32_literal | u32_literal | i64_literal | u64_literal | f16_literal | f32_literal | f64_literal | str_literal
-    public static LiteralExpressionSyntax ParseLiteralExpression(SyntaxIterator iterator)
+    public static LiteralExpressionSyntax ParseLiteralExpression(SyntaxTokenStream stream)
     {
-        var literalToken = iterator.Match();
+        var literalToken = stream.Match();
 
         return literalToken.SyntaxKind switch
         {

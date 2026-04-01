@@ -5,14 +5,14 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    public static BlockExpressionSyntax ParseBlockExpression(SyntaxIterator iterator)
+    public static BlockExpressionSyntax ParseBlockExpression(SyntaxTokenStream stream)
     {
-        var braceOpenToken = iterator.Match(SyntaxKind.BraceOpenToken);
+        var braceOpenToken = stream.Match(SyntaxKind.BraceOpenToken);
         var expressions = ParseSyntaxList(
-            iterator,
+            stream,
             [SyntaxKind.BraceCloseToken],
             ParseBlockExpressionStatement);
-        var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
+        var braceCloseToken = stream.Match(SyntaxKind.BraceCloseToken);
 
         return new BlockExpressionSyntax(braceOpenToken, expressions, braceCloseToken);
     }

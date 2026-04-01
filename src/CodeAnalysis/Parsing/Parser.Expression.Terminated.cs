@@ -4,6 +4,6 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static ExpressionSyntax ParseExpressionTerminated(SyntaxIterator iterator) =>
-        ParseExpression(iterator, allowUnterminated: false);
+    private static ExpressionSyntax ParseExpressionTerminated(SyntaxTokenStream stream) =>
+        ParseExpression(stream, allowUnterminated: false);
 }

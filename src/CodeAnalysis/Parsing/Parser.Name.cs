@@ -6,11 +6,11 @@ namespace CodeAnalysis.Parsing;
 internal partial class Parser
 {
     // name = simple_name | qualified_name
-    private static NameSyntax ParseName(SyntaxIterator iterator)
+    private static NameSyntax ParseName(SyntaxTokenStream stream)
     {
-        if (iterator.Peek(1).SyntaxKind is SyntaxKind.ColonColonToken)
-            return ParseQualifiedName(iterator);
+        if (stream.Peek(1).SyntaxKind is SyntaxKind.ColonColonToken)
+            return ParseQualifiedName(stream);
 
-        return ParseSimpleName(iterator);
+        return ParseSimpleName(stream);
     }
 }

@@ -5,9 +5,9 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    private static EmptyExpressionSyntax ParseEmptyExpression(SyntaxIterator iterator)
+    private static EmptyExpressionSyntax ParseEmptyExpression(SyntaxTokenStream stream)
     {
-        var semicolonToken = iterator.Match(SyntaxKind.SemicolonToken);
+        var semicolonToken = stream.Match(SyntaxKind.SemicolonToken);
 
         return new EmptyExpressionSyntax(semicolonToken);
     }

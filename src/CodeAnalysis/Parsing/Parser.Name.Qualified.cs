@@ -7,16 +7,16 @@ namespace CodeAnalysis.Parsing;
 internal partial class Parser
 {
     // qualified_name = simple_name ( "::" name )* ;
-    private static QualifiedNameSyntax ParseQualifiedName(SyntaxIterator iterator)
+    private static QualifiedNameSyntax ParseQualifiedName(SyntaxTokenStream stream)
     {
-        NameSyntax left = ParseSimpleName(iterator);
+        NameSyntax left = ParseSimpleName(stream);
         do
         {
-            var colonColonToken = iterator.Match(SyntaxKind.ColonColonToken);
-            var right = ParseSimpleName(iterator);
+            var colonColonToken = stream.Match(SyntaxKind.ColonColonToken);
+            var right = ParseSimpleName(stream);
 
             left = new QualifiedNameSyntax(left, colonColonToken, right);
-        } while (iterator.Current.SyntaxKind is SyntaxKind.ColonColonToken);
+        } while (stream.Current.SyntaxKind is SyntaxKind.ColonColonToken);
 
         return Unsafe.As<QualifiedNameSyntax>(left);
     }

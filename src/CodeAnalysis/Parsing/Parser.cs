@@ -7,9 +7,9 @@ namespace CodeAnalysis.Parsing;
 
 internal static partial class Parser
 {
-    private delegate T ParseDelegate<out T>(SyntaxIterator iterator) where T : SyntaxNode;
+    private delegate T ParseDelegate<out T>(SyntaxTokenStream stream) where T : SyntaxNode;
 
-    private delegate T? ParseOptionalDelegate<out T>(SyntaxIterator iterator) where T : SyntaxNode;
+    private delegate T? ParseOptionalDelegate<out T>(SyntaxTokenStream stream) where T : SyntaxNode;
 
     internal static Result<CompilationUnitSyntax> Parse(SourceText sourceText)
     {
@@ -21,7 +21,7 @@ internal static partial class Parser
                 scanDiagnostics);
         }
 
-        var iterator = new SyntaxIterator(sourceText, syntaxTokens);
+        var iterator = new SyntaxTokenStream(sourceText, syntaxTokens);
 
         // TODO: Maybe factor out module declaration?
         var all = ParseSyntaxList(iterator, [], ParseGlobalDeclaration);
