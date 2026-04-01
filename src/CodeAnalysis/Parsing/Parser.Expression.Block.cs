@@ -11,7 +11,7 @@ internal partial class Parser
         var expressions = ParseSyntaxList(
             iterator,
             [SyntaxKind.BraceCloseToken],
-            ParseExpressionTerminated);
+            ParseBlockExpressionStatement);
         var braceCloseToken = iterator.Match(SyntaxKind.BraceCloseToken);
 
         return new BlockExpressionSyntax(braceOpenToken, expressions, braceCloseToken);

@@ -182,7 +182,7 @@ internal static class BinderExpressionExtensions
                 return boundNode;
             }).ToImmutableArray();
 
-            return new BoundModuleDeclaration(binder.Module, members);
+            return new BoundModuleDeclaration(module, members);
         }
 
         private BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax)

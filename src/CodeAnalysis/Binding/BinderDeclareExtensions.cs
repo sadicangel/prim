@@ -27,7 +27,7 @@ internal static class BinderDeclareExtensions
                     binder = new GlobalSymbolBinder(module, binder);
                 }
 
-                foreach (var structSyntax in compilationUnit.Declarations.Select(x => x.Declaration).OfType<StructDeclarationSyntax>())
+                foreach (var structSyntax in compilationUnit.Declarations.OfType<StructDeclarationSyntax>())
                 {
                     binder.DeclareStruct(structSyntax);
                 }
@@ -48,7 +48,7 @@ internal static class BinderDeclareExtensions
                     binder = new GlobalSymbolBinder(module, binder);
                 }
 
-                foreach (var declaration in compilationUnit.Declarations.Select(x => x.Declaration))
+                foreach (var declaration in compilationUnit.Declarations)
                 {
                     switch (declaration)
                     {

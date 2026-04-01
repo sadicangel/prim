@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CodeAnalysis.Diagnostics;
@@ -35,7 +35,6 @@ internal sealed class LambdaBinder(LambdaTypeSymbol lambdaTypeType, Binder paren
     protected override bool TryLookupInCurrentScope<TSymbol>(string name, [MaybeNullWhen(false)] out TSymbol symbol)
     {
         symbol = null;
-        if (typeof(TSymbol) != typeof(VariableSymbol)) return false;
         if (_parameters?.TryGetValue(name, out var variable) is not true) return false;
         symbol = variable as TSymbol;
         return symbol is not null;

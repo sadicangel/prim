@@ -2,6 +2,7 @@
 using CodeAnalysis;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation;
+using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Repl;
@@ -24,12 +25,13 @@ while (true)
             y: i32 = 0;
         }
 
-        let value: i32 = 0;
+        let double: (i32) -> i32 = (x) => x * 2;
 
         let main: (str[]) -> i32 = (args) => {
             var a = 40;
             var b = -2;
             let c = a + b;
+            double(c);
         }
         """);
 
@@ -82,7 +84,8 @@ while (true)
 
     var evaluation = new Interpreter().Interpret(boundNode);
 
-    //console.WriteLine(evaluation.Values[0]);
+    var result = (PrimValue)((LambdaValue)evaluation).Delegate.DynamicInvoke(default(ArrayValue)!)!;
+    console.WriteLine(result);
 
     previousCompilation = compilation;
     //previousEvaluation = evaluation;

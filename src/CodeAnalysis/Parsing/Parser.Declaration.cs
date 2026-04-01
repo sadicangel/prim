@@ -5,7 +5,7 @@ namespace CodeAnalysis.Parsing;
 
 internal partial class Parser
 {
-    public static DeclarationSyntax ParseDeclaration(SyntaxIterator iterator) => iterator.Current.SyntaxKind switch
+    public static DeclarationSyntax ParseGlobalDeclaration(SyntaxIterator iterator) => iterator.Current.SyntaxKind switch
     {
         // TODO: Support enum declarations.
         SyntaxKind.ModuleKeyword => ParseModuleDeclaration(iterator),

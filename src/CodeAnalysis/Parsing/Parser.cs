@@ -25,8 +25,8 @@ internal static partial class Parser
 
         // TODO: Maybe factor out module declaration?
         var all = ParseSyntaxList(iterator, [], ParseGlobalDeclaration);
-        var module = all.SingleOrDefault(x => x.Declaration is ModuleDeclarationSyntax)?.Declaration as ModuleDeclarationSyntax;
-        var declarations = new SyntaxList<GlobalDeclarationSyntax>([.. all.Where(x => x.Declaration is not ModuleDeclarationSyntax)]);
+        var module = all.SingleOrDefault(x => x is ModuleDeclarationSyntax) as ModuleDeclarationSyntax;
+        var declarations = new SyntaxList<DeclarationSyntax>([.. all.Where(x => x is not ModuleDeclarationSyntax)]);
         var eofToken = iterator.Match(SyntaxKind.EofToken);
 
 

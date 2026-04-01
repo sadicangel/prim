@@ -4,7 +4,7 @@ namespace CodeAnalysis.Syntax;
 
 public sealed record class CompilationUnitSyntax(
     ModuleDeclarationSyntax? Module,
-    SyntaxList<GlobalDeclarationSyntax> Declarations,
+    SyntaxList<DeclarationSyntax> Declarations,
     SyntaxToken EofToken)
     : SyntaxNode(SyntaxKind.CompilationUnit)
 {

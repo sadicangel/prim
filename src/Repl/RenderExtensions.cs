@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
@@ -22,118 +23,118 @@ internal static class RenderExtensions
             console.Write(indentString);
     }
 
-    //private static void WriteType(this IAnsiConsole console, TypeSymbol type)
-    //{
-    //    console.MarkupInterpolated($"[green i]{Markup.Escape(type.QualifiedName)}[/]");
-    //}
+    extension(IAnsiConsole console)
+    {
+        private void WriteType(TypeSymbol type)
+        {
+            console.MarkupInterpolated($"[green i]{Markup.Escape(type.Name)}[/]");
+        }
 
-    //private static void WriteValue(this IAnsiConsole console, object value, int indent = 0)
-    //{
-    //    switch (value)
-    //    {
-    //        case ArrayValue array:
-    //            {
-    //                Indent(console, indent);
-    //                console.MarkupInterpolated($"[grey66]{Markup.Escape("[")}[/]");
-    //                var first = true;
-    //                foreach (var element in array)
-    //                {
-    //                    if (first) first = false;
-    //                    else console.Write(", ");
-    //                    console.WriteValue(element, indent);
-    //                }
-    //                console.MarkupInterpolated($"[grey66]{Markup.Escape("]")}[/]");
-    //            }
-    //            break;
-    //        case ErrorValue error:
-    //            {
-    //                Indent(console, indent);
-    //                if (error.IsError)
-    //                    console.MarkupInterpolated($"[maroon]err: [i]{Markup.Escape(error.ErrorMessage ?? "")}[/][/]");
-    //                else
-    //                    console.WriteValue(error.Value);
-    //            }
-    //            break;
-    //        case InstanceValue instance:
-    //            {
-    //                if (instance.IsLiteral)
-    //                {
-    //                    console.WriteValue(instance.Value, indent);
-    //                }
-    //                else
-    //                {
-    //                    Indent(console, indent);
-    //                    console.MarkupLineInterpolated($"[grey66]{"{"}[/]");
-    //                    ++indent;
-    //                    foreach (var (ps, pv) in instance)
-    //                    {
-    //                        Indent(console, indent);
-    //                        console.MarkupInterpolated($"[grey66]{Markup.Escape(ps.Name)}: [/]");
-    //                        console.WriteLine(pv);
-    //                    }
-    //                    --indent;
-    //                    Indent(console, indent);
-    //                    console.MarkupInterpolated($"[grey66]{Markup.Escape("}")}[/]");
-    //                }
-    //            }
-    //            break;
-    //        case LambdaValue lambda:
-    //            {
-    //                Indent(console, indent);
-    //                console.MarkupInterpolated($"[grey66]{Markup.Escape(lambda.Type.ToString())}[/]");
-    //            }
-    //            break;
-    //        case OptionValue option:
-    //            {
-    //                Indent(console, indent);
-    //                console.Write("[ ");
-    //                console.WriteValue(option.Value);
-    //                console.Write(" ] ");
-    //            }
-    //            break;
-    //        case ReferenceValue reference:
-    //            {
-    //                console.WriteValue(reference.ReferencedValue, indent);
-    //            }
-    //            break;
-    //        case StructValue @struct:
-    //            {
-    //                Indent(console, indent);
-    //                console.MarkupInterpolated($"[grey66]{Markup.Escape(@struct.Name)}[/]");
-    //            }
-    //            break;
-    //        case UnionValue union:
-    //            {
-    //                Indent(console, indent);
-    //                console.Write("[ ");
-    //                console.Write(union.Value);
-    //                console.Write(" ] ");
-    //            }
-    //            break;
-    //        case ModuleValue module:
-    //            {
-    //                Indent(console, indent);
-    //                console.Write(module.Name);
-    //            }
-    //            break;
-    //        default:
-    //            console.MarkupInterpolated($"[grey66]{Markup.Escape(value.ToString() ?? "")}[/]");
-    //            break;
-    //    }
-    //}
+        private void WriteValue(object value, int indent = 0)
+        {
+            switch (value)
+            {
+                case ArrayValue array:
+                    {
+                        Indent(console, indent);
+                        console.MarkupInterpolated($"[grey66]{Markup.Escape("[")}[/]");
+                        var first = true;
+                        foreach (var element in array)
+                        {
+                            if (first) first = false;
+                            else console.Write(", ");
+                            console.WriteValue(element, indent);
+                        }
 
-    //public static void Write(this IAnsiConsole console, PrimValue value, int indent = 0)
-    //{
-    //    console.WriteValue(value, indent);
-    //    console.Write(" ");
-    //    console.WriteType(value.Type);
-    //}
+                        console.MarkupInterpolated($"[grey66]{Markup.Escape("]")}[/]");
+                    }
+                    break;
+                //case ErrorValue error:
+                //    {
+                //        Indent(console, indent);
+                //        if (error.IsError)
+                //            console.MarkupInterpolated($"[maroon]err: [i]{Markup.Escape(error.ErrorMessage ?? "")}[/][/]");
+                //        else
+                //            console.WriteValue(error.Value);
+                //    }
+                //    break;
+                case InstanceValue instance:
+                    {
+                        if (instance.IsLiteral)
+                        {
+                            console.WriteValue(instance.Value, indent);
+                        }
+                        else
+                        {
+                            Indent(console, indent);
+                            console.MarkupLineInterpolated($"[grey66]{"{"}[/]");
+                            ++indent;
+                            foreach (var (ps, pv) in instance)
+                            {
+                                Indent(console, indent);
+                                console.MarkupInterpolated($"[grey66]{Markup.Escape(ps.Name)}: [/]");
+                                console.WriteLine(pv);
+                            }
 
-    //public static void WriteLine(this IAnsiConsole console, PrimValue value)
-    //{
-    //    console.Write(value);
-    //    console.WriteLine();
-    //}
+                            --indent;
+                            Indent(console, indent);
+                            console.MarkupInterpolated($"[grey66]{Markup.Escape("}")}[/]");
+                        }
+                    }
+                    break;
+                case LambdaValue lambda:
+                    {
+                        Indent(console, indent);
+                        console.MarkupInterpolated($"[grey66]{Markup.Escape(lambda.Type.ToString())}[/]");
+                    }
+                    break;
+                case ReferenceValue reference:
+                    {
+                        console.WriteValue(reference.ReferencedValue, indent);
+                    }
+                    break;
+                case StructValue @struct:
+                    {
+                        Indent(console, indent);
+                        console.MarkupInterpolated($"[grey66]{Markup.Escape(@struct.Name)}[/]");
+                    }
+                    break;
+                case UnionValue union:
+                    {
+                        Indent(console, indent);
+                        console.Write("[ ");
+                        console.Write(union.Value);
+                        console.Write(" ] ");
+                    }
+                    break;
+                case ModuleValue module:
+                    {
+                        Indent(console, indent);
+                        console.Write(module.ContainingModule);
+                    }
+                    break;
+                default:
+                    console.MarkupInterpolated($"[grey66]{Markup.Escape(value.ToString() ?? "")}[/]");
+                    break;
+            }
+        }
+    }
+
+    extension(IAnsiConsole console)
+    {
+        public void Write(PrimValue value, int indent = 0)
+        {
+            console.WriteValue(value, indent);
+            console.Write(" ");
+            console.WriteType(value.Type);
+        }
+
+        public void WriteLine(PrimValue value)
+        {
+            console.Write(value);
+            console.WriteLine();
+        }
+    }
 
     extension(IAnsiConsole console)
     {

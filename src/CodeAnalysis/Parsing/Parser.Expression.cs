@@ -10,10 +10,6 @@ internal partial class Parser
 
     public static ExpressionSyntax ParseExpression(SyntaxIterator iterator, bool allowUnterminated) => iterator.Current.SyntaxKind switch
     {
-        SyntaxKind.ModuleKeyword => ParseModuleDeclaration(iterator),
-        SyntaxKind.StructKeyword => ParseStructDeclaration(iterator),
-        SyntaxKind.LetKeyword => ParseVariableDeclaration(iterator),
-        SyntaxKind.VarKeyword => ParseVariableDeclaration(iterator),
         SyntaxKind.IfKeyword => ParseIfElseExpression(iterator),
         //SyntaxKind.ForKeyword => ParseForExpression(iterator),
         //SyntaxKind.WhileKeyword => ParseWhileExpression(iterator),
