@@ -7,10 +7,5 @@ internal sealed record class BoundModuleDeclaration(ModuleSymbol Module, Immutab
     : BoundDeclaration(BoundKind.ModuleDeclaration, Module.Syntax, Module.Type)
 {
     /// <inheritdoc />
-    public override IEnumerable<ITreeNode> Children()
-    {
-        yield return Module;
-        foreach (var member in Members)
-            yield return member;
-    }
+    public override IEnumerable<BoundNode> Children() => Members;
 }

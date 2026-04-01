@@ -49,7 +49,7 @@ internal static class DiagnosticMessage
     public static string InvalidParameterCount(int expected, int actual) =>
         $"Expected {expected} parameter(s), but got {actual}";
 
-    public static string InvalidArgumentListLength(int listLength) =>
+    public static string ArgumentCountMismatch(int listLength) =>
         $"Expression does not contain an overload that expects {listLength} arguments";
 
     public static string InvalidArrayLength() =>

@@ -7,9 +7,8 @@ internal sealed record class BoundPropertyDeclaration(PropertySymbol Property, B
     : BoundDeclaration(BoundKind.PropertyDeclaration, Property.Syntax, Property.Type)
 {
     /// <inheritdoc />
-    public override IEnumerable<ITreeNode> Children()
+    public override IEnumerable<BoundNode> Children()
     {
-        yield return Property;
         if (Initializer is not null)
             yield return Initializer;
     }

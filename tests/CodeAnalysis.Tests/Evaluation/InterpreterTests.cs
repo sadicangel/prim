@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Diagnostics;
+﻿using CodeAnalysis;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation;
 using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic.Declarations;
@@ -110,6 +111,60 @@ public sealed class InterpreterTests
 
         Assert.Equal(1, result.Get(x).Value);
         Assert.Equal(2, result.Get(y).Value);
+    }
+
+    [Fact]
+    public void Interpret_BoundInvocationExpression_InvokesLambda()
+    {
+        var compilation = CreateCompilation(
+            """
+            let addTwo: (i32) -> i32 = (x) => {
+                var result: i32 = x + 2;
+            };
+            let main: (str[]) -> i32 = (args) => {
+                var result: i32 = addTwo(40);
+            };
+            """);
+
+        var entryPoint = Assert.IsType<VariableSymbol>(compilation.EntryPoint);
+        var (boundNode, diagnostics) = compilation.Bind(entryPoint);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var invocation = Assert.IsType<BoundInvocationExpression>(resultDeclaration.Expression);
+
+        var result = new Interpreter().Interpret(invocation);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_BlockContainingOnlyNop_ReturnsUnit()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> unit = (args) => {
+                ;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        Assert.IsType<BoundNopExpression>(block.Expressions[0]);
+
+        var result = new Interpreter().Interpret(block);
+
+        Assert.Same(Unit.Value, result.Value);
+        Assert.Equal("unit", result.Type.Name);
     }
 
     private static Compilation CreateCompilation(string source)

@@ -45,10 +45,10 @@ internal static class BinderExpressionExtensions
                     binder.BindPropertyDeclaration((PropertyDeclarationSyntax)syntax),
                 //SyntaxKind.LocalDeclaration =>
                 //    binder.BindLocalDeclaration((LocalDeclarationSyntax)syntax),
-                //SyntaxKind.EmptyExpression =>
-                //    binder.BindEmptyExpression((EmptyExpressionSyntax)syntax),
-                //SyntaxKind.StatementExpression =>
-                //    binder.BindStatementExpression((StatementExpressionSyntax)syntax),
+                SyntaxKind.EmptyExpression =>
+                    binder.BindEmptyExpression((EmptyExpressionSyntax)syntax),
+                SyntaxKind.StatementExpression =>
+                    binder.BindStatementExpression((StatementExpressionSyntax)syntax),
                 SyntaxKind.BlockExpression =>
                     binder.BindBlockExpression((BlockExpressionSyntax)syntax),
                 //SyntaxKind.ArrayExpression =>
@@ -59,8 +59,8 @@ internal static class BinderExpressionExtensions
                 //    binder.BindMemberAccessExpression((MemberAccessExpressionSyntax)syntax),
                 //SyntaxKind.IndexExpression =>
                 //    binder.BindIndexExpression((IndexExpressionSyntax)syntax),
-                //SyntaxKind.InvocationExpression =>
-                //    binder.BindInvocationExpression((InvocationExpressionSyntax)syntax),
+                SyntaxKind.InvocationExpression =>
+                    binder.BindInvocationExpression((InvocationExpressionSyntax)syntax),
                 //SyntaxKind.ConversionExpression =>
                 //    binder.BindConversionExpression((ConversionExpressionSyntax)syntax),
                 SyntaxKind.UnaryPlusExpression or
@@ -270,6 +270,11 @@ internal static class BinderExpressionExtensions
             return new BoundVariableDeclaration(syntax, variable, new BoundNeverExpression(syntax, binder.Module.Never));
         }
 
+
+        private BoundNopExpression BindEmptyExpression(EmptyExpressionSyntax syntax) => new(syntax, binder.Module.Never);
+
+        private BoundExpression BindStatementExpression(StatementExpressionSyntax syntax) => binder.BindExpression(syntax.Expression);
+
         private BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax)
         {
             binder = new BlockBinder(binder);
@@ -318,6 +323,29 @@ internal static class BinderExpressionExtensions
             binder.ReportUndefinedTypeMember(operatorToken.SourceSpan, types[0].FullName, operatorName);
 
             return null;
+        }
+
+        private BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax)
+        {
+            var callee = binder.BindExpression(syntax.Callee);
+            if (callee.Type is not LambdaTypeSymbol lambdaType)
+            {
+                binder.ReportUndefinedInvocationOperator(callee.Syntax.SourceSpan, callee.Type.Name);
+                return new BoundNeverExpression(syntax, binder.Module.Never);
+            }
+
+            if (lambdaType.Parameters.Length != syntax.Arguments.Count)
+            {
+                binder.ReportArgumentCountMismatch(syntax.SourceSpan /*, lambdaType.ParameterTypes.Length*/, syntax.Arguments.Count);
+                return new BoundNeverExpression(syntax, binder.Module.Never);
+            }
+
+            var arguments = syntax.Arguments
+                .Select(binder.BindExpression)
+                .Select((argument, index) => binder.Convert(argument, lambdaType.Parameters[index]))
+                .ToImmutableArray();
+
+            return new BoundInvocationExpression(syntax, callee, arguments, lambdaType.ReturnType);
         }
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)

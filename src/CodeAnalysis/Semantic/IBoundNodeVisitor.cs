@@ -3,7 +3,7 @@ using CodeAnalysis.Semantic.Expressions;
 
 namespace CodeAnalysis.Semantic;
 
-internal interface IBoundNodeVisitor<T>
+internal interface IBoundNodeVisitor<out T>
 {
     // Declarations
     T Visit(BoundModuleDeclaration node);
@@ -13,6 +13,7 @@ internal interface IBoundNodeVisitor<T>
     T Visit(BoundVariableDeclaration node);
 
     // Expressions
+    T Visit(BoundNopExpression node);
     T Visit(BoundBinaryExpression node);
     T Visit(BoundBlockExpression node);
     T Visit(BoundLambdaExpression node);
@@ -20,6 +21,7 @@ internal interface IBoundNodeVisitor<T>
     T Visit(BoundReference node);
     T Visit(BoundNeverExpression node);
     T Visit(BoundUnaryExpression node);
+    T Visit(BoundInvocationExpression node);
 }
 
 internal static class BoundNodeVisitorExtensions
@@ -30,7 +32,7 @@ internal static class BoundNodeVisitorExtensions
         {
             BoundKind.Unbound => throw CreateUnsupportedNodeKindException(node),
             BoundKind.CompilationUnit => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.NopExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.NopExpression => visitor.Visit((BoundNopExpression)node),
             BoundKind.NeverExpression => visitor.Visit((BoundNeverExpression)node),
             BoundKind.StackInstantiation => throw CreateUnsupportedNodeKindException(node),
             BoundKind.LiteralExpression => visitor.Visit((BoundLiteralExpression)node),
@@ -50,7 +52,7 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.ArrayInitExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.StructInitExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.PropertyInitExpression => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.InvocationExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.InvocationExpression => visitor.Visit((BoundInvocationExpression)node),
             BoundKind.ConversionExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.UnaryExpression => visitor.Visit((BoundUnaryExpression)node),
             BoundKind.BinaryExpression => visitor.Visit((BoundBinaryExpression)node),

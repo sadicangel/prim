@@ -82,6 +82,11 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         return CacheValue(node.VariableSymbol, node, () => this.Visit(node.Expression));
     }
 
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundNopExpression node)
+    {
+        return CreateValue(node.Type.ContainingModule.Unit, Unit.Value);
+    }
+
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundBinaryExpression node)
     {
         var left = this.Visit(node.Left);
@@ -98,7 +103,9 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
 
         try
         {
-            var result = CreateDefaultValue(node.Type);
+            var result = node.Type.MapsToNever
+                ? CreateValue(node.Type.ContainingModule.Unit, Unit.Value)
+                : CreateDefaultValue(node.Type);
             foreach (var child in node.Expressions)
             {
                 result = this.Visit(child);
@@ -140,6 +147,21 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
 
         return ((LambdaValue)@operator).Invoke(operand);
     }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundInvocationExpression node)
+    {
+        var callee = this.Visit(node.Callee) as LambdaValue
+            ?? throw new InvalidOperationException($"Expected invocation callee '{node.Callee.Type.Name}' to evaluate to a lambda value.");
+
+        var arguments = new PrimValue[node.Arguments.Length];
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            arguments[i] = this.Visit(node.Arguments[i]);
+        }
+
+        return callee.Invoke(arguments);
+    }
+
     private PrimValue Evaluate(BoundNode node)
     {
         var index = GetOrCreateIndex(node.GetRoot());

@@ -10,7 +10,7 @@ internal sealed record class BoundBinaryExpression(
     BoundExpression Right)
     : BoundExpression(BoundKind.BinaryExpression, Syntax, ((LambdaTypeSymbol)Operator.Type).ReturnType)
 {
-    public override IEnumerable<ITreeNode> Children()
+    public override IEnumerable<BoundNode> Children()
     {
         yield return Left;
         yield return Operator;

@@ -57,26 +57,18 @@ begin:
                 //    }
                 //    goto begin;
 
-                //case SyntaxKind.ParenthesisOpenToken:
-                //    {
-                //        var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
-                //        var arguments = ParseSeparatedSyntaxList(
-                //            syntaxTree,
-                //            stream,
-                //            SyntaxKind.CommaToken,
-                //            [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
-                //            ParseArgument);
-                //        var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
+                case SyntaxKind.ParenthesisOpenToken:
+                    {
+                        var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
+                        var arguments = stream.ParseSyntaxList(
+                            SyntaxKind.CommaToken,
+                            [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
+                            ParserExpression.ParseExpression);
+                        var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
 
-                //        left = new InvocationExpressionSyntax(syntaxTree, left, parenthesisOpenToken, arguments, parenthesisCloseToken);
-
-                //        static ArgumentSyntax ParseArgument(SyntaxTree syntaxTree, SyntaxTokenStream stream)
-                //        {
-                //            var expression = ParseExpression(syntaxTree, stream);
-                //            return new ArgumentSyntax(syntaxTree, expression);
-                //        }
-                //    }
-                //    goto begin;
+                        left = new InvocationExpressionSyntax(left, parenthesisOpenToken, arguments, parenthesisCloseToken);
+                    }
+                    goto begin;
 
                 //case SyntaxKind.EqualsToken:
                 //    {

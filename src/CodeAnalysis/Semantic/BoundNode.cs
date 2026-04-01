@@ -1,14 +1,14 @@
-using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic;
 
-internal abstract record class BoundNode(BoundKind BoundKind, SyntaxNode Syntax) : ITreeNode
+internal abstract record class BoundNode(BoundKind BoundKind, SyntaxNode Syntax)
 {
     internal BoundNode? Parent { get; private set; }
 
     public virtual bool CanExitScope => false;
 
-    public abstract IEnumerable<ITreeNode> Children();
+    public abstract IEnumerable<BoundNode> Children();
 
     internal void SetParent(BoundNode? parent) => Parent = parent;
 }

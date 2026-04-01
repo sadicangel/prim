@@ -11,11 +11,8 @@ internal sealed record class BoundLambdaExpression(
     BoundExpression Body)
     : BoundExpression(BoundKind.LambdaExpression, Syntax, LambdaType)
 {
-    public override IEnumerable<ITreeNode> Children()
+    public override IEnumerable<BoundNode> Children()
     {
-        yield return LambdaType;
-        foreach (var parameter in Parameters)
-            yield return parameter;
         yield return Body;
     }
 }

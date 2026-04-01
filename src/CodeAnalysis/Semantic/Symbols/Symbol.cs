@@ -9,7 +9,7 @@ internal abstract record class Symbol(
     TypeSymbol Type,
     Symbol ContainingSymbol,
     ModuleSymbol ContainingModule,
-    Modifiers Modifiers) : ITreeNode
+    Modifiers Modifiers)
 {
     public string FullName => field ??= Name is "<global>" ? Name : $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
 
@@ -19,7 +19,4 @@ internal abstract record class Symbol(
     public override int GetHashCode() => HashCode.Combine(SymbolKind, Name);
 
     public sealed override string ToString() => $"{Name}: {Type.Name}";
-
-    /// <inheritdoc />
-    public IEnumerable<ITreeNode> Children() => [];
 }

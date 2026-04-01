@@ -7,11 +7,6 @@ using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 using Spectre.Console;
-using IAnsiConsole = Spectre.Console.IAnsiConsole;
-using IHasTreeNodes = Spectre.Console.IHasTreeNodes;
-using Markup = Spectre.Console.Markup;
-using Panel = Spectre.Console.Panel;
-using Tree = Spectre.Console.Tree;
 
 namespace Repl;
 
@@ -252,15 +247,15 @@ internal static class RenderExtensions
             console.WriteLine();
         }
 
-        public void Write(ITreeNode node)
+        public void Write(BoundNode node)
         {
             var tree = new Tree(node.GetType().Name).Style("dim white");
 
             WriteTo(node, tree);
 
-            console.Write(new Panel(tree).Header(GetKind(node)));
+            console.Write(new Panel(tree).Header(node.BoundKind.ToString()));
 
-            static void WriteTo(ITreeNode node, IHasTreeNodes tree)
+            static void WriteTo(BoundNode node, IHasTreeNodes tree)
             {
                 tree = node switch
                 {
@@ -268,10 +263,8 @@ internal static class RenderExtensions
                         tree.AddNode($"[aqua]{declaration.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(declaration.VariableSymbol.Name)}[/]"),
                     BoundExpression expression =>
                         tree.AddNode($"[aqua]{expression.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"),
-                    Symbol symbol =>
-                        tree.AddNode($"[aqua]{Markup.Escape(symbol.Name)}[/]"),
                     _ =>
-                        tree.AddNode($"[aqua]{GetKind(node)}[/]")
+                        tree.AddNode($"[aqua]{node.BoundKind.ToString()}[/]")
                 };
 
                 foreach (var child in node.Children())
@@ -279,19 +272,9 @@ internal static class RenderExtensions
                     WriteTo(child, tree);
                 }
             }
-
-            static string GetKind(ITreeNode treeNode)
-            {
-                return treeNode switch
-                {
-                    Symbol symbol => symbol.SymbolKind.ToString(),
-                    BoundNode node => node.BoundKind.ToString(),
-                    _ => throw new UnreachableException($"Unexpected {nameof(ITreeNode)} '{treeNode.GetType().Name}'")
-                };
-            }
         }
 
-        public void WriteLine(ITreeNode node)
+        public void WriteLine(BoundNode node)
         {
             console.Write(node);
             console.WriteLine();

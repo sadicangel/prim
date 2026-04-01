@@ -3,8 +3,9 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Expressions;
 
-internal sealed record class BoundLiteralExpression(SyntaxNode Syntax, TypeSymbol Type, object Value)
-    : BoundExpression(BoundKind.LiteralExpression, Syntax, Type)
+internal sealed record class BoundNopExpression(SyntaxNode Syntax, TypeSymbol Type)
+    : BoundExpression(BoundKind.NopExpression, Syntax, Type)
 {
+    /// <inheritdoc />
     public override IEnumerable<BoundNode> Children() => [];
 }

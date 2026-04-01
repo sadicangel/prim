@@ -9,7 +9,7 @@ internal sealed record class BoundUnaryExpression(
     BoundExpression Operand)
     : BoundExpression(BoundKind.UnaryExpression, Syntax, ((LambdaTypeSymbol)Operator.Type).ReturnType)
 {
-    public override IEnumerable<ITreeNode> Children()
+    public override IEnumerable<BoundNode> Children()
     {
         yield return Operator;
         yield return Operand;

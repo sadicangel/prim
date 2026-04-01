@@ -6,8 +6,5 @@ internal sealed record class BoundPredefinedDeclaration(Symbol Symbol)
     : BoundDeclaration(BoundKind.PredefinedDeclaration, Symbol.Syntax, Symbol.Type)
 {
     /// <inheritdoc />
-    public override IEnumerable<ITreeNode> Children()
-    {
-        yield return Symbol;
-    }
+    public override IEnumerable<BoundNode> Children() => [];
 }

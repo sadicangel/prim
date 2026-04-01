@@ -58,8 +58,8 @@ internal static class ReportDiagnosticExtensions
         public void ReportInvalidParameterCount(SourceSpan sourceSpan, int expected, int actual) =>
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidParameterCount(expected, actual));
 
-        public void ReportInvalidArgumentListLength(SourceSpan sourceSpan, int listLength) =>
-            reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidArgumentListLength(listLength));
+        public void ReportArgumentCountMismatch(SourceSpan sourceSpan, int listLength) =>
+            reporter.ReportError(sourceSpan, DiagnosticMessage.ArgumentCountMismatch(listLength));
 
         public void ReportInvalidArrayLength(SourceSpan sourceSpan) =>
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidArrayLength());
