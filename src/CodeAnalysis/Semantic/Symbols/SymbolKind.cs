@@ -4,6 +4,8 @@ public enum SymbolKind
 {
     Module,
     Property,
+    Indexer,
+    Operator,
     Variable,
     Label,
 

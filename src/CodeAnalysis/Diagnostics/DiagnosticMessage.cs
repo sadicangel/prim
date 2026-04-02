@@ -55,6 +55,10 @@ internal static class DiagnosticMessage
     public static string InvalidArrayLength() =>
         $"Invalid array length expression. Must be a constant {SyntaxFacts.GetText(SyntaxKind.I32Keyword)} value";
 
+    public static string ArrayElementTypeMismatch() =>
+        "Array initializer contains elements of different types";
+
+
     public static string InvalidAssignment() =>
         "Invalid left-hand side of assignment. Expected a reference (variable, property or indexer)";
 

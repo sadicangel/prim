@@ -1,4 +1,4 @@
-﻿namespace CodeAnalysis.Semantic;
+namespace CodeAnalysis.Semantic;
 
 internal enum BoundKind
 {
@@ -26,12 +26,15 @@ internal enum BoundKind
     OperatorDeclaration,
     ConversionDeclaration,
 
-    Reference,
+    VariableReference,
+    PropertyReference,
+    ElementReference,
 
     BlockExpression,
     ArrayInitExpression,
     StructInitExpression,
     PropertyInitExpression,
+    IndexExpression,
     InvocationExpression,
 
     ConversionExpression,

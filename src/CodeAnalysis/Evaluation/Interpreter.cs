@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
@@ -6,6 +6,7 @@ using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
+using CodeAnalysis.Semantic.References;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 
@@ -23,58 +24,70 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundModuleDeclaration node)
     {
-        return CacheValue(node.Module, node, () =>
-        {
-            var moduleValue = new ModuleValue(node.Module, node.Module.IsGlobal ? null! : ResolveModuleValue(node.Module.ContainingModule));
-            _evaluations[node.Module] = moduleValue;
-
-            foreach (var member in node.Members)
+        return CacheValue(
+            node.Module,
+            node,
+            () =>
             {
-                var memberValue = this.Visit(member);
-                if (TryGetDeclaredSymbol(member, out var symbol))
-                {
-                    moduleValue.Set(symbol, memberValue);
-                }
-            }
+                var moduleValue = new ModuleValue(node.Module, node.Module.IsGlobal ? null! : ResolveModuleValue(node.Module.ContainingModule));
+                _evaluations[node.Module] = moduleValue;
 
-            return moduleValue;
-        });
+                foreach (var member in node.Members)
+                {
+                    var memberValue = this.Visit(member);
+                    if (TryGetDeclaredSymbol(member, out var symbol))
+                    {
+                        moduleValue.Set(symbol, memberValue);
+                    }
+                }
+
+                return moduleValue;
+            });
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundPredefinedDeclaration node)
     {
-        return CacheValue(node.Symbol, node, () => node.Symbol switch
-        {
-            StructTypeSymbol structType => new StructValue(structType, structType.ContainingModule.RuntimeType),
-            VariableSymbol { Type: LambdaTypeSymbol lambdaType } variable => new LambdaValue(lambdaType, CreateBuiltinDelegate(variable, lambdaType)),
-            ModuleSymbol module => new ModuleValue(module, module.IsGlobal ? null! : ResolveModuleValue(module.ContainingModule)),
-            _ => throw new NotSupportedException($"Unsupported predefined symbol '{node.Symbol}'.")
-        });
+        return CacheValue(
+            node.Symbol,
+            node,
+            () => node.Symbol switch
+            {
+                StructTypeSymbol structType => new StructValue(structType, structType.ContainingModule.RuntimeType),
+                VariableSymbol { Type: LambdaTypeSymbol lambdaType } variable => new LambdaValue(lambdaType, CreateBuiltinDelegate(variable, lambdaType)),
+                ModuleSymbol module => new ModuleValue(module, module.IsGlobal ? null! : ResolveModuleValue(module.ContainingModule)),
+                _ => throw new NotSupportedException($"Unsupported predefined symbol '{node.Symbol}'.")
+            });
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundPropertyDeclaration node)
     {
-        return CacheValue(node.Property, node, () =>
-            node.Initializer is not null
-                ? this.Visit(node.Initializer)
-                : CreateDefaultValue(node.Property.Type));
+        return CacheValue(
+            node.Property,
+            node,
+            () =>
+                node.Initializer is not null
+                    ? this.Visit(node.Initializer)
+                    : CreateDefaultValue(node.Property.Type));
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundStructDeclaration node)
     {
-        return CacheValue(node.StructSymbol, node, () =>
-        {
-            var structValue = new StructValue(node.StructSymbol, node.StructSymbol.ContainingModule.RuntimeType);
-            _evaluations[node.StructSymbol] = structValue;
-
-            foreach (var property in node.Properties)
+        return CacheValue(
+            node.StructSymbol,
+            node,
+            () =>
             {
-                var propertyValue = this.Visit(property);
-                structValue.Set(property.Property, propertyValue);
-            }
+                var structValue = new StructValue(node.StructSymbol, node.StructSymbol.ContainingModule.RuntimeType);
+                _evaluations[node.StructSymbol] = structValue;
 
-            return structValue;
-        });
+                foreach (var property in node.Properties)
+                {
+                    var propertyValue = this.Visit(property);
+                    structValue.Set(property.Property, propertyValue);
+                }
+
+                return structValue;
+            });
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundVariableDeclaration node)
@@ -119,10 +132,22 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
     }
 
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundArrayInitExpression node)
+    {
+        var elements = new PrimValue[node.Elements.Length];
+        for (var i = 0; i < elements.Length; i++)
+        {
+            elements[i] = this.Visit(node.Elements[i]);
+        }
+
+        return new ArrayValue((ArrayTypeSymbol)node.Type, elements);
+    }
+
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundAssignmentExpression node)
     {
+        var left = ResolveReference(node.Left);
         var value = this.Visit(node.Right);
-        AssignValue(node.Left.Symbol, value);
+        left.ReferencedValue = value;
         return value;
     }
 
@@ -137,9 +162,19 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         return CreateValue(node.Type, node.Value);
     }
 
-    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundReference node)
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundVariableReference node)
     {
-        return ResolveSymbolValue(node.Symbol);
+        return ResolveReference(node).ReferencedValue;
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundPropertyReference node)
+    {
+        return ResolveReference(node).ReferencedValue;
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundElementReference node)
+    {
+        return ResolveReference(node).ReferencedValue;
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundNeverExpression node)
@@ -286,6 +321,35 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
 
         _evaluations[symbol] = value;
+    }
+
+    private ReferenceValue ResolveReference(BoundReference reference)
+    {
+        return reference switch
+        {
+            BoundVariableReference variable => new ReferenceValue(
+                variable.Type,
+                () => ResolveSymbolValue(variable.Variable),
+                value => AssignValue(variable.Variable, value)),
+            BoundPropertyReference property => new ReferenceValue(
+                property.Type,
+                () => ResolveSymbolValue(property.Property),
+                value => AssignValue(property.Property, value)),
+            BoundElementReference element => ResolveElementReference(element),
+            _ => throw new NotSupportedException($"Unsupported reference '{reference.GetType().Name}'.")
+        };
+    }
+
+    private ReferenceValue ResolveElementReference(BoundElementReference element)
+    {
+        var receiver = this.Visit(element.Receiver) as ArrayValue
+            ?? throw new InvalidOperationException($"Expected indexer receiver '{element.Receiver.Type.Name}' to evaluate to an array value.");
+        var index = this.Visit(element.Index);
+
+        return new ReferenceValue(
+            element.Type,
+            () => receiver[index],
+            value => receiver[index] = value);
     }
 
     private bool TryGetAssignmentFrame(Symbol symbol, out EvaluationFrame frame)
@@ -526,8 +590,8 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         {
             SyntaxKind.PlusToken => CreateValue(returnType, value),
             SyntaxKind.MinusToken => CreateValue(returnType, -value),
-            SyntaxKind.TildeToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)(~(sbyte)(object)value)),
-            SyntaxKind.TildeToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)(~(short)(object)value)),
+            SyntaxKind.TildeToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)~(sbyte)(object)value),
+            SyntaxKind.TildeToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)~(short)(object)value),
             SyntaxKind.TildeToken when typeof(T) == typeof(int) => CreateValue(returnType, ~(int)(object)value),
             SyntaxKind.TildeToken when typeof(T) == typeof(long) => CreateValue(returnType, ~(long)(object)value),
             SyntaxKind.TildeToken when typeof(T) == typeof(nint) => CreateValue(returnType, ~(nint)(object)value),
@@ -819,6 +883,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
                     {
                         index.Parameters[lambda.Parameters[i]] = new ParameterSlot(lambda, i);
                     }
+
                     break;
             }
 
@@ -831,4 +896,3 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
 
     private readonly record struct ParameterSlot(BoundLambdaExpression Lambda, int Index);
 }
-

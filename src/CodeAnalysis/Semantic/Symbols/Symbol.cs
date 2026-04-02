@@ -11,12 +11,9 @@ internal abstract record class Symbol(
     ModuleSymbol ContainingModule,
     Modifiers Modifiers)
 {
-    public string FullName => field ??= Name is "<global>" ? Name : $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
+    public virtual string FullName => field ??= $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
 
     public bool IsPredefined { get; init; }
-
-    public virtual bool Equals(Symbol? other) => other is not null && SymbolKind == other.SymbolKind && Name == other.Name;
-    public override int GetHashCode() => HashCode.Combine(SymbolKind, Name);
 
     public sealed override string ToString() => $"{Name}: {Type.Name}";
 }

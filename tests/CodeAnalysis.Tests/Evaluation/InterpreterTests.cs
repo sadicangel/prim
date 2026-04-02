@@ -1,9 +1,9 @@
-﻿using CodeAnalysis;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation;
 using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
+using CodeAnalysis.Semantic.References;
 using CodeAnalysis.Semantic.Symbols;
 
 namespace CodeAnalysis.Tests.Evaluation;
@@ -39,7 +39,7 @@ public sealed class InterpreterTests
     }
 
     [Fact]
-    public void Interpret_NestedReference_ResolvesGlobalDeclaration()
+    public void Interpret_NestedVariableReference_ResolvesGlobalDeclaration()
     {
         var compilation = CreateCompilation(
             """
@@ -57,11 +57,66 @@ public sealed class InterpreterTests
         var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
-        var reference = Assert.IsType<BoundReference>(resultDeclaration.Expression);
+        var reference = Assert.IsType<BoundVariableReference>(resultDeclaration.Expression);
 
         var result = new Interpreter().Interpret(reference);
 
         Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_ArrayInitExpression_EvaluatesElements()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32[] = (args) => {
+                var values: i32[] = [40, 2];
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var valuesDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var arrayInit = Assert.IsType<BoundArrayInitExpression>(valuesDeclaration.Expression);
+
+        var result = Assert.IsType<ArrayValue>(new Interpreter().Interpret(arrayInit));
+
+        Assert.Equal(2, result.Length);
+        Assert.Equal(40, result.Elements[0].Value);
+        Assert.Equal(2, result.Elements[1].Value);
+    }
+
+    [Fact]
+    public void Interpret_NestedElementReference_ResolvesArrayElement()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                var values: i32[] = [40, 2];
+                var result: i32 = values[0] + values[1];
+            };
+            """);
+
+        var entryPoint = Assert.IsType<VariableSymbol>(compilation.EntryPoint);
+        var (boundNode, diagnostics) = compilation.Bind(entryPoint);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var binary = Assert.IsType<BoundBinaryExpression>(resultDeclaration.Expression);
+        var left = Assert.IsType<BoundElementReference>(binary.Left);
+
+        var result = new Interpreter().Interpret(left);
+
+        Assert.Equal(40, result.Value);
         Assert.Equal("i32", result.Type.Name);
     }
 
@@ -204,6 +259,32 @@ public sealed class InterpreterTests
                     value = value + 2;
                 };
                 addTwo();
+            };
+            """);
+
+        var entryPoint = Assert.IsType<VariableSymbol>(compilation.EntryPoint);
+        var (boundNode, diagnostics) = compilation.Bind(entryPoint);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+
+        var result = new Interpreter().Interpret(block);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_BlockWithElementAssignment_UpdatesArrayValue()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                var values: i32[] = [40, 0];
+                values[1] = values[0] + 2;
+                values[1];
             };
             """);
 

@@ -64,6 +64,9 @@ internal static class ReportDiagnosticExtensions
         public void ReportInvalidArrayLength(SourceSpan sourceSpan) =>
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidArrayLength());
 
+        public void ReportArrayElementTypeMismatch(SourceSpan sourceSpan) =>
+            reporter.ReportError(sourceSpan, DiagnosticMessage.ArrayElementTypeMismatch());
+
         public void ReportInvalidAssignment(SourceSpan sourceSpan) =>
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidAssignment());
 

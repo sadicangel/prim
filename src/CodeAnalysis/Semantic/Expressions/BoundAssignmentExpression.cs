@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Semantic.References;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Expressions;
 

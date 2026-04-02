@@ -5,6 +5,7 @@ using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
+using CodeAnalysis.Semantic.References;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Declarations;
@@ -51,14 +52,14 @@ internal static class BinderExpressionExtensions
                     binder.BindStatementExpression((StatementExpressionSyntax)syntax),
                 SyntaxKind.BlockExpression =>
                     binder.BindBlockExpression((BlockExpressionSyntax)syntax),
-                //SyntaxKind.ArrayExpression =>
-                //    binder.BindArrayInitExpression((ArrayInitExpressionSyntax)syntax),
+                SyntaxKind.ArrayExpression =>
+                    binder.BindArrayInitExpression((ArrayInitExpressionSyntax)syntax),
                 //SyntaxKind.StructInitExpression =>
                 //    binder.BindStructInitExpression((StructInitExpressionSyntax)syntax),
                 //SyntaxKind.MemberAccessExpression =>
                 //    binder.BindMemberAccessExpression((MemberAccessExpressionSyntax)syntax),
-                //SyntaxKind.IndexExpression =>
-                //    binder.BindIndexExpression((IndexExpressionSyntax)syntax),
+                SyntaxKind.ElementAccessExpression =>
+                    binder.BindElementAccessExpression((ElementAccessExpressionSyntax)syntax),
                 SyntaxKind.InvocationExpression =>
                     binder.BindInvocationExpression((InvocationExpressionSyntax)syntax),
                 //SyntaxKind.ConversionExpression =>
@@ -129,6 +130,13 @@ internal static class BinderExpressionExtensions
             return new BoundLiteralExpression(syntax, type, syntax.InstanceValue);
         }
 
+        private static BoundReference CreateReference(SyntaxNode syntax, Symbol symbol) => symbol switch
+        {
+            PropertySymbol propertySymbol => new BoundPropertyReference(syntax, propertySymbol),
+            VariableSymbol variableSymbol => new BoundVariableReference(syntax, variableSymbol),
+            _ => throw new ArgumentOutOfRangeException(nameof(symbol))
+        };
+
         private BoundExpression BindSimpleName(SimpleNameSyntax syntax)
         {
             if (!binder.TryLookup<Symbol>(syntax.FullName, out var symbol))
@@ -137,7 +145,7 @@ internal static class BinderExpressionExtensions
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
-            return new BoundReference(syntax, symbol);
+            return Binder.CreateReference(syntax, symbol);
         }
 
         private BoundExpression BindQualifiedName(QualifiedNameSyntax syntax)
@@ -148,26 +156,26 @@ internal static class BinderExpressionExtensions
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
-            return new BoundReference(syntax, symbol);
+            return Binder.CreateReference(syntax, symbol);
         }
 
         private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
         {
             var left = binder.BindExpression(syntax.Left) as BoundReference;
-            if (left is not { Symbol: VariableSymbol variable })
+            if (left is null)
             {
                 binder.ReportInvalidAssignment(syntax.Left.SourceSpan);
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
-            if (variable.Modifiers.HasFlag(Modifiers.ReadOnly))
+            if (left.IsReadOnly)
             {
-                binder.ReportReadOnlyAssignment(syntax.Left.SourceSpan, variable.Name);
+                binder.ReportReadOnlyAssignment(syntax.Left.SourceSpan, left.Symbol.Name);
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
             var right = binder.BindExpression(syntax.Right);
-            right = binder.Convert(right, variable.Type);
+            right = binder.Convert(right, left.Type);
             return new BoundAssignmentExpression(syntax, left, right);
         }
 
@@ -323,31 +331,69 @@ internal static class BinderExpressionExtensions
             return new BoundBlockExpression(syntax, type, expressions.MoveToImmutable());
         }
 
-        private BoundReference? BindOperator(SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> types)
+        private BoundArrayInitExpression BindArrayInitExpression(ArrayInitExpressionSyntax syntax)
         {
-            if (types.IsEmpty)
+            TypeSymbol elementType = binder.Module.Unknown;
+            var elements = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Elements.Count);
+            foreach (var elementSyntax in syntax.Elements)
             {
-                throw new UnreachableException("Cannot bind an operator with no operand types");
-            }
-
-            var operatorName = Mangler.Mangle(operatorToken.SyntaxKind, types);
-            foreach (var type in types)
-            {
-                if (new TypeBinder(type).TryLookup<VariableSymbol>(operatorName, out var @operator))
+                var element = binder.BindExpression(elementSyntax);
+                elements.Add(element);
+                if (!element.Type.MapsToUnknown)
                 {
-                    return new BoundReference(operatorToken, @operator);
+                    if (elementType.MapsToUnknown)
+                    {
+                        elementType = element.Type;
+                    }
+                    else if (element.Type != elementType)
+                    {
+                        binder.ReportArrayElementTypeMismatch(elementSyntax.SourceSpan /*, element.Type.Name, elementType.Name*/);
+                    }
                 }
             }
 
-            // TODO: Report all the types we looked through, not just the first one.
-            binder.ReportUndefinedTypeMember(operatorToken.SourceSpan, types[0].FullName, operatorName);
+            if (elementType.MapsToUnknown)
+            {
+                binder.ReportInvalidImplicitType(syntax.SourceSpan, "array");
+            }
+
+            return new BoundArrayInitExpression(syntax, new ArrayTypeSymbol(syntax, elementType, null, binder.Module), elements.MoveToImmutable());
+        }
+
+        private BoundVariableReference? BindOperator(TypeSymbol containingType, SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> operatorTypes)
+        {
+            var operatorName = Mangler.Mangle(operatorToken.SyntaxKind, operatorTypes);
+            binder = new TypeBinder(containingType);
+            if (binder.TryLookup<VariableSymbol>(operatorName, out var @operator))
+            {
+                return new BoundVariableReference(operatorToken, @operator);
+            }
 
             return null;
+        }
+
+        private BoundExpression BindElementAccessExpression(ElementAccessExpressionSyntax syntax)
+        {
+            var receiver = binder.BindExpression(syntax.Receiver);
+            var index = binder.BindExpression(syntax.Index);
+
+            var typeBinder = new TypeBinder(receiver.Type);
+            if (typeBinder.TryLookup<IndexerSymbol>($"[{index.Type.Name}]", out var indexer))
+            {
+                index = binder.Convert(index, indexer.IndexType);
+                return new BoundElementReference(syntax, receiver, indexer, index);
+            }
+
+            binder.ReportUndefinedTypeMember(syntax.Index.SourceSpan, receiver.Type.FullName, Mangler.Mangle(SyntaxKind.BracketOpenBracketCloseToken, index.Type));
+            return new BoundNeverExpression(syntax, binder.Module.Never);
         }
 
         private BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax)
         {
             var callee = binder.BindExpression(syntax.Callee);
+            // TODO: Support 'call' operator.
+            // In this case the callee itself is the lambda, so it would probably not make sense to define an operator on it,
+            // but we might want to support some kind of "call" operator in the future.
             if (callee.Type is not LambdaTypeSymbol lambdaType)
             {
                 binder.ReportUndefinedInvocationOperator(callee.Syntax.SourceSpan, callee.Type.Name);
@@ -371,10 +417,12 @@ internal static class BinderExpressionExtensions
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)
         {
             var operand = binder.BindExpression(syntax.Operand);
-            if (binder.BindOperator(syntax.OperatorToken, operand.Type) is { } @operator)
+            if (binder.BindOperator(operand.Type, syntax.OperatorToken, operand.Type) is { } @operator)
             {
                 return new BoundUnaryExpression(syntax, @operator, operand);
             }
+
+            binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, operand.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, operand.Type));
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }
@@ -383,10 +431,16 @@ internal static class BinderExpressionExtensions
         {
             var left = binder.BindExpression(syntax.Left);
             var right = binder.BindExpression(syntax.Right);
-            if (binder.BindOperator(syntax.OperatorToken, left.Type, right.Type) is { } @operator)
+            var @operator = binder.BindOperator(left.Type, syntax.OperatorToken, left.Type, right.Type)
+                ?? binder.BindOperator(right.Type, syntax.OperatorToken, left.Type, right.Type);
+            if (@operator is not null)
             {
                 return new BoundBinaryExpression(syntax, left, @operator, right);
             }
+
+            binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, left.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, left.Type, right.Type));
+            if (left.Type != right.Type)
+                binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, right.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, left.Type, right.Type));
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }

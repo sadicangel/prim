@@ -40,4 +40,9 @@ internal sealed record class ModuleSymbol(SyntaxNode Syntax, string Name, Module
             current = current.ContainingModule;
         }
     }
+
+    public override string FullName => field ??= Name is "<global>" ? Name : $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
+
+    public bool Equals(ModuleSymbol? other) => other is not null && SymbolKind == other.SymbolKind && FullName == other.FullName;
+    public override int GetHashCode() => HashCode.Combine(SymbolKind, FullName);
 }

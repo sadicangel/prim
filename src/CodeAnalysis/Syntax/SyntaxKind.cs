@@ -181,7 +181,7 @@ public enum SyntaxKind
     StructExpression,
     PropertyExpression,
 
-    IndexExpression,
+    ElementAccessExpression,
     InvocationExpression,
     MemberAccessExpression,
     ConversionExpression,

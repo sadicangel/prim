@@ -1,5 +1,6 @@
-﻿using CodeAnalysis.Semantic.Declarations;
+using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
+using CodeAnalysis.Semantic.References;
 
 namespace CodeAnalysis.Semantic;
 
@@ -17,9 +18,12 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundBinaryExpression node);
     T Visit(BoundBlockExpression node);
     T Visit(BoundLambdaExpression node);
+    T Visit(BoundArrayInitExpression node);
     T Visit(BoundAssignmentExpression node);
     T Visit(BoundLiteralExpression node);
-    T Visit(BoundReference node);
+    T Visit(BoundVariableReference node);
+    T Visit(BoundPropertyReference node);
+    T Visit(BoundElementReference node);
     T Visit(BoundNeverExpression node);
     T Visit(BoundUnaryExpression node);
     T Visit(BoundInvocationExpression node);
@@ -48,9 +52,11 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.MethodDeclaration => throw CreateUnsupportedNodeKindException(node),
             BoundKind.OperatorDeclaration => throw CreateUnsupportedNodeKindException(node),
             BoundKind.ConversionDeclaration => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.Reference => visitor.Visit((BoundReference)node),
+            BoundKind.VariableReference => visitor.Visit((BoundVariableReference)node),
+            BoundKind.PropertyReference => visitor.Visit((BoundPropertyReference)node),
+            BoundKind.ElementReference => visitor.Visit((BoundElementReference)node),
             BoundKind.BlockExpression => visitor.Visit((BoundBlockExpression)node),
-            BoundKind.ArrayInitExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.ArrayInitExpression => visitor.Visit((BoundArrayInitExpression)node),
             BoundKind.StructInitExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.PropertyInitExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.InvocationExpression => visitor.Visit((BoundInvocationExpression)node),

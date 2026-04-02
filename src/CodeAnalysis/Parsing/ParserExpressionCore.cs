@@ -47,15 +47,15 @@ begin:
                 //    }
                 //    goto begin;
 
-                //case SyntaxKind.BracketOpenToken:
-                //    {
-                //        var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
-                //        var index = ParseExpression(syntaxTree, stream);
-                //        var bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
+                case SyntaxKind.BracketOpenToken:
+                    {
+                        var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
+                        var index = stream.ParseExpression();
+                        var bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
 
-                //        left = new IndexExpressionSyntax(syntaxTree, left, bracketOpenToken, index, bracketCloseToken);
-                //    }
-                //    goto begin;
+                        left = new ElementAccessExpressionSyntax(left, bracketOpenToken, index, bracketCloseToken);
+                    }
+                    goto begin;
 
                 case SyntaxKind.ParenthesisOpenToken:
                     {
@@ -165,7 +165,7 @@ begin:
             };
         }
 
-        private ArrayInitializerExpressionSyntax ParseArrayInitializerExpression()
+        private ArrayInitExpressionSyntax ParseArrayInitializerExpression()
         {
             var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
             var elements = stream.ParseSyntaxList(
@@ -174,7 +174,7 @@ begin:
                 ParserExpression.ParseExpression);
             var bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
 
-            return new ArrayInitializerExpressionSyntax(bracketOpenToken, elements, bracketCloseToken);
+            return new ArrayInitExpressionSyntax(bracketOpenToken, elements, bracketCloseToken);
         }
 
         private LambdaExpressionSyntax ParseLambdaExpression()

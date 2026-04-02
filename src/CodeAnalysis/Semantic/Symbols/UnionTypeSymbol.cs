@@ -9,4 +9,8 @@ internal sealed record class UnionTypeSymbol(SyntaxNode Syntax, ImmutableArray<T
         SymbolKind.Union,
         Syntax,
         string.Join(" | ", Types.Select(t => t.Name).Order(NaturalSortStringComparer.OrdinalIgnoreCase)),
-        ContainingModule);
+        ContainingModule)
+{
+    public bool Equals(UnionTypeSymbol? other) => other is not null && SymbolKind == other.SymbolKind && Name == other.Name;
+    public override int GetHashCode() => HashCode.Combine(SymbolKind, Name);
+}

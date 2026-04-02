@@ -17,6 +17,6 @@ internal sealed record class VariableSymbol(
         ContainingModule,
         Modifiers)
 {
-    public bool Equals(VariableSymbol? other) => base.Equals(other);
-    public override int GetHashCode() => base.GetHashCode();
+    public bool Equals(VariableSymbol? other) => other is not null && SymbolKind == other.SymbolKind && FullName == other.FullName;
+    public override int GetHashCode() => HashCode.Combine(SymbolKind, FullName);
 }

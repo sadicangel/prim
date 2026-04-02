@@ -15,9 +15,6 @@ internal abstract record class TypeSymbol(
     public bool MapsToNever => SwitchAndCheck(x => x.Name is "never");
     public bool MapsToUnknown => SwitchAndCheck(x => x.Name is "unknown");
 
-    public virtual bool Equals(TypeSymbol? other) => base.Equals(other);
-    public override int GetHashCode() => base.GetHashCode();
-
     private bool SwitchAndCheck(Func<TypeSymbol, bool> predicate)
     {
         return this switch

@@ -32,7 +32,9 @@ while (true)
             var b = 0;
             b = -1 * 2;
             let c = a + b;
-            double(c);
+
+            var d: i32[] = [1, 2, 3];
+            d[2] = double(c);
         }
         """);
 

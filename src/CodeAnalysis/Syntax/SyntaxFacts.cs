@@ -174,7 +174,7 @@ public static class SyntaxFacts
             SyntaxKind.StructExpression => null,
             SyntaxKind.PropertyExpression => null,
 
-            SyntaxKind.IndexExpression => null,
+            SyntaxKind.ElementAccessExpression => null,
             SyntaxKind.InvocationExpression => null,
             SyntaxKind.MemberAccessExpression => null,
             SyntaxKind.ConversionExpression => null,
