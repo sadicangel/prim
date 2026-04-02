@@ -119,6 +119,13 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
     }
 
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundAssignmentExpression node)
+    {
+        var value = this.Visit(node.Right);
+        AssignValue(node.Left.Symbol, value);
+        return value;
+    }
+
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundLambdaExpression node)
     {
         var captured = CaptureVisibleValues();
@@ -268,6 +275,38 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
 
         _evaluations[symbol] = value;
+    }
+
+    private void AssignValue(Symbol symbol, PrimValue value)
+    {
+        if (TryGetAssignmentFrame(symbol, out var frame))
+        {
+            frame.Values[symbol] = value;
+            return;
+        }
+
+        _evaluations[symbol] = value;
+    }
+
+    private bool TryGetAssignmentFrame(Symbol symbol, out EvaluationFrame frame)
+    {
+        foreach (var current in _frames)
+        {
+            if (current.Values.ContainsKey(symbol))
+            {
+                frame = current;
+                return true;
+            }
+        }
+
+        if (CurrentIndex?.Declarations.TryGetValue(symbol, out var declaration) is true &&
+            TryGetOwningFrame(symbol, declaration, out frame))
+        {
+            return true;
+        }
+
+        frame = null!;
+        return false;
     }
 
     private bool TryGetValue(Symbol symbol, [NotNullWhen(true)] out PrimValue? value)

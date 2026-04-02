@@ -29,7 +29,8 @@ while (true)
 
         let main: (str[]) -> i32 = (args) => {
             var a = 40;
-            var b = -2;
+            var b = 0;
+            b = -1 * 2;
             let c = a + b;
             double(c);
         }

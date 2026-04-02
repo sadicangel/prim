@@ -17,6 +17,7 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundBinaryExpression node);
     T Visit(BoundBlockExpression node);
     T Visit(BoundLambdaExpression node);
+    T Visit(BoundAssignmentExpression node);
     T Visit(BoundLiteralExpression node);
     T Visit(BoundReference node);
     T Visit(BoundNeverExpression node);
@@ -37,7 +38,7 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.StackInstantiation => throw CreateUnsupportedNodeKindException(node),
             BoundKind.LiteralExpression => visitor.Visit((BoundLiteralExpression)node),
             BoundKind.LambdaExpression => visitor.Visit((BoundLambdaExpression)node),
-            BoundKind.AssignmentExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.AssignmentExpression => visitor.Visit((BoundAssignmentExpression)node),
             BoundKind.PredefinedDeclaration => visitor.Visit((BoundPredefinedDeclaration)node),
             BoundKind.ModuleDeclaration => visitor.Visit((BoundModuleDeclaration)node),
             BoundKind.LabelDeclaration => throw CreateUnsupportedNodeKindException(node),

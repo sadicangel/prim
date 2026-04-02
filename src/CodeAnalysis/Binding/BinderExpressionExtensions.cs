@@ -29,8 +29,8 @@ internal static class BinderExpressionExtensions
                     binder.BindLiteralExpression((LiteralExpressionSyntax)syntax),
                 //SyntaxKind.GroupExpression =>
                 //    binder.BindGroupExpression((GroupExpressionSyntax)syntax),
-                //SyntaxKind.AssignmentExpression =>
-                //    binder.BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
+                SyntaxKind.AssignmentExpression =>
+                    binder.BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
                 //SyntaxKind.InitValueExpression =>
                 //    binder.BindInitValueExpression((InitValueExpressionSyntax)syntax),
                 SyntaxKind.LambdaExpression =>
@@ -149,6 +149,26 @@ internal static class BinderExpressionExtensions
             }
 
             return new BoundReference(syntax, symbol);
+        }
+
+        private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
+        {
+            var left = binder.BindExpression(syntax.Left) as BoundReference;
+            if (left is not { Symbol: VariableSymbol variable })
+            {
+                binder.ReportInvalidAssignment(syntax.Left.SourceSpan);
+                return new BoundNeverExpression(syntax, binder.Module.Never);
+            }
+
+            if (variable.Modifiers.HasFlag(Modifiers.ReadOnly))
+            {
+                binder.ReportReadOnlyAssignment(syntax.Left.SourceSpan, variable.Name);
+                return new BoundNeverExpression(syntax, binder.Module.Never);
+            }
+
+            var right = binder.BindExpression(syntax.Right);
+            right = binder.Convert(right, variable.Type);
+            return new BoundAssignmentExpression(syntax, left, right);
         }
 
         private BoundLambdaExpression BindLambdaExpression(LambdaExpressionSyntax syntax)

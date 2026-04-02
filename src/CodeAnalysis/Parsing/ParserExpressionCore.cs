@@ -70,13 +70,13 @@ begin:
                     }
                     goto begin;
 
-                //case SyntaxKind.EqualsToken:
-                //    {
-                //        var equalsToken = stream.Match(SyntaxKind.EqualsToken);
-                //        var right = ParseBinaryExpression(syntaxTree, stream);
-                //        left = new AssignmentExpressionSyntax(syntaxTree, left, equalsToken, right);
-                //    }
-                //    goto begin;
+                case SyntaxKind.EqualsToken:
+                    {
+                        var equalsToken = stream.Match(SyntaxKind.EqualsToken);
+                        var right = stream.ParseBinaryExpression();
+                        left = new AssignmentExpressionSyntax(left, equalsToken, right);
+                    }
+                    goto begin;
 
                 case { } when SyntaxFacts.GetBinaryOperatorPrecedence(stream.Current.SyntaxKind) is var binaryPrecedence && binaryPrecedence >= parentPrecedence.GetValueOrDefault():
                     {

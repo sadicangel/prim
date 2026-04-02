@@ -167,6 +167,60 @@ public sealed class InterpreterTests
         Assert.Equal("unit", result.Type.Name);
     }
 
+    [Fact]
+    public void Interpret_NestedAssignmentExpression_UpdatesLocalValue()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                var result: i32 = 40;
+                result = result + 2;
+            };
+            """);
+
+        var entryPoint = Assert.IsType<VariableSymbol>(compilation.EntryPoint);
+        var (boundNode, diagnostics) = compilation.Bind(entryPoint);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var assignment = Assert.IsType<BoundAssignmentExpression>(block.Expressions[1]);
+
+        var result = new Interpreter().Interpret(assignment);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_BlockWithCapturedAssignment_UpdatesCapturedValue()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                var value: i32 = 40;
+                var addTwo: () -> i32 = () => {
+                    value = value + 2;
+                };
+                addTwo();
+            };
+            """);
+
+        var entryPoint = Assert.IsType<VariableSymbol>(compilation.EntryPoint);
+        var (boundNode, diagnostics) = compilation.Bind(entryPoint);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+
+        var result = new Interpreter().Interpret(block);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
     private static Compilation CreateCompilation(string source)
     {
         var compilation = new Compilation(new SourceText(source), new ParseOptions { IsScript = true });
