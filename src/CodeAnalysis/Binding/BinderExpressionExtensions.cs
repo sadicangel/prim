@@ -32,8 +32,8 @@ internal static class BinderExpressionExtensions
                 //    binder.BindGroupExpression((GroupExpressionSyntax)syntax),
                 SyntaxKind.AssignmentExpression =>
                     binder.BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
-                //SyntaxKind.InitValueExpression =>
-                //    binder.BindInitValueExpression((InitValueExpressionSyntax)syntax),
+                //SyntaxKind.StructExpression =>
+                //    binder.BindStructExpression((StructExpressionSyntax)syntax),
                 SyntaxKind.LambdaExpression =>
                     binder.BindLambdaExpression((LambdaExpressionSyntax)syntax),
                 SyntaxKind.VariableDeclaration =>
@@ -53,15 +53,15 @@ internal static class BinderExpressionExtensions
                 SyntaxKind.BlockExpression =>
                     binder.BindBlockExpression((BlockExpressionSyntax)syntax),
                 SyntaxKind.ArrayExpression =>
-                    binder.BindArrayInitExpression((ArrayInitExpressionSyntax)syntax),
-                //SyntaxKind.StructInitExpression =>
-                //    binder.BindStructInitExpression((StructInitExpressionSyntax)syntax),
+                    binder.BindArrayExpression((ArrayExpressionSyntax)syntax),
+                SyntaxKind.StructExpression =>
+                    binder.BindStructExpression((StructExpressionSyntax)syntax),
                 //SyntaxKind.MemberAccessExpression =>
                 //    binder.BindMemberAccessExpression((MemberAccessExpressionSyntax)syntax),
                 SyntaxKind.ElementAccessExpression =>
                     binder.BindElementAccessExpression((ElementAccessExpressionSyntax)syntax),
                 SyntaxKind.InvocationExpression =>
-                    binder.BindInvocationExpression((InvocationExpressionSyntax)syntax),
+                    binder.BindCallExpression((CallExpressionSyntax)syntax),
                 //SyntaxKind.ConversionExpression =>
                 //    binder.BindConversionExpression((ConversionExpressionSyntax)syntax),
                 SyntaxKind.UnaryPlusExpression or
@@ -331,7 +331,7 @@ internal static class BinderExpressionExtensions
             return new BoundBlockExpression(syntax, type, expressions.MoveToImmutable());
         }
 
-        private BoundArrayInitExpression BindArrayInitExpression(ArrayInitExpressionSyntax syntax)
+        private BoundArrayExpression BindArrayExpression(ArrayExpressionSyntax syntax)
         {
             TypeSymbol elementType = binder.Module.Unknown;
             var elements = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Elements.Count);
@@ -357,7 +357,44 @@ internal static class BinderExpressionExtensions
                 binder.ReportInvalidImplicitType(syntax.SourceSpan, "array");
             }
 
-            return new BoundArrayInitExpression(syntax, new ArrayTypeSymbol(syntax, elementType, null, binder.Module), elements.MoveToImmutable());
+            return new BoundArrayExpression(syntax, new ArrayTypeSymbol(syntax, elementType, null, binder.Module), elements.MoveToImmutable());
+        }
+
+        private BoundExpression BindStructExpression(StructExpressionSyntax syntax)
+        {
+            if (!binder.TryLookup<StructTypeSymbol>(syntax.StructName.FullName, out var structType))
+            {
+                binder.ReportUndefinedSymbol(syntax.StructName.SourceSpan, syntax.StructName.FullName);
+                return new BoundNeverExpression(syntax, binder.Module.Never);
+            }
+
+            var typeBinder = new TypeBinder(structType, binder);
+            var properties = ImmutableArray.CreateBuilder<BoundPropertyExpression>(syntax.Properties.Count);
+            foreach (var propertySyntax in syntax.Properties)
+            {
+                if (typeBinder.BindPropertyExpression(propertySyntax) is not BoundPropertyExpression property)
+                {
+                    return new BoundNeverExpression(propertySyntax, binder.Module.Never);
+                }
+
+                properties.Add(property);
+            }
+
+            return new BoundStructExpression(syntax, structType, properties.MoveToImmutable());
+        }
+
+        private BoundExpression BindPropertyExpression(PropertyExpressionSyntax syntax)
+        {
+            if (!binder.TryLookup<PropertySymbol>(syntax.PropertyName.FullName, out var property))
+            {
+                binder.ReportUndefinedTypeMember(syntax.SourceSpan, ((TypeBinder)binder).Type.FullName, syntax.PropertyName.FullName);
+                return new BoundNeverExpression(syntax, binder.Module.Never);
+            }
+
+            var expression = binder.BindExpression(syntax.Value);
+
+            expression = binder.Convert(expression, property.Type);
+            return new BoundPropertyExpression(syntax, property, expression);
         }
 
         private BoundVariableReference? BindOperator(TypeSymbol containingType, SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> operatorTypes)
@@ -388,7 +425,7 @@ internal static class BinderExpressionExtensions
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }
 
-        private BoundExpression BindInvocationExpression(InvocationExpressionSyntax syntax)
+        private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
         {
             var callee = binder.BindExpression(syntax.Callee);
             // TODO: Support 'call' operator.
@@ -411,7 +448,7 @@ internal static class BinderExpressionExtensions
                 .Select((argument, index) => binder.Convert(argument, lambdaType.Parameters[index]))
                 .ToImmutableArray();
 
-            return new BoundInvocationExpression(syntax, callee, arguments, lambdaType.ReturnType);
+            return new BoundCallExpression(syntax, callee, arguments, lambdaType.ReturnType);
         }
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)

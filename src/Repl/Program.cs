@@ -31,10 +31,10 @@ while (true)
             var a = 40;
             var b = 0;
             b = -1 * 2;
-            let c = a + b;
+            let p = Point { x = a, y = b };
 
             var d: i32[] = [1, 2, 3];
-            d[2] = double(c);
+            //d[2] = double(p.a + p.b);
         }
         """);
 

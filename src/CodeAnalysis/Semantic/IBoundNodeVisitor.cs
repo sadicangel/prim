@@ -18,7 +18,9 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundBinaryExpression node);
     T Visit(BoundBlockExpression node);
     T Visit(BoundLambdaExpression node);
-    T Visit(BoundArrayInitExpression node);
+    T Visit(BoundArrayExpression node);
+    T Visit(BoundStructExpression node);
+    T Visit(BoundPropertyExpression node);
     T Visit(BoundAssignmentExpression node);
     T Visit(BoundLiteralExpression node);
     T Visit(BoundVariableReference node);
@@ -26,7 +28,7 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundElementReference node);
     T Visit(BoundNeverExpression node);
     T Visit(BoundUnaryExpression node);
-    T Visit(BoundInvocationExpression node);
+    T Visit(BoundCallExpression node);
 }
 
 internal static class BoundNodeVisitorExtensions
@@ -56,10 +58,10 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.PropertyReference => visitor.Visit((BoundPropertyReference)node),
             BoundKind.ElementReference => visitor.Visit((BoundElementReference)node),
             BoundKind.BlockExpression => visitor.Visit((BoundBlockExpression)node),
-            BoundKind.ArrayInitExpression => visitor.Visit((BoundArrayInitExpression)node),
-            BoundKind.StructInitExpression => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.PropertyInitExpression => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.InvocationExpression => visitor.Visit((BoundInvocationExpression)node),
+            BoundKind.ArrayExpression => visitor.Visit((BoundArrayExpression)node),
+            BoundKind.StructExpression => visitor.Visit((BoundStructExpression)node),
+            BoundKind.PropertyExpression => visitor.Visit((BoundPropertyExpression)node),
+            BoundKind.CallExpression => visitor.Visit((BoundCallExpression)node),
             BoundKind.ConversionExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.UnaryExpression => visitor.Visit((BoundUnaryExpression)node),
             BoundKind.BinaryExpression => visitor.Visit((BoundBinaryExpression)node),

@@ -26,7 +26,7 @@ internal static class ParserExpression
         private ExpressionSyntax ParseExpressionCore(bool allowUnterminated)
         {
             var expression = stream.ParseBinaryExpression();
-            if (allowUnterminated)
+            if (allowUnterminated || expression.IsTerminated)
             {
                 return expression;
             }

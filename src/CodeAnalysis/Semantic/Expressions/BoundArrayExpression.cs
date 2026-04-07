@@ -4,11 +4,11 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Expressions;
 
-internal sealed record class BoundArrayInitExpression(
+internal sealed record class BoundArrayExpression(
     SyntaxNode Syntax,
     TypeSymbol Type,
     ImmutableArray<BoundExpression> Elements)
-    : BoundExpression(BoundKind.ArrayInitExpression, Syntax, Type)
+    : BoundExpression(BoundKind.ArrayExpression, Syntax, Type)
 {
     /// <inheritdoc />
     public override IEnumerable<BoundNode> Children() => Elements;

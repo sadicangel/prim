@@ -33,58 +33,24 @@ begin:
                 //    }
                 //    goto begin;
 
-                //case SyntaxKind.BraceOpenToken when left is NameSyntax name:
-                //    {
-                //        var braceOpenToken = stream.Match(SyntaxKind.BraceOpenToken);
-                //        var properties = ParseSeparatedSyntaxList(
-                //            syntaxTree,
-                //            stream,
-                //            SyntaxKind.CommaToken,
-                //            [SyntaxKind.BraceCloseToken, SyntaxKind.EofToken],
-                //            ParsePropertyInitExpression);
-                //        var braceCloseToken = stream.Match(SyntaxKind.BraceCloseToken);
-                //        left = new StructInitExpressionSyntax(syntaxTree, name, braceOpenToken, properties, braceCloseToken);
-                //    }
-                //    goto begin;
-
                 case SyntaxKind.BracketOpenToken:
-                    {
-                        var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
-                        var index = stream.ParseExpression();
-                        var bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
+                    left = stream.ParseElementAccessExpression(left);
+                    goto begin;
 
-                        left = new ElementAccessExpressionSyntax(left, bracketOpenToken, index, bracketCloseToken);
-                    }
+                case SyntaxKind.BraceOpenToken when left is NameSyntax structName:
+                    left = stream.ParseStructExpression(structName);
                     goto begin;
 
                 case SyntaxKind.ParenthesisOpenToken:
-                    {
-                        var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
-                        var arguments = stream.ParseSyntaxList(
-                            SyntaxKind.CommaToken,
-                            [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
-                            ParserExpression.ParseExpression);
-                        var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
-
-                        left = new InvocationExpressionSyntax(left, parenthesisOpenToken, arguments, parenthesisCloseToken);
-                    }
+                    left = stream.ParseCallExpression(left);
                     goto begin;
 
                 case SyntaxKind.EqualsToken:
-                    {
-                        var equalsToken = stream.Match(SyntaxKind.EqualsToken);
-                        var right = stream.ParseBinaryExpression();
-                        left = new AssignmentExpressionSyntax(left, equalsToken, right);
-                    }
+                    left = stream.ParseAssignmentExpression(left);
                     goto begin;
 
                 case { } when SyntaxFacts.GetBinaryOperatorPrecedence(stream.Current.SyntaxKind) is var binaryPrecedence && binaryPrecedence >= parentPrecedence.GetValueOrDefault():
-                    {
-                        var operatorToken = stream.Match();
-                        var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(operatorToken.SyntaxKind);
-                        var right = stream.ParseBinaryExpression(binaryPrecedence);
-                        left = new BinaryExpressionSyntax(syntaxKind, left, operatorToken, right);
-                    }
+                    left = stream.ParseBinaryExpression(left, binaryPrecedence.Value);
                     goto begin;
             }
 
@@ -116,7 +82,7 @@ begin:
                 >= SyntaxKind.AnyKeyword and <= SyntaxKind.F64Keyword => new SimpleNameSyntax(stream.Match()),
                 >= SyntaxKind.TrueKeyword and <= SyntaxKind.NullKeyword => stream.ParseLiteralExpression(),
                 >= SyntaxKind.I8LiteralToken and <= SyntaxKind.StrLiteralToken => stream.ParseLiteralExpression(),
-                SyntaxKind.BracketOpenToken => stream.ParseArrayInitializerExpression(),
+                SyntaxKind.BracketOpenToken => stream.ParseArrayExpression(),
                 SyntaxKind.ParenthesisOpenToken when stream.IsLambdaExpressionAhead() => stream.ParseLambdaExpression(),
                 SyntaxKind.ParenthesisOpenToken => stream.ParseGroupExpression(),
                 _ => stream.ParseName(),
@@ -165,7 +131,7 @@ begin:
             };
         }
 
-        private ArrayInitExpressionSyntax ParseArrayInitializerExpression()
+        private ArrayExpressionSyntax ParseArrayExpression()
         {
             var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
             var elements = stream.ParseSyntaxList(
@@ -174,7 +140,7 @@ begin:
                 ParserExpression.ParseExpression);
             var bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
 
-            return new ArrayInitExpressionSyntax(bracketOpenToken, elements, bracketCloseToken);
+            return new ArrayExpressionSyntax(bracketOpenToken, elements, bracketCloseToken);
         }
 
         private LambdaExpressionSyntax ParseLambdaExpression()
@@ -198,6 +164,26 @@ begin:
                 body);
         }
 
+        private StructExpressionSyntax ParseStructExpression(NameSyntax structName)
+        {
+            var braceOpenToken = stream.Match(SyntaxKind.BraceOpenToken);
+            var properties = stream.ParseSyntaxList(
+                SyntaxKind.CommaToken,
+                [SyntaxKind.BraceCloseToken],
+                ParserExpressionCore.ParsePropertyExpression);
+            var braceCloseToken = stream.Match(SyntaxKind.BraceCloseToken);
+
+            return new StructExpressionSyntax(structName, braceOpenToken, properties, braceCloseToken);
+        }
+
+        private PropertyExpressionSyntax ParsePropertyExpression()
+        {
+            var propertyName = stream.ParseSimpleName();
+            var equalsToken = stream.Match(SyntaxKind.EqualsToken);
+            var value = stream.ParseExpression();
+            return new PropertyExpressionSyntax(propertyName, equalsToken, value);
+        }
+
         // group_expression = '(' expr ')'
         private GroupExpressionSyntax ParseGroupExpression()
         {
@@ -209,6 +195,41 @@ begin:
                 parenthesisOpenToken,
                 expression,
                 parenthesisCloseToken);
+        }
+
+        private ElementAccessExpressionSyntax ParseElementAccessExpression(ExpressionSyntax receiver)
+        {
+            var bracketOpenToken = stream.Match(SyntaxKind.BracketOpenToken);
+            var index = stream.ParseExpression();
+            var bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
+            return new ElementAccessExpressionSyntax(receiver, bracketOpenToken, index, bracketCloseToken);
+        }
+
+        private CallExpressionSyntax ParseCallExpression(ExpressionSyntax callee)
+        {
+            var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
+            var arguments = stream.ParseSyntaxList(
+                SyntaxKind.CommaToken,
+                [SyntaxKind.ParenthesisCloseToken, SyntaxKind.EofToken],
+                ParserExpression.ParseExpression);
+            var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
+
+            return new CallExpressionSyntax(callee, parenthesisOpenToken, arguments, parenthesisCloseToken);
+        }
+
+        private AssignmentExpressionSyntax ParseAssignmentExpression(ExpressionSyntax left)
+        {
+            var equalsToken = stream.Match(SyntaxKind.EqualsToken);
+            var right = stream.ParseExpressionTerminated();
+            return new AssignmentExpressionSyntax(left, equalsToken, right);
+        }
+
+        private BinaryExpressionSyntax ParseBinaryExpression(ExpressionSyntax left, int binaryPrecedence)
+        {
+            var operatorToken = stream.Match();
+            var syntaxKind = SyntaxFacts.GetBinaryOperatorExpression(operatorToken.SyntaxKind);
+            var right = stream.ParseBinaryExpression(binaryPrecedence);
+            return new BinaryExpressionSyntax(syntaxKind, left, operatorToken, right);
         }
     }
 }

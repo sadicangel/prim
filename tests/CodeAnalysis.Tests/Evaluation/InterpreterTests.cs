@@ -83,7 +83,7 @@ public sealed class InterpreterTests
         var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var valuesDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
-        var arrayInit = Assert.IsType<BoundArrayInitExpression>(valuesDeclaration.Expression);
+        var arrayInit = Assert.IsType<BoundArrayExpression>(valuesDeclaration.Expression);
 
         var result = Assert.IsType<ArrayValue>(new Interpreter().Interpret(arrayInit));
 
@@ -169,6 +169,39 @@ public sealed class InterpreterTests
     }
 
     [Fact]
+    public void Interpret_StructExpression_OverridesSpecifiedPropertiesAndKeepsDefaults()
+    {
+        var compilation = CreateCompilation(
+            """
+            struct Point {
+                x: i32 = 1;
+                y: i32 = 2;
+            }
+            let main: (str[]) -> Point = (args) => {
+                var point: Point = Point { x = 40 };
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<StructTypeSymbol>("Point", out var point));
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var pointDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var structExpression = Assert.IsType<BoundStructExpression>(pointDeclaration.Expression);
+
+        var result = Assert.IsType<InstanceValue>(new Interpreter().Interpret(structExpression));
+        Assert.True(point.TryLookup<PropertySymbol>("x", out var x));
+        Assert.True(point.TryLookup<PropertySymbol>("y", out var y));
+
+        Assert.Equal(40, result.Get(x).Value);
+        Assert.Equal(2, result.Get(y).Value);
+    }
+
+    [Fact]
     public void Interpret_BoundInvocationExpression_InvokesLambda()
     {
         var compilation = CreateCompilation(
@@ -189,7 +222,7 @@ public sealed class InterpreterTests
         var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
-        var invocation = Assert.IsType<BoundInvocationExpression>(resultDeclaration.Expression);
+        var invocation = Assert.IsType<BoundCallExpression>(resultDeclaration.Expression);
 
         var result = new Interpreter().Interpret(invocation);
 

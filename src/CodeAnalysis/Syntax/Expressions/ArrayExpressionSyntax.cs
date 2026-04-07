@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
 
-public sealed record class ArrayInitExpressionSyntax(
+public sealed record class ArrayExpressionSyntax(
     SyntaxToken BracketOpenToken,
     SeparatedSyntaxList<ExpressionSyntax> Elements,
     SyntaxToken BracketCloseToken)

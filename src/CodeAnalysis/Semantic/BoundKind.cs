@@ -31,11 +31,11 @@ internal enum BoundKind
     ElementReference,
 
     BlockExpression,
-    ArrayInitExpression,
-    StructInitExpression,
-    PropertyInitExpression,
+    ArrayExpression,
+    StructExpression,
+    PropertyExpression,
     IndexExpression,
-    InvocationExpression,
+    CallExpression,
 
     ConversionExpression,
 

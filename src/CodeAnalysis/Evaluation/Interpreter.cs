@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
@@ -132,7 +132,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
     }
 
-    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundArrayInitExpression node)
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundArrayExpression node)
     {
         var elements = new PrimValue[node.Elements.Length];
         for (var i = 0; i < elements.Length; i++)
@@ -141,6 +141,24 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
 
         return new ArrayValue((ArrayTypeSymbol)node.Type, elements);
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundStructExpression node)
+    {
+        var instance = CreateDefaultValue(node.StructType) as InstanceValue
+            ?? throw new InvalidOperationException($"Expected struct expression '{node.StructType.Name}' to evaluate to an instance value.");
+
+        foreach (var property in node.Properties)
+        {
+            instance[property.Property] = this.Visit(property);
+        }
+
+        return instance;
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundPropertyExpression node)
+    {
+        return this.Visit(node.Value);
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundAssignmentExpression node)
@@ -190,7 +208,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         return ((LambdaValue)@operator).Invoke(operand);
     }
 
-    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundInvocationExpression node)
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundCallExpression node)
     {
         var callee = this.Visit(node.Callee) as LambdaValue
             ?? throw new InvalidOperationException($"Expected invocation callee '{node.Callee.Type.Name}' to evaluate to a lambda value.");

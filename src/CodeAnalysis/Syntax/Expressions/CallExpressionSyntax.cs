@@ -1,6 +1,6 @@
 ﻿namespace CodeAnalysis.Syntax.Expressions;
 
-public sealed record class InvocationExpressionSyntax(
+public sealed record class CallExpressionSyntax(
     ExpressionSyntax Callee,
     SyntaxToken ParenthesisOpenToken,
     SeparatedSyntaxList<ExpressionSyntax> Arguments,
