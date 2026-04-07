@@ -25,13 +25,9 @@ begin:
                 //    }
                 //    goto begin;
 
-                //case SyntaxKind.DotToken:
-                //    {
-                //        var dotToken = stream.Match(SyntaxKind.DotToken);
-                //        var name = ParseSimpleName(syntaxTree, stream);
-                //        left = new MemberAccessExpressionSyntax(syntaxTree, left, dotToken, name);
-                //    }
-                //    goto begin;
+                case SyntaxKind.DotToken:
+                    left = stream.ParsePropertyAccessExpression(left);
+                    goto begin;
 
                 case SyntaxKind.BracketOpenToken:
                     left = stream.ParseElementAccessExpression(left);
@@ -195,6 +191,13 @@ begin:
                 parenthesisOpenToken,
                 expression,
                 parenthesisCloseToken);
+        }
+
+        private PropertyAccessExpressionSyntax ParsePropertyAccessExpression(ExpressionSyntax receiver)
+        {
+            var dotToken = stream.Match(SyntaxKind.DotToken);
+            var name = stream.ParseSimpleName();
+            return new PropertyAccessExpressionSyntax(receiver, dotToken, name);
         }
 
         private ElementAccessExpressionSyntax ParseElementAccessExpression(ExpressionSyntax receiver)

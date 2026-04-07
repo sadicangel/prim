@@ -349,13 +349,29 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
                 variable.Type,
                 () => ResolveSymbolValue(variable.Variable),
                 value => AssignValue(variable.Variable, value)),
-            BoundPropertyReference property => new ReferenceValue(
-                property.Type,
-                () => ResolveSymbolValue(property.Property),
-                value => AssignValue(property.Property, value)),
+            BoundPropertyReference property => ResolvePropertyReference(property),
             BoundElementReference element => ResolveElementReference(element),
             _ => throw new NotSupportedException($"Unsupported reference '{reference.GetType().Name}'.")
         };
+    }
+
+    private ReferenceValue ResolvePropertyReference(BoundPropertyReference property)
+    {
+        if (property.Receiver is null)
+        {
+            return new ReferenceValue(
+                property.Type,
+                () => ResolveSymbolValue(property.Property),
+                value => AssignValue(property.Property, value));
+        }
+
+        var receiver = this.Visit(property.Receiver) as InstanceValue
+            ?? throw new InvalidOperationException($"Expected property receiver '{property.Receiver.Type.Name}' to evaluate to an instance value.");
+
+        return new ReferenceValue(
+            property.Type,
+            () => receiver[property.Property],
+            value => receiver[property.Property] = value);
     }
 
     private ReferenceValue ResolveElementReference(BoundElementReference element)

@@ -34,7 +34,7 @@ while (true)
             let p = Point { x = a, y = b };
 
             var d: i32[] = [1, 2, 3];
-            //d[2] = double(p.a + p.b);
+            d[2] = double(p.x + p.y);
         }
         """);
 

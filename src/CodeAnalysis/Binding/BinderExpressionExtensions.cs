@@ -56,8 +56,8 @@ internal static class BinderExpressionExtensions
                     binder.BindArrayExpression((ArrayExpressionSyntax)syntax),
                 SyntaxKind.StructExpression =>
                     binder.BindStructExpression((StructExpressionSyntax)syntax),
-                //SyntaxKind.MemberAccessExpression =>
-                //    binder.BindMemberAccessExpression((MemberAccessExpressionSyntax)syntax),
+                SyntaxKind.PropertyAccessExpression =>
+                    binder.BindPropertyAccessExpression((PropertyAccessExpressionSyntax)syntax),
                 SyntaxKind.ElementAccessExpression =>
                     binder.BindElementAccessExpression((ElementAccessExpressionSyntax)syntax),
                 SyntaxKind.InvocationExpression =>
@@ -132,7 +132,7 @@ internal static class BinderExpressionExtensions
 
         private static BoundReference CreateReference(SyntaxNode syntax, Symbol symbol) => symbol switch
         {
-            PropertySymbol propertySymbol => new BoundPropertyReference(syntax, propertySymbol),
+            PropertySymbol propertySymbol => new BoundPropertyReference(syntax, null, propertySymbol),
             VariableSymbol variableSymbol => new BoundVariableReference(syntax, variableSymbol),
             _ => throw new ArgumentOutOfRangeException(nameof(symbol))
         };
@@ -407,6 +407,19 @@ internal static class BinderExpressionExtensions
             }
 
             return null;
+        }
+
+        private BoundExpression BindPropertyAccessExpression(PropertyAccessExpressionSyntax syntax)
+        {
+            var receiver = binder.BindExpression(syntax.Receiver);
+            var typeBinder = new TypeBinder(receiver.Type);
+            if (typeBinder.TryLookup<PropertySymbol>(syntax.PropertyName.FullName, out var property))
+            {
+                return new BoundPropertyReference(syntax, receiver, property);
+            }
+
+            binder.ReportUndefinedTypeMember(syntax.PropertyName.SourceSpan, receiver.Type.FullName, syntax.PropertyName.FullName);
+            return new BoundNeverExpression(syntax, binder.Module.Never);
         }
 
         private BoundExpression BindElementAccessExpression(ElementAccessExpressionSyntax syntax)

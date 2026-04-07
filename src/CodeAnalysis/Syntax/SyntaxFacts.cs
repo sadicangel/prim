@@ -176,7 +176,7 @@ public static class SyntaxFacts
 
             SyntaxKind.ElementAccessExpression => null,
             SyntaxKind.InvocationExpression => null,
-            SyntaxKind.MemberAccessExpression => null,
+            SyntaxKind.PropertyAccessExpression => null,
             SyntaxKind.ConversionExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,

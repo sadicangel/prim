@@ -231,6 +231,44 @@ public sealed class InterpreterTests
     }
 
     [Fact]
+    public void Interpret_PropertyAccessReference_ResolvesInstancePropertyValues()
+    {
+        var compilation = CreateCompilation(
+            """
+            struct Point {
+                x: i32 = 0;
+                y: i32 = 0;
+            }
+            let main: (str[]) -> i32 = (args) => {
+                var a = 40;
+                var b = 0;
+                b = -1 * 2;
+                let p = Point { x = a, y = b };
+
+                var d: i32[] = [1, 2, 3];
+                let r = p.x + p.y;
+            };
+            """);
+
+        var entryPoint = Assert.IsType<VariableSymbol>(compilation.EntryPoint);
+        var (boundNode, diagnostics) = compilation.Bind(entryPoint);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var binary = Assert.IsType<BoundBinaryExpression>(resultDeclaration.Expression);
+        Assert.IsType<BoundPropertyReference>(binary.Left);
+        Assert.IsType<BoundPropertyReference>(binary.Right);
+
+        var result = new Interpreter().Interpret(block);
+
+        Assert.Equal(38, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
     public void Interpret_BlockContainingOnlyNop_ReturnsUnit()
     {
         var compilation = CreateCompilation(
