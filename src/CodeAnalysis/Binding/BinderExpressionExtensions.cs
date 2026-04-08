@@ -95,12 +95,12 @@ internal static class BinderExpressionExtensions
                     binder.BindIfElseExpression((IfElseExpressionSyntax)syntax),
                 SyntaxKind.WhileExpression =>
                     binder.BindWhileExpression((WhileExpressionSyntax)syntax),
-                //SyntaxKind.ContinueExpression =>
-                //    binder.BindContinueExpression((ContinueExpressionSyntax)syntax),
-                //SyntaxKind.BreakExpression =>
-                //    binder.BindBreakExpression((BreakExpressionSyntax)syntax),
-                //SyntaxKind.ReturnExpression =>
-                //    binder.BindReturnExpression((ReturnExpressionSyntax)syntax),
+                SyntaxKind.ContinueExpression =>
+                    binder.BindContinueExpression((ContinueExpressionSyntax)syntax),
+                SyntaxKind.BreakExpression =>
+                    binder.BindBreakExpression((BreakExpressionSyntax)syntax),
+                SyntaxKind.ReturnExpression =>
+                    binder.BindReturnExpression((ReturnExpressionSyntax)syntax),
                 _ =>
                     throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             };

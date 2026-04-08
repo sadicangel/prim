@@ -147,9 +147,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
                 ? this.Visit(node.Else)
                 : CreateDefaultValue(node.Type.ContainingModule.Unit);
 
-        return node.Type is UnionTypeSymbol unionType && result.Type != unionType
-            ? new UnionValue(unionType, result)
-            : result;
+        return CoerceValue(node.Type, result);
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundWhileExpression node)
@@ -168,11 +166,37 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
 
             if (!shouldContinue)
             {
-                return result;
+                return CoerceValue(node.Type, result);
             }
 
-            result = this.Visit(node.Body);
+            try
+            {
+                result = CoerceValue(node.Type, this.Visit(node.Body));
+            }
+            catch (ContinueSignalException)
+            {
+                continue;
+            }
+            catch (BreakSignalException breakSignal)
+            {
+                return CoerceValue(node.Type, breakSignal.Value);
+            }
         }
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundBreakExpression node)
+    {
+        throw new BreakSignalException(CoerceValue(node.Type, this.Visit(node.Expression)));
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundContinueExpression node)
+    {
+        throw new ContinueSignalException();
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundReturnExpression node)
+    {
+        throw new ReturnSignalException(CoerceValue(node.Type, this.Visit(node.Expression)));
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundArrayExpression node)
@@ -556,7 +580,11 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         _frames.Push(frame);
         try
         {
-            return Evaluate(node.Body);
+            return CoerceValue(node.LambdaType.ReturnType, Evaluate(node.Body));
+        }
+        catch (ReturnSignalException returnSignal)
+        {
+            return CoerceValue(node.LambdaType.ReturnType, returnSignal.Value);
         }
         finally
         {
@@ -850,6 +878,13 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         };
     }
 
+    private static PrimValue CoerceValue(TypeSymbol targetType, PrimValue value)
+    {
+        return targetType is UnionTypeSymbol unionType && value.Type != unionType
+            ? new UnionValue(unionType, value)
+            : value;
+    }
+
     private PrimValue[] CreateDefaultElements(ArrayTypeSymbol arrayType)
     {
         var length = arrayType.Length ?? 0;
@@ -1061,4 +1096,16 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
     }
 
     private readonly record struct ParameterSlot(BoundLambdaExpression Lambda, int Index);
+
+    private sealed class BreakSignalException(PrimValue value) : Exception
+    {
+        public PrimValue Value { get; } = value;
+    }
+
+    private sealed class ContinueSignalException : Exception;
+
+    private sealed class ReturnSignalException(PrimValue value) : Exception
+    {
+        public PrimValue Value { get; } = value;
+    }
 }

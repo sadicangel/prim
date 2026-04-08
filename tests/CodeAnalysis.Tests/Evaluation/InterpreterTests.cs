@@ -588,6 +588,86 @@ public sealed class InterpreterTests
         Assert.Equal("i32", result.Type.Name);
     }
 
+    [Fact]
+    public void Interpret_WhileExpression_ReturnsBreakValue()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                while (true) {
+                    break 42;
+                }
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var whileExpression = Assert.IsType<BoundWhileExpression>(block.Expressions[0]);
+
+        var result = new Interpreter().Interpret(whileExpression);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_WhileExpression_ContinueSkipsToNextIteration()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> unit = (args) => {
+                var i: i32 = 0;
+                while (i < 3) {
+                    i = i + 1;
+                    continue;
+                }
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var whileExpression = Assert.IsType<BoundWhileExpression>(block.Expressions[1]);
+
+        var result = new Interpreter().Interpret(whileExpression);
+
+        Assert.Same(Unit.Value, result.Value);
+        Assert.Equal("unit", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_LambdaDeclaration_ReturnExpression_ExitsEarly()
+    {
+        var compilation = CreateCompilation(
+            """
+            let early: () -> i32 = () => {
+                return 42;
+                0;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("early", out var earlySymbol));
+        var (boundNode, diagnostics) = compilation.Bind(earlySymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var interpreter = new Interpreter();
+        var lambda = Assert.IsType<LambdaValue>(interpreter.Interpret(boundNode));
+
+        var result = lambda.Invoke();
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
     private static Compilation CreateCompilation(string source)
     {
         var compilation = new Compilation(new SourceText(source), new ParseOptions { IsScript = true });

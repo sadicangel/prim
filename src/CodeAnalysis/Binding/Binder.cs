@@ -10,7 +10,7 @@ internal abstract class Binder(Binder? parent) : ISymbolScope, IDiagnosticReport
 {
     private readonly DiagnosticBag _diagnostics = parent?._diagnostics ?? [];
 
-    protected Binder? Parent => parent;
+    public Binder? Parent => parent;
 
     public abstract ModuleSymbol Module { get; }
 

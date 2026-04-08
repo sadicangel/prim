@@ -34,6 +34,9 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundCallExpression node);
     T Visit(BoundIfElseExpression node);
     T Visit(BoundWhileExpression node);
+    T Visit(BoundBreakExpression node);
+    T Visit(BoundContinueExpression node);
+    T Visit(BoundReturnExpression node);
 }
 
 internal static class BoundNodeVisitorExtensions
@@ -74,9 +77,9 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.BinaryExpression => visitor.Visit((BoundBinaryExpression)node),
             BoundKind.IfElseExpression => visitor.Visit((BoundIfElseExpression)node),
             BoundKind.WhileExpression => visitor.Visit((BoundWhileExpression)node),
-            BoundKind.BreakExpression => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.ContinueExpression => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.ReturnExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.BreakExpression => visitor.Visit((BoundBreakExpression)node),
+            BoundKind.ContinueExpression => visitor.Visit((BoundContinueExpression)node),
+            BoundKind.ReturnExpression => visitor.Visit((BoundReturnExpression)node),
             BoundKind.GotoExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.ConditionalGotoExpression => throw CreateUnsupportedNodeKindException(node),
             _ => throw new ArgumentOutOfRangeException(nameof(node), node.BoundKind, null)

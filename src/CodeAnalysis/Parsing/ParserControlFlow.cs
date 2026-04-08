@@ -50,5 +50,38 @@ internal static class ParserControlFlow
                 parenthesisCloseToken,
                 body);
         }
+
+        public BreakExpressionSyntax ParseBreakExpression()
+        {
+            var breakKeyword = stream.Match(SyntaxKind.BreakKeyword);
+            if (stream.Current.SyntaxKind is SyntaxKind.SemicolonToken)
+            {
+                var semicolonToken = stream.Match(SyntaxKind.SemicolonToken);
+                return new BreakExpressionSyntax(breakKeyword, semicolonToken);
+            }
+
+            var expression = stream.ParseExpressionTerminated();
+            return new BreakExpressionSyntax(breakKeyword, expression);
+        }
+
+        public ContinueExpressionSyntax ParseContinueExpression()
+        {
+            var continueKeyword = stream.Match(SyntaxKind.ContinueKeyword);
+            var semicolonToken = stream.Match(SyntaxKind.SemicolonToken);
+            return new ContinueExpressionSyntax(continueKeyword, semicolonToken);
+        }
+
+        public ReturnExpressionSyntax ParseReturnExpression()
+        {
+            var returnKeyword = stream.Match(SyntaxKind.ReturnKeyword);
+            if (stream.Current.SyntaxKind is SyntaxKind.SemicolonToken)
+            {
+                var semicolonToken = stream.Match(SyntaxKind.SemicolonToken);
+                return new ReturnExpressionSyntax(returnKeyword, null, semicolonToken);
+            }
+
+            var expression = stream.ParseExpressionTerminated();
+            return new ReturnExpressionSyntax(returnKeyword, expression, null);
+        }
     }
 }

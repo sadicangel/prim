@@ -20,9 +20,15 @@ while (true)
         """
         let main: (str[]) -> i32 = (args) => {
             var i = 0;
+            var j = 0;
             while (i < 10) {
                 i = i + 1;
+                if (i < 5) continue;
+                break i;
             }
+            j = i * 2;
+
+            return j;
         }
         """);
 
