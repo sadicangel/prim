@@ -146,6 +146,84 @@ public sealed class InterpreterTests
     }
 
     [Fact]
+    public void GlobalModule_PredefinedNumericConversions_AreDeclaredOnBuiltinTypes()
+    {
+        var compilation = CreateCompilation(string.Empty);
+
+        Assert.True(
+            compilation.GlobalModule.I32.TryLookup<ConversionSymbol>(
+                ConversionSymbol.GetConversionName(compilation.GlobalModule.I32, compilation.GlobalModule.I64),
+                out var implicitConversion));
+        Assert.Equal(ConversionKind.Implicit, implicitConversion.ConversionKind);
+
+        Assert.True(
+            compilation.GlobalModule.I64.TryLookup<ConversionSymbol>(
+                ConversionSymbol.GetConversionName(compilation.GlobalModule.I64, compilation.GlobalModule.I32),
+                out var explicitConversion));
+        Assert.Equal(ConversionKind.Explicit, explicitConversion.ConversionKind);
+    }
+
+    [Fact]
+    public void Interpret_ImplicitNumericConversion_EvaluatesPredefinedConversion()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i64 = (args) => {
+                var result: i64 = 40;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var conversionCall = Assert.IsType<BoundCallExpression>(resultDeclaration.Expression);
+        var conversion = Assert.IsType<BoundConversionReference>(conversionCall.Callee);
+
+        Assert.Equal(ConversionKind.Implicit, conversion.Conversion.ConversionKind);
+        Assert.Equal("i64", conversionCall.Type.Name);
+
+        var result = new Interpreter().Interpret(conversionCall);
+
+        Assert.Equal(40L, result.Value);
+        Assert.Equal("i64", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_ExplicitNumericConversion_EvaluatesPredefinedConversion()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                var result: i32 = 42i64 as i32;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var conversionCall = Assert.IsType<BoundCallExpression>(resultDeclaration.Expression);
+        var conversion = Assert.IsType<BoundConversionReference>(conversionCall.Callee);
+
+        Assert.Equal(ConversionKind.Explicit, conversion.Conversion.ConversionKind);
+        Assert.Equal("i32", conversionCall.Type.Name);
+
+        var result = new Interpreter().Interpret(conversionCall);
+
+        Assert.Equal(42, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
     public void Interpret_StructDeclaration_EvaluatesPropertyDefaults()
     {
         var compilation = CreateCompilation(

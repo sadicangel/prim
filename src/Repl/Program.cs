@@ -35,6 +35,7 @@ while (true)
 
             var d: i32[] = [1, 2, 3];
             d[2] = double(p.x + p.y);
+            d[2] as f64;
         }
         """);
 

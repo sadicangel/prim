@@ -3,8 +3,8 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.References;
 
-internal sealed record class BoundVariableReference(SyntaxNode Syntax, VariableSymbol Variable)
-    : BoundReference(BoundKind.VariableReference, Syntax, Variable)
+internal sealed record class BoundOperatorReference(SyntaxNode Syntax, OperatorSymbol Operator)
+    : BoundReference(BoundKind.OperatorReference, Syntax, Operator)
 {
     /// <inheritdoc />
     public override IEnumerable<BoundNode> Children() => [];

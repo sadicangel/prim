@@ -10,6 +10,11 @@ internal abstract record class TypeSymbol(
     ModuleSymbol ContainingModule)
     : ContainerSymbol(SymbolKind, Syntax, Name, ContainingModule.RuntimeType, ContainingModule, ContainingModule, Modifiers.Static | Modifiers.ReadOnly)
 {
+    public bool IsAny => Name is "any";
+    public bool IsUnit => Name is "unit";
+    public bool IsNever => Name is "never";
+    public bool IsUnknown => Name is "unknown";
+
     public bool MapsToAny => SwitchAndCheck(x => x.Name is "any");
     public bool MapsToUnit => SwitchAndCheck(x => x.Name is "unit");
     public bool MapsToNever => SwitchAndCheck(x => x.Name is "never");

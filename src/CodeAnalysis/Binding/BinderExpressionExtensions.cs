@@ -62,8 +62,8 @@ internal static class BinderExpressionExtensions
                     binder.BindElementAccessExpression((ElementAccessExpressionSyntax)syntax),
                 SyntaxKind.InvocationExpression =>
                     binder.BindCallExpression((CallExpressionSyntax)syntax),
-                //SyntaxKind.ConversionExpression =>
-                //    binder.BindConversionExpression((ConversionExpressionSyntax)syntax),
+                SyntaxKind.ConversionExpression =>
+                    binder.BindConversionExpression((ConversionExpressionSyntax)syntax),
                 SyntaxKind.UnaryPlusExpression or
                     SyntaxKind.UnaryMinusExpression or
                     SyntaxKind.OnesComplementExpression or
@@ -134,6 +134,7 @@ internal static class BinderExpressionExtensions
         {
             PropertySymbol propertySymbol => new BoundPropertyReference(syntax, null, propertySymbol),
             VariableSymbol variableSymbol => new BoundVariableReference(syntax, variableSymbol),
+            OperatorSymbol operatorSymbol => new BoundOperatorReference(syntax, operatorSymbol),
             _ => throw new ArgumentOutOfRangeException(nameof(symbol))
         };
 
@@ -397,13 +398,14 @@ internal static class BinderExpressionExtensions
             return new BoundPropertyExpression(syntax, property, expression);
         }
 
-        private BoundVariableReference? BindOperator(TypeSymbol containingType, SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> operatorTypes)
+        private BoundOperatorReference? BindOperator(TypeSymbol containingType, SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> operandTypes)
         {
-            var operatorName = Mangler.Mangle(operatorToken.SyntaxKind, operatorTypes);
+            var operatorKind = operatorToken.SyntaxKind.GetOperatorKind(operandTypes.Length);
+            var operatorName = operatorKind.GetOperatorName(operandTypes);
             binder = new TypeBinder(containingType);
-            if (binder.TryLookup<VariableSymbol>(operatorName, out var @operator))
+            if (binder.TryLookup<OperatorSymbol>(operatorName, out var @operator))
             {
-                return new BoundVariableReference(operatorToken, @operator);
+                return new BoundOperatorReference(operatorToken, @operator);
             }
 
             return null;
@@ -462,6 +464,14 @@ internal static class BinderExpressionExtensions
                 .ToImmutableArray();
 
             return new BoundCallExpression(syntax, callee, arguments, lambdaType.ReturnType);
+        }
+
+        private BoundExpression BindConversionExpression(ConversionExpressionSyntax syntax)
+        {
+            var expression = binder.BindExpression(syntax.Expression);
+            var targetType = binder.BindType(syntax.Type);
+
+            return binder.Convert(expression, targetType, isExplicit: true);
         }
 
         private BoundExpression BindUnaryExpression(UnaryExpressionSyntax syntax)

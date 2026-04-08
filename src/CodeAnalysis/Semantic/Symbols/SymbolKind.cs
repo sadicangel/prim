@@ -6,6 +6,7 @@ public enum SymbolKind
     Property,
     Indexer,
     Operator,
+    Conversion,
     Variable,
     Label,
 

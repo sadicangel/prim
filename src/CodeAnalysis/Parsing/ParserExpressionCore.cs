@@ -17,13 +17,9 @@ internal static class ParserExpressionCore
 begin:
             switch (stream.Current.SyntaxKind)
             {
-                //case SyntaxKind.AsKeyword:
-                //    {
-                //        var asKeyword = stream.Match(SyntaxKind.AsKeyword);
-                //        var type = ParseType(syntaxTree, stream);
-                //        left = new ConversionExpressionSyntax(syntaxTree, left, asKeyword, type);
-                //    }
-                //    goto begin;
+                case SyntaxKind.AsKeyword:
+                    left = stream.ParseConversionExpression(left);
+                    goto begin;
 
                 case SyntaxKind.DotToken:
                     left = stream.ParsePropertyAccessExpression(left);
@@ -191,6 +187,13 @@ begin:
                 parenthesisOpenToken,
                 expression,
                 parenthesisCloseToken);
+        }
+
+        private ConversionExpressionSyntax ParseConversionExpression(ExpressionSyntax left)
+        {
+            var asKeyword = stream.Match(SyntaxKind.AsKeyword);
+            var type = stream.ParseType();
+            return new ConversionExpressionSyntax(left, asKeyword, type);
         }
 
         private PropertyAccessExpressionSyntax ParsePropertyAccessExpression(ExpressionSyntax receiver)

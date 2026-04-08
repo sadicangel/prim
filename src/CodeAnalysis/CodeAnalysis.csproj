@@ -4,4 +4,7 @@
             <_Parameter1>Repl</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="DotNext" />
+    </ItemGroup>
 </Project>

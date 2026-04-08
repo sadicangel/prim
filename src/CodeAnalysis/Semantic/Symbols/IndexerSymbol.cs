@@ -17,8 +17,10 @@ internal sealed record class IndexerSymbol(
         ContainingType.ContainingModule,
         Modifiers)
 {
+    public override string FullyQualifiedName => $"{ContainingType.FullyQualifiedName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
+
     public override string FullName => $"{ContainingType.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
 
-    public bool Equals(IndexerSymbol? other) => other is not null && SymbolKind == other.SymbolKind && FullName == other.FullName;
-    public override int GetHashCode() => HashCode.Combine(SymbolKind, FullName);
+    public bool Equals(IndexerSymbol? other) => other is not null && SymbolKind == other.SymbolKind && FullyQualifiedName == other.FullyQualifiedName;
+    public override int GetHashCode() => HashCode.Combine(SymbolKind, FullyQualifiedName);
 }

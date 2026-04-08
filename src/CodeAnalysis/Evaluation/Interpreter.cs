@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
@@ -53,8 +53,8 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
             () => node.Symbol switch
             {
                 StructTypeSymbol structType => new StructValue(structType, structType.ContainingModule.RuntimeType),
-                VariableSymbol { Type: LambdaTypeSymbol lambdaType } variable => new LambdaValue(lambdaType, CreateBuiltinDelegate(variable, lambdaType)),
                 ModuleSymbol module => new ModuleValue(module, module.IsGlobal ? null! : ResolveModuleValue(module.ContainingModule)),
+                { Type: LambdaTypeSymbol lambdaType } symbol => new LambdaValue(lambdaType, CreateBuiltinDelegate(symbol, lambdaType)),
                 _ => throw new NotSupportedException($"Unsupported predefined symbol '{node.Symbol}'.")
             });
     }
@@ -186,6 +186,16 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundPropertyReference node)
+    {
+        return ResolveReference(node).ReferencedValue;
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundOperatorReference node)
+    {
+        return ResolveReference(node).ReferencedValue;
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundConversionReference node)
     {
         return ResolveReference(node).ReferencedValue;
     }
@@ -350,6 +360,8 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
                 () => ResolveSymbolValue(variable.Variable),
                 value => AssignValue(variable.Variable, value)),
             BoundPropertyReference property => ResolvePropertyReference(property),
+            BoundOperatorReference @operator => ResolveOperatorReference(@operator),
+            BoundConversionReference conversion => ResolveConversionReference(conversion),
             BoundElementReference element => ResolveElementReference(element),
             _ => throw new NotSupportedException($"Unsupported reference '{reference.GetType().Name}'.")
         };
@@ -372,6 +384,22 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
             property.Type,
             () => receiver[property.Property],
             value => receiver[property.Property] = value);
+    }
+
+    private ReferenceValue ResolveOperatorReference(BoundOperatorReference @operator)
+    {
+        return new ReferenceValue(
+            @operator.Type,
+            () => ResolveSymbolValue(@operator.Operator),
+            value => AssignValue(@operator.Operator, value));
+    }
+
+    private ReferenceValue ResolveConversionReference(BoundConversionReference conversion)
+    {
+        return new ReferenceValue(
+            conversion.Type,
+            () => ResolveSymbolValue(conversion.Conversion),
+            value => AssignValue(conversion.Conversion, value));
     }
 
     private ReferenceValue ResolveElementReference(BoundElementReference element)
@@ -493,7 +521,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         }
     }
 
-    private Delegate CreateBuiltinDelegate(VariableSymbol symbol, LambdaTypeSymbol lambdaType)
+    private Delegate CreateBuiltinDelegate(Symbol symbol, LambdaTypeSymbol lambdaType)
     {
         return lambdaType.Parameters.Length switch
         {
@@ -503,13 +531,44 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         };
     }
 
-    private PrimValue EvaluateBuiltin(VariableSymbol symbol, LambdaTypeSymbol lambdaType, ReadOnlySpan<PrimValue> arguments)
+    private PrimValue EvaluateBuiltin(Symbol symbol, LambdaTypeSymbol lambdaType, ReadOnlySpan<PrimValue> arguments)
     {
-        return arguments.Length switch
+        return symbol switch
         {
-            1 => EvaluateUnaryBuiltin(symbol.Syntax.SyntaxKind, lambdaType.ReturnType, arguments[0]),
-            2 => EvaluateBinaryBuiltin(symbol.Syntax.SyntaxKind, lambdaType.Parameters[0], lambdaType.Parameters[1], lambdaType.ReturnType, arguments[0], arguments[1]),
-            _ => throw new NotSupportedException($"Unsupported builtin arity {arguments.Length} for '{symbol.Name}'.")
+            ConversionSymbol conversion => EvaluateConversionBuiltin(conversion, arguments),
+            _ => arguments.Length switch
+            {
+                1 => EvaluateUnaryBuiltin(symbol.Syntax.SyntaxKind, lambdaType.ReturnType, arguments[0]),
+                2 => EvaluateBinaryBuiltin(symbol.Syntax.SyntaxKind, lambdaType.Parameters[0], lambdaType.Parameters[1], lambdaType.ReturnType, arguments[0], arguments[1]),
+                _ => throw new NotSupportedException($"Unsupported builtin arity {arguments.Length} for '{symbol.Name}'.")
+            }
+        };
+    }
+
+    private PrimValue EvaluateConversionBuiltin(ConversionSymbol conversion, ReadOnlySpan<PrimValue> arguments)
+    {
+        if (arguments.Length != 1)
+        {
+            throw new NotSupportedException($"Unsupported conversion arity {arguments.Length} for '{conversion.Name}'.");
+        }
+
+        var targetType = (StructTypeSymbol)conversion.LambdaType.ReturnType;
+        return targetType.Name switch
+        {
+            "i8" => ConvertTo<sbyte>(arguments[0], targetType),
+            "i16" => ConvertTo<short>(arguments[0], targetType),
+            "i32" => ConvertTo<int>(arguments[0], targetType),
+            "i64" => ConvertTo<long>(arguments[0], targetType),
+            "isz" => ConvertTo<nint>(arguments[0], targetType),
+            "u8" => ConvertTo<byte>(arguments[0], targetType),
+            "u16" => ConvertTo<ushort>(arguments[0], targetType),
+            "u32" => ConvertTo<uint>(arguments[0], targetType),
+            "u64" => ConvertTo<ulong>(arguments[0], targetType),
+            "usz" => ConvertTo<nuint>(arguments[0], targetType),
+            "f16" => ConvertTo<Half>(arguments[0], targetType),
+            "f32" => ConvertTo<float>(arguments[0], targetType),
+            "f64" => ConvertTo<double>(arguments[0], targetType),
+            _ => throw new NotSupportedException($"Unsupported predefined conversion '{conversion.Name}'.")
         };
     }
 
@@ -520,7 +579,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         {
             "bool" => kind switch
             {
-                SyntaxKind.BangToken => CreateValue(returnType, !(bool)operand.Value),
+                SyntaxKind.ExclamationToken => CreateValue(returnType, !(bool)operand.Value),
                 _ => throw new NotSupportedException($"Unsupported unary operator '{kind}' for bool.")
             },
             "i8" => EvaluateNumericUnary<sbyte>(kind, returnType, operand),
@@ -548,7 +607,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         PrimValue left,
         PrimValue right)
     {
-        if (kind is SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken)
+        if (kind is SyntaxKind.EqualsEqualsToken or SyntaxKind.ExclamationEqualsToken)
         {
             var equals = Equals(left.Value, right.Value);
             return CreateValue(returnType, kind is SyntaxKind.EqualsEqualsToken ? equals : !equals);
@@ -597,11 +656,41 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         var result = kind switch
         {
             SyntaxKind.AmpersandAmpersandToken => a && b,
-            SyntaxKind.PipePipeToken => a || b,
+            SyntaxKind.BarBarToken => a || b,
             _ => throw new NotSupportedException($"Unsupported binary operator '{kind}' for bool.")
         };
 
         return CreateValue(returnType, result);
+    }
+
+    private PrimValue ConvertTo<TTarget>(PrimValue operand, StructTypeSymbol targetType)
+        where TTarget : INumberBase<TTarget>
+    {
+        return ((StructTypeSymbol)operand.Type).Name switch
+        {
+            "i8" => ConvertNumeric<sbyte, TTarget>(operand, targetType),
+            "i16" => ConvertNumeric<short, TTarget>(operand, targetType),
+            "i32" => ConvertNumeric<int, TTarget>(operand, targetType),
+            "i64" => ConvertNumeric<long, TTarget>(operand, targetType),
+            "isz" => ConvertNumeric<nint, TTarget>(operand, targetType),
+            "u8" => ConvertNumeric<byte, TTarget>(operand, targetType),
+            "u16" => ConvertNumeric<ushort, TTarget>(operand, targetType),
+            "u32" => ConvertNumeric<uint, TTarget>(operand, targetType),
+            "u64" => ConvertNumeric<ulong, TTarget>(operand, targetType),
+            "usz" => ConvertNumeric<nuint, TTarget>(operand, targetType),
+            "f16" => ConvertNumeric<Half, TTarget>(operand, targetType),
+            "f32" => ConvertNumeric<float, TTarget>(operand, targetType),
+            "f64" => ConvertNumeric<double, TTarget>(operand, targetType),
+            _ => throw new NotSupportedException($"Unsupported predefined conversion source '{operand.Type.Name}'.")
+        };
+    }
+
+    private PrimValue ConvertNumeric<TSource, TTarget>(PrimValue operand, TypeSymbol targetType)
+        where TSource : INumberBase<TSource>
+        where TTarget : INumberBase<TTarget>
+    {
+        var value = (TSource)operand.Value;
+        return CreateValue(targetType, TTarget.CreateChecked(value));
     }
 
     private PrimValue EvaluateUnsignedUnary<T>(SyntaxKind kind, TypeSymbol returnType, PrimValue operand)
@@ -643,10 +732,10 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         {
             SyntaxKind.PlusToken => CreateValue(returnType, a + b),
             SyntaxKind.MinusToken => CreateValue(returnType, a - b),
-            SyntaxKind.StarToken => CreateValue(returnType, a * b),
+            SyntaxKind.AsteriskToken => CreateValue(returnType, a * b),
             SyntaxKind.SlashToken => CreateValue(returnType, a / b),
             SyntaxKind.PercentToken => CreateValue(returnType, a % b),
-            SyntaxKind.StarStarToken => CreateValue(returnType, T.CreateChecked(Math.Pow(double.CreateChecked(a), double.CreateChecked(b)))),
+            SyntaxKind.AsteriskAsteriskToken => CreateValue(returnType, T.CreateChecked(Math.Pow(double.CreateChecked(a), double.CreateChecked(b)))),
             SyntaxKind.LessThanToken => CreateValue(returnType, a < b),
             SyntaxKind.LessThanEqualsToken => CreateValue(returnType, a <= b),
             SyntaxKind.GreaterThanToken => CreateValue(returnType, a > b),
@@ -661,26 +750,26 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
             SyntaxKind.AmpersandToken when typeof(T) == typeof(uint) => CreateValue(returnType, (uint)(object)a & (uint)(object)b),
             SyntaxKind.AmpersandToken when typeof(T) == typeof(ulong) => CreateValue(returnType, (ulong)(object)a & (ulong)(object)b),
             SyntaxKind.AmpersandToken when typeof(T) == typeof(nuint) => CreateValue(returnType, (nuint)(object)a & (nuint)(object)b),
-            SyntaxKind.PipeToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)((sbyte)(object)a | (sbyte)(object)b)),
-            SyntaxKind.PipeToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)((short)(object)a | (short)(object)b)),
-            SyntaxKind.PipeToken when typeof(T) == typeof(int) => CreateValue(returnType, (int)(object)a | (int)(object)b),
-            SyntaxKind.PipeToken when typeof(T) == typeof(long) => CreateValue(returnType, (long)(object)a | (long)(object)b),
-            SyntaxKind.PipeToken when typeof(T) == typeof(nint) => CreateValue(returnType, (nint)(object)a | (nint)(object)b),
-            SyntaxKind.PipeToken when typeof(T) == typeof(byte) => CreateValue(returnType, (byte)((byte)(object)a | (byte)(object)b)),
-            SyntaxKind.PipeToken when typeof(T) == typeof(ushort) => CreateValue(returnType, (ushort)((ushort)(object)a | (ushort)(object)b)),
-            SyntaxKind.PipeToken when typeof(T) == typeof(uint) => CreateValue(returnType, (uint)(object)a | (uint)(object)b),
-            SyntaxKind.PipeToken when typeof(T) == typeof(ulong) => CreateValue(returnType, (ulong)(object)a | (ulong)(object)b),
-            SyntaxKind.PipeToken when typeof(T) == typeof(nuint) => CreateValue(returnType, (nuint)(object)a | (nuint)(object)b),
-            SyntaxKind.HatToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)((sbyte)(object)a ^ (sbyte)(object)b)),
-            SyntaxKind.HatToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)((short)(object)a ^ (short)(object)b)),
-            SyntaxKind.HatToken when typeof(T) == typeof(int) => CreateValue(returnType, (int)(object)a ^ (int)(object)b),
-            SyntaxKind.HatToken when typeof(T) == typeof(long) => CreateValue(returnType, (long)(object)a ^ (long)(object)b),
-            SyntaxKind.HatToken when typeof(T) == typeof(nint) => CreateValue(returnType, (nint)(object)a ^ (nint)(object)b),
-            SyntaxKind.HatToken when typeof(T) == typeof(byte) => CreateValue(returnType, (byte)((byte)(object)a ^ (byte)(object)b)),
-            SyntaxKind.HatToken when typeof(T) == typeof(ushort) => CreateValue(returnType, (ushort)((ushort)(object)a ^ (ushort)(object)b)),
-            SyntaxKind.HatToken when typeof(T) == typeof(uint) => CreateValue(returnType, (uint)(object)a ^ (uint)(object)b),
-            SyntaxKind.HatToken when typeof(T) == typeof(ulong) => CreateValue(returnType, (ulong)(object)a ^ (ulong)(object)b),
-            SyntaxKind.HatToken when typeof(T) == typeof(nuint) => CreateValue(returnType, (nuint)(object)a ^ (nuint)(object)b),
+            SyntaxKind.BarToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)((sbyte)(object)a | (sbyte)(object)b)),
+            SyntaxKind.BarToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)((short)(object)a | (short)(object)b)),
+            SyntaxKind.BarToken when typeof(T) == typeof(int) => CreateValue(returnType, (int)(object)a | (int)(object)b),
+            SyntaxKind.BarToken when typeof(T) == typeof(long) => CreateValue(returnType, (long)(object)a | (long)(object)b),
+            SyntaxKind.BarToken when typeof(T) == typeof(nint) => CreateValue(returnType, (nint)(object)a | (nint)(object)b),
+            SyntaxKind.BarToken when typeof(T) == typeof(byte) => CreateValue(returnType, (byte)((byte)(object)a | (byte)(object)b)),
+            SyntaxKind.BarToken when typeof(T) == typeof(ushort) => CreateValue(returnType, (ushort)((ushort)(object)a | (ushort)(object)b)),
+            SyntaxKind.BarToken when typeof(T) == typeof(uint) => CreateValue(returnType, (uint)(object)a | (uint)(object)b),
+            SyntaxKind.BarToken when typeof(T) == typeof(ulong) => CreateValue(returnType, (ulong)(object)a | (ulong)(object)b),
+            SyntaxKind.BarToken when typeof(T) == typeof(nuint) => CreateValue(returnType, (nuint)(object)a | (nuint)(object)b),
+            SyntaxKind.CaretToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)((sbyte)(object)a ^ (sbyte)(object)b)),
+            SyntaxKind.CaretToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)((short)(object)a ^ (short)(object)b)),
+            SyntaxKind.CaretToken when typeof(T) == typeof(int) => CreateValue(returnType, (int)(object)a ^ (int)(object)b),
+            SyntaxKind.CaretToken when typeof(T) == typeof(long) => CreateValue(returnType, (long)(object)a ^ (long)(object)b),
+            SyntaxKind.CaretToken when typeof(T) == typeof(nint) => CreateValue(returnType, (nint)(object)a ^ (nint)(object)b),
+            SyntaxKind.CaretToken when typeof(T) == typeof(byte) => CreateValue(returnType, (byte)((byte)(object)a ^ (byte)(object)b)),
+            SyntaxKind.CaretToken when typeof(T) == typeof(ushort) => CreateValue(returnType, (ushort)((ushort)(object)a ^ (ushort)(object)b)),
+            SyntaxKind.CaretToken when typeof(T) == typeof(uint) => CreateValue(returnType, (uint)(object)a ^ (uint)(object)b),
+            SyntaxKind.CaretToken when typeof(T) == typeof(ulong) => CreateValue(returnType, (ulong)(object)a ^ (ulong)(object)b),
+            SyntaxKind.CaretToken when typeof(T) == typeof(nuint) => CreateValue(returnType, (nuint)(object)a ^ (nuint)(object)b),
             SyntaxKind.LessThanLessThanToken when typeof(T) == typeof(sbyte) => CreateValue(returnType, (sbyte)((sbyte)(object)a << int.CreateChecked(b))),
             SyntaxKind.LessThanLessThanToken when typeof(T) == typeof(short) => CreateValue(returnType, (short)((short)(object)a << int.CreateChecked(b))),
             SyntaxKind.LessThanLessThanToken when typeof(T) == typeof(int) => CreateValue(returnType, (int)(object)a << int.CreateChecked(b)),

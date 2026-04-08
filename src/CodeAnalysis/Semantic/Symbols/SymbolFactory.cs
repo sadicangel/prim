@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Declarations;
 using CodeAnalysis.Syntax.Names;
@@ -47,8 +47,7 @@ internal static class SymbolFactory
         DeclareBitwiseOperators(i8, i16, i32, i64, isz, u8, u16, u32, u64, usz);
         DeclareLogicalOperators(@bool);
         DeclareStringOperators(str);
-
-        // TODO: Missing conversions.
+        DeclarePredefinedConversions(i8, i16, i32, i64, isz, u8, u16, u32, u64, usz, f16, f32, f64);
 
         return global;
 
@@ -117,374 +116,408 @@ internal static class SymbolFactory
         return symbol;
     }
 
-    private static void DeclareEqualityOperators(params ReadOnlySpan<TypeSymbol> types)
+    private static void DeclareEqualityOperators(params ReadOnlySpan<StructTypeSymbol> types)
     {
         foreach (var type in types)
         {
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.Equals,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.EqualsEqualsToken),
-                    Name: Mangler.Mangle(SyntaxKind.EqualsEqualsToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.EqualsEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangEqualsToken),
-                    Name: Mangler.Mangle(SyntaxKind.BangEqualsToken, type, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangEqualsToken),
+                new OperatorSymbol(
+                    OperatorKind.NotEquals,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.ExclamationEqualsToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.ExclamationEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
         }
     }
 
-    private static void DeclareComparisonOperators(params ReadOnlySpan<TypeSymbol> types)
+    private static void DeclareComparisonOperators(params ReadOnlySpan<StructTypeSymbol> types)
     {
         foreach (var type in types)
         {
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.LessThan,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanToken),
-                    Name: Mangler.Mangle(SyntaxKind.LessThanToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.LessThanOrEqual,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanEqualsToken),
-                    Name: Mangler.Mangle(SyntaxKind.LessThanEqualsToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.GreaterThan,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanToken),
-                    Name: Mangler.Mangle(SyntaxKind.GreaterThanToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.GreaterThanOrEqual,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanEqualsToken),
-                    Name: Mangler.Mangle(SyntaxKind.GreaterThanEqualsToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanEqualsToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
         }
     }
 
-    private static void DeclareMathOperators(params ReadOnlySpan<TypeSymbol> types)
+    private static void DeclareMathOperators(params ReadOnlySpan<StructTypeSymbol> types)
     {
         foreach (var type in types)
         {
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.UnaryPlus,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
-                    Name: Mangler.Mangle(SyntaxKind.PlusToken, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                         Parameters: [type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.UnaryMinus,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
-                    Name: Mangler.Mangle(SyntaxKind.MinusToken, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
                         Parameters: [type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.Addition,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
-                    Name: Mangler.Mangle(SyntaxKind.PlusToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.Subtraction,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
-                    Name: Mangler.Mangle(SyntaxKind.MinusToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.MinusToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarToken),
-                    Name: Mangler.Mangle(SyntaxKind.StarToken, type, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarToken),
+                new OperatorSymbol(
+                    OperatorKind.Multiplication,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AsteriskToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AsteriskToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.Division,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.SlashToken),
-                    Name: Mangler.Mangle(SyntaxKind.SlashToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.SlashToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.Modulo,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PercentToken),
-                    Name: Mangler.Mangle(SyntaxKind.PercentToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PercentToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarStarToken),
-                    Name: Mangler.Mangle(SyntaxKind.StarStarToken, type, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.StarStarToken),
+                new OperatorSymbol(
+                    OperatorKind.Exponentiation,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AsteriskAsteriskToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AsteriskAsteriskToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
         }
     }
 
-    private static void DeclareBitwiseOperators(params ReadOnlySpan<TypeSymbol> types)
+    private static void DeclareBitwiseOperators(params ReadOnlySpan<StructTypeSymbol> types)
     {
         foreach (var type in types)
         {
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.OnesComplement,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.TildeToken),
-                    Name: Mangler.Mangle(SyntaxKind.TildeToken, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.TildeToken),
                         Parameters: [type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.BitwiseAnd,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandToken),
-                    Name: Mangler.Mangle(SyntaxKind.AmpersandToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipeToken),
-                    Name: Mangler.Mangle(SyntaxKind.PipeToken, type, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipeToken),
+                new OperatorSymbol(
+                    OperatorKind.BitwiseOr,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BarToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BarToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.HatToken),
-                    Name: Mangler.Mangle(SyntaxKind.HatToken, type, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.HatToken),
+                new OperatorSymbol(
+                    OperatorKind.ExclusiveOr,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.CaretToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.CaretToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.LeftShift,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanLessThanToken),
-                    Name: Mangler.Mangle(SyntaxKind.LessThanLessThanToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.LessThanLessThanToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.RightShift,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanGreaterThanToken),
-                    Name: Mangler.Mangle(SyntaxKind.GreaterThanGreaterThanToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.GreaterThanGreaterThanToken),
                         Parameters: [type, type],
                         ReturnType: type,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
         }
     }
 
-    private static void DeclareLogicalOperators(params ReadOnlySpan<TypeSymbol> types)
+    private static void DeclareLogicalOperators(params ReadOnlySpan<StructTypeSymbol> types)
     {
         foreach (var type in types)
         {
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangToken),
-                    Name: Mangler.Mangle(SyntaxKind.BangToken, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BangToken),
+                new OperatorSymbol(
+                    OperatorKind.NotEquals,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.ExclamationToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.ExclamationToken),
                         Parameters: [type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
+                new OperatorSymbol(
+                    OperatorKind.LogicalAnd,
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandAmpersandToken),
-                    Name: Mangler.Mangle(SyntaxKind.AmpersandAmpersandToken, type, type),
-                    Type: new LambdaTypeSymbol(
+                    LambdaType: new LambdaTypeSymbol(
                         Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AmpersandAmpersandToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
 
             Declare(
                 type,
-                new VariableSymbol(
-                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipePipeToken),
-                    Name: Mangler.Mangle(SyntaxKind.PipePipeToken, type, type),
-                    Type: new LambdaTypeSymbol(
-                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PipePipeToken),
+                new OperatorSymbol(
+                    OperatorKind.LogicalOr,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BarBarToken),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.BarBarToken),
                         Parameters: [type, type],
                         ReturnType: type.ContainingModule.Bool,
                         type.ContainingModule),
-                    ContainingModule: type.ContainingModule,
-                    Modifiers.Static | Modifiers.ReadOnly));
+                    ContainingType: type));
         }
     }
 
-    private static void DeclareStringOperators(TypeSymbol type)
+    private static void DeclareStringOperators(StructTypeSymbol type)
     {
         Declare(
             type,
-            new VariableSymbol(
+            new OperatorSymbol(
+                OperatorKind.Addition,
                 Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
-                Name: Mangler.Mangle(SyntaxKind.PlusToken, type, type),
-                Type: new LambdaTypeSymbol(
+                LambdaType: new LambdaTypeSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Parameters: [type, type],
                     ReturnType: type,
                     type.ContainingModule),
-                ContainingModule: type.ContainingModule,
-                Modifiers.Static | Modifiers.ReadOnly));
+                ContainingType: type));
 
         Declare(
             type,
-            new VariableSymbol(
+            new OperatorSymbol(
+                OperatorKind.Addition,
                 Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
-                Name: Mangler.Mangle(SyntaxKind.PlusToken, type, type.ContainingModule.Any),
-                Type: new LambdaTypeSymbol(
+                LambdaType: new LambdaTypeSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Parameters: [type, type.ContainingModule.Any],
                     ReturnType: type,
                     type.ContainingModule),
-                ContainingModule: type.ContainingModule,
-                Modifiers.Static | Modifiers.ReadOnly));
+                ContainingType: type));
 
         Declare(
             type,
-            new VariableSymbol(
+            new OperatorSymbol(
+                OperatorKind.Addition,
                 Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
-                Name: Mangler.Mangle(SyntaxKind.PlusToken, type.ContainingModule.Any, type),
-                Type: new LambdaTypeSymbol(
+                LambdaType: new LambdaTypeSymbol(
                     Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.PlusToken),
                     Parameters: [type.ContainingModule.Any, type],
                     ReturnType: type,
                     type.ContainingModule),
-                ContainingModule: type.ContainingModule,
-                Modifiers.Static | Modifiers.ReadOnly));
+                ContainingType: type));
+    }
+
+    private static void DeclarePredefinedConversions(
+        StructTypeSymbol i8,
+        StructTypeSymbol i16,
+        StructTypeSymbol i32,
+        StructTypeSymbol i64,
+        StructTypeSymbol isz,
+        StructTypeSymbol u8,
+        StructTypeSymbol u16,
+        StructTypeSymbol u32,
+        StructTypeSymbol u64,
+        StructTypeSymbol usz,
+        StructTypeSymbol f16,
+        StructTypeSymbol f32,
+        StructTypeSymbol f64)
+    {
+        DeclareConversions(i8, [i16, i32, i64, isz, f16, f32, f64], [u8, u16, u32, u64]);
+        DeclareConversions(i16, [i32, i64, isz, f16, f32, f64], [i8, u8, u16, u32, u64]);
+        DeclareConversions(i32, [i64, isz, f32, f64], [f16, i8, i16, u8, u16, u32, u64]);
+        DeclareConversions(i64, [isz, f32, f64], [f16, i8, i16, i32, u8, u16, u32, u64]);
+        DeclareConversions(isz, [], [f16, f32, f64, i8, i16, i32, i64, u8, u16, u32, u64, usz]);
+        DeclareConversions(u8, [u16, u32, u64, usz, f16, f32, f64], [i8, i16, i32, i64, isz]);
+        DeclareConversions(u16, [u32, u64, usz, f16, f32, f64], [i8, i16, i32, i64, isz, u8]);
+        DeclareConversions(u32, [u64, usz, f32, f64], [f16, i8, i16, i32, i64, isz, u8, u16]);
+        DeclareConversions(u64, [usz, f32, f64], [f16, i8, i16, i32, i64, isz, u8, u16, u32]);
+        DeclareConversions(usz, [], [f16, f32, f64, i8, i16, i32, i64, isz, u8, u16, u32, u64]);
+        DeclareConversions(f16, [f32, f64], [i8, i16, i32, i64, isz, u8, u16, u32, u64, usz]);
+        DeclareConversions(f32, [f64], [f16, i8, i16, i32, i64, isz, u8, u16, u32, u64, usz]);
+        DeclareConversions(f64, [], [f16, f32, i8, i16, i32, i64, isz, u8, u16, u32, u64, usz]);
+    }
+
+    private static void DeclareConversions(
+        StructTypeSymbol source,
+        ReadOnlySpan<StructTypeSymbol> implicitTargets,
+        ReadOnlySpan<StructTypeSymbol> explicitTargets)
+    {
+        DeclareConversions(source, ConversionKind.Implicit, implicitTargets);
+        DeclareConversions(source, ConversionKind.Explicit, explicitTargets);
+    }
+
+    private static void DeclareConversions(
+        StructTypeSymbol source,
+        ConversionKind conversionKind,
+        ReadOnlySpan<StructTypeSymbol> targets)
+    {
+        foreach (var target in targets)
+        {
+            Declare(
+                source,
+                new ConversionSymbol(
+                    conversionKind,
+                    Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AsKeyword),
+                    LambdaType: new LambdaTypeSymbol(
+                        Syntax: SyntaxToken.CreateSynthetic(SyntaxKind.AsKeyword),
+                        Parameters: [source],
+                        ReturnType: target,
+                        source.ContainingModule),
+                    ContainingType: source));
+        }
     }
 }

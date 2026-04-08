@@ -103,13 +103,13 @@ internal partial class Scanner
                 return 1;
 
             case ['!', '=', ..]:
-                kind = SyntaxKind.BangEqualsToken;
+                kind = SyntaxKind.ExclamationEqualsToken;
                 range = offset..(offset + 2);
                 value = null;
                 return 2;
 
             case ['!', ..]:
-                kind = SyntaxKind.BangToken;
+                kind = SyntaxKind.ExclamationToken;
                 range = offset..(offset + 1);
                 value = null;
                 return 1;
@@ -164,13 +164,13 @@ internal partial class Scanner
                 return 1;
 
             case ['^', '=', ..]:
-                kind = SyntaxKind.HatEqualsToken;
+                kind = SyntaxKind.CaretEqualsToken;
                 range = offset..(offset + 2);
                 value = null;
                 return 2;
 
             case ['^', ..]:
-                kind = SyntaxKind.HatToken;
+                kind = SyntaxKind.CaretToken;
                 range = offset..(offset + 1);
                 value = null;
                 return 1;
@@ -242,7 +242,7 @@ internal partial class Scanner
                 return 1;
 
             case ['|', '|', ..]:
-                kind = SyntaxKind.PipePipeToken;
+                kind = SyntaxKind.BarBarToken;
                 range = offset..(offset + 2);
                 value = null;
                 return 2;
@@ -254,7 +254,7 @@ internal partial class Scanner
                 return 2;
 
             case ['|', ..]:
-                kind = SyntaxKind.PipeToken;
+                kind = SyntaxKind.BarToken;
                 range = offset..(offset + 1);
                 value = null;
                 return 1;
@@ -290,7 +290,7 @@ internal partial class Scanner
                 return 3;
 
             case ['*', '*', ..]:
-                kind = SyntaxKind.StarStarToken;
+                kind = SyntaxKind.AsteriskAsteriskToken;
                 range = offset..(offset + 2);
                 value = null;
                 return 2;
@@ -302,7 +302,7 @@ internal partial class Scanner
                 return 2;
 
             case ['*', ..]:
-                kind = SyntaxKind.StarToken;
+                kind = SyntaxKind.AsteriskToken;
                 range = offset..(offset + 1);
                 value = null;
                 return 1;

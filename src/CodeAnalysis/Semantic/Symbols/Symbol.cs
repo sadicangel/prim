@@ -11,7 +11,9 @@ internal abstract record class Symbol(
     ModuleSymbol ContainingModule,
     Modifiers Modifiers)
 {
-    public virtual string FullName => field ??= $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
+    public virtual string FullyQualifiedName => field ??= $"{ContainingModule.FullyQualifiedName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
+
+    public virtual string FullName => field ??= ContainingModule.IsGlobal ? Name : $"{ContainingModule.FullName}{SyntaxFacts.GetText(SyntaxKind.ColonColonToken)}{Name}";
 
     public bool IsPredefined { get; init; }
 

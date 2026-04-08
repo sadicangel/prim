@@ -3,15 +3,12 @@ using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Expressions;
+
 internal sealed record class BoundBlockExpression(
     SyntaxNode Syntax,
     TypeSymbol Type,
     ImmutableArray<BoundExpression> Expressions)
     : BoundExpression(BoundKind.BlockExpression, Syntax, Type)
 {
-    public override IEnumerable<BoundNode> Children()
-    {
-        foreach (var expression in Expressions)
-            yield return expression;
-    }
+    public override IEnumerable<BoundNode> Children() => Expressions;
 }

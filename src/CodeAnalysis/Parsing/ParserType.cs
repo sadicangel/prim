@@ -36,7 +36,7 @@ internal static class ParserType
             // union        : type '|' type ['|' union]*
 
             var types = stream.ParseSyntaxList(
-                SyntaxKind.PipeToken,
+                SyntaxKind.BarToken,
                 [SyntaxKind.ColonToken, SyntaxKind.EqualsToken],
                 ParseSingleType);
 
@@ -76,7 +76,7 @@ internal static class ParserType
             return stream.Current.SyntaxKind switch
             {
                 SyntaxKind.BracketOpenToken => stream.ParseArrayType(type),
-                SyntaxKind.StarToken => stream.ParsePointerType(type),
+                SyntaxKind.AsteriskToken => stream.ParsePointerType(type),
                 SyntaxKind.HookToken => stream.ParseMaybeType(type),
                 _ => type,
             };
@@ -146,7 +146,7 @@ internal static class ParserType
 
         private PointerTypeSyntax ParsePointerType(TypeSyntax elementType)
         {
-            var starToken = stream.Match(SyntaxKind.StarToken);
+            var starToken = stream.Match(SyntaxKind.AsteriskToken);
 
             return new PointerTypeSyntax(elementType, starToken);
         }
