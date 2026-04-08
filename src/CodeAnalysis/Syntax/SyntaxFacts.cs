@@ -209,7 +209,7 @@ public static class SyntaxFacts
             SyntaxKind.TypeClause => null,
             SyntaxKind.InitClause => null,
 
-            SyntaxKind.IfExpression => null,
+            SyntaxKind.IfElseExpression => null,
             SyntaxKind.ElseClause => null,
             SyntaxKind.WhileExpression => null,
 

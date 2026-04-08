@@ -216,7 +216,7 @@ public enum SyntaxKind
     TypeClause,
     InitClause,
 
-    IfExpression,
+    IfElseExpression,
     ElseClause,
     WhileExpression,
 

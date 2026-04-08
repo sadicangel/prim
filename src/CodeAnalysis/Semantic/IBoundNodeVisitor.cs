@@ -1,4 +1,5 @@
-﻿using CodeAnalysis.Semantic.Declarations;
+using CodeAnalysis.Semantic.Declarations;
+using CodeAnalysis.Semantic.ControlFlow;
 using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.References;
 
@@ -31,6 +32,7 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundNeverExpression node);
     T Visit(BoundUnaryExpression node);
     T Visit(BoundCallExpression node);
+    T Visit(BoundIfElseExpression node);
 }
 
 internal static class BoundNodeVisitorExtensions
@@ -69,7 +71,7 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.ConversionExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.UnaryExpression => visitor.Visit((BoundUnaryExpression)node),
             BoundKind.BinaryExpression => visitor.Visit((BoundBinaryExpression)node),
-            BoundKind.IfExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.IfElseExpression => visitor.Visit((BoundIfElseExpression)node),
             BoundKind.WhileExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.BreakExpression => throw CreateUnsupportedNodeKindException(node),
             BoundKind.ContinueExpression => throw CreateUnsupportedNodeKindException(node),

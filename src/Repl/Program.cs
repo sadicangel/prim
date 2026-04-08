@@ -18,25 +18,27 @@ while (true)
 {
     var @default = Markup.Escape(
         """
-        module vec;
+        let main: (str[]) -> i32 = (args) => 2 + 2;
+        //module vec;
 
-        struct Point {
-            x: i32 = 0;
-            y: i32 = 0;
-        }
+        //struct Point {
+        //    x: i32 = 0;
+        //    y: i32 = 0;
+        //}
 
-        let double: (i32) -> i32 = (x) => x * 2;
+        //let double: (i32) -> i32 = (x) => x * 2;
 
-        let main: (str[]) -> i32 = (args) => {
-            var a = 40;
-            var b = 0;
-            b = -1 * 2;
-            let p = Point { x = a, y = b };
+        //let main: (str[]) -> i32 = (args) => {
+        //    var a = 40;
+        //    var b = 0;
+        //    b = -1 * 2;
+        //    let p = Point { x = a, y = b };
 
-            var d: i32[] = [1, 2, 3];
-            d[2] = double(p.x + p.y);
-            d[2] as f64;
-        }
+        //    var d: i32[] = [1, 2, 3];
+        //    d[2] = double(p.x + p.y);
+        //    let f = d[2] as i64;
+        //    if (f > 70 as i64) "greater than 70" else "less or equal to 70";
+        //}
         """);
 
     var code = console.Prompt(new TextPrompt<string>(">").DefaultValue(@default));

@@ -2,14 +2,14 @@
 
 namespace CodeAnalysis.Syntax.ControlFlow;
 
-public sealed record class IfExpressionSyntax(
+public sealed record class IfElseExpressionSyntax(
     SyntaxToken IfKeyword,
     SyntaxToken ParenthesisOpenToken,
     ExpressionSyntax Condition,
     SyntaxToken ParenthesisCloseToken,
     ExpressionSyntax Then,
     ElseClauseSyntax? ElseClause)
-    : ExpressionSyntax(SyntaxKind.IfExpression)
+    : ExpressionSyntax(SyntaxKind.IfElseExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

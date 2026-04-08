@@ -1,9 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic;
+using CodeAnalysis.Semantic.ControlFlow;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.References;
@@ -130,6 +131,25 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
         {
             _frames.Pop();
         }
+    }
+
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundIfElseExpression node)
+    {
+        var condition = this.Visit(node.Condition);
+        if (condition.Value is not bool shouldEvaluateThen)
+        {
+            throw new InvalidOperationException($"Expected if condition '{node.Condition.Type.Name}' to evaluate to a bool value.");
+        }
+
+        var result = shouldEvaluateThen
+            ? this.Visit(node.Then)
+            : node.Else is not null
+                ? this.Visit(node.Else)
+                : CreateDefaultValue(node.Type.ContainingModule.Unit);
+
+        return node.Type is UnionTypeSymbol unionType && result.Type != unionType
+            ? new UnionValue(unionType, result)
+            : result;
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundArrayExpression node)

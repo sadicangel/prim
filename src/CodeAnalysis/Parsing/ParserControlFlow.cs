@@ -7,7 +7,7 @@ internal static class ParserControlFlow
 {
     extension(SyntaxTokenStream stream)
     {
-        public IfExpressionSyntax ParseIfElseExpression()
+        public IfElseExpressionSyntax ParseIfElseExpression()
         {
             var ifKeyword = stream.Match(SyntaxKind.IfKeyword);
             var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
@@ -16,7 +16,7 @@ internal static class ParserControlFlow
             var then = stream.ParseExpression();
             var elseClause = stream.ParseElseClauseExpression();
 
-            return new IfExpressionSyntax(
+            return new IfElseExpressionSyntax(
                 ifKeyword,
                 parenthesisOpenToken,
                 condition,
@@ -32,7 +32,7 @@ internal static class ParserControlFlow
                 return null;
             }
 
-            var @else = stream.ParseExpression();
+            var @else = stream.ParseExpressionTerminated();
             return new ElseClauseSyntax(elseKeyword, @else);
         }
     }

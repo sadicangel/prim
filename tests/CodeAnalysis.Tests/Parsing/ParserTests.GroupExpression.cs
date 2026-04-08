@@ -8,7 +8,7 @@ public partial class ParserTests
         var tree = new SyntaxTree(new SourceText("if (2 > 0) true"), new ParseOptions { IsScript = true });
         var node = Assert.Single(tree.CompilationUnit.Declarations);
         Assert.Empty(tree.Diagnostics);
-        Assert.Equal(SyntaxKind.IfExpression, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.IfElseExpression, node.SyntaxKind);
     }
 
     [Fact]
@@ -17,6 +17,6 @@ public partial class ParserTests
         var tree = new SyntaxTree(new SourceText("if (2 > 0) true else false"), new ParseOptions { IsScript = true });
         var node = Assert.Single(tree.CompilationUnit.Declarations);
         Assert.Empty(tree.Diagnostics);
-        Assert.Equal(SyntaxKind.IfExpression, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.IfElseExpression, node.SyntaxKind);
     }
 }

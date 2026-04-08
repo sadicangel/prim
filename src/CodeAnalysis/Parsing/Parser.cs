@@ -13,7 +13,7 @@ internal static class Parser
 {
     extension(SyntaxTokenStream)
     {
-        public static Result<CompilationUnitSyntax> Parse(SourceText sourceText)
+        public static Result<CompilationUnitSyntax> Parse(SourceText sourceText, ParseOptions options)
         {
             var (syntaxTokens, scanDiagnostics) = Scanner.Scan(sourceText);
             if (syntaxTokens.Length == 0)

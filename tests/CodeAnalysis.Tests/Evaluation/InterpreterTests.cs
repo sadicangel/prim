@@ -1,6 +1,7 @@
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation;
 using CodeAnalysis.Evaluation.Values;
+using CodeAnalysis.Semantic.ControlFlow;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.References;
@@ -449,6 +450,86 @@ public sealed class InterpreterTests
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_IfElseExpression_EvaluatesElseBranchWhenConditionIsFalse()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 = (args) => {
+                var result: i32 = if (2 < 0) 40 else 2;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
+        var ifElse = Assert.IsType<BoundIfElseExpression>(resultDeclaration.Expression);
+
+        var result = new Interpreter().Interpret(ifElse);
+
+        Assert.Equal(2, result.Value);
+        Assert.Equal("i32", result.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_IfExpressionWithoutElse_ReturnsThenValueWrappedInUnionWhenConditionIsTrue()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 | unit = (args) => {
+                if (2 > 0) 40;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var ifElse = Assert.IsType<BoundIfElseExpression>(block.Expressions[0]);
+
+        var result = Assert.IsType<UnionValue>(new Interpreter().Interpret(ifElse));
+        var member = Assert.IsType<InstanceValue>(result.Value);
+
+        Assert.Equal("i32 | unit", result.Type.Name);
+        Assert.Equal(40, member.Value);
+        Assert.Equal("i32", member.Type.Name);
+    }
+
+    [Fact]
+    public void Interpret_IfExpressionWithoutElse_ReturnsUnitWrappedInUnionWhenConditionIsFalse()
+    {
+        var compilation = CreateCompilation(
+            """
+            let main: (str[]) -> i32 | unit = (args) => {
+                if (2 < 0) 40;
+            };
+            """);
+
+        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
+        var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
+        var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
+        var ifElse = Assert.IsType<BoundIfElseExpression>(block.Expressions[0]);
+
+        var result = Assert.IsType<UnionValue>(new Interpreter().Interpret(ifElse));
+        var member = Assert.IsType<InstanceValue>(result.Value);
+
+        Assert.Equal("i32 | unit", result.Type.Name);
+        Assert.Same(Unit.Value, member.Value);
+        Assert.Equal("unit", member.Type.Name);
     }
 
     private static Compilation CreateCompilation(string source)

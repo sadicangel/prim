@@ -44,7 +44,7 @@ internal enum BoundKind
     UnaryExpression,
     BinaryExpression,
 
-    IfExpression,
+    IfElseExpression,
     WhileExpression,
 
     BreakExpression,
