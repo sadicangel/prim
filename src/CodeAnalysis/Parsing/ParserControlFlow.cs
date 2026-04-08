@@ -35,5 +35,20 @@ internal static class ParserControlFlow
             var @else = stream.ParseExpressionTerminated();
             return new ElseClauseSyntax(elseKeyword, @else);
         }
+
+        public WhileExpressionSyntax ParseWhileExpression()
+        {
+            var whileKeyword = stream.Match(SyntaxKind.WhileKeyword);
+            var parenthesisOpenToken = stream.Match(SyntaxKind.ParenthesisOpenToken);
+            var condition = stream.ParseExpression();
+            var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
+            var body = stream.ParseExpression();
+            return new WhileExpressionSyntax(
+                whileKeyword,
+                parenthesisOpenToken,
+                condition,
+                parenthesisCloseToken,
+                body);
+        }
     }
 }

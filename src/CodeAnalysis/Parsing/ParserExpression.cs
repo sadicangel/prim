@@ -14,7 +14,7 @@ internal static class ParserExpression
         {
             SyntaxKind.IfKeyword => stream.ParseIfElseExpression(),
             //SyntaxKind.ForKeyword => stream.ParseForExpression(),
-            //SyntaxKind.WhileKeyword => stream.ParseWhileExpression(),
+            SyntaxKind.WhileKeyword => stream.ParseWhileExpression(),
             //SyntaxKind.BreakKeyword => stream.ParseBreakExpression(),
             //SyntaxKind.ContinueKeyword => stream.ParseContinueExpression(),
             //SyntaxKind.ReturnKeyword => stream.ParseReturnExpression(),

@@ -152,6 +152,29 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
             : result;
     }
 
+    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundWhileExpression node)
+    {
+        var result = node.Type.MapsToNever
+            ? CreateValue(node.Type.ContainingModule.Unit, Unit.Value)
+            : CreateDefaultValue(node.Type);
+
+        while (true)
+        {
+            var condition = this.Visit(node.Condition);
+            if (condition.Value is not bool shouldContinue)
+            {
+                throw new InvalidOperationException($"Expected while condition '{node.Condition.Type.Name}' to evaluate to a bool value.");
+            }
+
+            if (!shouldContinue)
+            {
+                return result;
+            }
+
+            result = this.Visit(node.Body);
+        }
+    }
+
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundArrayExpression node)
     {
         var elements = new PrimValue[node.Elements.Length];

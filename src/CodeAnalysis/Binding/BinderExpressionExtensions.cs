@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic;
-using CodeAnalysis.Semantic.ControlFlow;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.References;
@@ -94,8 +93,8 @@ internal static class BinderExpressionExtensions
                     binder.BindBinaryExpression((BinaryExpressionSyntax)syntax),
                 SyntaxKind.IfElseExpression =>
                     binder.BindIfElseExpression((IfElseExpressionSyntax)syntax),
-                //SyntaxKind.WhileExpression =>
-                //    binder.BindWhileExpression((WhileExpressionSyntax)syntax),
+                SyntaxKind.WhileExpression =>
+                    binder.BindWhileExpression((WhileExpressionSyntax)syntax),
                 //SyntaxKind.ContinueExpression =>
                 //    binder.BindContinueExpression((ContinueExpressionSyntax)syntax),
                 //SyntaxKind.BreakExpression =>
@@ -505,32 +504,6 @@ internal static class BinderExpressionExtensions
                 binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, right.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, left.Type, right.Type));
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
-        }
-
-        private BoundIfElseExpression BindIfElseExpression(IfElseExpressionSyntax syntax)
-        {
-            var condition = binder.BindExpression(syntax.Condition);
-            if (condition.Type != binder.Module.Bool)
-            {
-                condition = binder.Convert(condition, binder.Module.Bool);
-            }
-
-            var then = binder.BindExpression(syntax.Then);
-            if (syntax.ElseClause is null)
-            {
-                return new BoundIfElseExpression(syntax, condition, then);
-            }
-
-            var @else = binder.BindExpression(syntax.ElseClause.Else);
-
-            // TODO: We should support implicit conversions here and provide a better error message when the types are incompatible.
-            var type = then.Type == @else.Type ? then.Type : binder.Module.Never;
-            if (type.IsNever)
-            {
-                binder.ReportInvalidConversion(syntax.SourceSpan, then.Type.Name, @else.Type.Name);
-            }
-
-            return new BoundIfElseExpression(syntax, condition, then, @else, type);
         }
     }
 }
