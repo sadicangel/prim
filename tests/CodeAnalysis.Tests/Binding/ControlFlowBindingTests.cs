@@ -1,4 +1,5 @@
 using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Symbols;
 
 namespace CodeAnalysis.Tests.Binding;
@@ -37,6 +38,26 @@ public sealed class ControlFlowBindingTests
         var diagnostic = Assert.Single(diagnostics.Where(d => d.Message == "No enclosing function out of which to return"));
 
         Assert.Equal(DiagnosticSeverity.Error, diagnostic.Severity);
+    }
+
+    [Fact]
+    public void Bind_GlobalModule_BindsMembersThroughCompilation()
+    {
+        var compilation = CreateCompilation(
+            """
+            struct Point {
+                x: i32 = 1;
+            }
+            let main: () -> i32 = () => 42;
+            """);
+
+        var (boundNode, diagnostics) = compilation.Bind(compilation.GlobalModule);
+
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
+
+        var module = Assert.IsType<BoundModuleDeclaration>(boundNode);
+        Assert.Contains(module.Members, member => member is BoundStructDeclaration { StructSymbol.Name: "Point" });
+        Assert.Contains(module.Members, member => member is BoundVariableDeclaration { VariableSymbol.Name: "main" });
     }
 
     private static Compilation CreateCompilation(string source)

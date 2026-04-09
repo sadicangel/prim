@@ -9,7 +9,7 @@ internal static class BinderSymbolExtensions
 {
     extension(Symbol symbol)
     {
-        public Result<BoundNode> Bind()
+        public Result<BoundNode> BindDeclared()
         {
             if (symbol.IsPredefined)
             {

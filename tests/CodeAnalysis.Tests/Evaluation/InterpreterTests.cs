@@ -33,7 +33,7 @@ public sealed class InterpreterTests
         var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
         var binary = Assert.IsType<BoundBinaryExpression>(resultDeclaration.Expression);
 
-        var result = new Interpreter().Interpret(binary);
+        var result = new Interpreter(compilation).Interpret(binary);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -60,7 +60,7 @@ public sealed class InterpreterTests
         var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
         var reference = Assert.IsType<BoundVariableReference>(resultDeclaration.Expression);
 
-        var result = new Interpreter().Interpret(reference);
+        var result = new Interpreter(compilation).Interpret(reference);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -86,7 +86,7 @@ public sealed class InterpreterTests
         var valuesDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
         var arrayInit = Assert.IsType<BoundArrayExpression>(valuesDeclaration.Expression);
 
-        var result = Assert.IsType<ArrayValue>(new Interpreter().Interpret(arrayInit));
+        var result = Assert.IsType<ArrayValue>(new Interpreter(compilation).Interpret(arrayInit));
 
         Assert.Equal(2, result.Length);
         Assert.Equal(40, result.Elements[0].Value);
@@ -115,7 +115,7 @@ public sealed class InterpreterTests
         var binary = Assert.IsType<BoundBinaryExpression>(resultDeclaration.Expression);
         var left = Assert.IsType<BoundElementReference>(binary.Left);
 
-        var result = new Interpreter().Interpret(left);
+        var result = new Interpreter(compilation).Interpret(left);
 
         Assert.Equal(40, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -136,7 +136,7 @@ public sealed class InterpreterTests
         var (boundNode, diagnostics) = compilation.Bind(addTwo);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
-        var interpreter = new Interpreter();
+        var interpreter = new Interpreter(compilation);
         var lambda = Assert.IsType<LambdaValue>(interpreter.Interpret(boundNode));
         var i32 = Assert.IsType<StructValue>(interpreter.Interpret(compilation.Bind(compilation.GlobalModule.I32).Value));
 
@@ -188,7 +188,7 @@ public sealed class InterpreterTests
         Assert.Equal(ConversionKind.Implicit, conversion.Conversion.ConversionKind);
         Assert.Equal("i64", conversionCall.Type.Name);
 
-        var result = new Interpreter().Interpret(conversionCall);
+        var result = new Interpreter(compilation).Interpret(conversionCall);
 
         Assert.Equal(40L, result.Value);
         Assert.Equal("i64", result.Type.Name);
@@ -218,7 +218,7 @@ public sealed class InterpreterTests
         Assert.Equal(ConversionKind.Explicit, conversion.Conversion.ConversionKind);
         Assert.Equal("i32", conversionCall.Type.Name);
 
-        var result = new Interpreter().Interpret(conversionCall);
+        var result = new Interpreter(compilation).Interpret(conversionCall);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -239,7 +239,7 @@ public sealed class InterpreterTests
         var (boundNode, diagnostics) = compilation.Bind(point);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
-        var result = Assert.IsType<StructValue>(new Interpreter().Interpret(boundNode));
+        var result = Assert.IsType<StructValue>(new Interpreter(compilation).Interpret(boundNode));
         Assert.True(point.TryLookup<PropertySymbol>("x", out var x));
         Assert.True(point.TryLookup<PropertySymbol>("y", out var y));
 
@@ -272,7 +272,7 @@ public sealed class InterpreterTests
         var pointDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
         var structExpression = Assert.IsType<BoundStructExpression>(pointDeclaration.Expression);
 
-        var result = Assert.IsType<InstanceValue>(new Interpreter().Interpret(structExpression));
+        var result = Assert.IsType<InstanceValue>(new Interpreter(compilation).Interpret(structExpression));
         Assert.True(point.TryLookup<PropertySymbol>("x", out var x));
         Assert.True(point.TryLookup<PropertySymbol>("y", out var y));
 
@@ -303,7 +303,7 @@ public sealed class InterpreterTests
         var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
         var invocation = Assert.IsType<BoundCallExpression>(resultDeclaration.Expression);
 
-        var result = new Interpreter().Interpret(invocation);
+        var result = new Interpreter(compilation).Interpret(invocation);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -341,7 +341,7 @@ public sealed class InterpreterTests
         Assert.IsType<BoundPropertyReference>(binary.Left);
         Assert.IsType<BoundPropertyReference>(binary.Right);
 
-        var result = new Interpreter().Interpret(block);
+        var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Equal(38, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -366,7 +366,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         Assert.IsType<BoundNopExpression>(block.Expressions[0]);
 
-        var result = new Interpreter().Interpret(block);
+        var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Same(Unit.Value, result.Value);
         Assert.Equal("unit", result.Type.Name);
@@ -392,7 +392,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var assignment = Assert.IsType<BoundAssignmentExpression>(block.Expressions[1]);
 
-        var result = new Interpreter().Interpret(assignment);
+        var result = new Interpreter(compilation).Interpret(assignment);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -420,7 +420,7 @@ public sealed class InterpreterTests
         var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
 
-        var result = new Interpreter().Interpret(block);
+        var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -446,7 +446,7 @@ public sealed class InterpreterTests
         var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
 
-        var result = new Interpreter().Interpret(block);
+        var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -472,7 +472,7 @@ public sealed class InterpreterTests
         var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
         var ifElse = Assert.IsType<BoundIfElseExpression>(resultDeclaration.Expression);
 
-        var result = new Interpreter().Interpret(ifElse);
+        var result = new Interpreter(compilation).Interpret(ifElse);
 
         Assert.Equal(2, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -497,7 +497,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var ifElse = Assert.IsType<BoundIfElseExpression>(block.Expressions[0]);
 
-        var result = Assert.IsType<UnionValue>(new Interpreter().Interpret(ifElse));
+        var result = Assert.IsType<UnionValue>(new Interpreter(compilation).Interpret(ifElse));
         var member = Assert.IsType<InstanceValue>(result.Value);
 
         Assert.Equal("i32 | unit", result.Type.Name);
@@ -524,7 +524,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var ifElse = Assert.IsType<BoundIfElseExpression>(block.Expressions[0]);
 
-        var result = Assert.IsType<UnionValue>(new Interpreter().Interpret(ifElse));
+        var result = Assert.IsType<UnionValue>(new Interpreter(compilation).Interpret(ifElse));
         var member = Assert.IsType<InstanceValue>(result.Value);
 
         Assert.Equal("i32 | unit", result.Type.Name);
@@ -554,7 +554,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var whileExpression = Assert.IsType<BoundWhileExpression>(block.Expressions[1]);
 
-        var result = new Interpreter().Interpret(whileExpression);
+        var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Equal(3, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -582,7 +582,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var whileExpression = Assert.IsType<BoundWhileExpression>(block.Expressions[1]);
 
-        var result = new Interpreter().Interpret(whileExpression);
+        var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Equal(0, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -609,7 +609,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var whileExpression = Assert.IsType<BoundWhileExpression>(block.Expressions[0]);
 
-        var result = new Interpreter().Interpret(whileExpression);
+        var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Equal(42, result.Value);
         Assert.Equal("i32", result.Type.Name);
@@ -638,7 +638,7 @@ public sealed class InterpreterTests
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
         var whileExpression = Assert.IsType<BoundWhileExpression>(block.Expressions[1]);
 
-        var result = new Interpreter().Interpret(whileExpression);
+        var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Same(Unit.Value, result.Value);
         Assert.Equal("unit", result.Type.Name);
@@ -659,7 +659,7 @@ public sealed class InterpreterTests
         var (boundNode, diagnostics) = compilation.Bind(earlySymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
-        var interpreter = new Interpreter();
+        var interpreter = new Interpreter(compilation);
         var lambda = Assert.IsType<LambdaValue>(interpreter.Interpret(boundNode));
 
         var result = lambda.Invoke();

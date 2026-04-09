@@ -13,7 +13,7 @@ using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Evaluation;
 
-internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
+internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<PrimValue>
 {
     private readonly Dictionary<Symbol, PrimValue> _evaluations = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<BoundNode, BoundTreeIndex> _indexes = new(ReferenceEqualityComparer.Instance);
@@ -363,7 +363,7 @@ internal sealed class Interpreter : IBoundNodeVisitor<PrimValue>
             throw new InvalidOperationException($"Cannot interpret parameter '{symbol.Name}' outside of a lambda invocation.");
         }
 
-        var (boundNode, diagnostics) = symbol.Bind();
+        var (boundNode, diagnostics) = compilation.Bind(symbol);
         if (diagnostics.HasErrorDiagnostics)
         {
             throw new InvalidOperationException($"Failed to bind '{symbol.FullName}' during interpretation:{Environment.NewLine}{string.Join(Environment.NewLine, diagnostics)}");

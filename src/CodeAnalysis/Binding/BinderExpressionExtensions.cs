@@ -207,7 +207,7 @@ internal static class BinderExpressionExtensions
 
             var members = module.Members.Select(member =>
             {
-                var (boundNode, diagnostics) = member.Bind();
+                var (boundNode, diagnostics) = member.BindDeclared();
                 binder.AddDiagnostics(diagnostics);
                 return boundNode;
             }).ToImmutableArray();

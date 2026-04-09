@@ -79,7 +79,7 @@ while (true)
 
     console.WriteLine(boundNode);
 
-    var evaluation = new Interpreter().Interpret(boundNode);
+    var evaluation = new Interpreter(compilation).Interpret(boundNode);
 
     var result = (PrimValue)((LambdaValue)evaluation).Delegate.DynamicInvoke(default(ArrayValue)!)!;
     console.WriteLine(result);

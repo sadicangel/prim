@@ -20,7 +20,7 @@ public sealed class Compilation(ImmutableArray<SourceText> sourceTexts, ParseOpt
 
     public ImmutableArray<SyntaxTree> SyntaxTrees => !field.IsDefault ? field : field = [.. SourceTexts.Select(st => new SyntaxTree(st, ParseOptions))];
 
-    internal ModuleSymbol GlobalModule => field ??= GetGlobalModule();
+    internal ModuleSymbol GlobalModule => field ??= CreateDeclaredGlobalModule();
 
     internal VariableSymbol? EntryPoint => GlobalModule.FindEntryPoint();
 
@@ -29,7 +29,7 @@ public sealed class Compilation(ImmutableArray<SourceText> sourceTexts, ParseOpt
 
     public IEnumerable<Diagnostic> GetDiagnostics() => SyntaxTrees.SelectMany(x => x.Diagnostics);
 
-    internal ModuleSymbol GetGlobalModule()
+    internal ModuleSymbol CreateDeclaredGlobalModule()
     {
         var global = Previous?.GlobalModule ?? SymbolFactory.CreateGlobalModule();
         var binder = new GlobalSymbolBinder(global);
@@ -37,20 +37,23 @@ public sealed class Compilation(ImmutableArray<SourceText> sourceTexts, ParseOpt
         return global;
     }
 
+    internal void EnsureGlobalSymbolsDeclared() => _ = GlobalModule;
+
     internal Result<BoundNode> Bind(Symbol symbol)
     {
         var current = this;
+        EnsureGlobalSymbolsDeclared();
         //do
         //{
         if (current._bindings.TryGetValue(symbol, out var binding))
         {
-            return binding;
+            return new Result<BoundNode>(binding.Value.LinkParents(), binding.Diagnostics);
         }
 
         //    current = current.Previous;
         //} while (current is not null);
 
-        var result = symbol.Bind();
+        var result = symbol.BindDeclared();
         var boundNode = result.Value.LinkParents();
         return _bindings[symbol] = new Result<BoundNode>(boundNode, result.Diagnostics);
     }
