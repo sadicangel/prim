@@ -167,9 +167,6 @@ public static class SyntaxFacts
             SyntaxKind.VariableDeclaration => null,
             SyntaxKind.PropertyDeclaration => null,
 
-            SyntaxKind.EmptyExpression => null,
-            SyntaxKind.StatementExpression => null,
-            SyntaxKind.BlockExpression => null,
             SyntaxKind.ArrayExpression => null,
             SyntaxKind.StructExpression => null,
             SyntaxKind.PropertyExpression => null,
@@ -209,13 +206,17 @@ public static class SyntaxFacts
             SyntaxKind.TypeClause => null,
             SyntaxKind.InitClause => null,
 
-            SyntaxKind.IfElseExpression => null,
-            SyntaxKind.ElseClause => null,
-            SyntaxKind.WhileExpression => null,
+            SyntaxKind.EmptyStatement => null,
+            SyntaxKind.ExpressionStatement => null,
+            SyntaxKind.BlockStatement => null,
 
-            SyntaxKind.ContinueExpression => null,
-            SyntaxKind.BreakExpression => null,
-            SyntaxKind.ReturnExpression => null,
+            SyntaxKind.IfElseStatement => null,
+            SyntaxKind.ElseClause => null,
+            SyntaxKind.WhileStatement => null,
+
+            SyntaxKind.ContinueStatement => null,
+            SyntaxKind.BreakStatement => null,
+            SyntaxKind.ReturnStatement => null,
 
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };

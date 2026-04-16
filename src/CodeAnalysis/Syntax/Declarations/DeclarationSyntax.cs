@@ -1,6 +1,5 @@
-﻿using CodeAnalysis.Syntax.Expressions;
+﻿using CodeAnalysis.Syntax.Statements;
 
 namespace CodeAnalysis.Syntax.Declarations;
 
-public abstract record class DeclarationSyntax(SyntaxKind SyntaxKind)
-    : ExpressionSyntax(SyntaxKind);
+public abstract record class DeclarationSyntax(SyntaxKind SyntaxKind) : StatementSyntax(SyntaxKind);

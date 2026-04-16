@@ -6,9 +6,7 @@ partial class ParserTests
     [MemberData(nameof(UnaryExpressions))]
     public void Parse_UnaryExpression(SyntaxKind expression, string @operator)
     {
-        var tree = new SyntaxTree(new SourceText($"{@operator}a"), new ParseOptions { IsScript = true });
-        var node = Assert.Single(tree.CompilationUnit.Declarations);
-        Assert.Empty(tree.Diagnostics);
+        var node = ParseExpression($"{@operator}a");
         Assert.Equal(expression, node.SyntaxKind);
     }
 

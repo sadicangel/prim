@@ -1,15 +1,11 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic;
-using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.References;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.ControlFlow;
-using CodeAnalysis.Syntax.Declarations;
 using CodeAnalysis.Syntax.Expressions;
 using CodeAnalysis.Syntax.Names;
 
@@ -23,10 +19,6 @@ internal static class BinderExpressionExtensions
         {
             return syntax.SyntaxKind switch
             {
-                SyntaxKind.SimpleName =>
-                    binder.BindSimpleName((SimpleNameSyntax)syntax),
-                SyntaxKind.QualifiedName =>
-                    binder.BindQualifiedName((QualifiedNameSyntax)syntax),
                 >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression =>
                     binder.BindLiteralExpression((LiteralExpressionSyntax)syntax),
                 //SyntaxKind.GroupExpression =>
@@ -37,22 +29,6 @@ internal static class BinderExpressionExtensions
                 //    binder.BindStructExpression((StructExpressionSyntax)syntax),
                 SyntaxKind.LambdaExpression =>
                     binder.BindLambdaExpression((LambdaExpressionSyntax)syntax),
-                SyntaxKind.VariableDeclaration =>
-                    binder.BindVariableDeclaration((VariableDeclarationSyntax)syntax),
-                SyntaxKind.ModuleDeclaration =>
-                    binder.BindModuleDeclaration((ModuleDeclarationSyntax)syntax),
-                SyntaxKind.StructDeclaration =>
-                    binder.BindStructDeclaration((StructDeclarationSyntax)syntax),
-                SyntaxKind.PropertyDeclaration =>
-                    binder.BindPropertyDeclaration((PropertyDeclarationSyntax)syntax),
-                //SyntaxKind.LocalDeclaration =>
-                //    binder.BindLocalDeclaration((LocalDeclarationSyntax)syntax),
-                SyntaxKind.EmptyExpression =>
-                    binder.BindEmptyExpression((EmptyExpressionSyntax)syntax),
-                SyntaxKind.StatementExpression =>
-                    binder.BindStatementExpression((StatementExpressionSyntax)syntax),
-                SyntaxKind.BlockExpression =>
-                    binder.BindBlockExpression((BlockExpressionSyntax)syntax),
                 SyntaxKind.ArrayExpression =>
                     binder.BindArrayExpression((ArrayExpressionSyntax)syntax),
                 SyntaxKind.StructExpression =>
@@ -91,16 +67,10 @@ internal static class BinderExpressionExtensions
                     SyntaxKind.GreaterThanOrEqualExpression or
                     SyntaxKind.CoalesceExpression =>
                     binder.BindBinaryExpression((BinaryExpressionSyntax)syntax),
-                SyntaxKind.IfElseExpression =>
-                    binder.BindIfElseExpression((IfElseExpressionSyntax)syntax),
-                SyntaxKind.WhileExpression =>
-                    binder.BindWhileExpression((WhileExpressionSyntax)syntax),
-                SyntaxKind.ContinueExpression =>
-                    binder.BindContinueExpression((ContinueExpressionSyntax)syntax),
-                SyntaxKind.BreakExpression =>
-                    binder.BindBreakExpression((BreakExpressionSyntax)syntax),
-                SyntaxKind.ReturnExpression =>
-                    binder.BindReturnExpression((ReturnExpressionSyntax)syntax),
+                SyntaxKind.SimpleName =>
+                    binder.BindSimpleName((SimpleNameSyntax)syntax),
+                SyntaxKind.QualifiedName =>
+                    binder.BindQualifiedName((QualifiedNameSyntax)syntax),
                 _ =>
                     throw new NotImplementedException(syntax.SyntaxKind.ToString()),
             };
@@ -192,145 +162,9 @@ internal static class BinderExpressionExtensions
             // TODO: Maybe detect binding errors here and avoid binding the body below?
             lambdaBinder.BindParameters(syntax);
 
-            var body = binder.BindExpression(syntax.Body);
+            var body = binder.BindStatement(syntax.Body);
 
             return new BoundLambdaExpression(syntax, lambdaBinder.LambdaType, [.. lambdaBinder.Parameters], body);
-        }
-
-        private BoundModuleDeclaration BindModuleDeclaration(ModuleDeclarationSyntax syntax)
-        {
-            var module = binder.Module;
-            if (syntax.Name.FullName != "<global>" && !binder.TryLookup<ModuleSymbol>(syntax.Name.FullName, out module))
-            {
-                throw new UnreachableException($"Module {syntax.Name.FullName}' should have already been declared");
-            }
-
-            var members = module.Members.Select(member =>
-            {
-                var (boundNode, diagnostics) = member.BindDeclared();
-                binder.AddDiagnostics(diagnostics);
-                return boundNode;
-            }).ToImmutableArray();
-
-            return new BoundModuleDeclaration(module, members);
-        }
-
-        private BoundStructDeclaration BindStructDeclaration(StructDeclarationSyntax syntax)
-        {
-            if (!binder.TryLookup<StructTypeSymbol>(syntax.Name.FullName, out var structType))
-            {
-                throw new UnreachableException($"Struct '{syntax.Name.FullName}' should have already been declared");
-            }
-
-            binder = new TypeBinder(structType, binder);
-            var properties = structType.Members
-                .Select(member => binder.BindPropertyDeclaration((PropertyDeclarationSyntax)member.Syntax))
-                .ToImmutableArray();
-
-            return new BoundStructDeclaration(structType, properties);
-        }
-
-        private BoundPropertyDeclaration BindPropertyDeclaration(PropertyDeclarationSyntax syntax)
-        {
-            if (!binder.TryLookup<PropertySymbol>(syntax.Name.FullName, out var property))
-            {
-                throw new UnreachableException($"Property '{syntax.Name.FullName}' should have already been declared");
-            }
-
-            var initializer = default(BoundExpression);
-            if (syntax.InitClause is not null)
-            {
-                initializer = binder.BindExpression(syntax.InitClause.Expression);
-
-                if (initializer.Type.MapsToUnknown)
-                {
-                    binder.ReportInvalidImplicitType(syntax.SourceSpan, initializer.Type.Name);
-                }
-            }
-
-            return new BoundPropertyDeclaration(property, initializer);
-        }
-
-        private BoundVariableDeclaration BindVariableDeclaration(VariableDeclarationSyntax syntax)
-        {
-            var variableType = syntax.TypeClause is not null ? binder.BindType(syntax.TypeClause.Type) : binder.Module.Unknown;
-            var modifiers = syntax.BindingKeyword.SyntaxKind is SyntaxKind.LetKeyword ? Modifiers.ReadOnly : Modifiers.None;
-
-            var variable = new VariableSymbol(syntax, syntax.Name.FullName, variableType, binder.Module, modifiers);
-            if (!binder.TryDeclare(variable))
-            {
-                binder.ReportSymbolRedeclaration(syntax.SourceSpan, variable.Name);
-            }
-
-            if (syntax.InitClause?.Expression is { } initExpression)
-            {
-                if (variableType is LambdaTypeSymbol lambdaType)
-                {
-                    binder = new LambdaBinder(lambdaType, binder);
-                }
-
-                var expression = binder.BindExpression(initExpression);
-                if (!variable.Type.MapsToUnknown)
-                {
-                    expression = binder.Convert(expression, variable.Type);
-                    return new BoundVariableDeclaration(syntax, variable, expression);
-                }
-
-                if (expression.Type.MapsToUnknown)
-                {
-                    binder.ReportInvalidImplicitType(syntax.SourceSpan, expression.Type.Name);
-                }
-
-                // We've inferred the symbol type, we can replace it with some magic.
-                SetType(variable, expression.Type);
-
-                return new BoundVariableDeclaration(syntax, variable, expression);
-
-                [UnsafeAccessor(UnsafeAccessorKind.Method, Name = $"set_{nameof(TypeSymbol.Type)}")]
-                static extern void SetType(Symbol symbol, TypeSymbol type);
-            }
-
-            if (variable.Type.MapsToUnit)
-            {
-                var expression = new BoundLiteralExpression(SyntaxToken.CreateSynthetic(SyntaxKind.NullKeyword), binder.Module.Unit, Unit.Value);
-                return new BoundVariableDeclaration(syntax, variable, expression);
-            }
-
-            binder.ReportUninitializedVariable(syntax.SourceSpan, variable.Name);
-            return new BoundVariableDeclaration(syntax, variable, new BoundNeverExpression(syntax, binder.Module.Never));
-        }
-
-
-        private BoundNopExpression BindEmptyExpression(EmptyExpressionSyntax syntax) => new(syntax, binder.Module.Never);
-
-        private BoundExpression BindStatementExpression(StatementExpressionSyntax syntax) => binder.BindExpression(syntax.Expression);
-
-        private BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax)
-        {
-            binder = new BlockBinder(binder);
-
-            var types = new HashSet<TypeSymbol>();
-            var expressions = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Expressions.Count);
-            foreach (var expressionSyntax in syntax.Expressions)
-            {
-                var expression = binder.BindExpression(expressionSyntax);
-                expressions.Add(expression);
-                if (expression.CanExitScope)
-                    types.Add(expression.Type);
-            }
-
-            if (expressions.Count > 0)
-                types.Add(expressions[^1].Type);
-
-            var type = types switch
-            {
-                { Count: 0 } => binder.Module.Unit,
-                { Count: 1 } => types.Single(),
-                _ when types.Contains(binder.Module.Never) => binder.Module.Never,
-                _ => new UnionTypeSymbol(syntax, [.. types], binder.Module)
-            };
-
-            return new BoundBlockExpression(syntax, type, expressions.MoveToImmutable());
         }
 
         private BoundArrayExpression BindArrayExpression(ArrayExpressionSyntax syntax)

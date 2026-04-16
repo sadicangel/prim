@@ -171,11 +171,6 @@ public enum SyntaxKind
 
     GroupExpression,
 
-    EmptyExpression,
-
-    StatementExpression,
-    BlockExpression,
-
     ArrayExpression,
     LambdaExpression,
     StructExpression,
@@ -216,11 +211,15 @@ public enum SyntaxKind
     TypeClause,
     InitClause,
 
-    IfElseExpression,
-    ElseClause,
-    WhileExpression,
+    BlockStatement,
+    ExpressionStatement,
+    EmptyStatement,
 
-    ContinueExpression,
-    BreakExpression,
-    ReturnExpression,
+    IfElseStatement,
+    ElseClause,
+    WhileStatement,
+
+    ContinueStatement,
+    BreakStatement,
+    ReturnStatement,
 }

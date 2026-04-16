@@ -1,14 +1,14 @@
 ﻿using CodeAnalysis.Syntax.Expressions;
 
-namespace CodeAnalysis.Syntax.ControlFlow;
+namespace CodeAnalysis.Syntax.Statements;
 
-public sealed record class WhileExpressionSyntax(
+public sealed record class WhileStatementSyntax(
     SyntaxToken WhileKeyword,
     SyntaxToken ParenthesisOpenToken,
     ExpressionSyntax Condition,
     SyntaxToken ParenthesisCloseToken,
-    ExpressionSyntax Body)
-    : ExpressionSyntax(SyntaxKind.WhileExpression)
+    StatementSyntax Body)
+    : StatementSyntax(SyntaxKind.WhileStatement)
 {
     /// <inheritdoc />
     public override IEnumerable<SyntaxNode> Children()

@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Syntax.Names;
+using CodeAnalysis.Syntax.Statements;
 
 namespace CodeAnalysis.Syntax.Expressions;
 
@@ -7,7 +8,7 @@ public sealed record class LambdaExpressionSyntax(
     SeparatedSyntaxList<SimpleNameSyntax> Parameters,
     SyntaxToken ParenthesisCloseToken,
     SyntaxToken EqualsGreaterThanToken,
-    ExpressionSyntax Body)
+    StatementSyntax Body)
     : ExpressionSyntax(SyntaxKind.LambdaExpression)
 {
     public override IEnumerable<SyntaxNode> Children()

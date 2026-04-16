@@ -6,9 +6,7 @@ partial class ParserTests
     [MemberData(nameof(BinaryExpressions))]
     public void Parse_BinaryExpression(SyntaxKind expression, string @operator)
     {
-        var tree = new SyntaxTree(new SourceText($"a {@operator} b"), new ParseOptions { IsScript = true });
-        var node = Assert.Single(tree.CompilationUnit.Declarations);
-        Assert.Empty(tree.Diagnostics);
+        var node = ParseExpression($"a {@operator} b");
         Assert.Equal(expression, node.SyntaxKind);
     }
 

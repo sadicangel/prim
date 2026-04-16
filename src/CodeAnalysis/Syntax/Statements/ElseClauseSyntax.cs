@@ -1,11 +1,9 @@
-﻿using CodeAnalysis.Syntax.Expressions;
-
-namespace CodeAnalysis.Syntax.ControlFlow;
+﻿namespace CodeAnalysis.Syntax.Statements;
 
 public sealed record class ElseClauseSyntax(
     SyntaxToken ElseKeyword,
-    ExpressionSyntax Else)
-    : SyntaxNode(SyntaxKind.ElseClause)
+    StatementSyntax Else)
+    : StatementSyntax(SyntaxKind.ElseClause)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

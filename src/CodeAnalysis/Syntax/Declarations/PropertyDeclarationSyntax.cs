@@ -15,7 +15,7 @@ public sealed record class PropertyDeclarationSyntax(
     TypeClauseSyntax TypeClause,
     InitClauseSyntax? InitClause,
     SyntaxToken SemicolonToken)
-    : ExpressionSyntax(SyntaxKind.PropertyDeclaration)
+    : DeclarationSyntax(SyntaxKind.PropertyDeclaration)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

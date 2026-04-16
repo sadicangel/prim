@@ -1,15 +1,15 @@
 ﻿using CodeAnalysis.Syntax.Expressions;
 
-namespace CodeAnalysis.Syntax.ControlFlow;
+namespace CodeAnalysis.Syntax.Statements;
 
-public sealed record class IfElseExpressionSyntax(
+public sealed record class IfElseStatementSyntax(
     SyntaxToken IfKeyword,
     SyntaxToken ParenthesisOpenToken,
     ExpressionSyntax Condition,
     SyntaxToken ParenthesisCloseToken,
-    ExpressionSyntax Then,
+    StatementSyntax Then,
     ElseClauseSyntax? ElseClause)
-    : ExpressionSyntax(SyntaxKind.IfElseExpression)
+    : StatementSyntax(SyntaxKind.IfElseStatement)
 {
     public override IEnumerable<SyntaxNode> Children()
     {

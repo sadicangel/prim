@@ -138,7 +138,7 @@ internal static class ParserType
                 return new ArrayTypeSyntax(elementType, bracketOpenToken, bracketCloseToken);
             }
 
-            var length = stream.ParseExpressionTerminated();
+            var length = stream.ParseExpression();
             bracketCloseToken = stream.Match(SyntaxKind.BracketCloseToken);
 
             return new ArrayTypeSyntax(elementType, bracketOpenToken, length, bracketCloseToken);

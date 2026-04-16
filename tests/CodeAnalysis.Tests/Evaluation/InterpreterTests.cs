@@ -458,7 +458,8 @@ public sealed class InterpreterTests
         var compilation = CreateCompilation(
             """
             let main: (str[]) -> i32 = (args) => {
-                var result: i32 = if (2 < 0) 40 else 2;
+                var result: i32 = 0;
+                if (2 < 0) result = 40; else result = 2;
             };
             """);
 
@@ -469,8 +470,7 @@ public sealed class InterpreterTests
         var main = Assert.IsType<BoundVariableDeclaration>(boundNode);
         var lambda = Assert.IsType<BoundLambdaExpression>(main.Expression);
         var block = Assert.IsType<BoundBlockExpression>(lambda.Body);
-        var resultDeclaration = Assert.IsType<BoundVariableDeclaration>(block.Expressions[^1]);
-        var ifElse = Assert.IsType<BoundIfElseExpression>(resultDeclaration.Expression);
+        var ifElse = Assert.IsType<BoundIfElseExpression>(block.Expressions[1]);
 
         var result = new Interpreter(compilation).Interpret(ifElse);
 

@@ -145,8 +145,8 @@ begin:
 
             var parenthesisCloseToken = stream.Match(SyntaxKind.ParenthesisCloseToken);
             var equalsGreaterThanToken = stream.Match(SyntaxKind.EqualsGreaterThanToken);
-            // TODO: This should be block expression or statement expression. Not all.
-            var body = stream.ParseExpressionTerminated();
+
+            var body = stream.ParseStatement();
 
             return new LambdaExpressionSyntax(
                 parenthesisOpenToken,
@@ -226,7 +226,7 @@ begin:
         private AssignmentExpressionSyntax ParseAssignmentExpression(ExpressionSyntax left)
         {
             var equalsToken = stream.Match(SyntaxKind.EqualsToken);
-            var right = stream.ParseExpressionTerminated();
+            var right = stream.ParseExpression();
             return new AssignmentExpressionSyntax(left, equalsToken, right);
         }
 

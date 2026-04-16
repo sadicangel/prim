@@ -25,19 +25,16 @@ public sealed class ControlFlowBindingTests
     }
 
     [Fact]
-    public void Bind_ReturnExpressionOutsideLambda_ReportsDiagnostic()
+    public void Bind_ReturnStatementAsDirectLambdaBody_ProducesNoDiagnostic()
     {
         var compilation = CreateCompilation(
             """
-            let value: i32 = return 42;
+            let value: () -> i32 = () => return 42;
             """);
 
         Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("value", out var valueSymbol));
         var (_, diagnostics) = compilation.Bind(valueSymbol);
-
-        var diagnostic = Assert.Single(diagnostics.Where(d => d.Message == "No enclosing function out of which to return"));
-
-        Assert.Equal(DiagnosticSeverity.Error, diagnostic.Severity);
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
     }
 
     [Fact]

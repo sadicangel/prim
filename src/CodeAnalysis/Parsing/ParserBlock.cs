@@ -1,5 +1,5 @@
 ﻿using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax.Statements;
 
 namespace CodeAnalysis.Parsing;
 
@@ -7,21 +7,21 @@ internal static class ParserBlock
 {
     extension(SyntaxTokenStream stream)
     {
-        public BlockExpressionSyntax ParseBlockExpression()
+        public BlockStatementSyntax ParseBlockStatement()
         {
             var braceOpenToken = stream.Match(SyntaxKind.BraceOpenToken);
-            var expressions = stream.ParseSyntaxList(
+            var statements = stream.ParseSyntaxList(
                 [SyntaxKind.BraceCloseToken],
                 ParseBlockExpressionStatement);
             var braceCloseToken = stream.Match(SyntaxKind.BraceCloseToken);
 
-            return new BlockExpressionSyntax(braceOpenToken, expressions, braceCloseToken);
+            return new BlockStatementSyntax(braceOpenToken, statements, braceCloseToken);
         }
 
-        private ExpressionSyntax ParseBlockExpressionStatement() => stream.Current.SyntaxKind switch
+        private StatementSyntax ParseBlockExpressionStatement() => stream.Current.SyntaxKind switch
         {
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => stream.ParseLocalDeclaration(),
-            _ => stream.ParseExpressionTerminated(),
+            _ => stream.ParseStatement(),
         };
     }
 }
