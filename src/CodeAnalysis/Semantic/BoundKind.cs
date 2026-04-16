@@ -51,5 +51,5 @@ internal enum BoundKind
     ContinueExpression,
     ReturnExpression,
     GotoExpression,
-    ConditionalGotoExpression,
+    GotoIfExpression,
 }

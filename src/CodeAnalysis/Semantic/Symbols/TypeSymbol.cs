@@ -10,15 +10,15 @@ internal abstract record class TypeSymbol(
     ModuleSymbol ContainingModule)
     : ContainerSymbol(SymbolKind, Syntax, Name, ContainingModule.RuntimeType, ContainingModule, ContainingModule, Modifiers.Static | Modifiers.ReadOnly)
 {
-    public bool IsAny => Name is "any";
-    public bool IsUnit => Name is "unit";
-    public bool IsNever => Name is "never";
-    public bool IsUnknown => Name is "unknown";
+    public bool IsAny => Name is PredefinedTypeNames.Any;
+    public bool IsUnit => Name is PredefinedTypeNames.Unit;
+    public bool IsNever => Name is PredefinedTypeNames.Never;
+    public bool IsUnknown => Name is PredefinedTypeNames.Unknown;
 
-    public bool MapsToAny => SwitchAndCheck(x => x.Name is "any");
-    public bool MapsToUnit => SwitchAndCheck(x => x.Name is "unit");
-    public bool MapsToNever => SwitchAndCheck(x => x.Name is "never");
-    public bool MapsToUnknown => SwitchAndCheck(x => x.Name is "unknown");
+    public bool MapsToAny => SwitchAndCheck(x => x.Name is PredefinedTypeNames.Any);
+    public bool MapsToUnit => SwitchAndCheck(x => x.Name is PredefinedTypeNames.Unit);
+    public bool MapsToNever => SwitchAndCheck(x => x.Name is PredefinedTypeNames.Never);
+    public bool MapsToUnknown => SwitchAndCheck(x => x.Name is PredefinedTypeNames.Unknown);
 
     private bool SwitchAndCheck(Func<TypeSymbol, bool> predicate)
     {

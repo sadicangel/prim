@@ -29,7 +29,6 @@ internal interface IBoundNodeVisitor<out T>
     T Visit(BoundOperatorReference node);
     T Visit(BoundConversionReference node);
     T Visit(BoundElementReference node);
-    T Visit(BoundNeverExpression node);
     T Visit(BoundUnaryExpression node);
     T Visit(BoundCallExpression node);
     T Visit(BoundIfElseExpression node);
@@ -48,7 +47,6 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.Unbound => throw CreateUnsupportedNodeKindException(node),
             BoundKind.CompilationUnit => throw CreateUnsupportedNodeKindException(node),
             BoundKind.NopExpression => visitor.Visit((BoundNopExpression)node),
-            BoundKind.NeverExpression => visitor.Visit((BoundNeverExpression)node),
             BoundKind.StackInstantiation => throw CreateUnsupportedNodeKindException(node),
             BoundKind.LiteralExpression => visitor.Visit((BoundLiteralExpression)node),
             BoundKind.LambdaExpression => visitor.Visit((BoundLambdaExpression)node),
@@ -81,7 +79,7 @@ internal static class BoundNodeVisitorExtensions
             BoundKind.ContinueExpression => visitor.Visit((BoundContinueExpression)node),
             BoundKind.ReturnExpression => visitor.Visit((BoundReturnExpression)node),
             BoundKind.GotoExpression => throw CreateUnsupportedNodeKindException(node),
-            BoundKind.ConditionalGotoExpression => throw CreateUnsupportedNodeKindException(node),
+            BoundKind.GotoIfExpression => throw CreateUnsupportedNodeKindException(node),
             _ => throw new ArgumentOutOfRangeException(nameof(node), node.BoundKind, null)
         };
     }

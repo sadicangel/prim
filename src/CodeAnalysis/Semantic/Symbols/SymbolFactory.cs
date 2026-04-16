@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using CodeAnalysis.Syntax;
 using CodeAnalysis.Syntax.Declarations;
 using CodeAnalysis.Syntax.Names;
@@ -12,26 +12,26 @@ internal static class SymbolFactory
         var global = MakeGlobalModule();
 
         var type = Declare(global, MakeRuntimeType(global));
-        var never = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.NeverKeyword), "never", global));
+        var never = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.NeverKeyword), PredefinedTypeNames.Never, global));
 
-        var any = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.AnyKeyword), "any", global));
-        var unknown = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnknownKeyword), "unknown", global));
-        var unit = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnitKeyword), "unit", global));
-        var str = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.StrKeyword), "str", global));
-        var @bool = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.BoolKeyword), "bool", global));
-        var i8 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I8Keyword), "i8", global));
-        var i16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I16Keyword), "i16", global));
-        var i32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I32Keyword), "i32", global));
-        var i64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I64Keyword), "i64", global));
-        var isz = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.IszKeyword), "isz", global));
-        var u8 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U8Keyword), "u8", global));
-        var u16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U16Keyword), "u16", global));
-        var u32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U32Keyword), "u32", global));
-        var u64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U64Keyword), "u64", global));
-        var usz = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UszKeyword), "usz", global));
-        var f16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F16Keyword), "f16", global));
-        var f32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F32Keyword), "f32", global));
-        var f64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F64Keyword), "f64", global));
+        var any = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.AnyKeyword), PredefinedTypeNames.Any, global));
+        var unknown = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnknownKeyword), PredefinedTypeNames.Unknown, global));
+        var unit = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UnitKeyword), PredefinedTypeNames.Unit, global));
+        var str = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.StrKeyword), PredefinedTypeNames.Str, global));
+        var @bool = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.BoolKeyword), PredefinedTypeNames.Bool, global));
+        var i8 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I8Keyword), PredefinedTypeNames.I8, global));
+        var i16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I16Keyword), PredefinedTypeNames.I16, global));
+        var i32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I32Keyword), PredefinedTypeNames.I32, global));
+        var i64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.I64Keyword), PredefinedTypeNames.I64, global));
+        var isz = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.IszKeyword), PredefinedTypeNames.Isz, global));
+        var u8 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U8Keyword), PredefinedTypeNames.U8, global));
+        var u16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U16Keyword), PredefinedTypeNames.U16, global));
+        var u32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U32Keyword), PredefinedTypeNames.U32, global));
+        var u64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.U64Keyword), PredefinedTypeNames.U64, global));
+        var usz = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.UszKeyword), PredefinedTypeNames.Usz, global));
+        var f16 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F16Keyword), PredefinedTypeNames.F16, global));
+        var f32 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F32Keyword), PredefinedTypeNames.F32, global));
+        var f64 = Declare(global, new StructTypeSymbol(SyntaxToken.CreateSynthetic(SyntaxKind.F64Keyword), PredefinedTypeNames.F64, global));
 
         // Type is its own type. We need to avoid recursion.
         SetType(type, type);
@@ -90,7 +90,7 @@ internal static class SymbolFactory
         {
             SymbolKind = SymbolKind.Struct,
             Syntax = SyntaxToken.CreateSynthetic(SyntaxKind.TypeKeyword),
-            Name = "type",
+            Name = PredefinedTypeNames.Type,
             Type = null!,
             ContainingSymbol = global,
             ContainingModule = global,

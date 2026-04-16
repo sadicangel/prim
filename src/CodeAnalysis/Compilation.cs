@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic;
@@ -55,7 +55,6 @@ public sealed class Compilation(ImmutableArray<SourceText> sourceTexts, ParseOpt
 
         var result = symbol.BindDeclared();
         var boundNode = result.Value.LinkParents();
-        return _bindings[symbol] = new Result<BoundNode>(boundNode, result.Diagnostics);
+        return _bindings[symbol] = result with { Value = boundNode };
     }
 }
-

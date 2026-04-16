@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using CodeAnalysis.Binding;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic;
@@ -270,11 +269,6 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundElementReference node)
     {
         return ResolveReference(node).ReferencedValue;
-    }
-
-    PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundNeverExpression node)
-    {
-        throw new InvalidOperationException($"Cannot interpret '{node.Syntax.SyntaxKind}' because binding produced a never expression.");
     }
 
     PrimValue IBoundNodeVisitor<PrimValue>.Visit(BoundUnaryExpression node)
@@ -626,19 +620,19 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
         var targetType = (StructTypeSymbol)conversion.LambdaType.ReturnType;
         return targetType.Name switch
         {
-            "i8" => ConvertTo<sbyte>(arguments[0], targetType),
-            "i16" => ConvertTo<short>(arguments[0], targetType),
-            "i32" => ConvertTo<int>(arguments[0], targetType),
-            "i64" => ConvertTo<long>(arguments[0], targetType),
-            "isz" => ConvertTo<nint>(arguments[0], targetType),
-            "u8" => ConvertTo<byte>(arguments[0], targetType),
-            "u16" => ConvertTo<ushort>(arguments[0], targetType),
-            "u32" => ConvertTo<uint>(arguments[0], targetType),
-            "u64" => ConvertTo<ulong>(arguments[0], targetType),
-            "usz" => ConvertTo<nuint>(arguments[0], targetType),
-            "f16" => ConvertTo<Half>(arguments[0], targetType),
-            "f32" => ConvertTo<float>(arguments[0], targetType),
-            "f64" => ConvertTo<double>(arguments[0], targetType),
+            PredefinedTypeNames.I8 => ConvertTo<sbyte>(arguments[0], targetType),
+            PredefinedTypeNames.I16 => ConvertTo<short>(arguments[0], targetType),
+            PredefinedTypeNames.I32 => ConvertTo<int>(arguments[0], targetType),
+            PredefinedTypeNames.I64 => ConvertTo<long>(arguments[0], targetType),
+            PredefinedTypeNames.Isz => ConvertTo<nint>(arguments[0], targetType),
+            PredefinedTypeNames.U8 => ConvertTo<byte>(arguments[0], targetType),
+            PredefinedTypeNames.U16 => ConvertTo<ushort>(arguments[0], targetType),
+            PredefinedTypeNames.U32 => ConvertTo<uint>(arguments[0], targetType),
+            PredefinedTypeNames.U64 => ConvertTo<ulong>(arguments[0], targetType),
+            PredefinedTypeNames.Usz => ConvertTo<nuint>(arguments[0], targetType),
+            PredefinedTypeNames.F16 => ConvertTo<Half>(arguments[0], targetType),
+            PredefinedTypeNames.F32 => ConvertTo<float>(arguments[0], targetType),
+            PredefinedTypeNames.F64 => ConvertTo<double>(arguments[0], targetType),
             _ => throw new NotSupportedException($"Unsupported predefined conversion '{conversion.Name}'.")
         };
     }
@@ -648,24 +642,24 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
         var operandType = (StructTypeSymbol)operand.Type;
         return operandType.Name switch
         {
-            "bool" => kind switch
+            PredefinedTypeNames.Bool => kind switch
             {
                 SyntaxKind.ExclamationToken => CreateValue(returnType, !(bool)operand.Value),
                 _ => throw new NotSupportedException($"Unsupported unary operator '{kind}' for bool.")
             },
-            "i8" => EvaluateNumericUnary<sbyte>(kind, returnType, operand),
-            "i16" => EvaluateNumericUnary<short>(kind, returnType, operand),
-            "i32" => EvaluateNumericUnary<int>(kind, returnType, operand),
-            "i64" => EvaluateNumericUnary<long>(kind, returnType, operand),
-            "isz" => EvaluateNumericUnary<nint>(kind, returnType, operand),
-            "u8" => EvaluateUnsignedUnary<byte>(kind, returnType, operand),
-            "u16" => EvaluateUnsignedUnary<ushort>(kind, returnType, operand),
-            "u32" => EvaluateUnsignedUnary<uint>(kind, returnType, operand),
-            "u64" => EvaluateUnsignedUnary<ulong>(kind, returnType, operand),
-            "usz" => EvaluateUnsignedUnary<nuint>(kind, returnType, operand),
-            "f16" => EvaluateNumericUnary<Half>(kind, returnType, operand),
-            "f32" => EvaluateNumericUnary<float>(kind, returnType, operand),
-            "f64" => EvaluateNumericUnary<double>(kind, returnType, operand),
+            PredefinedTypeNames.I8 => EvaluateNumericUnary<sbyte>(kind, returnType, operand),
+            PredefinedTypeNames.I16 => EvaluateNumericUnary<short>(kind, returnType, operand),
+            PredefinedTypeNames.I32 => EvaluateNumericUnary<int>(kind, returnType, operand),
+            PredefinedTypeNames.I64 => EvaluateNumericUnary<long>(kind, returnType, operand),
+            PredefinedTypeNames.Isz => EvaluateNumericUnary<nint>(kind, returnType, operand),
+            PredefinedTypeNames.U8 => EvaluateUnsignedUnary<byte>(kind, returnType, operand),
+            PredefinedTypeNames.U16 => EvaluateUnsignedUnary<ushort>(kind, returnType, operand),
+            PredefinedTypeNames.U32 => EvaluateUnsignedUnary<uint>(kind, returnType, operand),
+            PredefinedTypeNames.U64 => EvaluateUnsignedUnary<ulong>(kind, returnType, operand),
+            PredefinedTypeNames.Usz => EvaluateUnsignedUnary<nuint>(kind, returnType, operand),
+            PredefinedTypeNames.F16 => EvaluateNumericUnary<Half>(kind, returnType, operand),
+            PredefinedTypeNames.F32 => EvaluateNumericUnary<float>(kind, returnType, operand),
+            PredefinedTypeNames.F64 => EvaluateNumericUnary<double>(kind, returnType, operand),
             _ => throw new NotSupportedException($"Unsupported unary operator '{kind}' for {operandType.Name}.")
         };
     }
@@ -696,25 +690,25 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
         var concreteLeftType = (StructTypeSymbol)leftType;
         return concreteLeftType.Name switch
         {
-            "str" => kind switch
+            PredefinedTypeNames.Str => kind switch
             {
                 SyntaxKind.PlusToken => CreateValue(returnType, $"{left.Value}{right.Value}"),
                 _ => throw new NotSupportedException($"Unsupported binary operator '{kind}' for str.")
             },
-            "bool" => EvaluateBoolBinary(kind, returnType, left, right),
-            "i8" => EvaluateNumericBinary<sbyte>(kind, returnType, left, right),
-            "i16" => EvaluateNumericBinary<short>(kind, returnType, left, right),
-            "i32" => EvaluateNumericBinary<int>(kind, returnType, left, right),
-            "i64" => EvaluateNumericBinary<long>(kind, returnType, left, right),
-            "isz" => EvaluateNumericBinary<nint>(kind, returnType, left, right),
-            "u8" => EvaluateNumericBinary<byte>(kind, returnType, left, right),
-            "u16" => EvaluateNumericBinary<ushort>(kind, returnType, left, right),
-            "u32" => EvaluateNumericBinary<uint>(kind, returnType, left, right),
-            "u64" => EvaluateNumericBinary<ulong>(kind, returnType, left, right),
-            "usz" => EvaluateNumericBinary<nuint>(kind, returnType, left, right),
-            "f16" => EvaluateNumericBinary<Half>(kind, returnType, left, right),
-            "f32" => EvaluateNumericBinary<float>(kind, returnType, left, right),
-            "f64" => EvaluateNumericBinary<double>(kind, returnType, left, right),
+            PredefinedTypeNames.Bool => EvaluateBoolBinary(kind, returnType, left, right),
+            PredefinedTypeNames.I8 => EvaluateNumericBinary<sbyte>(kind, returnType, left, right),
+            PredefinedTypeNames.I16 => EvaluateNumericBinary<short>(kind, returnType, left, right),
+            PredefinedTypeNames.I32 => EvaluateNumericBinary<int>(kind, returnType, left, right),
+            PredefinedTypeNames.I64 => EvaluateNumericBinary<long>(kind, returnType, left, right),
+            PredefinedTypeNames.Isz => EvaluateNumericBinary<nint>(kind, returnType, left, right),
+            PredefinedTypeNames.U8 => EvaluateNumericBinary<byte>(kind, returnType, left, right),
+            PredefinedTypeNames.U16 => EvaluateNumericBinary<ushort>(kind, returnType, left, right),
+            PredefinedTypeNames.U32 => EvaluateNumericBinary<uint>(kind, returnType, left, right),
+            PredefinedTypeNames.U64 => EvaluateNumericBinary<ulong>(kind, returnType, left, right),
+            PredefinedTypeNames.Usz => EvaluateNumericBinary<nuint>(kind, returnType, left, right),
+            PredefinedTypeNames.F16 => EvaluateNumericBinary<Half>(kind, returnType, left, right),
+            PredefinedTypeNames.F32 => EvaluateNumericBinary<float>(kind, returnType, left, right),
+            PredefinedTypeNames.F64 => EvaluateNumericBinary<double>(kind, returnType, left, right),
             _ => throw new NotSupportedException($"Unsupported binary operator '{kind}' for {concreteLeftType.Name}.")
         };
     }
@@ -739,19 +733,19 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
     {
         return ((StructTypeSymbol)operand.Type).Name switch
         {
-            "i8" => ConvertNumeric<sbyte, TTarget>(operand, targetType),
-            "i16" => ConvertNumeric<short, TTarget>(operand, targetType),
-            "i32" => ConvertNumeric<int, TTarget>(operand, targetType),
-            "i64" => ConvertNumeric<long, TTarget>(operand, targetType),
-            "isz" => ConvertNumeric<nint, TTarget>(operand, targetType),
-            "u8" => ConvertNumeric<byte, TTarget>(operand, targetType),
-            "u16" => ConvertNumeric<ushort, TTarget>(operand, targetType),
-            "u32" => ConvertNumeric<uint, TTarget>(operand, targetType),
-            "u64" => ConvertNumeric<ulong, TTarget>(operand, targetType),
-            "usz" => ConvertNumeric<nuint, TTarget>(operand, targetType),
-            "f16" => ConvertNumeric<Half, TTarget>(operand, targetType),
-            "f32" => ConvertNumeric<float, TTarget>(operand, targetType),
-            "f64" => ConvertNumeric<double, TTarget>(operand, targetType),
+            PredefinedTypeNames.I8 => ConvertNumeric<sbyte, TTarget>(operand, targetType),
+            PredefinedTypeNames.I16 => ConvertNumeric<short, TTarget>(operand, targetType),
+            PredefinedTypeNames.I32 => ConvertNumeric<int, TTarget>(operand, targetType),
+            PredefinedTypeNames.I64 => ConvertNumeric<long, TTarget>(operand, targetType),
+            PredefinedTypeNames.Isz => ConvertNumeric<nint, TTarget>(operand, targetType),
+            PredefinedTypeNames.U8 => ConvertNumeric<byte, TTarget>(operand, targetType),
+            PredefinedTypeNames.U16 => ConvertNumeric<ushort, TTarget>(operand, targetType),
+            PredefinedTypeNames.U32 => ConvertNumeric<uint, TTarget>(operand, targetType),
+            PredefinedTypeNames.U64 => ConvertNumeric<ulong, TTarget>(operand, targetType),
+            PredefinedTypeNames.Usz => ConvertNumeric<nuint, TTarget>(operand, targetType),
+            PredefinedTypeNames.F16 => ConvertNumeric<Half, TTarget>(operand, targetType),
+            PredefinedTypeNames.F32 => ConvertNumeric<float, TTarget>(operand, targetType),
+            PredefinedTypeNames.F64 => ConvertNumeric<double, TTarget>(operand, targetType),
             _ => throw new NotSupportedException($"Unsupported predefined conversion source '{operand.Type.Name}'.")
         };
     }
@@ -901,25 +895,25 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
     {
         return structType.Name switch
         {
-            "any" => CreateValue(structType, Unit.Value),
-            "unknown" => CreateValue(structType, Unit.Value),
-            "unit" => CreateValue(structType, Unit.Value),
-            "str" => CreateValue(structType, string.Empty),
-            "bool" => CreateValue(structType, false),
-            "i8" => CreateValue(structType, (sbyte)0),
-            "i16" => CreateValue(structType, (short)0),
-            "i32" => CreateValue(structType, 0),
-            "i64" => CreateValue(structType, 0L),
-            "isz" => CreateValue(structType, (nint)0),
-            "u8" => CreateValue(structType, (byte)0),
-            "u16" => CreateValue(structType, (ushort)0),
-            "u32" => CreateValue(structType, 0u),
-            "u64" => CreateValue(structType, 0UL),
-            "usz" => CreateValue(structType, (nuint)0),
-            "f16" => CreateValue(structType, (Half)0),
-            "f32" => CreateValue(structType, 0f),
-            "f64" => CreateValue(structType, 0d),
-            "never" => throw new InvalidOperationException("Cannot synthesize a runtime value for never."),
+            PredefinedTypeNames.Any => CreateValue(structType, Unit.Value),
+            PredefinedTypeNames.Unknown => CreateValue(structType, Unit.Value),
+            PredefinedTypeNames.Unit => CreateValue(structType, Unit.Value),
+            PredefinedTypeNames.Str => CreateValue(structType, string.Empty),
+            PredefinedTypeNames.Bool => CreateValue(structType, false),
+            PredefinedTypeNames.I8 => CreateValue(structType, (sbyte)0),
+            PredefinedTypeNames.I16 => CreateValue(structType, (short)0),
+            PredefinedTypeNames.I32 => CreateValue(structType, 0),
+            PredefinedTypeNames.I64 => CreateValue(structType, 0L),
+            PredefinedTypeNames.Isz => CreateValue(structType, (nint)0),
+            PredefinedTypeNames.U8 => CreateValue(structType, (byte)0),
+            PredefinedTypeNames.U16 => CreateValue(structType, (ushort)0),
+            PredefinedTypeNames.U32 => CreateValue(structType, 0u),
+            PredefinedTypeNames.U64 => CreateValue(structType, 0UL),
+            PredefinedTypeNames.Usz => CreateValue(structType, (nuint)0),
+            PredefinedTypeNames.F16 => CreateValue(structType, (Half)0),
+            PredefinedTypeNames.F32 => CreateValue(structType, 0f),
+            PredefinedTypeNames.F64 => CreateValue(structType, 0d),
+            PredefinedTypeNames.Never => throw new InvalidOperationException("Cannot synthesize a runtime value for never."),
             _ => CreateDefaultUserStructValue(structType)
         };
     }

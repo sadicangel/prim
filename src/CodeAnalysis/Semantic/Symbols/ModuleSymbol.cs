@@ -5,26 +5,26 @@ namespace CodeAnalysis.Semantic.Symbols;
 internal sealed record class ModuleSymbol(SyntaxNode Syntax, string Name, ModuleSymbol ContainingModule)
     : ContainerSymbol(SymbolKind.Module, Syntax, Name, ContainingModule.RuntimeType, ContainingModule, ContainingModule, Modifiers.Static | Modifiers.ReadOnly)
 {
-    public StructTypeSymbol RuntimeType => Get<StructTypeSymbol>("type");
-    public StructTypeSymbol Any => Get<StructTypeSymbol>("any");
-    public StructTypeSymbol Unknown => Get<StructTypeSymbol>("unknown");
-    public StructTypeSymbol Never => Get<StructTypeSymbol>("never");
-    public StructTypeSymbol Unit => Get<StructTypeSymbol>("unit");
-    public StructTypeSymbol Str => Get<StructTypeSymbol>("str");
-    public StructTypeSymbol Bool => Get<StructTypeSymbol>("bool");
-    public StructTypeSymbol I8 => Get<StructTypeSymbol>("i8");
-    public StructTypeSymbol I16 => Get<StructTypeSymbol>("i16");
-    public StructTypeSymbol I32 => Get<StructTypeSymbol>("i32");
-    public StructTypeSymbol I64 => Get<StructTypeSymbol>("i64");
-    public StructTypeSymbol Isz => Get<StructTypeSymbol>("isz");
-    public StructTypeSymbol U8 => Get<StructTypeSymbol>("u8");
-    public StructTypeSymbol U16 => Get<StructTypeSymbol>("u16");
-    public StructTypeSymbol U32 => Get<StructTypeSymbol>("u32");
-    public StructTypeSymbol U64 => Get<StructTypeSymbol>("u64");
-    public StructTypeSymbol Usz => Get<StructTypeSymbol>("usz");
-    public StructTypeSymbol F16 => Get<StructTypeSymbol>("f16");
-    public StructTypeSymbol F32 => Get<StructTypeSymbol>("f32");
-    public StructTypeSymbol F64 => Get<StructTypeSymbol>("f64");
+    public StructTypeSymbol RuntimeType => Get<StructTypeSymbol>(PredefinedTypeNames.Type);
+    public StructTypeSymbol Any => Get<StructTypeSymbol>(PredefinedTypeNames.Any);
+    public StructTypeSymbol Unknown => Get<StructTypeSymbol>(PredefinedTypeNames.Unknown);
+    public StructTypeSymbol Never => Get<StructTypeSymbol>(PredefinedTypeNames.Never);
+    public StructTypeSymbol Unit => Get<StructTypeSymbol>(PredefinedTypeNames.Unit);
+    public StructTypeSymbol Str => Get<StructTypeSymbol>(PredefinedTypeNames.Str);
+    public StructTypeSymbol Bool => Get<StructTypeSymbol>(PredefinedTypeNames.Bool);
+    public StructTypeSymbol I8 => Get<StructTypeSymbol>(PredefinedTypeNames.I8);
+    public StructTypeSymbol I16 => Get<StructTypeSymbol>(PredefinedTypeNames.I16);
+    public StructTypeSymbol I32 => Get<StructTypeSymbol>(PredefinedTypeNames.I32);
+    public StructTypeSymbol I64 => Get<StructTypeSymbol>(PredefinedTypeNames.I64);
+    public StructTypeSymbol Isz => Get<StructTypeSymbol>(PredefinedTypeNames.Isz);
+    public StructTypeSymbol U8 => Get<StructTypeSymbol>(PredefinedTypeNames.U8);
+    public StructTypeSymbol U16 => Get<StructTypeSymbol>(PredefinedTypeNames.U16);
+    public StructTypeSymbol U32 => Get<StructTypeSymbol>(PredefinedTypeNames.U32);
+    public StructTypeSymbol U64 => Get<StructTypeSymbol>(PredefinedTypeNames.U64);
+    public StructTypeSymbol Usz => Get<StructTypeSymbol>(PredefinedTypeNames.Usz);
+    public StructTypeSymbol F16 => Get<StructTypeSymbol>(PredefinedTypeNames.F16);
+    public StructTypeSymbol F32 => Get<StructTypeSymbol>(PredefinedTypeNames.F32);
+    public StructTypeSymbol F64 => Get<StructTypeSymbol>(PredefinedTypeNames.F64);
 
     internal bool IsGlobal => Name == "<global>";
 

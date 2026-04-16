@@ -36,7 +36,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(binary);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(reference);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(left);
 
         Assert.Equal(40, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public sealed class InterpreterTests
         var result = lambda.Invoke(new InstanceValue(i32, 40));
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -186,12 +186,12 @@ public sealed class InterpreterTests
         var conversion = Assert.IsType<BoundConversionReference>(conversionCall.Callee);
 
         Assert.Equal(ConversionKind.Implicit, conversion.Conversion.ConversionKind);
-        Assert.Equal("i64", conversionCall.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I64, conversionCall.Type.Name);
 
         var result = new Interpreter(compilation).Interpret(conversionCall);
 
         Assert.Equal(40L, result.Value);
-        Assert.Equal("i64", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I64, result.Type.Name);
     }
 
     [Fact]
@@ -216,12 +216,12 @@ public sealed class InterpreterTests
         var conversion = Assert.IsType<BoundConversionReference>(conversionCall.Callee);
 
         Assert.Equal(ConversionKind.Explicit, conversion.Conversion.ConversionKind);
-        Assert.Equal("i32", conversionCall.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, conversionCall.Type.Name);
 
         var result = new Interpreter(compilation).Interpret(conversionCall);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -306,7 +306,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(invocation);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -344,7 +344,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Equal(38, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -369,7 +369,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Same(Unit.Value, result.Value);
-        Assert.Equal("unit", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.Unit, result.Type.Name);
     }
 
     [Fact]
@@ -395,7 +395,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(assignment);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -423,7 +423,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -449,7 +449,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(block);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -475,7 +475,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(ifElse);
 
         Assert.Equal(2, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -502,7 +502,7 @@ public sealed class InterpreterTests
 
         Assert.Equal("i32 | unit", result.Type.Name);
         Assert.Equal(40, member.Value);
-        Assert.Equal("i32", member.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, member.Type.Name);
     }
 
     [Fact]
@@ -529,7 +529,7 @@ public sealed class InterpreterTests
 
         Assert.Equal("i32 | unit", result.Type.Name);
         Assert.Same(Unit.Value, member.Value);
-        Assert.Equal("unit", member.Type.Name);
+        Assert.Equal(PredefinedTypeNames.Unit, member.Type.Name);
     }
 
     [Fact]
@@ -557,7 +557,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Equal(3, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -585,7 +585,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Equal(0, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -612,7 +612,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     [Fact]
@@ -641,7 +641,7 @@ public sealed class InterpreterTests
         var result = new Interpreter(compilation).Interpret(whileExpression);
 
         Assert.Same(Unit.Value, result.Value);
-        Assert.Equal("unit", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.Unit, result.Type.Name);
     }
 
     [Fact]
@@ -665,7 +665,7 @@ public sealed class InterpreterTests
         var result = lambda.Invoke();
 
         Assert.Equal(42, result.Value);
-        Assert.Equal("i32", result.Type.Name);
+        Assert.Equal(PredefinedTypeNames.I32, result.Type.Name);
     }
 
     private static Compilation CreateCompilation(string source)
