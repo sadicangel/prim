@@ -1,9 +1,9 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic.Symbols;
-using CodeAnalysis.Syntax.Expressions;
+using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Binding;
@@ -70,3 +70,4 @@ internal sealed class LambdaBinder(LambdaTypeSymbol lambdaTypeType, Binder paren
         }
     }
 }
+

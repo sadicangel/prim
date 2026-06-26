@@ -1,18 +1,11 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using CodeAnalysis;
 using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Evaluation;
-using CodeAnalysis.Evaluation.Values;
-using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 using Repl;
 using Spectre.Console;
 
 var console = AnsiConsole.Console;
-
-var parseOptions = new ParseOptions { IsScript = true };
-var previousCompilation = default(Compilation);
-//var previousEvaluation = default(Evaluation);
 
 while (true)
 {
@@ -37,18 +30,7 @@ while (true)
     if (code == @default)
         code = Markup.Remove(code);
 
-    //if (code.StartsWith('#'))
-    //{
-    //    switch (code)
-    //    {
-    //        case "#scope" when previousCompilation is not null:
-    //            console.WriteLine(previousCompilation.BoundScope);
-    //            break;
-    //    }
-    //    continue;
-    //}
-
-    var compilation = new Compilation(new SourceText(code), parseOptions, previousCompilation);
+    var compilation = new Compilation(new SourceText(code));
 
     var parseDiagnostics = compilation.GetDiagnostics().ToImmutableArray();
 
@@ -66,24 +48,4 @@ while (true)
     {
         console.WriteLine(syntaxTree);
     }
-
-    var (boundNode, bindDiagnostics) = compilation.Bind(compilation.EntryPoint!);
-
-    if (bindDiagnostics.Length > 0)
-    {
-        foreach (var diagnostic in bindDiagnostics)
-            console.WriteLine(diagnostic);
-        if (bindDiagnostics.HasErrorDiagnostics)
-            continue;
-    }
-
-    console.WriteLine(boundNode);
-
-    var evaluation = new Interpreter(compilation).Interpret(boundNode);
-
-    var result = (PrimValue)((LambdaValue)evaluation).Delegate.DynamicInvoke(default(ArrayValue)!)!;
-    console.WriteLine(result);
-
-    previousCompilation = compilation;
-    //previousEvaluation = evaluation;
 }

@@ -1,8 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>Repl</_Parameter1>
         </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>CodeAnalysis.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Binding\**" />
+        <Compile Remove="Semantic\**" />
+        <Compile Remove="Evaluation\**" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="DotNext" />

@@ -83,6 +83,11 @@ internal static class DiagnosticMessage
     public static string InvalidOperatorDeclaration(string operatorKind, string operationParameterCount) =>
         $"Invalid {operatorKind} declaration. Must have {operationParameterCount} parameters";
 
+    public static string InvalidQualifiedDeclarationName() =>
+        "Qualified declaration names are only valid for module declarations";
+
+    public static string InvalidModulePath(string modulePath) =>
+        $"'{modulePath}' cannot be used as a module path";
     public static string InvalidReturn() =>
         "No enclosing function out of which to return";
 

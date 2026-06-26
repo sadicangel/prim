@@ -6,6 +6,6 @@ public partial class ParserTests
     public void Parse_GroupExpression()
     {
         var node = ParseExpression("(true)");
-        Assert.Equal(SyntaxKind.GroupExpression, node.SyntaxKind);
+        Assert.Equal(SyntaxKind.GroupExpression, node.Kind);
     }
 }

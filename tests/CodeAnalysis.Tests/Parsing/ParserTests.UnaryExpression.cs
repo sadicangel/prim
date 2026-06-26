@@ -7,7 +7,7 @@ partial class ParserTests
     public void Parse_UnaryExpression(SyntaxKind expression, string @operator)
     {
         var node = ParseExpression($"{@operator}a");
-        Assert.Equal(expression, node.SyntaxKind);
+        Assert.Equal(expression, node.Kind);
     }
 
     public static TheoryData<SyntaxKind, string> UnaryExpressions()

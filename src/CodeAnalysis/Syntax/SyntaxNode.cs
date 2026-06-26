@@ -2,7 +2,7 @@
 
 namespace CodeAnalysis.Syntax;
 
-public abstract record class SyntaxNode(SyntaxKind SyntaxKind)
+public abstract record class SyntaxNode(SyntaxKind Kind)
 {
     public bool IsSynthetic { get; init; }
 
@@ -13,7 +13,7 @@ public abstract record class SyntaxNode(SyntaxKind SyntaxKind)
     public virtual SourceSpan SourceSpanWithTrivia => SourceSpan.Union(Children().First(x => !x.IsSynthetic).SourceSpanWithTrivia, Children().Last(x => !x.IsSynthetic).SourceSpanWithTrivia);
 
     public sealed override string ToString() =>
-        SourceSpan.Length > 0 ? $"{SyntaxKind} {SourceSpan}" : SyntaxKind.ToString();
+        SourceSpan.Length > 0 ? $"{Kind} {SourceSpan}" : Kind.ToString();
 
     public abstract IEnumerable<SyntaxNode> Children();
 }

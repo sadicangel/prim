@@ -6,8 +6,6 @@ using CodeAnalysis.Semantic.Expressions;
 using CodeAnalysis.Semantic.References;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Binding;
 
@@ -17,68 +15,37 @@ internal static class BinderExpressionExtensions
     {
         public BoundExpression BindExpression(ExpressionSyntax syntax)
         {
-            return syntax.SyntaxKind switch
+            return syntax.Kind switch
             {
-                >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression =>
-                    binder.BindLiteralExpression((LiteralExpressionSyntax)syntax),
-                //SyntaxKind.GroupExpression =>
-                //    binder.BindGroupExpression((GroupExpressionSyntax)syntax),
-                SyntaxKind.AssignmentExpression =>
-                    binder.BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
-                //SyntaxKind.StructExpression =>
-                //    binder.BindStructExpression((StructExpressionSyntax)syntax),
-                SyntaxKind.LambdaExpression =>
-                    binder.BindLambdaExpression((LambdaExpressionSyntax)syntax),
-                SyntaxKind.ArrayExpression =>
-                    binder.BindArrayExpression((ArrayExpressionSyntax)syntax),
-                SyntaxKind.StructExpression =>
-                    binder.BindStructExpression((StructExpressionSyntax)syntax),
-                SyntaxKind.PropertyAccessExpression =>
-                    binder.BindPropertyAccessExpression((PropertyAccessExpressionSyntax)syntax),
-                SyntaxKind.ElementAccessExpression =>
-                    binder.BindElementAccessExpression((ElementAccessExpressionSyntax)syntax),
-                SyntaxKind.InvocationExpression =>
-                    binder.BindCallExpression((CallExpressionSyntax)syntax),
-                SyntaxKind.ConversionExpression =>
-                    binder.BindConversionExpression((ConversionExpressionSyntax)syntax),
-                SyntaxKind.UnaryPlusExpression or
-                    SyntaxKind.UnaryMinusExpression or
-                    SyntaxKind.OnesComplementExpression or
-                    SyntaxKind.NotExpression =>
-                    binder.BindUnaryExpression((UnaryExpressionSyntax)syntax),
-                SyntaxKind.AddExpression or
-                    SyntaxKind.SubtractExpression or
-                    SyntaxKind.MultiplyExpression or
-                    SyntaxKind.DivideExpression or
-                    SyntaxKind.ModuloExpression or
-                    SyntaxKind.PowerExpression or
-                    SyntaxKind.LeftShiftExpression or
-                    SyntaxKind.RightShiftExpression or
-                    SyntaxKind.LogicalOrExpression or
-                    SyntaxKind.LogicalAndExpression or
-                    SyntaxKind.BitwiseOrExpression or
-                    SyntaxKind.BitwiseAndExpression or
-                    SyntaxKind.ExclusiveOrExpression or
-                    SyntaxKind.EqualsExpression or
-                    SyntaxKind.NotEqualsExpression or
-                    SyntaxKind.LessThanExpression or
-                    SyntaxKind.LessThanOrEqualExpression or
-                    SyntaxKind.GreaterThanExpression or
-                    SyntaxKind.GreaterThanOrEqualExpression or
-                    SyntaxKind.CoalesceExpression =>
-                    binder.BindBinaryExpression((BinaryExpressionSyntax)syntax),
-                SyntaxKind.SimpleName =>
-                    binder.BindSimpleName((SimpleNameSyntax)syntax),
-                SyntaxKind.QualifiedName =>
-                    binder.BindQualifiedName((QualifiedNameSyntax)syntax),
-                _ =>
-                    throw new NotImplementedException(syntax.SyntaxKind.ToString()),
+                >= SyntaxKind.I8LiteralExpression and <= SyntaxKind.NullLiteralExpression => binder.BindLiteralExpression((LiteralExpressionSyntax)syntax),
+                SyntaxKind.NameExpression => binder.BindNameExpression((NameExpressionSyntax)syntax),
+                SyntaxKind.SimpleName => binder.BindSimpleName((SimpleNameSyntax)syntax),
+                SyntaxKind.QualifiedName => binder.BindQualifiedName((QualifiedNameSyntax)syntax),
+                SyntaxKind.GroupExpression => binder.BindGroupExpression((GroupExpressionSyntax)syntax),
+                SyntaxKind.BlockExpression => binder.BindBlockExpression((BlockExpressionSyntax)syntax),
+                SyntaxKind.IfElseExpression => binder.BindIfElseExpression((IfElseExpressionSyntax)syntax),
+                SyntaxKind.WhileExpression => binder.BindWhileExpression((WhileExpressionSyntax)syntax),
+                SyntaxKind.BreakExpression => binder.BindBreakExpression((BreakExpressionSyntax)syntax),
+                SyntaxKind.ContinueExpression => binder.BindContinueExpression((ContinueExpressionSyntax)syntax),
+                SyntaxKind.ReturnExpression => binder.BindReturnExpression((ReturnExpressionSyntax)syntax),
+                SyntaxKind.AssignmentExpression => binder.BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
+                SyntaxKind.LambdaExpression => binder.BindLambdaExpression((LambdaExpressionSyntax)syntax),
+                SyntaxKind.ArrayInitializerExpression => binder.BindArrayExpression((ArrayInitializerExpressionSyntax)syntax),
+                SyntaxKind.ModuleExpression or SyntaxKind.TypeExpression => new BoundNeverExpression(syntax, binder.Module.Never),
+                SyntaxKind.ObjectInitializerExpression => binder.BindObjectInitializerExpression((ObjectInitializerExpressionSyntax)syntax),
+                SyntaxKind.MemberAccessExpression => binder.BindMemberAccessExpression((MemberAccessExpressionSyntax)syntax),
+                SyntaxKind.ElementAccessExpression => binder.BindElementAccessExpression((ElementAccessExpressionSyntax)syntax),
+                SyntaxKind.InvocationExpression => binder.BindCallExpression((InvocationExpressionSyntax)syntax),
+                SyntaxKind.ConversionExpression => binder.BindConversionExpression((ConversionExpressionSyntax)syntax),
+                SyntaxKind.UnaryPlusExpression or SyntaxKind.UnaryMinusExpression or SyntaxKind.OnesComplementExpression or SyntaxKind.NotExpression => binder.BindUnaryExpression((UnaryExpressionSyntax)syntax),
+                SyntaxKind.AddExpression or SyntaxKind.SubtractExpression or SyntaxKind.MultiplyExpression or SyntaxKind.DivideExpression or SyntaxKind.ModuloExpression or SyntaxKind.PowerExpression or SyntaxKind.LeftShiftExpression or SyntaxKind.RightShiftExpression or SyntaxKind.LogicalOrExpression or SyntaxKind.LogicalAndExpression or SyntaxKind.BitwiseOrExpression or SyntaxKind.BitwiseAndExpression or SyntaxKind.ExclusiveOrExpression or SyntaxKind.EqualsExpression or SyntaxKind.NotEqualsExpression or SyntaxKind.LessThanExpression or SyntaxKind.LessThanOrEqualExpression or SyntaxKind.GreaterThanExpression or SyntaxKind.GreaterThanOrEqualExpression or SyntaxKind.CoalesceExpression => binder.BindBinaryExpression((BinaryExpressionSyntax)syntax),
+                _ => throw new NotImplementedException(syntax.Kind.ToString()),
             };
         }
 
         private BoundLiteralExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
         {
-            var type = syntax.SyntaxKind switch
+            var type = syntax.Kind switch
             {
                 SyntaxKind.I8LiteralExpression => binder.Module.I8,
                 SyntaxKind.I16LiteralExpression => binder.Module.I16,
@@ -95,12 +62,31 @@ internal static class BinderExpressionExtensions
                 SyntaxKind.TrueLiteralExpression => binder.Module.Bool,
                 SyntaxKind.FalseLiteralExpression => binder.Module.Bool,
                 SyntaxKind.NullLiteralExpression => binder.Module.Unit,
-                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'")
+                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.Kind}'")
             };
 
             return new BoundLiteralExpression(syntax, type, syntax.InstanceValue);
         }
 
+        private BoundExpression BindNameExpression(NameExpressionSyntax syntax) => binder.BindExpression(syntax.Name);
+
+        private BoundExpression BindGroupExpression(GroupExpressionSyntax syntax) => binder.BindExpression(syntax.Expression);
+
+        private BoundBlockExpression BindBlockExpression(BlockExpressionSyntax syntax)
+        {
+            var blockBinder = new BlockBinder(binder);
+            var expressions = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Items.Count);
+            foreach (var item in syntax.Items)
+            {
+                var expression = item is StatementSyntax statement
+                    ? blockBinder.BindStatement(statement)
+                    : blockBinder.BindExpression((ExpressionSyntax)item);
+                expressions.Add(expression);
+            }
+
+            var type = expressions.Count == 0 ? binder.Module.Unit : expressions[^1].Type;
+            return new BoundBlockExpression(syntax, type, expressions.MoveToImmutable());
+        }
         private static BoundReference CreateReference(SyntaxNode syntax, Symbol symbol) => symbol switch
         {
             PropertySymbol propertySymbol => new BoundPropertyReference(syntax, null, propertySymbol),
@@ -162,12 +148,12 @@ internal static class BinderExpressionExtensions
             // TODO: Maybe detect binding errors here and avoid binding the body below?
             lambdaBinder.BindParameters(syntax);
 
-            var body = binder.BindStatement(syntax.Body);
+            var body = binder.BindExpression(syntax.Body);
 
             return new BoundLambdaExpression(syntax, lambdaBinder.LambdaType, [.. lambdaBinder.Parameters], body);
         }
 
-        private BoundArrayExpression BindArrayExpression(ArrayExpressionSyntax syntax)
+        private BoundArrayExpression BindArrayExpression(ArrayInitializerExpressionSyntax syntax)
         {
             TypeSymbol elementType = binder.Module.Unknown;
             var elements = ImmutableArray.CreateBuilder<BoundExpression>(syntax.Elements.Count);
@@ -196,11 +182,18 @@ internal static class BinderExpressionExtensions
             return new BoundArrayExpression(syntax, new ArrayTypeSymbol(syntax, elementType, null, binder.Module), elements.MoveToImmutable());
         }
 
-        private BoundExpression BindStructExpression(StructExpressionSyntax syntax)
+        private BoundExpression BindObjectInitializerExpression(ObjectInitializerExpressionSyntax syntax)
         {
-            if (!binder.TryLookup<StructTypeSymbol>(syntax.StructName.FullName, out var structType))
+            var typeName = syntax.TypeName switch
             {
-                binder.ReportUndefinedSymbol(syntax.StructName.SourceSpan, syntax.StructName.FullName);
+                NameExpressionSyntax { Name: var name } => name,
+                NameSyntax name => name,
+                _ => null
+            };
+
+            if (typeName is null || !binder.TryLookup<StructTypeSymbol>(typeName.FullName, out var structType))
+            {
+                binder.ReportUndefinedSymbol(syntax.TypeName.SourceSpan, syntax.TypeName.SourceSpan.ToString());
                 return new BoundNeverExpression(syntax, binder.Module.Never);
             }
 
@@ -209,9 +202,7 @@ internal static class BinderExpressionExtensions
             foreach (var propertySyntax in syntax.Properties)
             {
                 if (typeBinder.BindPropertyExpression(propertySyntax) is not BoundPropertyExpression property)
-                {
                     return new BoundNeverExpression(propertySyntax, binder.Module.Never);
-                }
 
                 properties.Add(property);
             }
@@ -219,7 +210,7 @@ internal static class BinderExpressionExtensions
             return new BoundStructExpression(syntax, structType, properties.MoveToImmutable());
         }
 
-        private BoundExpression BindPropertyExpression(PropertyExpressionSyntax syntax)
+        private BoundExpression BindPropertyExpression(PropertyInitializerExpressionSyntax syntax)
         {
             if (!binder.TryLookup<PropertySymbol>(syntax.PropertyName.FullName, out var property))
             {
@@ -235,7 +226,7 @@ internal static class BinderExpressionExtensions
 
         private BoundOperatorReference? BindOperator(TypeSymbol containingType, SyntaxToken operatorToken, params ReadOnlySpan<TypeSymbol> operandTypes)
         {
-            var operatorKind = operatorToken.SyntaxKind.GetOperatorKind(operandTypes.Length);
+            var operatorKind = operatorToken.Kind.GetOperatorKind(operandTypes.Length);
             var operatorName = operatorKind.GetOperatorName(operandTypes);
             binder = new TypeBinder(containingType);
             if (binder.TryLookup<OperatorSymbol>(operatorName, out var @operator))
@@ -246,16 +237,16 @@ internal static class BinderExpressionExtensions
             return null;
         }
 
-        private BoundExpression BindPropertyAccessExpression(PropertyAccessExpressionSyntax syntax)
+        private BoundExpression BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
         {
             var receiver = binder.BindExpression(syntax.Receiver);
             var typeBinder = new TypeBinder(receiver.Type);
-            if (typeBinder.TryLookup<PropertySymbol>(syntax.PropertyName.FullName, out var property))
+            if (typeBinder.TryLookup<PropertySymbol>(syntax.MemberName.FullName, out var property))
             {
                 return new BoundPropertyReference(syntax, receiver, property);
             }
 
-            binder.ReportUndefinedTypeMember(syntax.PropertyName.SourceSpan, receiver.Type.FullName, syntax.PropertyName.FullName);
+            binder.ReportUndefinedTypeMember(syntax.MemberName.SourceSpan, receiver.Type.FullName, syntax.MemberName.FullName);
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }
 
@@ -275,7 +266,7 @@ internal static class BinderExpressionExtensions
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }
 
-        private BoundExpression BindCallExpression(CallExpressionSyntax syntax)
+        private BoundExpression BindCallExpression(InvocationExpressionSyntax syntax)
         {
             var callee = binder.BindExpression(syntax.Callee);
             // TODO: Support 'call' operator.
@@ -317,7 +308,7 @@ internal static class BinderExpressionExtensions
                 return new BoundUnaryExpression(syntax, @operator, operand);
             }
 
-            binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, operand.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, operand.Type));
+            binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, operand.Type.FullName, Mangler.Mangle(syntax.OperatorToken.Kind, operand.Type));
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }
@@ -333,9 +324,9 @@ internal static class BinderExpressionExtensions
                 return new BoundBinaryExpression(syntax, left, @operator, right);
             }
 
-            binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, left.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, left.Type, right.Type));
+            binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, left.Type.FullName, Mangler.Mangle(syntax.OperatorToken.Kind, left.Type, right.Type));
             if (left.Type != right.Type)
-                binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, right.Type.FullName, Mangler.Mangle(syntax.SyntaxKind, left.Type, right.Type));
+                binder.ReportUndefinedTypeMember(syntax.OperatorToken.SourceSpan, right.Type.FullName, Mangler.Mangle(syntax.OperatorToken.Kind, left.Type, right.Type));
 
             return new BoundNeverExpression(syntax, binder.Module.Never);
         }

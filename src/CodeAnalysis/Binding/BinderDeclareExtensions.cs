@@ -1,9 +1,7 @@
 ﻿using System.Collections.Immutable;
-using System.Diagnostics;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Declarations;
 
 namespace CodeAnalysis.Binding;
 
@@ -13,108 +11,163 @@ internal static class BinderDeclareExtensions
     {
         public void DeclareSymbols(ImmutableArray<SyntaxTree> syntaxTrees)
         {
-            binder.DeclareTypes(syntaxTrees);
+            var nonModuleDeclarationNames = GetNonModuleDeclarationNames(syntaxTrees);
+            binder.DeclareTypes(syntaxTrees, nonModuleDeclarationNames);
             binder.DeclareMembers(syntaxTrees);
         }
 
-        private void DeclareTypes(ImmutableArray<SyntaxTree> syntaxTrees)
+        private void DeclareTypes(ImmutableArray<SyntaxTree> syntaxTrees, HashSet<string> nonModuleDeclarationNames)
         {
-            foreach (var compilationUnit in syntaxTrees.Select(x => x.CompilationUnit))
+            foreach (var declaration in syntaxTrees.SelectMany(x => x.CompilationUnit.Declarations))
             {
-                if (compilationUnit.Module is not null)
+                switch (declaration.Initializer)
                 {
-                    var module = binder.DeclareModule(compilationUnit.Module);
-                    binder = new GlobalSymbolBinder(module, binder);
-                }
+                    case ModuleExpressionSyntax:
+                        binder.DeclareModule(declaration, nonModuleDeclarationNames);
+                        break;
 
-                foreach (var structSyntax in compilationUnit.Declarations.OfType<StructDeclarationSyntax>())
-                {
-                    binder.DeclareStruct(structSyntax);
+                    case TypeExpressionSyntax:
+                        binder.DeclareStruct(declaration);
+                        break;
                 }
             }
         }
 
         private void DeclareMembers(ImmutableArray<SyntaxTree> syntaxTrees)
         {
-            foreach (var compilationUnit in syntaxTrees.Select(x => x.CompilationUnit))
+            foreach (var declaration in syntaxTrees.SelectMany(x => x.CompilationUnit.Declarations))
             {
-                if (compilationUnit.Module is not null)
+                switch (declaration.Initializer)
                 {
-                    if (!binder.TryLookup<ModuleSymbol>(compilationUnit.Module.Name.FullName, out var module))
-                    {
-                        throw new UnreachableException($"Missing {nameof(ModuleSymbol)} '{compilationUnit.Module.Name.FullName}'");
-                    }
+                    case TypeExpressionSyntax typeExpression:
+                        binder.DeclareStructMembers(declaration, typeExpression);
+                        break;
 
-                    binder = new GlobalSymbolBinder(module, binder);
-                }
+                    case ModuleExpressionSyntax:
+                        break;
 
-                foreach (var declaration in compilationUnit.Declarations)
-                {
-                    switch (declaration)
-                    {
-                        case StructDeclarationSyntax structDeclaration:
-                            binder.DeclareStructMembers(structDeclaration);
-                            break;
-
-                        case VariableDeclarationSyntax variable:
-                            binder.DeclareVariable(variable);
-                            break;
-                    }
+                    default:
+                        binder.DeclareVariable(declaration);
+                        break;
                 }
             }
         }
 
-        private ModuleSymbol DeclareModule(ModuleDeclarationSyntax syntax)
+        private ModuleSymbol? DeclareModule(GlobalDeclarationSyntax syntax, HashSet<string> nonModuleDeclarationNames)
         {
-            var module = new ModuleSymbol(syntax, syntax.Name.FullName, binder.Module);
-            _ = binder.TryDeclare(module);
+            var module = binder.Module;
+            var parts = syntax.Name.Name.ToArray();
+            var pathParts = new List<string>(parts.Length);
+
+            for (var i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                pathParts.Add(part);
+                var path = string.Join(SyntaxFacts.NameSeparator.ToString(), pathParts);
+                var isFinalPart = i == parts.Length - 1;
+
+                if (!isFinalPart && nonModuleDeclarationNames.Contains(path))
+                {
+                    binder.ReportInvalidModulePath(syntax.Name.SourceSpan, path);
+                    return null;
+                }
+
+                if (module.TryLookup<Symbol>(part, out var existing))
+                {
+                    if (existing is ModuleSymbol existingModule)
+                    {
+                        module = existingModule;
+                        continue;
+                    }
+
+                    if (isFinalPart)
+                        binder.ReportSymbolRedeclaration(syntax.Name.SourceSpan, part);
+                    else
+                        binder.ReportInvalidModulePath(syntax.Name.SourceSpan, path);
+
+                    return null;
+                }
+
+                var newModule = new ModuleSymbol(syntax, part, module);
+                if (!module.TryDeclare(newModule))
+                {
+                    binder.ReportSymbolRedeclaration(syntax.Name.SourceSpan, part);
+                    return null;
+                }
+
+                module = newModule;
+            }
+
             return module;
         }
 
-        private void DeclareStruct(StructDeclarationSyntax syntax)
+        private void DeclareStruct(GlobalDeclarationSyntax syntax)
         {
-            var @struct = new StructTypeSymbol(syntax, syntax.Name.FullName, binder.Module);
-
-            if (!binder.TryDeclare(@struct))
+            if (syntax.Name is QualifiedNameSyntax)
             {
-                binder.ReportSymbolRedeclaration(syntax.SourceSpan, @struct.Name);
+                binder.ReportInvalidQualifiedDeclarationName(syntax.Name.SourceSpan);
+                return;
             }
+
+            var @struct = new StructTypeSymbol(syntax, syntax.Name.FullName, binder.Module);
+            if (!binder.TryDeclare(@struct))
+                binder.ReportSymbolRedeclaration(syntax.SourceSpan, @struct.Name);
         }
 
-        private void DeclareStructMembers(StructDeclarationSyntax syntax)
+        private void DeclareStructMembers(GlobalDeclarationSyntax syntax, TypeExpressionSyntax typeExpression)
         {
+            if (syntax.Name is QualifiedNameSyntax)
+                return;
+
             if (!binder.TryLookup<StructTypeSymbol>(syntax.Name.FullName, out var structType))
             {
-                // TODO: Should this be a diagnostics instead?
-                throw new UnreachableException($"Missing {nameof(StructTypeSymbol)} '{syntax.Name.FullName}'");
+                binder.ReportUndefinedType(syntax.Name.SourceSpan, syntax.Name.FullName);
+                return;
             }
 
-            foreach (var propertySyntax in syntax.Properties)
+            var typeBinder = new TypeBinder(structType, binder);
+            foreach (var propertySyntax in typeExpression.Properties)
             {
-                var propertyType = binder.BindType(propertySyntax.TypeClause.Type);
-                var property = new PropertySymbol(propertySyntax, propertySyntax.Name.FullName, propertyType, structType, Modifiers.None);
-                if (!structType.TryDeclare(property))
-                {
+                var propertyType = propertySyntax.Type is not null
+                    ? binder.BindType(propertySyntax.Type)
+                    : binder.Module.Unknown;
+                var property = new PropertySymbol(
+                    propertySyntax,
+                    propertySyntax.Name.Name.Name,
+                    propertyType,
+                    structType,
+                    propertySyntax.IsReadOnly ? Modifiers.ReadOnly : Modifiers.None);
+
+                if (!typeBinder.TryDeclare(property))
                     binder.ReportSymbolRedeclaration(propertySyntax.SourceSpan, property.Name);
-                }
             }
         }
 
-        private void DeclareVariable(VariableDeclarationSyntax syntax)
+        private void DeclareVariable(GlobalDeclarationSyntax syntax)
         {
-            var variableType = syntax.TypeClause is not null ? binder.BindType(syntax.TypeClause.Type) : binder.Module.Never;
-            if (variableType == binder.Module.Never)
+            if (syntax.Name is QualifiedNameSyntax)
             {
-                binder.ReportInvalidImplicitType(syntax.SourceSpan, variableType.FullName);
+                binder.ReportInvalidQualifiedDeclarationName(syntax.Name.SourceSpan);
+                return;
             }
 
-            var modifiers = syntax.BindingKeyword.SyntaxKind is SyntaxKind.LetKeyword ? Modifiers.ReadOnly : Modifiers.None;
-
+            var variableType = syntax.Type is not null
+                ? binder.BindType(syntax.Type)
+                : binder.Module.Unknown;
+            var modifiers = syntax.IsReadOnly ? Modifiers.ReadOnly : Modifiers.None;
             var variable = new VariableSymbol(syntax, syntax.Name.FullName, variableType, binder.Module, modifiers);
+
             if (!binder.TryDeclare(variable))
-            {
                 binder.ReportSymbolRedeclaration(syntax.SourceSpan, variable.Name);
-            }
+        }
+
+        private static HashSet<string> GetNonModuleDeclarationNames(ImmutableArray<SyntaxTree> syntaxTrees)
+        {
+            return syntaxTrees
+                .SelectMany(x => x.CompilationUnit.Declarations)
+                .Where(declaration => declaration.Initializer is not ModuleExpressionSyntax)
+                .Select(declaration => declaration.Name.FullName)
+                .ToHashSet(StringComparer.Ordinal);
         }
     }
 }

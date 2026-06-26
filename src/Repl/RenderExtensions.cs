@@ -1,10 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Evaluation.Values;
-using CodeAnalysis.Semantic;
-using CodeAnalysis.Semantic.Declarations;
-using CodeAnalysis.Semantic.Expressions;
-using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
 using Spectre.Console;
 
@@ -12,125 +7,6 @@ namespace Repl;
 
 internal static class RenderExtensions
 {
-    private static void Indent(IAnsiConsole console, int indent, string indentString = "  ")
-    {
-        for (var i = 0; i < indent; ++i)
-            console.Write(indentString);
-    }
-
-    extension(IAnsiConsole console)
-    {
-        private void WriteType(TypeSymbol type)
-        {
-            console.MarkupInterpolated($"[green i]{Markup.Escape(type.Name)}[/]");
-        }
-
-        private void WriteValue(object value, int indent = 0)
-        {
-            switch (value)
-            {
-                case ArrayValue array:
-                    {
-                        Indent(console, indent);
-                        console.MarkupInterpolated($"[grey66]{Markup.Escape("[")}[/]");
-                        var first = true;
-                        foreach (var element in array)
-                        {
-                            if (first) first = false;
-                            else console.Write(", ");
-                            console.WriteValue(element, indent);
-                        }
-
-                        console.MarkupInterpolated($"[grey66]{Markup.Escape("]")}[/]");
-                    }
-                    break;
-                //case ErrorValue error:
-                //    {
-                //        Indent(console, indent);
-                //        if (error.IsError)
-                //            console.MarkupInterpolated($"[maroon]err: [i]{Markup.Escape(error.ErrorMessage ?? "")}[/][/]");
-                //        else
-                //            console.WriteValue(error.Value);
-                //    }
-                //    break;
-                case InstanceValue instance:
-                    {
-                        if (instance.IsLiteral)
-                        {
-                            console.WriteValue(instance.Value, indent);
-                        }
-                        else
-                        {
-                            Indent(console, indent);
-                            console.MarkupLineInterpolated($"[grey66]{"{"}[/]");
-                            ++indent;
-                            foreach (var (ps, pv) in instance)
-                            {
-                                Indent(console, indent);
-                                console.MarkupInterpolated($"[grey66]{Markup.Escape(ps.Name)}: [/]");
-                                console.WriteLine(pv);
-                            }
-
-                            --indent;
-                            Indent(console, indent);
-                            console.MarkupInterpolated($"[grey66]{Markup.Escape("}")}[/]");
-                        }
-                    }
-                    break;
-                case LambdaValue lambda:
-                    {
-                        Indent(console, indent);
-                        console.MarkupInterpolated($"[grey66]{Markup.Escape(lambda.Type.ToString())}[/]");
-                    }
-                    break;
-                case ReferenceValue reference:
-                    {
-                        console.WriteValue(reference.ReferencedValue, indent);
-                    }
-                    break;
-                case StructValue @struct:
-                    {
-                        Indent(console, indent);
-                        console.MarkupInterpolated($"[grey66]{Markup.Escape(@struct.Name)}[/]");
-                    }
-                    break;
-                case UnionValue union:
-                    {
-                        Indent(console, indent);
-                        console.Write("[ ");
-                        console.Write(union.Value);
-                        console.Write(" ] ");
-                    }
-                    break;
-                case ModuleValue module:
-                    {
-                        Indent(console, indent);
-                        console.Write(module.ContainingModule);
-                    }
-                    break;
-                default:
-                    console.MarkupInterpolated($"[grey66]{Markup.Escape(value.ToString() ?? "")}[/]");
-                    break;
-            }
-        }
-    }
-
-    extension(IAnsiConsole console)
-    {
-        public void Write(PrimValue value, int indent = 0)
-        {
-            console.WriteValue(value, indent);
-            console.Write(" ");
-            console.WriteType(value.Type);
-        }
-
-        public void WriteLine(PrimValue value)
-        {
-            console.Write(value);
-            console.WriteLine();
-        }
-    }
-
     extension(IAnsiConsole console)
     {
         public void Write(Diagnostic diagnostic)
@@ -189,7 +65,7 @@ internal static class RenderExtensions
 
         public void Write(SyntaxTree syntaxTree)
         {
-            var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.SyntaxKind}[/]").Style("dim white");
+            var tree = new Tree($"[aqua]{syntaxTree.CompilationUnit.Kind}[/]").Style("dim white");
 
             WriteTo(syntaxTree.CompilationUnit, tree);
 
@@ -203,22 +79,17 @@ internal static class RenderExtensions
                     {
                         case SyntaxToken token:
                             foreach (var trivia in token.LeadingTrivia)
-                                treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
+                                treeNode.AddNode($"[grey66 i]{trivia.Kind}[/]");
                             if (token.Value is not null)
-                                treeNode.AddNode($"[green3]{token.SyntaxKind}[/] {FormatLiteral(token)}");
+                                treeNode.AddNode($"[green3]{token.Kind}[/] {FormatLiteral(token)}");
                             else
-                                treeNode.AddNode($"[green3]{token.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(token.SourceSpan.ToString())}[/]");
+                                treeNode.AddNode($"[green3]{token.Kind}[/] [darkseagreen2 i]{Markup.Escape(token.SourceSpan.ToString())}[/]");
                             foreach (var trivia in token.TrailingTrivia)
-                                treeNode.AddNode($"[grey66 i]{trivia.SyntaxKind}[/]");
+                                treeNode.AddNode($"[grey66 i]{trivia.Kind}[/]");
                             break;
 
-                        //case TypeSyntax type:
-                        //    WriteTo(child, treeNode.AddNode($"[aqua]{child.SyntaxKind}[/] [darkseagreen2 i]{Markup.Escape(type.Text.ToString())}[/]"));
-                        //    // $"{base.Name}: {Type.Name}"
-                        //    break;
-
                         case SyntaxNode node:
-                            WriteTo(child, treeNode.AddNode($"[aqua]{node.SyntaxKind}[/]"));
+                            WriteTo(child, treeNode.AddNode($"[aqua]{node.Kind}[/]"));
                             break;
 
                         default:
@@ -229,14 +100,14 @@ internal static class RenderExtensions
 
             static string FormatLiteral(SyntaxToken token)
             {
-                return token.SyntaxKind switch
+                return token.Kind switch
                 {
                     >= SyntaxKind.I8LiteralToken and <= SyntaxKind.F64LiteralToken => $"[gold3]{token.Value}[/]",
-                    SyntaxKind.StrLiteralToken => $"[darkorange3]\"{Markup.Escape(token.Value?.ToString() ?? "")}\"[/]",
+                    SyntaxKind.StrLiteralToken => $"[darkorange3]\"{Markup.Escape(token.Value?.ToString() ?? string.Empty)}\"[/]",
                     SyntaxKind.TrueKeyword or
                         SyntaxKind.FalseKeyword or
                         SyntaxKind.NullKeyword => $"[blue3_1]{token.Value}[/]",
-                    _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{token.SyntaxKind}'"),
+                    _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{token.Kind}'"),
                 };
             }
         }
@@ -246,79 +117,5 @@ internal static class RenderExtensions
             console.Write(syntaxTree);
             console.WriteLine();
         }
-
-        public void Write(BoundNode node)
-        {
-            var tree = new Tree(node.GetType().Name).Style("dim white");
-
-            WriteTo(node, tree);
-
-            console.Write(new Panel(tree).Header(node.BoundKind.ToString()));
-
-            static void WriteTo(BoundNode node, IHasTreeNodes tree)
-            {
-                tree = node switch
-                {
-                    BoundVariableDeclaration declaration =>
-                        tree.AddNode($"[aqua]{declaration.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(declaration.VariableSymbol.Name)}[/]"),
-                    BoundExpression expression =>
-                        tree.AddNode($"[aqua]{expression.BoundKind}[/] [darkseagreen2 i]{Markup.Escape(expression.Type.Name)}[/]"),
-                    _ =>
-                        tree.AddNode($"[aqua]{node.BoundKind.ToString()}[/]")
-                };
-
-                foreach (var child in node.Children())
-                {
-                    WriteTo(child, tree);
-                }
-            }
-        }
-
-        public void WriteLine(BoundNode node)
-        {
-            console.Write(node);
-            console.WriteLine();
-        }
     }
-
-    //public static void Write(this IAnsiConsole console, ScopeSymbol scope)
-    //{
-    //    var tree = ToTree(scope);
-
-    //    while (scope != scope.ContainingScope)
-    //    {
-    //        scope = scope.ContainingScope;
-    //        var node = ToTree(scope);
-    //        node.AddNode(tree);
-    //        tree = node;
-    //    }
-
-    //    console.Write(new Panel(tree).Header(scope.Name));
-
-    //    static Tree ToTree(ScopeSymbol scope)
-    //    {
-    //        var tree = new Tree($"[darkorange3_1]{scope.Name}[/]")
-    //            .Style("dim white");
-
-    //        foreach (var symbol in scope.DeclaredSymbols)
-    //        {
-    //            if (symbol is ScopeSymbol innerScope)
-    //            {
-    //                tree.AddNode(ToTree(innerScope));
-    //            }
-    //            else
-    //            {
-    //                tree.AddNode($"{Markup.Escape(symbol.Name)} [green i]{Markup.Escape(symbol.Type.Name)}[/]");
-    //            }
-    //        }
-
-    //        return tree;
-    //    }
-    //}
-
-    //public static void WriteLine(this IAnsiConsole console, ScopeSymbol scope)
-    //{
-    //    console.Write(scope);
-    //    console.WriteLine();
-    //}
 }

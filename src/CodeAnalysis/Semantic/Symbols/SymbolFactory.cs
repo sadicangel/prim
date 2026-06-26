@@ -1,7 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Declarations;
-using CodeAnalysis.Syntax.Names;
 
 namespace CodeAnalysis.Semantic.Symbols;
 
@@ -60,10 +58,7 @@ internal static class SymbolFactory
         var module = (ModuleSymbol)RuntimeHelpers.GetUninitializedObject(typeof(ModuleSymbol)) with
         {
             SymbolKind = SymbolKind.Module,
-            Syntax = new ModuleDeclarationSyntax(
-                SyntaxToken.CreateSynthetic(SyntaxKind.ModuleKeyword),
-                new SyntheticSimpleNameSyntax("<global>"),
-                SyntaxToken.CreateSynthetic(SyntaxKind.SemicolonToken)),
+            Syntax = SyntaxToken.CreateSynthetic(SyntaxKind.ModuleKeyword),
             Name = "<global>",
             Type = null!,
             ContainingSymbol = null!,
@@ -521,3 +516,4 @@ internal static class SymbolFactory
         }
     }
 }
+

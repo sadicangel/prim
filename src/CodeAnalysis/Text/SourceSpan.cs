@@ -4,9 +4,11 @@ namespace CodeAnalysis.Text;
 
 public readonly record struct SourceSpan(SourceText SourceText, Range Range)
 {
-    public char this[Index index] => SourceText[Range][index];
-    public char this[int index] => SourceText[Range][index];
-    public ReadOnlySpan<char> this[Range range] => SourceText[Range][range];
+    public ReadOnlySpan<char> TextSpan => SourceText[Range];
+
+    public char this[Index index] => TextSpan[index];
+    public char this[int index] => TextSpan[index];
+    public ReadOnlySpan<char> this[Range range] => TextSpan[range];
 
     public int Length => Range.End.Value - Range.Start.Value;
 
@@ -19,7 +21,7 @@ public readonly record struct SourceSpan(SourceText SourceText, Range Range)
     public int EndLine => SourceText.GetLineIndex(Range.End);
     public int EndCharacter => Range.End.Value - SourceText.Lines[StartLine].SourceSpan.Range.Start.Value;
 
-    public override string ToString() => SourceText[Range].ToString();
+    public override string ToString() => TextSpan.ToString();
 
     public static SourceSpan Union(SourceSpan left, SourceSpan right)
     {

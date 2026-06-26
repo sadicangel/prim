@@ -40,7 +40,7 @@ internal static class ReportDiagnosticExtensions
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidLocationForTypeDefinition());
 
         public void ReportUnexpectedToken(SyntaxKind expected, SyntaxToken actual) =>
-            reporter.ReportError(actual.SourceSpan, DiagnosticMessage.UnexpectedToken(expected, actual.SyntaxKind));
+            reporter.ReportError(actual.SourceSpan, DiagnosticMessage.UnexpectedToken(expected, actual.Kind));
 
         // Binding Errors.
         public void ReportAmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
@@ -91,6 +91,11 @@ internal static class ReportDiagnosticExtensions
         public void ReportInvalidOperatorDeclaration(SourceSpan sourceSpan, string operatorKind, string operationParameterCount) =>
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidOperatorDeclaration(operatorKind, operationParameterCount));
 
+        public void ReportInvalidQualifiedDeclarationName(SourceSpan sourceSpan) =>
+            reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidQualifiedDeclarationName());
+
+        public void ReportInvalidModulePath(SourceSpan sourceSpan, string modulePath) =>
+            reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidModulePath(modulePath));
         public void ReportInvalidReturn(SourceSpan sourceSpan) =>
             reporter.ReportError(sourceSpan, DiagnosticMessage.InvalidReturn());
 

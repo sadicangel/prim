@@ -7,7 +7,7 @@ partial class ParserTests
     public void Parse_BinaryExpression(SyntaxKind expression, string @operator)
     {
         var node = ParseExpression($"a {@operator} b");
-        Assert.Equal(expression, node.SyntaxKind);
+        Assert.Equal(expression, node.Kind);
     }
 
     public static TheoryData<SyntaxKind, string> BinaryExpressions()

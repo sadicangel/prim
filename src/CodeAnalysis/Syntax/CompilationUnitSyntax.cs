@@ -1,17 +1,9 @@
-﻿using CodeAnalysis.Syntax.Declarations;
-
-namespace CodeAnalysis.Syntax;
+﻿namespace CodeAnalysis.Syntax;
 
 public sealed record class CompilationUnitSyntax(
-    ModuleDeclarationSyntax? Module,
-    SyntaxList<DeclarationSyntax> Declarations,
+    SyntaxList<GlobalDeclarationSyntax> Declarations,
     SyntaxToken EofToken)
     : SyntaxNode(SyntaxKind.CompilationUnit)
 {
-    public override IEnumerable<SyntaxNode> Children()
-    {
-        if (Module is not null) yield return Module;
-        foreach (var declaration in Declarations)
-            yield return declaration;
-    }
+    public override IEnumerable<SyntaxNode> Children() => Declarations.SyntaxNodes;
 }

@@ -3,6 +3,7 @@
 public static class PredefinedTypeNames
 {
     public const string Any = "any";
+    public const string Err = "err";
     public const string Unknown = "unknown";
     public const string Never = "never";
     public const string Unit = "unit";

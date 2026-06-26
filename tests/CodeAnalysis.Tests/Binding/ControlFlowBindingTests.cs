@@ -1,4 +1,4 @@
-using CodeAnalysis.Diagnostics;
+﻿using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic.Declarations;
 using CodeAnalysis.Semantic.Symbols;
 
@@ -11,7 +11,7 @@ public sealed class ControlFlowBindingTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> unit = (args) => {
+            main: (str[]) -> unit = (args) => {
                 break;
             };
             """);
@@ -19,7 +19,7 @@ public sealed class ControlFlowBindingTests
         Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
         var (_, diagnostics) = compilation.Bind(mainSymbol);
 
-        var diagnostic = Assert.Single(diagnostics.Where(d => d.Message == "No enclosing loop out of which to break or continue"));
+        var diagnostic = Assert.Single(diagnostics, d => d.Message == "No enclosing loop out of which to break or continue");
 
         Assert.Equal(DiagnosticSeverity.Error, diagnostic.Severity);
     }
@@ -29,7 +29,7 @@ public sealed class ControlFlowBindingTests
     {
         var compilation = CreateCompilation(
             """
-            let value: () -> i32 = () => return 42;
+            value: () -> i32 = () => return 42;
             """);
 
         Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("value", out var valueSymbol));
@@ -42,10 +42,10 @@ public sealed class ControlFlowBindingTests
     {
         var compilation = CreateCompilation(
             """
-            struct Point {
+            Point := type {
                 x: i32 = 1;
-            }
-            let main: () -> i32 = () => 42;
+            };
+            main: () -> i32 = () => 42;
             """);
 
         var (boundNode, diagnostics) = compilation.Bind(compilation.GlobalModule);

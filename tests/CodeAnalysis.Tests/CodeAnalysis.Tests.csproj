@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,6 +13,11 @@
       https://xunit.net/docs/getting-started/v3/microsoft-testing-platform
     -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Binding\**" />
+    <Compile Remove="Evaluation\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />

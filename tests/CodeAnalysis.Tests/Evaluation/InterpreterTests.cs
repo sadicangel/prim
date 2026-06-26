@@ -1,4 +1,4 @@
-﻿using CodeAnalysis.Diagnostics;
+using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Evaluation;
 using CodeAnalysis.Evaluation.Values;
 using CodeAnalysis.Semantic.ControlFlow;
@@ -16,10 +16,10 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var a: i32 = 40;
-                var b: i32 = 2;
-                var result: i32 = a + b;
+            main: (str[]) -> i32 = (args) => {
+                a: i32 = 40;
+                b: i32 = 2;
+                result: i32 = a + b;
             };
             """);
 
@@ -44,9 +44,9 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let answer: i32 = 42;
-            let main: (str[]) -> i32 = (args) => {
-                var result: i32 = answer;
+            answer: i32 = 42;
+            main: (str[]) -> i32 = (args) => {
+                result: i32 = answer;
             };
             """);
 
@@ -71,8 +71,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32[] = (args) => {
-                var values: i32[] = [40, 2];
+            main: (str[]) -> i32[] = (args) => {
+                values: i32[] = [40, 2];
             };
             """);
 
@@ -98,9 +98,9 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var values: i32[] = [40, 2];
-                var result: i32 = values[0] + values[1];
+            main: (str[]) -> i32 = (args) => {
+                values: i32[] = [40, 2];
+                result: i32 = values[0] + values[1];
             };
             """);
 
@@ -126,8 +126,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let addTwo: (i32) -> i32 = (x) => {
-                var result: i32 = x + 2;
+            addTwo: (i32) -> i32 = (x) => {
+                result: i32 = x + 2;
             };
             """);
 
@@ -169,8 +169,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i64 = (args) => {
-                var result: i64 = 40;
+            main: (str[]) -> i64 = (args) => {
+                result: i64 = 40;
             };
             """);
 
@@ -199,8 +199,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var result: i32 = 42i64 as i32;
+            main: (str[]) -> i32 = (args) => {
+                result: i32 = 42i64 as i32;
             };
             """);
 
@@ -229,10 +229,10 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            struct Point {
+            Point:=struct {
                 x: i32 = 1;
                 y: i32 = 2;
-            }
+            };
             """);
 
         Assert.True(compilation.GlobalModule.TryLookup<StructTypeSymbol>("Point", out var point));
@@ -252,12 +252,12 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            struct Point {
+            Point:=struct {
                 x: i32 = 1;
                 y: i32 = 2;
-            }
-            let main: (str[]) -> Point = (args) => {
-                var point: Point = Point { x = 40 };
+            };
+            main: (str[]) -> Point = (args) => {
+                point: Point = Point { x = 40 };
             };
             """);
 
@@ -285,11 +285,11 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let addTwo: (i32) -> i32 = (x) => {
-                var result: i32 = x + 2;
+            addTwo: (i32) -> i32 = (x) => {
+                result: i32 = x + 2;
             };
-            let main: (str[]) -> i32 = (args) => {
-                var result: i32 = addTwo(40);
+            main: (str[]) -> i32 = (args) => {
+                result: i32 = addTwo(40);
             };
             """);
 
@@ -314,18 +314,18 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            struct Point {
+            Point:=struct {
                 x: i32 = 0;
                 y: i32 = 0;
-            }
-            let main: (str[]) -> i32 = (args) => {
-                var a = 40;
-                var b = 0;
+            };
+            main: (str[]) -> i32 = (args) => {
+                a:= 40;
+                b:= 0;
                 b = -1 * 2;
-                let p = Point { x = a, y = b };
+                p:= Point { x = a, y = b };
 
-                var d: i32[] = [1, 2, 3];
-                let r = p.x + p.y;
+                d: i32[] = [1, 2, 3];
+                r:= p.x + p.y;
             };
             """);
 
@@ -352,7 +352,7 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> unit = (args) => {
+            main: (str[]) -> unit = (args) => {
                 ;
             };
             """);
@@ -377,8 +377,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var result: i32 = 40;
+            main: (str[]) -> i32 = (args) => {
+                result: i32 = 40;
                 result = result + 2;
             };
             """);
@@ -403,9 +403,9 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var value: i32 = 40;
-                var addTwo: () -> i32 = () => {
+            main: (str[]) -> i32 = (args) => {
+                value: i32 = 40;
+                addTwo: () -> i32 = () => {
                     value = value + 2;
                 };
                 addTwo();
@@ -431,8 +431,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var values: i32[] = [40, 0];
+            main: (str[]) -> i32 = (args) => {
+                values: i32[] = [40, 0];
                 values[1] = values[0] + 2;
                 values[1];
             };
@@ -457,8 +457,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var result: i32 = 0;
+            main: (str[]) -> i32 = (args) => {
+                result: i32 = 0;
                 if (2 < 0) result = 40; else result = 2;
             };
             """);
@@ -483,7 +483,7 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 | unit = (args) => {
+            main: (str[]) -> i32 | unit = (args) => {
                 if (2 > 0) 40;
             };
             """);
@@ -510,7 +510,7 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 | unit = (args) => {
+            main: (str[]) -> i32 | unit = (args) => {
                 if (2 < 0) 40;
             };
             """);
@@ -537,8 +537,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var i: i32 = 0;
+            main: (str[]) -> i32 = (args) => {
+                i: i32 = 0;
                 while (i < 3) {
                     i = i + 1;
                 }
@@ -565,8 +565,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
-                var i: i32 = 5;
+            main: (str[]) -> i32 = (args) => {
+                i: i32 = 5;
                 while (i < 3) {
                     i = i + 1;
                 }
@@ -593,7 +593,7 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> i32 = (args) => {
+            main: (str[]) -> i32 = (args) => {
                 while (true) {
                     break 42;
                 }
@@ -620,8 +620,8 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let main: (str[]) -> unit = (args) => {
-                var i: i32 = 0;
+            main: (str[]) -> unit = (args) => {
+                i: i32 = 0;
                 while (i < 3) {
                     i = i + 1;
                     continue;
@@ -649,7 +649,7 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(
             """
-            let early: () -> i32 = () => {
+            early: () -> i32 = () => {
                 return 42;
                 0;
             };

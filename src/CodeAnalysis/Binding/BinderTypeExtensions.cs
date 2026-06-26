@@ -3,8 +3,6 @@ using System.Diagnostics;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Semantic.Symbols;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Types;
 
 namespace CodeAnalysis.Binding;
 
@@ -14,16 +12,16 @@ internal static class BinderTypeExtensions
     {
         public TypeSymbol BindType(TypeSyntax syntax)
         {
-            return syntax.SyntaxKind switch
+            return syntax.Kind switch
             {
                 SyntaxKind.ArrayType => binder.BindArrayType((ArrayTypeSyntax)syntax),
                 SyntaxKind.LambdaType => binder.BindLambdaType((LambdaTypeSyntax)syntax),
                 SyntaxKind.MaybeType => binder.BindMaybeType((MaybeTypeSyntax)syntax),
                 SyntaxKind.NamedType => binder.BindNamedType((NamedTypeSyntax)syntax),
                 SyntaxKind.PointerType => binder.BindPointerType((PointerTypeSyntax)syntax),
-                SyntaxKind.PredefinedType => binder.BindPredefinedType((PredefinedTypeSyntax)syntax),
+                >= SyntaxKind.AnyType and <= SyntaxKind.F64Type => binder.BindPredefinedType((PredefinedTypeSyntax)syntax),
                 SyntaxKind.UnionType => binder.BindUnionType((UnionTypeSyntax)syntax),
-                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
+                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.Kind}'"),
             };
         }
 
@@ -34,7 +32,7 @@ internal static class BinderTypeExtensions
             switch (syntax.Length)
             {
                 // TODO: This should probably be isz, not i32.
-                case LiteralExpressionSyntax { SyntaxKind: SyntaxKind.I32LiteralExpression } literal:
+                case LiteralExpressionSyntax { Kind: SyntaxKind.I32LiteralExpression } literal:
                     Debug.Assert(literal.InstanceValue is int);
                     return new ArrayTypeSymbol(syntax, elementType, (int)literal.InstanceValue, binder.Module);
 
@@ -64,7 +62,7 @@ internal static class BinderTypeExtensions
 
         private StructTypeSymbol BindNamedType(NamedTypeSyntax syntax)
         {
-            if (binder.Module.TryLookup<StructTypeSymbol>(syntax.Name.FullName, out var structType))
+            if (binder.TryLookupNamedType(syntax.Name, out var structType))
             {
                 return structType;
             }
@@ -74,6 +72,31 @@ internal static class BinderTypeExtensions
             return binder.Module.Never;
         }
 
+        private bool TryLookupNamedType(NameSyntax syntax, out StructTypeSymbol structType)
+        {
+            var parts = syntax.Name.ToArray();
+            if (parts.Length == 1)
+                return binder.Module.TryLookup(parts[0], out structType);
+
+            if (!binder.TryLookup<ModuleSymbol>(parts[0], out var module))
+            {
+                structType = null!;
+                return false;
+            }
+
+            for (var i = 1; i < parts.Length - 1; i++)
+            {
+                if (!module.TryLookup<ModuleSymbol>(parts[i], out var childModule))
+                {
+                    structType = null!;
+                    return false;
+                }
+
+                module = childModule;
+            }
+
+            return module.TryLookup(parts[^1], out structType);
+        }
         private PointerTypeSymbol BindPointerType(PointerTypeSyntax syntax)
         {
             var elementType = binder.BindType(syntax.ElementType);
@@ -82,7 +105,7 @@ internal static class BinderTypeExtensions
 
         private StructTypeSymbol BindPredefinedType(PredefinedTypeSyntax syntax)
         {
-            return syntax.PredefinedTypeToken.SyntaxKind switch
+            return syntax.PredefinedTypeToken.Kind switch
             {
                 SyntaxKind.AnyKeyword => binder.Module.Any,
                 SyntaxKind.UnknownKeyword => binder.Module.Unknown,
@@ -104,7 +127,7 @@ internal static class BinderTypeExtensions
                 SyntaxKind.F16Keyword => binder.Module.F16,
                 SyntaxKind.F32Keyword => binder.Module.F32,
                 SyntaxKind.F64Keyword => binder.Module.F64,
-                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.SyntaxKind}'"),
+                _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)} '{syntax.Kind}'"),
             };
         }
 

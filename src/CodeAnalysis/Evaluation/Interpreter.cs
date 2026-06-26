@@ -603,8 +603,8 @@ internal sealed class Interpreter(Compilation compilation) : IBoundNodeVisitor<P
             ConversionSymbol conversion => EvaluateConversionBuiltin(conversion, arguments),
             _ => arguments.Length switch
             {
-                1 => EvaluateUnaryBuiltin(symbol.Syntax.SyntaxKind, lambdaType.ReturnType, arguments[0]),
-                2 => EvaluateBinaryBuiltin(symbol.Syntax.SyntaxKind, lambdaType.Parameters[0], lambdaType.Parameters[1], lambdaType.ReturnType, arguments[0], arguments[1]),
+                1 => EvaluateUnaryBuiltin(symbol.Syntax.Kind, lambdaType.ReturnType, arguments[0]),
+                2 => EvaluateBinaryBuiltin(symbol.Syntax.Kind, lambdaType.Parameters[0], lambdaType.Parameters[1], lambdaType.ReturnType, arguments[0], arguments[1]),
                 _ => throw new NotSupportedException($"Unsupported builtin arity {arguments.Length} for '{symbol.Name}'.")
             }
         };

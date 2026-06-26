@@ -1,8 +1,4 @@
 using CodeAnalysis.Diagnostics;
-using CodeAnalysis.Parsing;
-using CodeAnalysis.Scanning;
-using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Statements;
 
 namespace CodeAnalysis.Tests.Parsing;
 
@@ -10,33 +6,35 @@ public partial class ParserTests
 {
     private static ExpressionSyntax ParseExpression(string text)
     {
-        var sourceText = new SourceText(text);
-        var (tokens, scanDiagnostics) = Scanner.Scan(sourceText);
+        var sourceText = new SourceText($"__test:={text};");
+        var syntaxTree = new SyntaxTree(sourceText);
+        var diagnostics = syntaxTree.Diagnostics.ToArray();
 
-        Assert.False(scanDiagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, scanDiagnostics));
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
-        var stream = new SyntaxTokenStream(sourceText, tokens);
-        var expression = stream.ParseExpression();
-        _ = stream.Match(SyntaxKind.EofToken);
-
-        Assert.False(stream.Diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, stream.Diagnostics));
-
-        return expression;
+        var declaration = Assert.Single(syntaxTree.CompilationUnit.Declarations);
+        return declaration.Initializer;
     }
 
-    private static StatementSyntax ParseStatement(string text)
+    private static ExpressionSyntax ParseStatement(string text) => ParseExpression(text);
+    private static GlobalDeclarationSyntax ParseGlobalDeclaration(string text)
     {
         var sourceText = new SourceText(text);
-        var (tokens, scanDiagnostics) = Scanner.Scan(sourceText);
+        var syntaxTree = new SyntaxTree(sourceText);
+        var diagnostics = syntaxTree.Diagnostics.ToArray();
 
-        Assert.False(scanDiagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, scanDiagnostics));
+        Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
-        var stream = new SyntaxTokenStream(sourceText, tokens);
-        var statement = stream.ParseStatement();
-        _ = stream.Match(SyntaxKind.EofToken);
+        return Assert.Single(syntaxTree.CompilationUnit.Declarations);
+    }
 
-        Assert.False(stream.Diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, stream.Diagnostics));
+    private static ExpressionSyntax ParseExpressionWithDiagnostics(string text, out Diagnostic[] diagnostics)
+    {
+        var sourceText = new SourceText($"__test:={text};");
+        var syntaxTree = new SyntaxTree(sourceText);
+        diagnostics = syntaxTree.Diagnostics.ToArray();
 
-        return statement;
+        var declaration = Assert.Single(syntaxTree.CompilationUnit.Declarations);
+        return declaration.Initializer;
     }
 }

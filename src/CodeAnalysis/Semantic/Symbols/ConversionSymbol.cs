@@ -1,4 +1,4 @@
-using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Semantic.Symbols;
 

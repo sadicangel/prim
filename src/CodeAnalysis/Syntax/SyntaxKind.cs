@@ -2,7 +2,7 @@
 
 public enum SyntaxKind
 {
-    InvalidSyntax,
+    InvalidSyntaxToken,
 
     // SyntaxTokens
 
@@ -33,7 +33,6 @@ public enum SyntaxKind
     BracketCloseToken,
     BracketOpenBracketCloseToken,
     ColonToken,
-    ColonColonToken,
     CommaToken,
     DotToken,
     DotDotToken,
@@ -88,6 +87,7 @@ public enum SyntaxKind
     ReturnKeyword,
 
     AnyKeyword,
+    ErrKeyword,
     UnknownKeyword,
     NeverKeyword,
     UnitKeyword,
@@ -109,7 +109,6 @@ public enum SyntaxKind
     F64Keyword,
 
     ModuleKeyword,
-    StructKeyword,
     LetKeyword,
     VarKeyword,
 
@@ -123,63 +122,76 @@ public enum SyntaxKind
     WhiteSpaceTrivia,
     SingleLineCommentTrivia,
     MultiLineCommentTrivia,
-    InvalidTextTrivia,
+    InvalidSyntaxTrivia,
 
     // Other nodes
-
+    AnyType,
+    ErrType,
+    UnknownType,
+    NeverType,
+    UnitType,
+    TypeType,
+    StrType,
+    BoolType,
+    I8Type,
+    I16Type,
+    I32Type,
+    I64Type,
+    IszType,
+    U8Type,
+    U16Type,
+    U32Type,
+    U64Type,
+    UszType,
+    F16Type,
+    F32Type,
+    F64Type,
     ArrayType,
     LambdaType,
     NamedType,
     MaybeType,
     PointerType,
-    PredefinedType,
     UnionType,
 
     Parameter,
     Argument,
 
-    CompilationUnit,
-
-    // Declarations
-    GlobalDeclaration,
-    LocalDeclaration,
-    ModuleDeclaration,
-    StructDeclaration,
-    VariableDeclaration,
-    PropertyDeclaration,
-
-    // Expressions
-
     SimpleName,
     QualifiedName,
 
-    I8LiteralExpression,
-    U8LiteralExpression,
-    I16LiteralExpression,
-    U16LiteralExpression,
-    I32LiteralExpression,
-    U32LiteralExpression,
-    I64LiteralExpression,
-    U64LiteralExpression,
-    F16LiteralExpression,
-    F32LiteralExpression,
-    F64LiteralExpression,
-    StrLiteralExpression,
-    TrueLiteralExpression,
-    FalseLiteralExpression,
-    NullLiteralExpression,
+    CompilationUnit,
 
-    GroupExpression,
+    // Statements
+    GlobalDeclaration,
+    LocalDeclaration,
 
-    ArrayExpression,
-    LambdaExpression,
-    StructExpression,
-    PropertyExpression,
+    ExpressionStatement,
+    EmptyStatement,
 
-    PropertyAccessExpression,
+    // Expressions
+    ModuleExpression,
+    TypeExpression,
+
+    BlockExpression,
+
+    IfElseExpression,
+    WhileExpression,
+
+    ContinueExpression,
+    BreakExpression,
+    ReturnExpression,
+
+    ArrayInitializerExpression,
+    ObjectInitializerExpression,
+    PropertyInitializerExpression,
+
     ElementAccessExpression,
-    InvocationExpression,
+    MemberAccessExpression,
     ConversionExpression,
+
+    LambdaExpression,
+    InvocationExpression,
+    GroupExpression,
 
     UnaryPlusExpression,
     UnaryMinusExpression,
@@ -208,18 +220,22 @@ public enum SyntaxKind
     CoalesceExpression,
 
     AssignmentExpression,
-    TypeClause,
-    InitClause,
 
-    BlockStatement,
-    ExpressionStatement,
-    EmptyStatement,
+    NameExpression,
 
-    IfElseStatement,
-    ElseClause,
-    WhileStatement,
-
-    ContinueStatement,
-    BreakStatement,
-    ReturnStatement,
+    I8LiteralExpression,
+    U8LiteralExpression,
+    I16LiteralExpression,
+    U16LiteralExpression,
+    I32LiteralExpression,
+    U32LiteralExpression,
+    I64LiteralExpression,
+    U64LiteralExpression,
+    F16LiteralExpression,
+    F32LiteralExpression,
+    F64LiteralExpression,
+    StrLiteralExpression,
+    TrueLiteralExpression,
+    FalseLiteralExpression,
+    NullLiteralExpression,
 }

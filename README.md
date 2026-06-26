@@ -51,35 +51,30 @@ a : i32 = 29;  // explicit type i32 assigned to a
 b := "a string"; // type inferred from the assigned value - str
 ```
 
-### Functions
-- Functions are defined with a signature that includes argument names, types, and a return type.
-- The syntax uses -> to indicate the return type.
-- Functions can either have a block of code with a return statement or a single expression body.
+#### Mutability:
 ```ts
-sum : (a: i32, b: i32) -> i32 = (a, b) -> { return a + b; } // block body
-double : (x: i32) -> i32 = x -> x * 2; // single-expression body
-double := (x: i32) -> x * 2; // type inference
+a :: "cannot reassign a"; // immutable
+b := "can reassign b"; // mutable
+```
+
+#### Functions
+- Functions are just variables with a lamda type.
+```ts
+sum : (i32, i32) -> i32 = (a, b) -> { return a + b; } // block body
+double : (i32) -> i32 = x -> x * 2; // single-expression body
+double := (x: i32) -> x * 2; // type inference (**not yet supported**)
 ```
 - Functions as first-class values, meaning they can be assigned to variables, be passed as arguments to other functions or returned from them.
 
-### Structs
-- The language supports user-defined structured types (struct) for grouping related fields.
-- Struct fields are defined with explicit types, and instances are created using literal syntax.
-```ts
-Point2D : struct = struct { x: f32; y: f32; } // defining a 2D point structure
-Point2D := struct { x: f32; y: f32; } // type inference
-point := Point2D { x = 0, y = 1 }; // creating an instance with literal field assignments
-```
 ### Arrays
 - Arrays are fixed-length. This is specified using the syntax `Type[size]`, meaning the array has a predefined length that cannot be changed after initialization.
 - Arrays are initialized using square brackets ([]) containing a list of values.
 ```ts
-array : i32[2] = [1, 2]; //  array of two i32 values, initialized with the values 1 and 2.
-array : i32[_] = [1, 2]; //  same as above, but the size is inferred from the values - i32[2]
-array := ["str1", "str2", "str3"]; // type inferred from the assigned value - str[3]
+array := [1, 2]; // array of two i32 values, initialized with the values 1 and 2. 
+// inferred type is i32[2] though this is assignable to i32[] (**not yet supported**)
 ```
+When length is supported in arrays we can have:
 - The type and length are both part of the array's signature. For example, `i32[2]` and `i32[3]` are considered different types and cannot be used interchangeably.
-
 - Since arrays have fixed lengths, the compiler can enforce bounds checking both at compile-time and runtime.
 
 ### Pointers  
@@ -89,6 +84,61 @@ ptr : i32* = &a;
 ptr := &a; // type inference
 b := *ptr; // dereferencing the pointer to get the value of a*
 ```
+
+### Unions
+- A union represents a value type that can be one of multiple types
+- Appending `?` is short hand for a union of that type with the unit type.
+```ts
+i32OrStr: i32 | str = "value";
+i32OrStr = 29;
+
+a : i32? = null;
+a = 29;
+```
+
+### Structs
+- The language supports user-defined structured types for grouping related fields.
+```ts
+Point2D :: type { x: f32; y: f32; } // defining a 2D point structure
+point := Point2D { x = 0, y = 1 }; // creating an instance with literal field assignments
+```
+### Modules
+- Definitions.
+- Imports (**not yet supported**)
+```ts
+math :: module;
+Point2D :: type { x: f32; y: f32; } // defining a 2D point structure
+point := Point2D { x = 0, y = 1 }; // creating an instance with literal field assignments
+```
+In another file it would look like this:
+```ts
+import math // as M
+point := math.Point2D { x = 0, y = 1 }; 
+```
+
+### Control flow
+- Most constructs in the language are expressions.
+
+#### if-else
+```ts
+a :: if (x > 0) "greater than 0" else "less than or equal to 0"; // type of a is str
+b :: if (x > 0) "greater than 0"; // type of b is str | unit
+```
+
+#### while
+```ts
+h := 0;
+a :: while (h <= 10) {
+  if (flipCoin() == "tails") break false;
+  h += 1;
+  continue true;
+}
+```
+
+## TODO
+- Drop parenthesis on if and while. We can most likely know where the expression ends.
+- Add for
+- Add defer
 
 ## Previous Versions
 

@@ -4,11 +4,13 @@ namespace CodeAnalysis.Syntax;
 
 public static class SyntaxFacts
 {
+    public const char NameSeparator = '.';
+
     public static string? GetText(SyntaxKind syntaxKind)
     {
         return syntaxKind switch
         {
-            SyntaxKind.InvalidSyntax => null,
+            SyntaxKind.InvalidSyntaxToken => null,
             SyntaxKind.EofToken => null,
             SyntaxKind.IdentifierToken => null,
 
@@ -23,7 +25,6 @@ public static class SyntaxFacts
             SyntaxKind.BracketCloseToken => "]",
             SyntaxKind.BracketOpenBracketCloseToken => "[]",
             SyntaxKind.ColonToken => ":",
-            SyntaxKind.ColonColonToken => "::",
             SyntaxKind.CommaToken => ",",
             SyntaxKind.DotToken => ".",
             SyntaxKind.DotDotToken => "..",
@@ -91,6 +92,7 @@ public static class SyntaxFacts
             SyntaxKind.ReturnKeyword => "return",
 
             SyntaxKind.AnyKeyword => PredefinedTypeNames.Any,
+            SyntaxKind.ErrKeyword => PredefinedTypeNames.Err,
             SyntaxKind.UnknownKeyword => PredefinedTypeNames.Unknown,
             SyntaxKind.NeverKeyword => PredefinedTypeNames.Never,
             SyntaxKind.UnitKeyword => PredefinedTypeNames.Unit,
@@ -112,7 +114,6 @@ public static class SyntaxFacts
             SyntaxKind.F64Keyword => PredefinedTypeNames.F64,
 
             SyntaxKind.ModuleKeyword => "module",
-            SyntaxKind.StructKeyword => "struct",
             SyntaxKind.LetKeyword => "let",
             SyntaxKind.VarKeyword => "var",
 
@@ -126,11 +127,10 @@ public static class SyntaxFacts
             SyntaxKind.WhiteSpaceTrivia => null,
             SyntaxKind.SingleLineCommentTrivia => null,
             SyntaxKind.MultiLineCommentTrivia => null,
-            SyntaxKind.InvalidTextTrivia => null,
+            SyntaxKind.InvalidSyntaxTrivia => null,
 
             SyntaxKind.CompilationUnit => null,
 
-            SyntaxKind.PredefinedType => null,
             SyntaxKind.NamedType => null,
             SyntaxKind.MaybeType => null,
             SyntaxKind.PointerType => null,
@@ -162,18 +162,13 @@ public static class SyntaxFacts
 
             SyntaxKind.GroupExpression => null,
 
-            SyntaxKind.ModuleDeclaration => null,
-            SyntaxKind.StructDeclaration => null,
-            SyntaxKind.VariableDeclaration => null,
-            SyntaxKind.PropertyDeclaration => null,
 
-            SyntaxKind.ArrayExpression => null,
-            SyntaxKind.StructExpression => null,
-            SyntaxKind.PropertyExpression => null,
+            SyntaxKind.ArrayInitializerExpression => null,
+            SyntaxKind.TypeExpression => null,
 
             SyntaxKind.ElementAccessExpression => null,
             SyntaxKind.InvocationExpression => null,
-            SyntaxKind.PropertyAccessExpression => null,
+            SyntaxKind.MemberAccessExpression => null,
             SyntaxKind.ConversionExpression => null,
 
             SyntaxKind.UnaryPlusExpression => null,
@@ -203,20 +198,11 @@ public static class SyntaxFacts
             SyntaxKind.CoalesceExpression => null,
 
             SyntaxKind.AssignmentExpression => null,
-            SyntaxKind.TypeClause => null,
-            SyntaxKind.InitClause => null,
 
             SyntaxKind.EmptyStatement => null,
             SyntaxKind.ExpressionStatement => null,
-            SyntaxKind.BlockStatement => null,
+            SyntaxKind.BlockExpression => null,
 
-            SyntaxKind.IfElseStatement => null,
-            SyntaxKind.ElseClause => null,
-            SyntaxKind.WhileStatement => null,
-
-            SyntaxKind.ContinueStatement => null,
-            SyntaxKind.BreakStatement => null,
-            SyntaxKind.ReturnStatement => null,
 
             _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
         };
@@ -238,6 +224,7 @@ public static class SyntaxFacts
             "return" => SyntaxKind.ReturnKeyword,
 
             PredefinedTypeNames.Any => SyntaxKind.AnyKeyword,
+            PredefinedTypeNames.Err => SyntaxKind.ErrKeyword,
             PredefinedTypeNames.Unknown => SyntaxKind.UnknownKeyword,
             PredefinedTypeNames.Never => SyntaxKind.NeverKeyword,
             PredefinedTypeNames.Unit => SyntaxKind.UnitKeyword,
@@ -259,7 +246,6 @@ public static class SyntaxFacts
             PredefinedTypeNames.F64 => SyntaxKind.F64Keyword,
 
             "module" => SyntaxKind.ModuleKeyword,
-            "struct" => SyntaxKind.StructKeyword,
             "let" => SyntaxKind.LetKeyword,
             "var" => SyntaxKind.VarKeyword,
 
@@ -272,6 +258,32 @@ public static class SyntaxFacts
             _ => SyntaxKind.IdentifierToken,
         };
     }
+
+    public static SyntaxKind? GetPredefinedTypeKind(SyntaxKind syntaxKind) => syntaxKind switch
+    {
+        SyntaxKind.AnyKeyword => SyntaxKind.AnyType,
+        SyntaxKind.ErrKeyword => SyntaxKind.ErrType,
+        SyntaxKind.UnknownKeyword => SyntaxKind.UnknownType,
+        SyntaxKind.NeverKeyword => SyntaxKind.NeverType,
+        SyntaxKind.UnitKeyword => SyntaxKind.UnitType,
+        SyntaxKind.TypeKeyword => SyntaxKind.TypeType,
+        SyntaxKind.StrKeyword => SyntaxKind.StrType,
+        SyntaxKind.BoolKeyword => SyntaxKind.BoolType,
+        SyntaxKind.I8Keyword => SyntaxKind.I8Type,
+        SyntaxKind.I16Keyword => SyntaxKind.I16Type,
+        SyntaxKind.I32Keyword => SyntaxKind.I32Type,
+        SyntaxKind.I64Keyword => SyntaxKind.I64Type,
+        SyntaxKind.IszKeyword => SyntaxKind.IszType,
+        SyntaxKind.U8Keyword => SyntaxKind.U8Type,
+        SyntaxKind.U16Keyword => SyntaxKind.U16Type,
+        SyntaxKind.U32Keyword => SyntaxKind.U32Type,
+        SyntaxKind.U64Keyword => SyntaxKind.U64Type,
+        SyntaxKind.UszKeyword => SyntaxKind.UszType,
+        SyntaxKind.F16Keyword => SyntaxKind.F16Type,
+        SyntaxKind.F32Keyword => SyntaxKind.F32Type,
+        SyntaxKind.F64Keyword => SyntaxKind.F64Type,
+        _ => null
+    };
 
     public static bool IsOperator(SyntaxKind syntaxKind) => IsUnaryOperator(syntaxKind) || IsBinaryOperator(syntaxKind);
     public static bool IsUnaryOperator(SyntaxKind syntaxKind) => GetUnaryOperatorPrecedence(syntaxKind) > 0;
@@ -286,13 +298,33 @@ public static class SyntaxFacts
     public static bool IsNumberLiteralToken(SyntaxKind syntaxKind) =>
         syntaxKind is >= SyntaxKind.I32LiteralToken and <= SyntaxKind.F64LiteralToken;
 
-    public static int? GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
+    public static SyntaxKind GetLiteralExpressionKind(SyntaxKind syntaxKind) => syntaxKind switch
+    {
+        SyntaxKind.I8LiteralToken => SyntaxKind.I8LiteralExpression,
+        SyntaxKind.U8LiteralToken => SyntaxKind.U8LiteralExpression,
+        SyntaxKind.I16LiteralToken => SyntaxKind.I16LiteralExpression,
+        SyntaxKind.U16LiteralToken => SyntaxKind.U16LiteralExpression,
+        SyntaxKind.I32LiteralToken => SyntaxKind.I32LiteralExpression,
+        SyntaxKind.U32LiteralToken => SyntaxKind.U32LiteralExpression,
+        SyntaxKind.I64LiteralToken => SyntaxKind.I64LiteralExpression,
+        SyntaxKind.U64LiteralToken => SyntaxKind.U64LiteralExpression,
+        SyntaxKind.F16LiteralToken => SyntaxKind.F16LiteralExpression,
+        SyntaxKind.F32LiteralToken => SyntaxKind.F32LiteralExpression,
+        SyntaxKind.F64LiteralToken => SyntaxKind.F64LiteralExpression,
+        SyntaxKind.StrLiteralToken => SyntaxKind.StrLiteralExpression,
+        SyntaxKind.TrueKeyword => SyntaxKind.TrueLiteralExpression,
+        SyntaxKind.FalseKeyword => SyntaxKind.FalseLiteralExpression,
+        SyntaxKind.NullKeyword => SyntaxKind.NullLiteralExpression,
+        _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{syntaxKind}'")
+    };
+
+    public static int GetUnaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
     {
         SyntaxKind.ExclamationToken => 8,
         SyntaxKind.MinusToken => 8,
         SyntaxKind.PlusToken => 8,
         SyntaxKind.TildeToken => 8,
-        _ => null,
+        _ => 0,
     };
 
     public static SyntaxKind GetUnaryOperatorExpression(SyntaxKind operatorKind) => operatorKind switch
@@ -304,7 +336,7 @@ public static class SyntaxFacts
         _ => throw new UnreachableException($"Unexpected {nameof(SyntaxKind)}: '{operatorKind}'")
     };
 
-    public static int? GetBinaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
+    public static int GetBinaryOperatorPrecedence(SyntaxKind syntaxKind) => syntaxKind switch
     {
         SyntaxKind.AsteriskAsteriskToken => 7,
         SyntaxKind.PercentToken => 6,
@@ -326,7 +358,7 @@ public static class SyntaxFacts
         SyntaxKind.BarBarToken => 1,
         SyntaxKind.CaretToken => 1,
         SyntaxKind.HookHookToken => 1,
-        _ => null,
+        _ => 0,
     };
 
     public static SyntaxKind GetBinaryOperatorExpression(SyntaxKind operatorKind) => operatorKind switch

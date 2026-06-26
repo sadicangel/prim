@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using CodeAnalysis.Semantic;
 using CodeAnalysis.Syntax;
-using CodeAnalysis.Syntax.Expressions;
-using CodeAnalysis.Syntax.Statements;
 
 namespace CodeAnalysis.Binding;
 
@@ -21,3 +19,4 @@ internal static class BinderNodeExtensions
         }
     }
 }
+

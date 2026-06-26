@@ -10,7 +10,7 @@ internal sealed record class ArrayValue : PrimValue, IEnumerable<PrimValue>
     {
         ArrayType = arrayType;
         Elements = elements;
-        // index = arrayType.GetOperators(SyntaxKind.BracketOpenBracketCloseToken).Single();
+        // index = arrayType.GetOperators(Kind.BracketOpenBracketCloseToken).Single();
         //Add(index, new LambdaValue(index.LambdaType, GetValue));
     }
 
