@@ -83,7 +83,7 @@ public sealed class BinderTests
     }
 
     [Fact]
-    public void Bind_QualifiedReferences_StartAtGlobalModule_NotCurrentModule()
+    public void Bind_QualifiedTypeReference_AmbiguousBetweenCurrentAndGlobal_ReportsDiagnostic()
     {
         var (mathCompilation, _, mathDiagnostics) = Bind(
             """
@@ -91,7 +91,6 @@ public sealed class BinderTests
             Point := type {
                 x: i32 = 0;
             };
-            one := 1;
             """);
         AssertNoErrors(mathDiagnostics);
 
@@ -101,30 +100,46 @@ public sealed class BinderTests
             Point := type {
                 y: bool = false;
             };
+            """,
+            mathCompilation.GlobalModule);
+        AssertNoErrors(appMathDiagnostics);
+
+        var (_, _, appDiagnostics) = Bind(
+            """
+            app :: module;
+            p: math.Point = math.Point { x = 1 };
+            """,
+            appMathCompilation.GlobalModule);
+
+        Assert.Contains(appDiagnostics, d => d.Id == DiagnosticId.AmbiguousSymbol);
+    }
+
+    [Fact]
+    public void Bind_QualifiedExpression_AmbiguousBetweenCurrentAndGlobal_ReportsDiagnostic()
+    {
+        var (mathCompilation, _, mathDiagnostics) = Bind(
+            """
+            math :: module;
+            one := 1;
+            """);
+        AssertNoErrors(mathDiagnostics);
+
+        var (appMathCompilation, _, appMathDiagnostics) = Bind(
+            """
+            app.math :: module;
             one := false;
             """,
             mathCompilation.GlobalModule);
         AssertNoErrors(appMathDiagnostics);
 
-        var (appCompilation, _, appDiagnostics) = Bind(
+        var (_, _, appDiagnostics) = Bind(
             """
             app :: module;
-            p: math.Point = math.Point { x = 1 };
             x := math.one;
             """,
             appMathCompilation.GlobalModule);
 
-        AssertNoErrors(appDiagnostics);
-        var globalMath = Assert.IsType<ModuleSymbol>(appCompilation.GlobalModule.Lookup("math"));
-        var globalPoint = Assert.IsType<StructTypeSymbol>(globalMath.Lookup("Point"));
-        var app = Assert.IsType<ModuleSymbol>(appCompilation.GlobalModule.Lookup("app"));
-        var appMath = Assert.IsType<ModuleSymbol>(app.Lookup("math"));
-        var relativePoint = Assert.IsType<StructTypeSymbol>(appMath.Lookup("Point"));
-        var p = Assert.IsType<VariableSymbol>(app.Lookup("p"));
-        var x = Assert.IsType<VariableSymbol>(app.Lookup("x"));
-        Assert.Same(globalPoint, p.Type);
-        Assert.NotSame(relativePoint, p.Type);
-        Assert.Equal(PredefinedTypeNames.I32, x.Type.Name.ToString());
+        Assert.Contains(appDiagnostics, d => d.Id == DiagnosticId.AmbiguousSymbol);
     }
 
     [Fact]

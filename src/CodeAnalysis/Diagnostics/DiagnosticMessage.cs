@@ -37,6 +37,9 @@ internal static class DiagnosticMessage
         $"Unexpected token '{GetDisplayText(actual)}'. Expected '{GetDisplayText(expected)}'";
 
     // Binding error messages.
+    public static string AmbiguousSymbol(string symbolName) =>
+        $"Symbol '{symbolName}' is ambiguous";
+
     public static string AmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
         $"Binary operator '{@operator.SourceSpan}' is ambiguous on operands of type '{leftTypeName}' and '{rightTypeName}'";
 
@@ -140,3 +143,4 @@ internal static class DiagnosticMessage
     //public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
     //public static string NotAllPathsReturn() => "Not all code paths return a value";
 }
+

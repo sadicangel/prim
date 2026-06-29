@@ -1,4 +1,4 @@
-using CodeAnalysis.Syntax;
+﻿using CodeAnalysis.Syntax;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Diagnostics;
@@ -37,6 +37,9 @@ internal static class DiagnosticExtensions
             new(DiagnosticId.UnexpectedToken, DiagnosticSeverity.Error, actual.SourceSpan, DiagnosticMessage.UnexpectedToken(expected, actual.Kind));
 
         // Binding Errors.
+        public static Diagnostic AmbiguousSymbol(SourceSpan sourceSpan, string symbolName) =>
+            new(DiagnosticId.AmbiguousSymbol, DiagnosticSeverity.Error, sourceSpan, DiagnosticMessage.AmbiguousSymbol(symbolName));
+
         public static Diagnostic AmbiguousBinaryOperator(SyntaxToken @operator, string leftTypeName, string rightTypeName) =>
             new(DiagnosticId.AmbiguousBinaryOperator, DiagnosticSeverity.Error, @operator.SourceSpan, DiagnosticMessage.AmbiguousBinaryOperator(@operator, leftTypeName, rightTypeName));
 

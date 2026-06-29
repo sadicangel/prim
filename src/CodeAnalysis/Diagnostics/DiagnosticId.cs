@@ -1,4 +1,4 @@
-namespace CodeAnalysis.Diagnostics;
+﻿namespace CodeAnalysis.Diagnostics;
 
 public enum DiagnosticId
 {
@@ -11,6 +11,7 @@ public enum DiagnosticId
     InvalidLocationForTypeDefinition,
     InvalidModuleDeclaration,
     UnexpectedToken,
+    AmbiguousSymbol,
     AmbiguousBinaryOperator,
     AmbiguousInvocationOperator,
     AmbiguousUnaryOperator,

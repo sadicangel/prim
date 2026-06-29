@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Syntax;
@@ -181,6 +181,7 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
             }
         }
     }
+
     private void DeclareVariableHeaders(SyntaxTree syntaxTree)
     {
         var module = _treeModules[syntaxTree];
@@ -357,6 +358,7 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
 
         return BindConversion(BindExpression(syntax), targetType);
     }
+
     public IStatementNode BindExpressionStatement(ExpressionStatementSyntax syntax)
     {
         var expression = BindExpression(syntax.Expression);
@@ -487,8 +489,11 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
 
     public IExpressionNode BindPropertyInitializerExpression(PropertyInitializerExpressionSyntax syntax)
     {
-        var property = _scope.Lookup<PropertySymbol>(syntax.PropertyName.Name);
-        if (property is null)
+        var lookup = _scope.Lookup(syntax.PropertyName.Name);
+        if (lookup.Kind == LookupResultKind.Ambiguous)
+            return ReportAmbiguousSymbol(syntax, syntax.PropertyName.Name);
+
+        if (lookup.Symbol is not PropertySymbol property)
         {
             Report(Diagnostic.UndefinedTypeMember(syntax.PropertyName.SourceSpan, _scope.Module.Name.ToString(), syntax.PropertyName.Name.ToString()));
             return CreateNeverExpression(syntax);
@@ -543,17 +548,12 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
 
     public IExpressionNode BindMemberAccessExpression(MemberAccessExpressionSyntax syntax)
     {
-        if (BindGlobalQualifiedMemberAccessExpression(syntax) is { } qualifiedExpression)
+        if (BindQualifiedMemberAccessExpression(syntax) is { } qualifiedExpression)
             return qualifiedExpression;
 
         var receiver = BindExpression(syntax.Receiver);
         var memberName = syntax.MemberName.Name;
-        var member = receiver switch
-        {
-            ModuleReferenceNode module => module.Symbol.Lookup(memberName),
-            TypeReferenceNode type => type.Symbol.Lookup(memberName),
-            _ => receiver.Type.Lookup<MemberSymbol>(memberName)
-        };
+        var member = LookupMember(receiver, memberName);
 
         if (member is null)
         {
@@ -564,38 +564,45 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
         return BindSymbol(syntax, member, receiver);
     }
 
-    private IExpressionNode? BindGlobalQualifiedMemberAccessExpression(MemberAccessExpressionSyntax syntax)
+    private IExpressionNode? BindQualifiedMemberAccessExpression(MemberAccessExpressionSyntax syntax)
     {
         if (!TryGetMemberAccessNameParts(syntax, out var parts))
             return null;
 
-        if (_scope.LookupLexical(parts[0].Name) is not null)
+        var firstLookup = _scope.Lookup(parts[0].Name);
+        if (firstLookup.Kind == LookupResultKind.Found && IsValueReceiverSymbol(firstLookup.Symbol))
             return null;
 
-        var current = _scope.Module.Global.Lookup(parts[0].Name);
-        if (current is null)
-            return null;
-
-        foreach (var part in parts.Skip(1))
+        var qualifiedName = new NameString(parts.Select(part => part.Name.FullName));
+        var lookup = _scope.Lookup(qualifiedName);
+        return lookup.Kind switch
         {
-            if (current is not ContainerSymbol container)
-            {
-                Report(Diagnostic.UndefinedTypeMember(part.SourceSpan, current.Name.ToString(), part.Name.ToString()));
-                return CreateNeverExpression(syntax);
-            }
-
-            var next = container.Lookup(part.Name);
-            if (next is null)
-            {
-                Report(Diagnostic.UndefinedTypeMember(part.SourceSpan, current.Name.ToString(), part.Name.ToString()));
-                return CreateNeverExpression(syntax);
-            }
-
-            current = next;
-        }
-
-        return BindSymbol(syntax, current);
+            LookupResultKind.NotFound => null,
+            LookupResultKind.Ambiguous => ReportAmbiguousSymbol(syntax, qualifiedName),
+            LookupResultKind.Found => BindSymbol(syntax, lookup.Symbol!),
+            _ => throw new InvalidOperationException($"Unknown lookup result '{lookup.Kind}'.")
+        };
     }
+
+    private IExpressionNode ReportAmbiguousSymbol(SyntaxNode syntax, NameString name)
+    {
+        Report(Diagnostic.AmbiguousSymbol(syntax.SourceSpan, name.ToString()));
+        return CreateNeverExpression(syntax);
+    }
+
+    private static Symbol? LookupMember(IExpressionNode receiver, NameString memberName) => receiver switch
+    {
+        ModuleReferenceNode module => module.Symbol.Lookup(memberName),
+        TypeReferenceNode type => type.Symbol.Lookup(memberName),
+        _ => receiver.Type.Lookup<MemberSymbol>(memberName)
+    };
+
+    private static bool IsValueReceiverSymbol(Symbol? symbol) => symbol switch
+    {
+        VariableSymbol => true,
+        MemberSymbol { IsStatic: false } => true,
+        _ => false
+    };
 
     private static bool TryGetMemberAccessNameParts(
         MemberAccessExpressionSyntax syntax,
@@ -616,6 +623,7 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
         parts.Reverse();
         return parts.Count > 1;
     }
+
     public IExpressionNode BindConversionExpression(ConversionExpressionSyntax syntax)
     {
         var expression = BindExpression(syntax.Expression);
@@ -735,14 +743,19 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
 
     public IExpressionNode BindNameExpression(NameExpressionSyntax syntax)
     {
-        var symbol = _scope.Lookup(syntax.Name.Name);
-        if (symbol is null)
+        var lookup = _scope.Lookup(syntax.Name.Name);
+        switch (lookup.Kind)
         {
-            Report(Diagnostic.UndefinedSymbol(syntax.SourceSpan, syntax.Name.Name.ToString()));
-            return CreateNeverExpression(syntax);
+            case LookupResultKind.NotFound:
+                Report(Diagnostic.UndefinedSymbol(syntax.SourceSpan, syntax.Name.Name.ToString()));
+                return CreateNeverExpression(syntax);
+            case LookupResultKind.Ambiguous:
+                return ReportAmbiguousSymbol(syntax, syntax.Name.Name);
+            case LookupResultKind.Found:
+                return BindSymbol(syntax, lookup.Symbol!);
+            default:
+                throw new InvalidOperationException($"Unknown lookup result '{lookup.Kind}'.");
         }
-
-        return BindSymbol(syntax, symbol);
     }
 
     public IExpressionNode BindLiteralExpression(LiteralExpressionSyntax syntax)
@@ -792,7 +805,8 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
             case SyntaxKind.UszType: return _scope.Module.UszType;
             case SyntaxKind.F16Type: return _scope.Module.F16Type;
             case SyntaxKind.F32Type: return _scope.Module.F32Type;
-            case SyntaxKind.F64Type: return _scope.Module.F64Type;            case SyntaxKind.ArrayType:
+            case SyntaxKind.F64Type: return _scope.Module.F64Type;
+            case SyntaxKind.ArrayType:
                 var arrayTypeSyntax = (ArrayTypeSyntax)syntax;
                 var elementType = BindType(arrayTypeSyntax.ElementType);
                 if (elementType.IsNever) return elementType;
@@ -817,8 +831,14 @@ internal sealed class Binder(IScope? scope = null) : IDiagnosticReporter
                 return new LambdaTypeSymbol(parameterTypes, returnType, syntax);
             case SyntaxKind.NamedType:
                 var namedTypeSyntax = (NamedTypeSyntax)syntax;
-                var namedType = _scope.Lookup<TypeSymbol>(namedTypeSyntax.Name.Name);
-                if (namedType is null)
+                var lookup = _scope.Lookup(namedTypeSyntax.Name.Name);
+                if (lookup.Kind == LookupResultKind.Ambiguous)
+                {
+                    Report(Diagnostic.AmbiguousSymbol(namedTypeSyntax.Name.SourceSpan, namedTypeSyntax.Name.Name.ToString()));
+                    return _scope.Module.NeverType;
+                }
+
+                if (lookup.Symbol is not TypeSymbol namedType)
                 {
                     Report(Diagnostic.UndefinedType(namedTypeSyntax.Name.SourceSpan, namedTypeSyntax.Name.Name.ToString()));
                     return _scope.Module.NeverType;

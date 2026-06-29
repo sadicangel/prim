@@ -1,14 +1,67 @@
+﻿using System.Collections.Immutable;
+
 namespace CodeAnalysis.Semantic;
+
+internal enum LookupResultKind
+{
+    NotFound,
+    Found,
+    Ambiguous
+}
+
+internal readonly record struct LookupResult(
+    LookupResultKind Kind,
+    Symbol? Symbol,
+    ImmutableArray<Symbol> Candidates)
+{
+    public static LookupResult NotFound => new(LookupResultKind.NotFound, null, []);
+
+    public static LookupResult Found(Symbol symbol) => new(LookupResultKind.Found, symbol, [symbol]);
+
+    public static LookupResult Ambiguous(Symbol local, Symbol global) => new(LookupResultKind.Ambiguous, null, [local, global]);
+}
 
 internal interface IScope
 {
     IScope? Parent { get; }
     ModuleSymbol Module { get; }
     bool Declare(Symbol symbol);
-    Symbol? Lookup(NameString name);
-    T? Lookup<T>(NameString name) where T : Symbol => Lookup(name) as T;
-    Symbol? LookupLexical(NameString name);
-    T? LookupLexical<T>(NameString name) where T : Symbol => LookupLexical(name) as T;
+    LookupResult Lookup(NameString name);
+}
+
+internal static class ScopeLookup
+{
+    public static LookupResult LookupQualified(IScope scope, NameString name)
+    {
+        if (name.IsEmpty) return LookupResult.NotFound;
+        if (name.IsSimple) return scope.Lookup(name);
+
+        var local = LookupLocalQualified(scope, name);
+        var global = scope.Module.Global.Lookup(name);
+
+        if (local is null && global is null) return LookupResult.NotFound;
+        if (local is null) return LookupResult.Found(global!);
+        if (global is null || ReferenceEquals(local, global)) return LookupResult.Found(local);
+
+        return LookupResult.Ambiguous(local, global);
+    }
+
+    private static Symbol? LookupLocalQualified(IScope scope, NameString name)
+    {
+        using var enumerator = name.GetEnumerator();
+        if (!enumerator.MoveNext()) return null;
+
+        var first = scope.Lookup(enumerator.Current);
+        var current = first.Kind == LookupResultKind.Found ? first.Symbol : null;
+        while (current is not null && enumerator.MoveNext())
+        {
+            current = current is ContainerSymbol container
+                ? container.Lookup(enumerator.Current)
+                : null;
+        }
+
+        return current;
+    }
 }
 
 internal sealed class ModuleScope(ModuleSymbol module) : IScope
@@ -19,20 +72,18 @@ internal sealed class ModuleScope(ModuleSymbol module) : IScope
 
     public bool Declare(Symbol symbol) => module.Declare(symbol);
 
-    public Symbol? Lookup(NameString name)
+    public LookupResult Lookup(NameString name)
     {
-        if (name.IsEmpty) return null;
-        if (!name.IsSimple) return module.Global.Lookup(name);
+        if (name.IsEmpty) return LookupResult.NotFound;
+        if (!name.IsSimple) return ScopeLookup.LookupQualified(this, name);
 
         for (var current = module; ; current = current.ContainingModule)
         {
             var symbol = current.Lookup(name);
-            if (symbol is not null) return symbol;
-            if (current == current.ContainingModule) return null;
+            if (symbol is not null) return LookupResult.Found(symbol);
+            if (current == current.ContainingModule) return LookupResult.NotFound;
         }
     }
-
-    public Symbol? LookupLexical(NameString name) => null;
 }
 
 internal sealed class BlockScope(IScope parent) : IScope
@@ -49,18 +100,12 @@ internal sealed class BlockScope(IScope parent) : IScope
         return (_locals ??= []).TryAdd(variable.Name, variable);
     }
 
-    public Symbol? Lookup(NameString name)
+    public LookupResult Lookup(NameString name)
     {
-        if (name.IsSimple && _locals?.GetValueOrDefault(name) is { } local)
-            return local;
+        if (!name.IsSimple) return ScopeLookup.LookupQualified(this, name);
+        if (_locals?.GetValueOrDefault(name) is { } local)
+            return LookupResult.Found(local);
         return parent.Lookup(name);
-    }
-
-    public Symbol? LookupLexical(NameString name)
-    {
-        if (name.IsSimple && _locals?.GetValueOrDefault(name) is { } local)
-            return local;
-        return parent.LookupLexical(name);
     }
 }
 
@@ -78,18 +123,12 @@ internal sealed class LoopScope(IScope parent) : IScope
         return (_locals ??= []).TryAdd(variable.Name, variable);
     }
 
-    public Symbol? Lookup(NameString name)
+    public LookupResult Lookup(NameString name)
     {
-        if (name.IsSimple && _locals?.GetValueOrDefault(name) is { } local)
-            return local;
+        if (!name.IsSimple) return ScopeLookup.LookupQualified(this, name);
+        if (_locals?.GetValueOrDefault(name) is { } local)
+            return LookupResult.Found(local);
         return Parent.Lookup(name);
-    }
-
-    public Symbol? LookupLexical(NameString name)
-    {
-        if (name.IsSimple && _locals?.GetValueOrDefault(name) is { } local)
-            return local;
-        return Parent.LookupLexical(name);
     }
 }
 
@@ -110,36 +149,21 @@ internal sealed class LambdaScope(IScope parent, LambdaTypeSymbol lambdaType) : 
         return (_parameters ??= []).TryAdd(variable.Name, variable);
     }
 
-    public Symbol? Lookup(NameString name)
+    public LookupResult Lookup(NameString name)
     {
-        if (!name.IsSimple) return parent.Lookup(name);
+        if (!name.IsSimple) return ScopeLookup.LookupQualified(this, name);
 
         var parameter = _parameters?.GetValueOrDefault(name);
-        if (parameter is not null) return parameter;
+        if (parameter is not null) return LookupResult.Found(parameter);
 
         var capture = _captures?.GetValueOrDefault(name);
-        if (capture is not null) return capture;
+        if (capture is not null) return LookupResult.Found(capture);
 
-        capture = parent.Lookup(name);
-        if (capture is null) return null;
+        var lookup = parent.Lookup(name);
+        if (lookup.Kind != LookupResultKind.Found || lookup.Symbol is null) return lookup;
 
-        return (_captures ??= [])[capture.Name] = capture;
-    }
-
-    public Symbol? LookupLexical(NameString name)
-    {
-        if (!name.IsSimple) return parent.LookupLexical(name);
-
-        var parameter = _parameters?.GetValueOrDefault(name);
-        if (parameter is not null) return parameter;
-
-        var capture = _captures?.GetValueOrDefault(name);
-        if (capture is not null) return capture;
-
-        capture = parent.LookupLexical(name);
-        if (capture is null) return null;
-
-        return (_captures ??= [])[capture.Name] = capture;
+        capture = lookup.Symbol;
+        return LookupResult.Found((_captures ??= [])[capture.Name] = capture);
     }
 }
 
@@ -155,18 +179,12 @@ internal sealed class TypeScope(IScope parent, TypeSymbol type) : IScope
         return type.Declare(symbol);
     }
 
-    public Symbol? Lookup(NameString name)
+    public LookupResult Lookup(NameString name)
     {
-        if (name.IsSimple && type.Lookup(name) is { } member)
-            return member;
+        if (!name.IsSimple) return ScopeLookup.LookupQualified(this, name);
+        if (type.Lookup(name) is { } member)
+            return LookupResult.Found(member);
         return Parent.Lookup(name);
-    }
-
-    public Symbol? LookupLexical(NameString name)
-    {
-        if (name.IsSimple && type.Lookup(name) is { } member)
-            return member;
-        return Parent.LookupLexical(name);
     }
 }
 
@@ -178,17 +196,11 @@ internal sealed class InstanceScope(IScope parent, TypeSymbol type) : IScope
 
     public bool Declare(Symbol symbol) => false;
 
-    public Symbol? Lookup(NameString name)
+    public LookupResult Lookup(NameString name)
     {
-        if (name.IsSimple && type.Lookup<MemberSymbol>(name) is { } member)
-            return member;
+        if (!name.IsSimple) return ScopeLookup.LookupQualified(this, name);
+        if (type.Lookup<MemberSymbol>(name) is { } member)
+            return LookupResult.Found(member);
         return Parent.Lookup(name);
-    }
-
-    public Symbol? LookupLexical(NameString name)
-    {
-        if (name.IsSimple && type.Lookup<MemberSymbol>(name) is { } member)
-            return member;
-        return Parent.LookupLexical(name);
     }
 }
