@@ -1,8 +1,9 @@
-﻿namespace CodeAnalysis.Syntax;
+namespace CodeAnalysis.Syntax;
 
 public abstract record class NameSyntax(SyntaxKind Kind) : ExpressionSyntax(Kind)
 {
     public abstract NameString Name { get; }
+
     public string FullName => Name.FullName;
 }
 

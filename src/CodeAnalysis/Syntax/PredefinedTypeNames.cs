@@ -7,6 +7,7 @@ public static class PredefinedTypeNames
     public const string Unknown = "unknown";
     public const string Never = "never";
     public const string Unit = "unit";
+    public const string Module = "module";
     public const string Type = "type";
     public const string Str = "str";
     public const string Bool = "bool";

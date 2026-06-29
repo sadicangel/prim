@@ -76,7 +76,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -131,7 +131,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("addTwo", out var addTwo));
+        var addTwo = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("addTwo"));
 
         var (boundNode, diagnostics) = compilation.Bind(addTwo);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
@@ -151,17 +151,15 @@ public sealed class InterpreterTests
     {
         var compilation = CreateCompilation(string.Empty);
 
-        Assert.True(
-            compilation.GlobalModule.I32.TryLookup<ConversionSymbol>(
-                ConversionSymbol.GetConversionName(compilation.GlobalModule.I32, compilation.GlobalModule.I64),
-                out var implicitConversion));
-        Assert.Equal(ConversionKind.Implicit, implicitConversion.ConversionKind);
+        var implicitConversion = Assert.IsType<ConversionSymbol>(
+            compilation.GlobalModule.I32Type.Lookup(
+                ConversionSymbol.GetName(compilation.GlobalModule.I32Type, compilation.GlobalModule.I64Type)));
+        Assert.True(implicitConversion.IsImplicit);
 
-        Assert.True(
-            compilation.GlobalModule.I64.TryLookup<ConversionSymbol>(
-                ConversionSymbol.GetConversionName(compilation.GlobalModule.I64, compilation.GlobalModule.I32),
-                out var explicitConversion));
-        Assert.Equal(ConversionKind.Explicit, explicitConversion.ConversionKind);
+        var explicitConversion = Assert.IsType<ConversionSymbol>(
+            compilation.GlobalModule.I64Type.Lookup(
+                ConversionSymbol.GetName(compilation.GlobalModule.I64Type, compilation.GlobalModule.I32Type)));
+        Assert.False(explicitConversion.IsImplicit);
     }
 
     [Fact]
@@ -174,7 +172,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -204,7 +202,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -235,13 +233,13 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<StructTypeSymbol>("Point", out var point));
+        var point = Assert.IsType<StructTypeSymbol>(compilation.GlobalModule.Lookup("Point"));
         var (boundNode, diagnostics) = compilation.Bind(point);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
         var result = Assert.IsType<StructValue>(new Interpreter(compilation).Interpret(boundNode));
-        Assert.True(point.TryLookup<PropertySymbol>("x", out var x));
-        Assert.True(point.TryLookup<PropertySymbol>("y", out var y));
+        var x = Assert.IsType<PropertySymbol>(point.Lookup("x"));
+        var y = Assert.IsType<PropertySymbol>(point.Lookup("y"));
 
         Assert.Equal(1, result.Get(x).Value);
         Assert.Equal(2, result.Get(y).Value);
@@ -261,8 +259,8 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<StructTypeSymbol>("Point", out var point));
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var point = Assert.IsType<StructTypeSymbol>(compilation.GlobalModule.Lookup("Point"));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -273,8 +271,8 @@ public sealed class InterpreterTests
         var structExpression = Assert.IsType<BoundStructExpression>(pointDeclaration.Expression);
 
         var result = Assert.IsType<InstanceValue>(new Interpreter(compilation).Interpret(structExpression));
-        Assert.True(point.TryLookup<PropertySymbol>("x", out var x));
-        Assert.True(point.TryLookup<PropertySymbol>("y", out var y));
+        var x = Assert.IsType<PropertySymbol>(point.Lookup("x"));
+        var y = Assert.IsType<PropertySymbol>(point.Lookup("y"));
 
         Assert.Equal(40, result.Get(x).Value);
         Assert.Equal(2, result.Get(y).Value);
@@ -357,7 +355,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -463,7 +461,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -488,7 +486,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -515,7 +513,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -545,7 +543,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -573,7 +571,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -600,7 +598,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -629,7 +627,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("main", out var mainSymbol));
+        var mainSymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("main"));
         var (boundNode, diagnostics) = compilation.Bind(mainSymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 
@@ -655,7 +653,7 @@ public sealed class InterpreterTests
             };
             """);
 
-        Assert.True(compilation.GlobalModule.TryLookup<VariableSymbol>("early", out var earlySymbol));
+        var earlySymbol = Assert.IsType<VariableSymbol>(compilation.GlobalModule.Lookup("early"));
         var (boundNode, diagnostics) = compilation.Bind(earlySymbol);
         Assert.False(diagnostics.HasErrorDiagnostics, string.Join(Environment.NewLine, diagnostics));
 

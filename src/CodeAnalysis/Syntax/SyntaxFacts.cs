@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace CodeAnalysis.Syntax;
 
@@ -164,7 +164,7 @@ public static class SyntaxFacts
 
 
             SyntaxKind.ArrayInitializerExpression => null,
-            SyntaxKind.TypeExpression => null,
+            SyntaxKind.TypeInitializerExpression => null,
 
             SyntaxKind.ElementAccessExpression => null,
             SyntaxKind.InvocationExpression => null,

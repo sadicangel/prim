@@ -4,11 +4,11 @@ using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
 
-internal sealed class Parser
+internal sealed class Parser : IDiagnosticReporter
 {
     private readonly Scanner _scanner;
     private readonly SyntaxTokenStream _stream;
-    private readonly DiagnosticBag _diagnostics = [];
+    private readonly List<Diagnostic> _diagnostics = [];
 
     public Parser(SourceText sourceText)
     {
@@ -16,7 +16,9 @@ internal sealed class Parser
         _stream = new SyntaxTokenStream([.. _scanner.ScanAll()]);
     }
 
-    public IEnumerable<Diagnostic> Diagnostics => _scanner.Diagnostics.Concat(_diagnostics);
+    public IEnumerable<Diagnostic> GetDiagnostics() => _scanner.GetDiagnostics().Concat(_diagnostics);
+
+    public void Report(Diagnostic diagnostic) => _diagnostics.Add(diagnostic);
 
     public CompilationUnitSyntax Parse()
     {
@@ -200,7 +202,7 @@ internal sealed class Parser
             actual.Kind == SyntaxKind.BarToken ||
             endingKinds.Contains(actual.Kind);
 
-        _diagnostics.ReportUnexpectedToken(SyntaxKind.IdentifierToken, actual);
+        Report(Diagnostic.UnexpectedToken(SyntaxKind.IdentifierToken, actual));
 
         if (!isExpectedTerminator)
             _stream.Skip();
@@ -410,13 +412,13 @@ internal sealed class Parser
         return expression;
     }
 
-    private ModuleExpressionSyntax ParseModuleExpression()
+    private ModuleInitializerExpressionSyntax ParseModuleExpression()
     {
         var moduleKeyword = Match(SyntaxKind.ModuleKeyword);
-        return new ModuleExpressionSyntax(moduleKeyword);
+        return new ModuleInitializerExpressionSyntax(moduleKeyword);
     }
 
-    private TypeExpressionSyntax ParseTypeExpression()
+    private TypeInitializerExpressionSyntax ParseTypeExpression()
     {
         var typeKeyword = Match(SyntaxKind.TypeKeyword);
         var braceOpenToken = Match(SyntaxKind.BraceOpenToken);
@@ -427,7 +429,7 @@ internal sealed class Parser
 
         var braceCloseToken = Match(SyntaxKind.BraceCloseToken);
 
-        return new TypeExpressionSyntax(
+        return new TypeInitializerExpressionSyntax(
             typeKeyword,
             braceOpenToken,
             new SyntaxList<LocalDeclarationSyntax>(properties.ToImmutable()),
@@ -650,7 +652,7 @@ internal sealed class Parser
 
     private SyntaxToken CreateSyntheticFrom(SyntaxToken syntaxToken, SyntaxKind expectedSyntaxKind)
     {
-        _diagnostics.ReportUnexpectedToken(expectedSyntaxKind, syntaxToken);
+        Report(Diagnostic.UnexpectedToken(expectedSyntaxKind, syntaxToken));
         return SyntaxToken.CreateSynthetic(expectedSyntaxKind, syntaxToken.SourceSpan);
     }
 
@@ -658,7 +660,7 @@ internal sealed class Parser
     {
         var actual = _stream.Peek();
 
-        _diagnostics.ReportUnexpectedToken(expectedSyntaxKind, actual);
+        Report(Diagnostic.UnexpectedToken(expectedSyntaxKind, actual));
 
         var sourceSpan = new SourceSpan(
             actual.SourceSpan.SourceText,

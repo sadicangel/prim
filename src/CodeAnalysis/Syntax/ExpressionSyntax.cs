@@ -2,27 +2,6 @@
 
 public abstract record class ExpressionSyntax(SyntaxKind Kind) : SyntaxNode(Kind);
 
-public sealed record class ModuleExpressionSyntax(SyntaxToken ModuleKeyword) : ExpressionSyntax(SyntaxKind.ModuleExpression)
-{
-    public override IEnumerable<SyntaxNode> Children() { yield return ModuleKeyword; }
-}
-
-public sealed record class TypeExpressionSyntax(
-    SyntaxToken TypeKeyword,
-    SyntaxToken BraceOpenToken,
-    SyntaxList<LocalDeclarationSyntax> Properties,
-    SyntaxToken BraceCloseToken)
-    : ExpressionSyntax(SyntaxKind.TypeExpression)
-{
-    public override IEnumerable<SyntaxNode> Children()
-    {
-        yield return TypeKeyword;
-        yield return BraceOpenToken;
-        foreach (var property in Properties) yield return property;
-        yield return BraceCloseToken;
-    }
-}
-
 public sealed record class BlockExpressionSyntax(
     SyntaxToken BraceOpenToken,
     SyntaxList<SyntaxNode> Items,
@@ -124,6 +103,27 @@ public sealed record class ArrayInitializerExpressionSyntax(
     }
 }
 
+public sealed record class ModuleInitializerExpressionSyntax(SyntaxToken ModuleKeyword) : ExpressionSyntax(SyntaxKind.ModuleInitializerExpression)
+{
+    public override IEnumerable<SyntaxNode> Children() { yield return ModuleKeyword; }
+}
+
+public sealed record class TypeInitializerExpressionSyntax(
+    SyntaxToken TypeKeyword,
+    SyntaxToken BraceOpenToken,
+    SyntaxList<LocalDeclarationSyntax> Properties,
+    SyntaxToken BraceCloseToken)
+    : ExpressionSyntax(SyntaxKind.TypeInitializerExpression)
+{
+    public override IEnumerable<SyntaxNode> Children()
+    {
+        yield return TypeKeyword;
+        yield return BraceOpenToken;
+        foreach (var property in Properties) yield return property;
+        yield return BraceCloseToken;
+    }
+}
+
 public sealed record class ObjectInitializerExpressionSyntax(
     ExpressionSyntax TypeName,
     SyntaxToken BraceOpenToken,
@@ -140,14 +140,14 @@ public sealed record class ObjectInitializerExpressionSyntax(
     }
 }
 
-public sealed record class PropertyInitializerExpressionSyntax(SimpleNameSyntax PropertyName, SyntaxToken EqualsToken, ExpressionSyntax Value)
-    : SyntaxNode(SyntaxKind.PropertyInitializerExpression)
+public sealed record class PropertyInitializerExpressionSyntax(SimpleNameSyntax PropertyName, SyntaxToken EqualsToken, ExpressionSyntax PropertyValue)
+    : ExpressionSyntax(SyntaxKind.PropertyInitializerExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return PropertyName;
         yield return EqualsToken;
-        yield return Value;
+        yield return PropertyValue;
     }
 }
 
@@ -264,14 +264,14 @@ public sealed record class BinaryExpressionSyntax(ExpressionSyntax Left, SyntaxT
     }
 }
 
-public sealed record class AssignmentExpressionSyntax(ExpressionSyntax Left, SyntaxToken EqualsToken, ExpressionSyntax Right)
+public sealed record class AssignmentExpressionSyntax(ExpressionSyntax Reference, SyntaxToken EqualsToken, ExpressionSyntax Value)
     : ExpressionSyntax(SyntaxKind.AssignmentExpression)
 {
     public override IEnumerable<SyntaxNode> Children()
     {
-        yield return Left;
+        yield return Reference;
         yield return EqualsToken;
-        yield return Right;
+        yield return Value;
     }
 }
 

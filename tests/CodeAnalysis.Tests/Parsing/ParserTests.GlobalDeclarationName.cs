@@ -1,4 +1,4 @@
-namespace CodeAnalysis.Tests.Parsing;
+﻿namespace CodeAnalysis.Tests.Parsing;
 
 public partial class ParserTests
 {
@@ -26,7 +26,7 @@ public partial class ParserTests
         var declaration = ParseGlobalDeclaration("a.b :: type { };");
 
         Assert.IsType<QualifiedNameSyntax>(declaration.Name);
-        Assert.IsType<TypeExpressionSyntax>(declaration.Initializer);
+        Assert.IsType<TypeInitializerExpressionSyntax>(declaration.Initializer);
     }
 
     [Fact]

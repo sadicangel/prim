@@ -1,16 +1,20 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Syntax;
 
-internal sealed class Scanner(SourceText sourceText)
+internal sealed class Scanner(SourceText sourceText) : IDiagnosticReporter
 {
-    private readonly DiagnosticBag _diagnostics = new();
+    private readonly List<Diagnostic> _diagnostics = [];
     private int _position = 0;
 
-    public IReadOnlyList<Diagnostic> Diagnostics => _diagnostics;
+    public IEnumerable<Diagnostic> Diagnostics => GetDiagnostics();
+
+    public IEnumerable<Diagnostic> GetDiagnostics() => _diagnostics;
+
+    public void Report(Diagnostic diagnostic) => _diagnostics.Add(diagnostic);
 
     public IEnumerable<SyntaxToken> ScanAll()
     {
@@ -217,7 +221,7 @@ internal sealed class Scanner(SourceText sourceText)
             default:
                 _position += 1;
                 var sourceSpan = new SourceSpan(sourceText, start.._position);
-                _diagnostics.ReportInvalidCharacter(sourceSpan, sourceText[start]);
+                Report(Diagnostic.InvalidCharacter(sourceSpan, sourceText[start]));
                 return (SyntaxKind.InvalidSyntaxToken, sourceSpan, null);
         }
 
@@ -256,7 +260,7 @@ internal sealed class Scanner(SourceText sourceText)
         }
 
         var sourceSpan = new SourceSpan(sourceText, start.._position);
-        if (!terminated) _diagnostics.ReportUnterminatedString(sourceSpan);
+        if (!terminated) Report(Diagnostic.UnterminatedString(sourceSpan));
 
         return (SyntaxKind.StrLiteralToken, sourceSpan, builder.ToString());
     }
@@ -343,42 +347,42 @@ internal sealed class Scanner(SourceText sourceText)
             {
                 case SyntaxKind.I8LiteralToken:
                     syntaxKind = SyntaxKind.I8LiteralToken;
-                    isInvalid |= integer < sbyte.MinValue || integer > sbyte.MaxValue;
+                    isInvalid |= integer is < sbyte.MinValue or > sbyte.MaxValue;
                     value = integer is >= sbyte.MinValue and <= sbyte.MaxValue ? (sbyte)integer : (sbyte)0;
                     break;
                 case SyntaxKind.U8LiteralToken:
                     syntaxKind = SyntaxKind.U8LiteralToken;
-                    isInvalid |= integer < byte.MinValue || integer > byte.MaxValue;
+                    isInvalid |= integer is < byte.MinValue or > byte.MaxValue;
                     value = integer is >= byte.MinValue and <= byte.MaxValue ? (byte)integer : (byte)0;
                     break;
                 case SyntaxKind.I16LiteralToken:
                     syntaxKind = SyntaxKind.I16LiteralToken;
-                    isInvalid |= integer < short.MinValue || integer > short.MaxValue;
+                    isInvalid |= integer is < short.MinValue or > short.MaxValue;
                     value = integer is >= short.MinValue and <= short.MaxValue ? (short)integer : (short)0;
                     break;
                 case SyntaxKind.U16LiteralToken:
                     syntaxKind = SyntaxKind.U16LiteralToken;
-                    isInvalid |= integer < ushort.MinValue || integer > ushort.MaxValue;
+                    isInvalid |= integer is < ushort.MinValue or > ushort.MaxValue;
                     value = integer is >= ushort.MinValue and <= ushort.MaxValue ? (ushort)integer : (ushort)0;
                     break;
                 case SyntaxKind.I32LiteralToken:
                     syntaxKind = SyntaxKind.I32LiteralToken;
-                    isInvalid |= integer < int.MinValue || integer > int.MaxValue;
+                    isInvalid |= integer is < int.MinValue or > int.MaxValue;
                     value = integer is >= int.MinValue and <= int.MaxValue ? (int)integer : 0;
                     break;
                 case SyntaxKind.U32LiteralToken:
                     syntaxKind = SyntaxKind.U32LiteralToken;
-                    isInvalid |= integer < uint.MinValue || integer > uint.MaxValue;
+                    isInvalid |= integer is < uint.MinValue or > uint.MaxValue;
                     value = integer is >= uint.MinValue and <= uint.MaxValue ? (uint)integer : 0u;
                     break;
                 case SyntaxKind.I64LiteralToken:
                     syntaxKind = SyntaxKind.I64LiteralToken;
-                    isInvalid |= integer < long.MinValue || integer > long.MaxValue;
+                    isInvalid |= integer is < long.MinValue or > long.MaxValue;
                     value = integer is >= long.MinValue and <= long.MaxValue ? (long)integer : 0L;
                     break;
                 case SyntaxKind.U64LiteralToken:
                     syntaxKind = SyntaxKind.U64LiteralToken;
-                    isInvalid |= integer < ulong.MinValue || integer > ulong.MaxValue;
+                    isInvalid |= integer is < ulong.MinValue or > ulong.MaxValue;
                     value = integer is >= ulong.MinValue and <= ulong.MaxValue ? (ulong)integer : 0UL;
                     break;
                 default:
@@ -390,7 +394,7 @@ internal sealed class Scanner(SourceText sourceText)
                     else
                     {
                         syntaxKind = SyntaxKind.I64LiteralToken;
-                        isInvalid |= integer < long.MinValue || integer > long.MaxValue;
+                        isInvalid |= integer is < long.MinValue or > long.MaxValue;
                         value = integer is >= long.MinValue and <= long.MaxValue ? (long)integer : 0L;
                     }
 
@@ -400,7 +404,7 @@ internal sealed class Scanner(SourceText sourceText)
 
         _position = start + read;
         var sourceSpan = new SourceSpan(sourceText, start.._position);
-        if (isInvalid) _diagnostics.ReportInvalidSyntaxValue(sourceSpan, syntaxKind);
+        if (isInvalid) Report(Diagnostic.InvalidSyntaxValue(sourceSpan, syntaxKind));
         return (syntaxKind, sourceSpan, value);
     }
 
@@ -456,7 +460,7 @@ internal sealed class Scanner(SourceText sourceText)
         }
 
         var sourceSpan = new SourceSpan(sourceText, start.._position);
-        if (!terminated) _diagnostics.ReportUnterminatedComment(sourceSpan);
+        if (!terminated) Report(Diagnostic.UnterminatedComment(sourceSpan));
         return new SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, sourceSpan);
     }
 

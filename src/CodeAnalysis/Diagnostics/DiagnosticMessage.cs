@@ -1,4 +1,4 @@
-﻿using CodeAnalysis.Syntax;
+using CodeAnalysis.Syntax;
 
 namespace CodeAnalysis.Diagnostics;
 
@@ -29,6 +29,9 @@ internal static class DiagnosticMessage
 
     public static string InvalidLocationForTypeDefinition() =>
         $"Invalid location for type definition";
+
+    public static string InvalidModuleDeclaration() =>
+        "Module declarations must appear first and only once in a compilation unit";
 
     public static string UnexpectedToken(SyntaxKind expected, SyntaxKind actual) =>
         $"Unexpected token '{GetDisplayText(actual)}'. Expected '{GetDisplayText(expected)}'";
@@ -74,8 +77,8 @@ internal static class DiagnosticMessage
     public static string InvalidExpressionType(string expectedTypeName, string actualTypeName) =>
         $"Invalid expression of type '{actualTypeName}'. Expected '{expectedTypeName}'";
 
-    public static string InvalidImplicitConversion(string sourceTypeName, string targeTypeName) =>
-        $"Invalid implicit conversion from type '{sourceTypeName}' to '{targeTypeName}'. An explicit conversion exists (are you missing a cast?)";
+    public static string InvalidImplicitConversion(string sourceTypeName, string targetTypeName) =>
+        $"Invalid implicit conversion from type '{sourceTypeName}' to '{targetTypeName}'. An explicit conversion exists (are you missing a cast?)";
 
     public static string InvalidImplicitType(string typeName) =>
         $"Invalid implicit type '{typeName}'";
@@ -88,6 +91,7 @@ internal static class DiagnosticMessage
 
     public static string InvalidModulePath(string modulePath) =>
         $"'{modulePath}' cannot be used as a module path";
+
     public static string InvalidReturn() =>
         "No enclosing function out of which to return";
 
@@ -132,7 +136,7 @@ internal static class DiagnosticMessage
 
 
     //public static string InvalidExpressionType(PrimType actualType) => $"Invalid expression of type '{actualType}'";
-    //public static string InvalidSymbol(SyntaxToken identifierToken, SymbolKind expectedKind, SymbolKind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
+    //public static string InvalidSymbol(SyntaxToken identifierToken, Kind expectedKind, Kind actualKind) => $"{actualKind} '{identifierToken.Text}' is not a '{expectedKind}'";
     //public static string InvalidReturnExpression(string functionName) => $"Since '{functionName}' returns void, a return keyword must not be followed by an expression";
     //public static string NotAllPathsReturn() => "Not all code paths return a value";
 }

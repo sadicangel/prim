@@ -8,8 +8,6 @@
         </AssemblyAttribute>
     </ItemGroup>
     <ItemGroup>
-        <Compile Remove="Binding\**" />
-        <Compile Remove="Semantic\**" />
         <Compile Remove="Evaluation\**" />
     </ItemGroup>
     <ItemGroup>

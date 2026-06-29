@@ -41,7 +41,7 @@ public sealed record class LocalDeclarationSyntax(
     : DeclarationSyntax(SyntaxKind.LocalDeclaration)
 {
     public override bool IsReadOnly => OperatorToken.Kind is SyntaxKind.ColonToken;
-    public override bool IsStatic => true;
+    public override bool IsStatic => false;
 
     public override IEnumerable<SyntaxNode> Children()
     {

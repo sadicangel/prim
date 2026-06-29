@@ -169,8 +169,6 @@ public enum SyntaxKind
     EmptyStatement,
 
     // Expressions
-    ModuleExpression,
-    TypeExpression,
 
     BlockExpression,
 
@@ -181,10 +179,13 @@ public enum SyntaxKind
     BreakExpression,
     ReturnExpression,
 
-    ArrayInitializerExpression,
+    ModuleInitializerExpression,
+    TypeInitializerExpression,
     ObjectInitializerExpression,
+    ArrayInitializerExpression,
     PropertyInitializerExpression,
 
+    NameExpression,
     ElementAccessExpression,
     MemberAccessExpression,
     ConversionExpression,
@@ -220,8 +221,6 @@ public enum SyntaxKind
     CoalesceExpression,
 
     AssignmentExpression,
-
-    NameExpression,
 
     I8LiteralExpression,
     U8LiteralExpression,

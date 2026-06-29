@@ -1,4 +1,5 @@
 ﻿using CodeAnalysis.Text;
 
 namespace CodeAnalysis.Diagnostics;
-public sealed record class Diagnostic(string Id, SourceSpan SourceSpan, DiagnosticSeverity Severity, string Message);
+
+public sealed record class Diagnostic(DiagnosticId Id, DiagnosticSeverity Severity, SourceSpan SourceSpan, string Message);

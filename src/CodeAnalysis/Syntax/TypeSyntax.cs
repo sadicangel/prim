@@ -23,7 +23,7 @@ public sealed record class ArrayTypeSyntax(
 
 public sealed record class LambdaTypeSyntax(
     SyntaxToken ParenthesisOpenToken,
-    SeparatedSyntaxList<TypeSyntax> Parameters,
+    SeparatedSyntaxList<TypeSyntax> ParameterTypes,
     SyntaxToken ParenthesisCloseToken,
     SyntaxToken ArrowReturnToken,
     TypeSyntax ReturnType)
@@ -32,7 +32,7 @@ public sealed record class LambdaTypeSyntax(
     public override IEnumerable<SyntaxNode> Children()
     {
         yield return ParenthesisOpenToken;
-        foreach (var parameter in Parameters.SyntaxNodes) yield return parameter;
+        foreach (var parameter in ParameterTypes.SyntaxNodes) yield return parameter;
         yield return ParenthesisCloseToken;
         yield return ArrowReturnToken;
         yield return ReturnType;

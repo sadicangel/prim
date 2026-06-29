@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using CodeAnalysis.Diagnostics;
 using CodeAnalysis.Text;
 
@@ -12,7 +12,7 @@ public sealed class SyntaxTree(SourceText sourceText)
     private readonly Parser _parser = new(sourceText);
 
     public CompilationUnitSyntax CompilationUnit => field ??= _parser.Parse();
-    public IEnumerable<Diagnostic> Diagnostics => _parser.Diagnostics;
+    public IEnumerable<Diagnostic> Diagnostics => _parser.GetDiagnostics();
 
     internal Dictionary<SyntaxNode, SyntaxNode?> NodeParents { get => field ??= NodeParentsHelper.CreateNodeParents(CompilationUnit); }
     internal SyntaxNode? GetParent(SyntaxNode node) => NodeParents[node];
