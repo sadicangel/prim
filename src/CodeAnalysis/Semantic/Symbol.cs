@@ -7,7 +7,7 @@ internal abstract record class Symbol(
     SymbolKind Kind,
     NameString Name,
     TypeSymbol Type,
-    Symbol ContainingSymbol,
+    ContainerSymbol ContainingSymbol,
     ModuleSymbol ContainingModule,
     bool IsStatic,
     bool IsReadOnly,
@@ -22,7 +22,7 @@ internal abstract record class ContainerSymbol(
     SymbolKind Kind,
     NameString Name,
     TypeSymbol Type,
-    Symbol ContainingSymbol,
+    ContainerSymbol ContainingSymbol,
     ModuleSymbol ContainingModule,
     bool IsStatic,
     bool IsReadOnly,
@@ -51,7 +51,6 @@ internal abstract record class ContainerSymbol(
     }
 
     public T? Lookup<T>(NameString name) where T : Symbol => Lookup(name) as T;
-
 }
 
 internal sealed record class ModuleSymbol(NameString Name, ModuleSymbol ContainingModule, SyntaxNode? Syntax = null)
@@ -140,23 +139,23 @@ internal abstract record class MemberSymbol(
     SymbolKind Kind,
     NameString Name,
     TypeSymbol Type,
-    Symbol ContainingSymbol,
+    ContainerSymbol ContainingSymbol,
     bool IsStatic,
     bool IsReadOnly,
     SyntaxNode? Syntax)
     : Symbol(Kind, Name, Type, ContainingSymbol, ContainingSymbol as ModuleSymbol ?? ContainingSymbol.ContainingModule, IsStatic, IsReadOnly, Syntax);
 
-internal sealed record class PropertySymbol(NameString Name, TypeSymbol Type, Symbol ContainingSymbol, bool IsStatic, bool IsReadOnly, SyntaxNode? Syntax = null)
+internal sealed record class PropertySymbol(NameString Name, TypeSymbol Type, ContainerSymbol ContainingSymbol, bool IsStatic, bool IsReadOnly, SyntaxNode? Syntax = null)
     : MemberSymbol(SymbolKind.Property, Name, Type, ContainingSymbol, IsStatic, IsReadOnly, Syntax);
 
-internal sealed record class IndexerSymbol(NameString Name, TypeSymbol Type, ImmutableArray<TypeSymbol> ParameterTypes, Symbol ContainingSymbol, bool IsStatic, bool IsReadOnly, SyntaxNode? Syntax = null)
+internal sealed record class IndexerSymbol(NameString Name, TypeSymbol Type, ImmutableArray<TypeSymbol> ParameterTypes, ContainerSymbol ContainingSymbol, bool IsStatic, bool IsReadOnly, SyntaxNode? Syntax = null)
     : MemberSymbol(SymbolKind.Indexer, Name, Type, ContainingSymbol, IsStatic, IsReadOnly, Syntax);
 
-internal sealed record class OperatorSymbol(NameString Name, TypeSymbol Type, ImmutableArray<TypeSymbol> OperandTypes, Symbol ContainingSymbol, bool IsStatic, bool IsReadOnly, SyntaxNode? Syntax = null)
+internal sealed record class OperatorSymbol(NameString Name, TypeSymbol Type, ImmutableArray<TypeSymbol> OperandTypes, ContainerSymbol ContainingSymbol, bool IsStatic, bool IsReadOnly, SyntaxNode? Syntax = null)
     : MemberSymbol(SymbolKind.Operator, Name, Type, ContainingSymbol, IsStatic, IsReadOnly, Syntax);
 
-internal sealed record class ConversionSymbol(NameString Name, TypeSymbol Type, TypeSymbol OperandType, bool IsImplicit, Symbol ContainingSymbol, SyntaxNode? Syntax = null)
-    : Symbol(SymbolKind.Conversion, Name, Type, ContainingSymbol, ContainingSymbol.ContainingModule, IsStatic: true, IsReadOnly: true, Syntax)
+internal sealed record class ConversionSymbol(NameString Name, TypeSymbol Type, TypeSymbol OperandType, bool IsImplicit, ContainerSymbol ContainingSymbol, SyntaxNode? Syntax = null)
+    : Symbol(SymbolKind.Conversion, Name, Type, ContainingSymbol, ContainingSymbol.ContainingModule, IsStatic: true, IsReadOnly: true, Syntax: Syntax)
 {
     public static NameString GetName(TypeSymbol source, TypeSymbol target) => $"op_{target.Name}({source.Name})";
 }

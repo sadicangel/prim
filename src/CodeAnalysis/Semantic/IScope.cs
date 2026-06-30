@@ -9,16 +9,17 @@ internal enum LookupResultKind
     Ambiguous
 }
 
-internal readonly record struct LookupResult(
-    LookupResultKind Kind,
-    Symbol? Symbol,
-    ImmutableArray<Symbol> Candidates)
+internal readonly record struct LookupResult(params ImmutableArray<Symbol> Candidates)
 {
-    public static LookupResult NotFound => new(LookupResultKind.NotFound, null, []);
+    public LookupResultKind Kind => (LookupResultKind)int.Clamp(Candidates.Length, 0, 2);
 
-    public static LookupResult Found(Symbol symbol) => new(LookupResultKind.Found, symbol, [symbol]);
+    public Symbol? Symbol => Candidates is [var symbol] ? symbol : null;
 
-    public static LookupResult Ambiguous(Symbol local, Symbol global) => new(LookupResultKind.Ambiguous, null, [local, global]);
+    public static LookupResult NotFound => new();
+
+    public static LookupResult Found(Symbol symbol) => new(symbol);
+
+    public static LookupResult Ambiguous(Symbol local, Symbol global) => new(local, global);
 }
 
 internal interface IScope
