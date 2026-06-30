@@ -75,7 +75,7 @@ internal static class SymbolFactory
         return module;
 
         [UnsafeAccessor(UnsafeAccessorKind.Method, Name = $"set_{nameof(Symbol.ContainingSymbol)}")]
-        static extern void SetContainingSymbol(Symbol symbol, Symbol containingSymbol);
+        static extern void SetContainingSymbol(Symbol symbol, ContainerSymbol containingSymbol);
 
         [UnsafeAccessor(UnsafeAccessorKind.Method, Name = $"set_{nameof(Symbol.ContainingModule)}")]
         static extern void SetContainingModule(Symbol symbol, ModuleSymbol containingModule);
